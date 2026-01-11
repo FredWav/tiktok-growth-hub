@@ -1,0 +1,252 @@
+import { Link } from "react-router-dom";
+import { ArrowRight, Check, Zap, Target, Crown, Clock, Users, TrendingUp } from "lucide-react";
+import { Layout } from "@/components/layout/Layout";
+import { Section, SectionHeader } from "@/components/ui/section";
+import { Button } from "@/components/ui/button";
+
+const offers = [
+  {
+    id: "one-shot",
+    icon: Zap,
+    title: "One Shot",
+    subtitle: "La clarté en 1h30",
+    description: "Une session intensive pour repartir avec un plan d'action clair et actionnable.",
+    price: "179€",
+    priceNote: "Paiement unique",
+    duration: "1h30",
+    forWho: [
+      "Tu débutes sur TikTok et tu veux partir sur de bonnes bases",
+      "Tu postes mais tu n'as pas de stratégie claire",
+      "Tu veux un regard extérieur expert",
+    ],
+    notForWho: [
+      "Tu cherches quelqu'un pour faire le travail à ta place",
+      "Tu n'es pas prêt à appliquer les conseils",
+    ],
+    includes: [
+      "Diagnostic complet de ton compte",
+      "Analyse de ton marché et ta niche",
+      "Plan d'action personnalisé",
+      "Stratégie de contenu sur 30 jours",
+      "Replay de la session",
+    ],
+    cta: "Réserver maintenant",
+    href: "/one-shot",
+    variant: "default" as const,
+  },
+  {
+    id: "45-jours",
+    icon: Target,
+    title: "Accompagnement 45 Jours",
+    subtitle: "Transformation complète",
+    description: "45 jours pour transformer ta présence TikTok. Suivi hebdomadaire et accès direct.",
+    price: "Sur candidature",
+    priceNote: "Appel de qualification requis",
+    duration: "45 jours",
+    forWho: [
+      "Tu veux des résultats rapides et mesurables",
+      "Tu es prêt à t'investir sérieusement",
+      "Tu veux un accompagnement personnalisé",
+    ],
+    notForWho: [
+      "Tu n'as pas le temps de créer du contenu",
+      "Tu cherches une solution miracle sans effort",
+    ],
+    includes: [
+      "Onboarding complet avec stratégie sur mesure",
+      "Appels hebdomadaires de suivi",
+      "Review de tous tes contenus",
+      "Accès messagerie prioritaire",
+      "Templates et ressources exclusives",
+      "Optimisation continue de ta stratégie",
+    ],
+    cta: "Réserver un appel",
+    href: "/offres/45-jours",
+    variant: "premium" as const,
+    featured: true,
+  },
+  {
+    id: "vip",
+    icon: Crown,
+    title: "VIP à Vie",
+    subtitle: "L'excellence sans limite",
+    description: "Accès illimité à mon accompagnement. Pour ceux qui visent l'excellence sur le long terme.",
+    price: "Sur candidature",
+    priceNote: "Profils sélectionnés uniquement",
+    duration: "Illimité",
+    forWho: [
+      "Tu veux bâtir une présence durable",
+      "Tu as des ambitions élevées",
+      "Tu values l'accompagnement premium",
+    ],
+    notForWho: [
+      "Tu n'es pas certain de ton engagement long terme",
+      "Tu débutes complètement sur TikTok",
+    ],
+    includes: [
+      "Tout l'accompagnement 45 jours",
+      "Accès à vie aux mises à jour",
+      "Appels illimités sur demande",
+      "Priorité absolue sur mes autres clients",
+      "Stratégie évolutive à long terme",
+      "Accès à mon réseau professionnel",
+    ],
+    cta: "Candidater",
+    href: "/offres/vip",
+    variant: "premium" as const,
+  },
+];
+
+const stats = [
+  { icon: Users, value: "100+", label: "Créateurs accompagnés" },
+  { icon: TrendingUp, value: "10M+", label: "Vues générées" },
+  { icon: Clock, value: "3 ans", label: "D'expertise TikTok" },
+];
+
+export default function Offres() {
+  return (
+    <Layout>
+      {/* Hero */}
+      <Section variant="cream" size="lg">
+        <div className="max-w-3xl mx-auto text-center">
+          <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">
+            Trouve l'accompagnement <span className="text-gold-gradient">adapté à tes besoins</span>
+          </h1>
+          <p className="text-lg text-muted-foreground">
+            Trois niveaux d'engagement pour trois types de profils. 
+            Pas de formule standard : chaque accompagnement est personnalisé.
+          </p>
+        </div>
+      </Section>
+
+      {/* Stats */}
+      <Section variant="dark" size="sm">
+        <div className="flex flex-wrap justify-center gap-12">
+          {stats.map((stat, index) => (
+            <div key={index} className="text-center">
+              <stat.icon className="h-6 w-6 text-primary mx-auto mb-2" />
+              <div className="text-2xl font-semibold text-cream">{stat.value}</div>
+              <div className="text-sm text-muted-foreground">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      {/* Offers Detail */}
+      <Section variant="default" size="xl">
+        <div className="space-y-16 md:space-y-24">
+          {offers.map((offer, index) => (
+            <div
+              key={offer.id}
+              id={offer.id}
+              className={`grid lg:grid-cols-2 gap-8 lg:gap-12 items-start ${
+                index % 2 === 1 ? "lg:direction-rtl" : ""
+              }`}
+            >
+              {/* Info */}
+              <div className={index % 2 === 1 ? "lg:order-2" : ""}>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className={`p-2 rounded-lg ${offer.featured ? "bg-primary/10" : "bg-muted"}`}>
+                    <offer.icon className={`h-5 w-5 ${offer.featured ? "text-primary" : "text-muted-foreground"}`} />
+                  </div>
+                  <span className="text-sm text-primary font-medium">{offer.subtitle}</span>
+                </div>
+
+                <h2 className="font-display text-3xl md:text-4xl font-semibold mb-4">
+                  {offer.title}
+                </h2>
+
+                <p className="text-lg text-muted-foreground mb-6">
+                  {offer.description}
+                </p>
+
+                <div className="flex items-baseline gap-2 mb-6">
+                  <span className="text-3xl font-bold">{offer.price}</span>
+                  <span className="text-muted-foreground">{offer.priceNote}</span>
+                </div>
+
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-8">
+                  <span className="flex items-center gap-1">
+                    <Clock className="h-4 w-4" />
+                    {offer.duration}
+                  </span>
+                </div>
+
+                <Button
+                  variant={offer.featured ? "hero" : "premium"}
+                  size="lg"
+                  asChild
+                >
+                  <Link to={offer.href}>
+                    {offer.cta}
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+
+              {/* Details */}
+              <div className={`space-y-6 ${index % 2 === 1 ? "lg:order-1" : ""}`}>
+                {/* Includes */}
+                <div className="bg-muted/50 rounded-xl p-6">
+                  <h3 className="font-semibold mb-4">Ce qui est inclus</h3>
+                  <ul className="space-y-3">
+                    {offer.includes.map((item, i) => (
+                      <li key={i} className="flex items-start gap-3">
+                        <Check className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                        <span className="text-sm">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* For Who */}
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="bg-green-50 rounded-xl p-5">
+                    <h4 className="font-medium text-green-900 mb-3">Pour toi si...</h4>
+                    <ul className="space-y-2">
+                      {offer.forWho.map((item, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-green-800">
+                          <Check className="h-4 w-4 mt-0.5 shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="bg-red-50 rounded-xl p-5">
+                    <h4 className="font-medium text-red-900 mb-3">Pas pour toi si...</h4>
+                    <ul className="space-y-2">
+                      {offer.notForWho.map((item, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-red-800">
+                          <span className="h-4 w-4 mt-0.5 shrink-0 text-center">✕</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      {/* CTA */}
+      <Section variant="cream" size="lg">
+        <div className="max-w-2xl mx-auto text-center">
+          <h2 className="font-display text-3xl font-semibold mb-4">
+            Tu ne sais pas quelle offre choisir ?
+          </h2>
+          <p className="text-muted-foreground mb-6">
+            Commence par un One Shot. On fera le point ensemble et je te conseillerai la suite adaptée à ta situation.
+          </p>
+          <Button variant="hero" size="lg" asChild>
+            <Link to="/one-shot">
+              Commencer par un One Shot — 179€
+            </Link>
+          </Button>
+        </div>
+      </Section>
+    </Layout>
+  );
+}

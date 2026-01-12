@@ -149,7 +149,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <h3 className="font-semibold mb-1">Email</h3>
-                  <p className="text-muted-foreground">contact@contentpro.fr</p>
+                  <p className="text-muted-foreground">contact@fredwav.com</p>
                 </div>
               </div>
 

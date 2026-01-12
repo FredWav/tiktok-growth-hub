@@ -23,8 +23,8 @@ export function Header() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <span className="font-display text-xl md:text-2xl font-semibold tracking-tight">
-              <span className="text-foreground">Content</span>
-              <span className="text-primary">Pro</span>
+              <span className="text-foreground">Fred</span>
+              <span className="text-primary">Wav</span>
             </span>
           </Link>
 

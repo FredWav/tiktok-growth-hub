@@ -9,12 +9,12 @@ export function Footer() {
           <div className="md:col-span-2">
             <Link to="/" className="inline-block mb-4">
               <span className="font-display text-2xl font-semibold tracking-tight text-cream">
-                Content<span className="text-primary">Pro</span>
+                Fred<span className="text-primary">Wav</span>
               </span>
             </Link>
             <p className="text-sm text-muted-foreground max-w-md">
-              Stratégie de contenu et performance TikTok. 
-              Des résultats concrets, pas des promesses vides.
+              Expert stratégie TikTok. 
+              Des résultats, pas des promesses.
             </p>
           </div>
 
@@ -51,7 +51,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link to="/contact" className="hover:text-primary transition-colors">
-                  Nous contacter
+                  Me contacter
                 </Link>
               </li>
               <li>
@@ -65,7 +65,7 @@ export function Footer() {
 
         <div className="border-t border-border/20 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} ContentPro. Tous droits réservés.
+            © {new Date().getFullYear()} Fred Wav. Tous droits réservés.
           </p>
           <div className="flex gap-6 text-xs">
             <Link to="/mentions-legales" className="hover:text-primary transition-colors">

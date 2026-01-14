@@ -135,7 +135,7 @@ const Auth: React.FC = () => {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="font-display text-3xl text-primary">Stéphanie Paraud</h1>
+          <h1 className="font-display text-3xl text-primary">Fred Wav</h1>
           <p className="text-cream/60 mt-2">
             {isLogin ? "Connectez-vous à votre espace" : "Créez votre compte"}
           </p>
@@ -264,18 +264,18 @@ const Auth: React.FC = () => {
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
-            <button
-              type="button"
-              onClick={toggleMode}
-              className="text-primary hover:text-primary/80 text-sm transition-colors"
-              disabled={isLoading}
-            >
-              {isLogin
-                ? "Pas encore de compte ? Inscrivez-vous"
-                : "Déjà un compte ? Connectez-vous"}
-            </button>
-          </div>
+          {!isLogin && (
+            <div className="mt-6 text-center">
+              <button
+                type="button"
+                onClick={toggleMode}
+                className="text-primary hover:text-primary/80 text-sm transition-colors"
+                disabled={isLoading}
+              >
+                Déjà un compte ? Connectez-vous
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Back to home */}

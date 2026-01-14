@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Copy, Check, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
 import { AdminLayout } from "@/components/layout/AdminLayout";
@@ -27,12 +27,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useCreateClient } from "@/hooks/useClients";
 import { supabase } from "@/integrations/supabase/client";
 
 const clientFormSchema = z.object({
   email: z.string().email("Email invalide"),
   full_name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
+  password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
   company: z.string().optional(),
   phone: z.string().optional(),
   instagram: z.string().optional(),
@@ -47,16 +47,27 @@ const clientFormSchema = z.object({
 
 type ClientFormValues = z.infer<typeof clientFormSchema>;
 
+// Generate a random password
+const generatePassword = () => {
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let password = '';
+  for (let i = 0; i < 10; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
+};
+
 const ClientNew = () => {
   const navigate = useNavigate();
-  const createClient = useCreateClient();
   const [isCreatingUser, setIsCreatingUser] = useState(false);
+  const [createdCredentials, setCreatedCredentials] = useState<{ email: string; password: string } | null>(null);
 
   const form = useForm<ClientFormValues>({
     resolver: zodResolver(clientFormSchema),
     defaultValues: {
       email: "",
       full_name: "",
+      password: generatePassword(),
       company: "",
       phone: "",
       instagram: "",
@@ -74,67 +85,54 @@ const ClientNew = () => {
     setIsCreatingUser(true);
 
     try {
-      // Search for existing user by email in profiles
-      // We need to find users - let's check if a profile exists with matching email
-      // Since profiles don't have email, we need to search auth.users
-      // For now, we'll look up by user_id in a different approach
-      
-      // Get all profiles and try to match - this is a workaround
-      // In production, you'd use an edge function with admin API
-      const { data: profiles, error: profilesError } = await supabase
-        .from("profiles")
-        .select("id, full_name");
-
-      if (profilesError) throw profilesError;
-
-      // For this implementation, we'll create with the first available user
-      // or show an error - proper implementation needs edge function
-      
-      // Try to find if there's a user already with client role but no client record
-      const { data: existingClients } = await supabase
-        .from("clients")
-        .select("user_id");
-      
-      const existingClientUserIds = new Set(existingClients?.map(c => c.user_id) || []);
-      
-      // Find a user that's not yet a client
-      const availableProfile = profiles?.find(p => !existingClientUserIds.has(p.id));
-      
-      if (!availableProfile) {
-        toast.error("Aucun utilisateur disponible. L'utilisateur doit d'abord créer un compte.");
-        setIsCreatingUser(false);
-        return;
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('Non authentifié');
       }
 
-      const userId = availableProfile.id;
-
-      // Create the client record
       const tagsArray = data.tags 
         ? data.tags.split(",").map(t => t.trim()).filter(Boolean)
         : [];
 
-      await createClient.mutateAsync({
-        user_id: userId,
-        offer: data.offer,
-        status: data.status,
-        company: data.company || null,
-        phone: data.phone || null,
-        instagram: data.instagram || null,
-        website: data.website || null,
-        start_date: data.start_date || null,
-        end_date: data.end_date || null,
-        internal_notes: data.internal_notes || null,
-        tags: tagsArray.length > 0 ? tagsArray : null,
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/invite-client`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            email: data.email,
+            password: data.password,
+            full_name: data.full_name,
+            company: data.company || undefined,
+            phone: data.phone || undefined,
+            instagram: data.instagram || undefined,
+            website: data.website || undefined,
+            offer: data.offer,
+            status: data.status,
+            start_date: data.start_date || undefined,
+            end_date: data.end_date || undefined,
+            internal_notes: data.internal_notes || undefined,
+            tags: tagsArray.length > 0 ? tagsArray : undefined,
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Erreur lors de la création du client');
+      }
+
+      // Store credentials to display
+      setCreatedCredentials({
+        email: data.email,
+        password: data.password,
       });
 
-      // Update profile name if needed
-      await supabase
-        .from("profiles")
-        .update({ full_name: data.full_name })
-        .eq("id", userId);
-
-      toast.success("Client créé avec succès");
-      navigate("/admin/clients");
+      toast.success("Compte client créé avec succès !");
     } catch (error: any) {
       console.error("Error creating client:", error);
       toast.error(error.message || "Erreur lors de la création du client");
@@ -143,7 +141,91 @@ const ClientNew = () => {
     }
   };
 
-  const isLoading = isCreatingUser || createClient.isPending;
+  const isLoading = isCreatingUser;
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+
+  const copyToClipboard = (text: string, field: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedField(field);
+    setTimeout(() => setCopiedField(null), 2000);
+  };
+
+  const regeneratePassword = () => {
+    form.setValue('password', generatePassword());
+  };
+
+  // If credentials were created, show success screen
+  if (createdCredentials) {
+    return (
+      <AdminLayout>
+        <div className="max-w-md mx-auto space-y-6">
+          <Card className="border-green-500/50 bg-green-500/5">
+            <CardHeader>
+              <CardTitle className="text-green-600 flex items-center gap-2">
+                <Check className="h-5 w-5" />
+                Compte client créé !
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Communiquez ces identifiants à votre client pour qu'il puisse se connecter :
+              </p>
+              
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-muted rounded-md">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Email</p>
+                    <p className="font-mono text-sm">{createdCredentials.email}</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => copyToClipboard(createdCredentials.email, 'email')}
+                  >
+                    {copiedField === 'email' ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                  </Button>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-muted rounded-md">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Mot de passe</p>
+                    <p className="font-mono text-sm">{createdCredentials.password}</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => copyToClipboard(createdCredentials.password, 'password')}
+                  >
+                    {copiedField === 'password' ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => {
+                    setCreatedCredentials(null);
+                    form.reset();
+                    form.setValue('password', generatePassword());
+                  }}
+                >
+                  Créer un autre client
+                </Button>
+                <Button
+                  className="flex-1"
+                  onClick={() => navigate("/admin/clients")}
+                >
+                  Voir les clients
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
@@ -160,7 +242,7 @@ const ClientNew = () => {
           <div>
             <h1 className="text-2xl font-bold">Nouveau client</h1>
             <p className="text-muted-foreground">
-              Créer un nouveau dossier client
+              Créer un compte client avec identifiants
             </p>
           </div>
         </div>
@@ -172,7 +254,7 @@ const ClientNew = () => {
               {/* Informations principales */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Informations principales</CardTitle>
+                  <CardTitle>Compte et identité</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <FormField
@@ -189,7 +271,39 @@ const ClientNew = () => {
                           />
                         </FormControl>
                         <FormDescription>
-                          L'email doit correspondre à un compte utilisateur existant
+                          Email de connexion pour le client
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Mot de passe *</FormLabel>
+                        <div className="flex gap-2">
+                          <FormControl>
+                            <Input
+                              type="text"
+                              placeholder="Mot de passe"
+                              {...field}
+                            />
+                          </FormControl>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={regeneratePassword}
+                            title="Générer un nouveau mot de passe"
+                          >
+                            <RefreshCw className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <FormDescription>
+                          Mot de passe initial (à communiquer au client)
                         </FormDescription>
                         <FormMessage />
                       </FormItem>

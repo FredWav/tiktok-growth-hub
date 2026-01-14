@@ -31,14 +31,12 @@ export const useUpcomingSessions = (days: number = 7) => {
       const future = new Date();
       future.setDate(future.getDate() + days);
 
-      const { data, error } = await supabase
+      // Get sessions with client info
+      const { data: sessions, error } = await supabase
         .from("sessions")
         .select(`
           *,
-          client:clients(
-            id,
-            profile:profiles!clients_user_id_fkey(full_name)
-          )
+          client:clients(id, user_id, offer, status)
         `)
         .eq("status", "scheduled")
         .gte("scheduled_at", now.toISOString())
@@ -46,7 +44,23 @@ export const useUpcomingSessions = (days: number = 7) => {
         .order("scheduled_at", { ascending: true });
 
       if (error) throw error;
-      return data;
+
+      // Get unique user_ids to fetch profiles
+      const userIds = [...new Set(sessions?.map(s => s.client?.user_id).filter(Boolean) || [])];
+      
+      if (userIds.length === 0) return sessions?.map(s => ({ ...s, clientName: 'Client inconnu' })) || [];
+
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", userIds);
+
+      const profileMap = new Map(profiles?.map(p => [p.id, p.full_name]) || []);
+
+      return sessions?.map(session => ({
+        ...session,
+        clientName: session.client?.user_id ? profileMap.get(session.client.user_id) || 'Client inconnu' : 'Client inconnu'
+      })) || [];
     },
   });
 };

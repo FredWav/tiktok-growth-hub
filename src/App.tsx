@@ -19,6 +19,7 @@ import NotFound from "./pages/NotFound";
 // Admin pages
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminClients from "./pages/admin/Clients";
+import AdminClientNew from "./pages/admin/ClientNew";
 import AdminClientDetail from "./pages/admin/ClientDetail";
 import AdminSessions from "./pages/admin/Sessions";
 import AdminBookings from "./pages/admin/Bookings";
@@ -67,6 +68,14 @@ const App = () => (
               element={
                 <ProtectedRoute requiredRole="admin">
                   <AdminClients />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/clients/new"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AdminClientNew />
                 </ProtectedRoute>
               }
             />

@@ -4,26 +4,26 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Mail, Lock, User } from "lucide-react";
+import { Loader2, Mail, Lock, User, Shield, ArrowLeft } from "lucide-react";
 import { z } from "zod";
+import { toast } from "sonner";
 
 const loginSchema = z.object({
   email: z.string().email("Email invalide"),
   password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
 });
 
-const signupSchema = z.object({
+const adminSetupSchema = z.object({
   fullName: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
   email: z.string().email("Email invalide"),
   password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Les mots de passe ne correspondent pas",
-  path: ["confirmPassword"],
+  secretCode: z.string().min(1, "Le code secret est requis"),
 });
 
+type AuthMode = 'login' | 'adminSetup';
+
 const Auth: React.FC = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [mode, setMode] = useState<AuthMode>('login');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -32,12 +32,12 @@ const Auth: React.FC = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [secretCode, setSecretCode] = useState("");
 
   // Field errors
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-  const { user, role, signIn, signUp } = useAuth();
+  const { user, role, signIn } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -55,63 +55,32 @@ const Auth: React.FC = () => {
     }
   }, [user, role, navigate, location]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setSuccess(null);
     setFieldErrors({});
 
+    const result = loginSchema.safeParse({ email, password });
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0]) {
+          errors[err.path[0].toString()] = err.message;
+        }
+      });
+      setFieldErrors(errors);
+      return;
+    }
+
+    setIsLoading(true);
     try {
-      if (isLogin) {
-        const result = loginSchema.safeParse({ email, password });
-        if (!result.success) {
-          const errors: Record<string, string> = {};
-          result.error.errors.forEach((err) => {
-            if (err.path[0]) {
-              errors[err.path[0].toString()] = err.message;
-            }
-          });
-          setFieldErrors(errors);
-          return;
-        }
-
-        setIsLoading(true);
-        const { error } = await signIn(email, password);
-        
-        if (error) {
-          if (error.message.includes("Invalid login credentials")) {
-            setError("Email ou mot de passe incorrect");
-          } else {
-            setError(error.message);
-          }
-        }
-      } else {
-        const result = signupSchema.safeParse({ fullName, email, password, confirmPassword });
-        if (!result.success) {
-          const errors: Record<string, string> = {};
-          result.error.errors.forEach((err) => {
-            if (err.path[0]) {
-              errors[err.path[0].toString()] = err.message;
-            }
-          });
-          setFieldErrors(errors);
-          return;
-        }
-
-        setIsLoading(true);
-        const { error } = await signUp(email, password, fullName);
-        
-        if (error) {
-          if (error.message.includes("User already registered")) {
-            setError("Un compte existe déjà avec cet email");
-          } else {
-            setError(error.message);
-          }
+      const { error } = await signIn(email, password);
+      
+      if (error) {
+        if (error.message.includes("Invalid login credentials")) {
+          setError("Email ou mot de passe incorrect");
         } else {
-          setSuccess("Compte créé avec succès ! Vous pouvez maintenant vous connecter.");
-          setIsLogin(true);
-          setPassword("");
-          setConfirmPassword("");
+          setError(error.message);
         }
       }
     } catch (err) {
@@ -121,13 +90,71 @@ const Auth: React.FC = () => {
     }
   };
 
-  const toggleMode = () => {
-    setIsLogin(!isLogin);
+  const handleAdminSetup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setFieldErrors({});
+
+    const result = adminSetupSchema.safeParse({ fullName, email, password, secretCode });
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0]) {
+          errors[err.path[0].toString()] = err.message;
+        }
+      });
+      setFieldErrors(errors);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/setup-admin`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({
+            email,
+            password,
+            fullName,
+            secretCode,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || 'Erreur lors de la création du compte admin');
+        return;
+      }
+
+      setSuccess('Compte administrateur créé ! Connexion en cours...');
+      toast.success('Compte administrateur créé avec succès');
+
+      // Auto-login
+      const { error: signInError } = await signIn(email, password);
+      if (signInError) {
+        setError('Compte créé mais erreur de connexion. Veuillez vous connecter manuellement.');
+        setMode('login');
+      }
+    } catch (err) {
+      setError("Une erreur inattendue s'est produite");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resetForm = () => {
     setError(null);
     setSuccess(null);
     setFieldErrors({});
     setPassword("");
-    setConfirmPassword("");
+    setSecretCode("");
   };
 
   return (
@@ -137,14 +164,90 @@ const Auth: React.FC = () => {
         <div className="text-center mb-8">
           <h1 className="font-display text-3xl text-primary">Fred Wav</h1>
           <p className="text-cream/60 mt-2">
-            {isLogin ? "Connectez-vous à votre espace" : "Créez votre compte"}
+            {mode === 'login' && "Connectez-vous à votre espace"}
+            {mode === 'adminSetup' && "Configuration administrateur"}
           </p>
         </div>
 
         {/* Card */}
         <div className="bg-noir-light border border-primary/20 rounded-lg p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {!isLogin && (
+          {mode === 'login' && (
+            <form onSubmit={handleLogin} className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-cream">
+                  Email
+                </Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-cream/40" />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="votre@email.com"
+                    className="pl-10 bg-noir border-primary/30 text-cream placeholder:text-cream/40"
+                    disabled={isLoading}
+                  />
+                </div>
+                {fieldErrors.email && (
+                  <p className="text-red-400 text-sm">{fieldErrors.email}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-cream">
+                  Mot de passe
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-cream/40" />
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="pl-10 bg-noir border-primary/30 text-cream placeholder:text-cream/40"
+                    disabled={isLoading}
+                  />
+                </div>
+                {fieldErrors.password && (
+                  <p className="text-red-400 text-sm">{fieldErrors.password}</p>
+                )}
+              </div>
+
+              {error && (
+                <div className="bg-red-500/10 border border-red-500/30 rounded-md p-3">
+                  <p className="text-red-400 text-sm">{error}</p>
+                </div>
+              )}
+
+              {success && (
+                <div className="bg-green-500/10 border border-green-500/30 rounded-md p-3">
+                  <p className="text-green-400 text-sm">{success}</p>
+                </div>
+              )}
+
+              <Button
+                type="submit"
+                className="w-full"
+                variant="hero"
+                size="lg"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Connexion...
+                  </>
+                ) : (
+                  "Se connecter"
+                )}
+              </Button>
+            </form>
+          )}
+
+          {mode === 'adminSetup' && (
+            <form onSubmit={handleAdminSetup} className="space-y-5">
               <div className="space-y-2">
                 <Label htmlFor="fullName" className="text-cream">
                   Nom complet
@@ -165,114 +268,122 @@ const Auth: React.FC = () => {
                   <p className="text-red-400 text-sm">{fieldErrors.fullName}</p>
                 )}
               </div>
-            )}
 
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-cream">
-                Email
-              </Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-cream/40" />
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="votre@email.com"
-                  className="pl-10 bg-noir border-primary/30 text-cream placeholder:text-cream/40"
-                  disabled={isLoading}
-                />
-              </div>
-              {fieldErrors.email && (
-                <p className="text-red-400 text-sm">{fieldErrors.email}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-cream">
-                Mot de passe
-              </Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-cream/40" />
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="pl-10 bg-noir border-primary/30 text-cream placeholder:text-cream/40"
-                  disabled={isLoading}
-                />
-              </div>
-              {fieldErrors.password && (
-                <p className="text-red-400 text-sm">{fieldErrors.password}</p>
-              )}
-            </div>
-
-            {!isLogin && (
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-cream">
-                  Confirmer le mot de passe
+                <Label htmlFor="adminEmail" className="text-cream">
+                  Email
+                </Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-cream/40" />
+                  <Input
+                    id="adminEmail"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="admin@email.com"
+                    className="pl-10 bg-noir border-primary/30 text-cream placeholder:text-cream/40"
+                    disabled={isLoading}
+                  />
+                </div>
+                {fieldErrors.email && (
+                  <p className="text-red-400 text-sm">{fieldErrors.email}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="adminPassword" className="text-cream">
+                  Mot de passe
                 </Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-cream/40" />
                   <Input
-                    id="confirmPassword"
+                    id="adminPassword"
                     type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
                     className="pl-10 bg-noir border-primary/30 text-cream placeholder:text-cream/40"
                     disabled={isLoading}
                   />
                 </div>
-                {fieldErrors.confirmPassword && (
-                  <p className="text-red-400 text-sm">{fieldErrors.confirmPassword}</p>
+                {fieldErrors.password && (
+                  <p className="text-red-400 text-sm">{fieldErrors.password}</p>
                 )}
               </div>
-            )}
 
-            {error && (
-              <div className="bg-red-500/10 border border-red-500/30 rounded-md p-3">
-                <p className="text-red-400 text-sm">{error}</p>
+              <div className="space-y-2">
+                <Label htmlFor="secretCode" className="text-cream">
+                  Code secret
+                </Label>
+                <div className="relative">
+                  <Shield className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-cream/40" />
+                  <Input
+                    id="secretCode"
+                    type="password"
+                    value={secretCode}
+                    onChange={(e) => setSecretCode(e.target.value)}
+                    placeholder="Code d'accès admin"
+                    className="pl-10 bg-noir border-primary/30 text-cream placeholder:text-cream/40"
+                    disabled={isLoading}
+                  />
+                </div>
+                {fieldErrors.secretCode && (
+                  <p className="text-red-400 text-sm">{fieldErrors.secretCode}</p>
+                )}
               </div>
-            )}
 
-            {success && (
-              <div className="bg-green-500/10 border border-green-500/30 rounded-md p-3">
-                <p className="text-green-400 text-sm">{success}</p>
-              </div>
-            )}
-
-            <Button
-              type="submit"
-              className="w-full"
-              variant="hero"
-              size="lg"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Chargement...
-                </>
-              ) : isLogin ? (
-                "Se connecter"
-              ) : (
-                "Créer mon compte"
+              {error && (
+                <div className="bg-red-500/10 border border-red-500/30 rounded-md p-3">
+                  <p className="text-red-400 text-sm">{error}</p>
+                </div>
               )}
-            </Button>
-          </form>
 
-          {!isLogin && (
-            <div className="mt-6 text-center">
-              <button
-                type="button"
-                onClick={toggleMode}
-                className="text-primary hover:text-primary/80 text-sm transition-colors"
+              {success && (
+                <div className="bg-green-500/10 border border-green-500/30 rounded-md p-3">
+                  <p className="text-green-400 text-sm">{success}</p>
+                </div>
+              )}
+
+              <Button
+                type="submit"
+                className="w-full"
+                variant="hero"
+                size="lg"
                 disabled={isLoading}
               >
-                Déjà un compte ? Connectez-vous
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Création...
+                  </>
+                ) : (
+                  "Créer le compte admin"
+                )}
+              </Button>
+
+              <button
+                type="button"
+                onClick={() => { setMode('login'); resetForm(); }}
+                className="w-full flex items-center justify-center gap-2 text-cream/60 hover:text-cream text-sm transition-colors mt-4"
+                disabled={isLoading}
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Retour à la connexion
+              </button>
+            </form>
+          )}
+
+          {/* Admin setup link - only visible on login */}
+          {mode === 'login' && (
+            <div className="mt-6 pt-4 border-t border-primary/10">
+              <button
+                type="button"
+                onClick={() => { setMode('adminSetup'); resetForm(); }}
+                className="w-full flex items-center justify-center gap-2 text-cream/40 hover:text-cream/60 text-xs transition-colors"
+                disabled={isLoading}
+              >
+                <Shield className="h-3 w-3" />
+                Configuration administrateur
               </button>
             </div>
           )}

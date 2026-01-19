@@ -91,6 +91,50 @@ export type Database = {
           },
         ]
       }
+      client_observations: {
+        Row: {
+          client_id: string
+          content: string
+          created_at: string
+          id: string
+          image_url: string | null
+          metadata: Json | null
+          title: string | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          content: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          metadata?: Json | null
+          title?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          metadata?: Json | null
+          title?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_observations_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           company: string | null

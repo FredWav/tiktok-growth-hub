@@ -5,11 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Building2, Phone, Globe, Instagram, Calendar, FileText, CheckSquare, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Building2, Phone, Globe, Instagram, Calendar, FileText, CheckSquare, AlertTriangle, Eye } from "lucide-react";
 import { useClient, useUpdateClient } from "@/hooks/useClients";
 import { useClientTasks } from "@/hooks/useTasks";
 import { useClientSessions } from "@/hooks/useSessions";
 import { useClientDeliverables } from "@/hooks/useDeliverables";
+import { useClientObservations } from "@/hooks/useObservations";
 import { ClientStatusBadge } from "@/components/admin/ClientStatusBadge";
 import { OfferBadge } from "@/components/admin/OfferBadge";
 import { ClientProgress } from "@/components/admin/ClientProgress";
@@ -18,6 +19,7 @@ import { ClientTasksTab } from "@/components/admin/client-detail/ClientTasksTab"
 import { ClientSessionsTab } from "@/components/admin/client-detail/ClientSessionsTab";
 import { ClientDeliverablesTab } from "@/components/admin/client-detail/ClientDeliverablesTab";
 import { ClientNotesTab } from "@/components/admin/client-detail/ClientNotesTab";
+import { ClientObservationsTab } from "@/components/admin/client-detail/ClientObservationsTab";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
@@ -30,6 +32,7 @@ const ClientDetail: React.FC = () => {
   const { data: tasks = [], isLoading: tasksLoading } = useClientTasks(id);
   const { data: sessions = [], isLoading: sessionsLoading } = useClientSessions(id);
   const { data: deliverables = [], isLoading: deliverablesLoading } = useClientDeliverables(id);
+  const { data: observations = [] } = useClientObservations(id);
   const updateClient = useUpdateClient();
 
   if (clientLoading) {
@@ -202,6 +205,13 @@ const ClientDetail: React.FC = () => {
               Livrables ({deliverables.length})
             </TabsTrigger>
             <TabsTrigger
+              value="observations"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
+              <Eye className="h-4 w-4 mr-1.5" />
+              Observations ({observations.length})
+            </TabsTrigger>
+            <TabsTrigger
               value="notes"
               className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
@@ -243,6 +253,10 @@ const ClientDetail: React.FC = () => {
               deliverables={deliverables}
               isLoading={deliverablesLoading}
             />
+          </TabsContent>
+
+          <TabsContent value="observations">
+            <ClientObservationsTab clientId={client.id} />
           </TabsContent>
 
           <TabsContent value="notes">

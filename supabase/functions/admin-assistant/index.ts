@@ -25,7 +25,7 @@ const tools = [
     type: "function",
     function: {
       name: "get_client_details",
-      description: "Récupère les détails complets d'un client incluant sessions, tâches et livrables",
+      description: "Récupère les détails complets d'un client incluant sessions, tâches, livrables ET observations",
       parameters: {
         type: "object",
         properties: {
@@ -234,6 +234,139 @@ const tools = [
         required: ["title"]
       }
     }
+  },
+  // ========== NEW OBSERVATION TOOLS ==========
+  {
+    type: "function",
+    function: {
+      name: "add_observation",
+      description: "Ajoute une observation/note pour un client. Types: note (note libre), measure (mesure/stat), milestone (étape atteinte), concern (point d'attention), image_analysis (analyse d'image)",
+      parameters: {
+        type: "object",
+        properties: {
+          client_id: { type: "string", description: "L'ID du client" },
+          client_name: { type: "string", description: "Le nom du client" },
+          type: { 
+            type: "string", 
+            enum: ["note", "measure", "milestone", "concern", "image_analysis"],
+            description: "Type d'observation"
+          },
+          title: { type: "string", description: "Titre court de l'observation" },
+          content: { type: "string", description: "Contenu détaillé de l'observation" },
+          image_url: { type: "string", description: "URL d'une image associée (optionnel)" },
+          metadata: { 
+            type: "object", 
+            description: "Données structurées (ex: {weight: 75, followers: 15000, engagement: 2.3})",
+            additionalProperties: true
+          },
+          is_private: { type: "boolean", description: "Si true, l'observation n'est pas visible par le client (défaut: false)" }
+        },
+        required: ["type", "content"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "get_client_observations",
+      description: "Récupère les observations d'un client, optionnellement filtrées par type",
+      parameters: {
+        type: "object",
+        properties: {
+          client_id: { type: "string", description: "L'ID du client" },
+          client_name: { type: "string", description: "Le nom du client" },
+          type: { 
+            type: "string", 
+            enum: ["note", "measure", "milestone", "concern", "image_analysis"],
+            description: "Filtrer par type d'observation"
+          },
+          limit: { type: "number", description: "Nombre max d'observations (défaut: 20)" }
+        }
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "search_observations",
+      description: "Recherche dans les observations de tous les clients ou d'un client spécifique",
+      parameters: {
+        type: "object",
+        properties: {
+          query: { type: "string", description: "Terme de recherche (dans titre et contenu)" },
+          client_id: { type: "string", description: "Optionnel: restreindre à un client" },
+          client_name: { type: "string", description: "Optionnel: nom du client pour restreindre" },
+          type: { type: "string", description: "Optionnel: filtrer par type" }
+        },
+        required: ["query"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "update_observation",
+      description: "Modifie une observation existante",
+      parameters: {
+        type: "object",
+        properties: {
+          observation_id: { type: "string", description: "L'ID de l'observation" },
+          title: { type: "string" },
+          content: { type: "string" },
+          type: { type: "string", enum: ["note", "measure", "milestone", "concern", "image_analysis"] },
+          metadata: { type: "object", additionalProperties: true },
+          is_private: { type: "boolean" }
+        },
+        required: ["observation_id"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "delete_observation",
+      description: "Supprime une observation",
+      parameters: {
+        type: "object",
+        properties: {
+          observation_id: { type: "string", description: "L'ID de l'observation" }
+        },
+        required: ["observation_id"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "analyze_image",
+      description: "Analyse une image avec l'IA (stats TikTok, screenshots, photos de progression) et retourne une analyse détaillée. Peut optionnellement sauvegarder l'analyse comme observation.",
+      parameters: {
+        type: "object",
+        properties: {
+          image_url: { type: "string", description: "URL de l'image à analyser" },
+          context: { type: "string", description: "Contexte pour guider l'analyse (ex: 'stats TikTok', 'photo de progression', 'capture d'écran')" },
+          client_id: { type: "string", description: "Optionnel: ID du client concerné" },
+          client_name: { type: "string", description: "Optionnel: nom du client concerné" },
+          save_as_observation: { type: "boolean", description: "Si true, sauvegarde l'analyse comme observation" }
+        },
+        required: ["image_url"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "get_client_evolution",
+      description: "Génère un résumé de l'évolution d'un client sur une période, basé sur les observations, sessions et tâches",
+      parameters: {
+        type: "object",
+        properties: {
+          client_id: { type: "string", description: "L'ID du client" },
+          client_name: { type: "string", description: "Le nom du client" },
+          days: { type: "number", description: "Période en jours (défaut: 30)" }
+        }
+      }
+    }
   }
 ];
 
@@ -242,9 +375,26 @@ Tu as accès complet à la base de données clients et tu peux :
 - Consulter et rechercher des informations sur tous les clients
 - Gérer les rendez-vous (créer, modifier, annuler)
 - Gérer les tâches des clients
-- Prendre des notes sur les clients
+- Prendre des notes et observations détaillées sur les clients
+- Analyser des images (captures d'écran de stats, photos de progression)
 - Créer des livrables
 - Répondre à toutes les questions sur l'activité
+
+SYSTÈME D'OBSERVATIONS :
+Tu disposes d'un système complet de suivi client avec différents types d'observations :
+- "note" : Notes libres sur le client
+- "measure" : Mesures et statistiques (followers, engagement, vues, etc.)
+- "milestone" : Étapes importantes atteintes
+- "concern" : Points d'attention, problèmes à surveiller
+- "image_analysis" : Analyses d'images avec extraction de données
+
+Quand on te demande de noter quelque chose sur un client, utilise add_observation.
+Quand on te demande l'évolution ou le suivi d'un client, utilise get_client_observations et get_client_evolution.
+
+ANALYSE D'IMAGES :
+Quand on te partage une image (URL), tu peux l'analyser avec analyze_image.
+Tu peux extraire des données de captures d'écran TikTok, Instagram, etc.
+Propose toujours de sauvegarder l'analyse comme observation.
 
 INSTRUCTIONS IMPORTANTES :
 - Réponds de manière concise et professionnelle en français
@@ -252,6 +402,7 @@ INSTRUCTIONS IMPORTANTES :
 - Si tu cherches un client par nom, utilise search_clients d'abord
 - Pour les dates, utilise le format ISO 8601 (ex: 2025-01-20T14:00:00Z)
 - Sois proactif : si quelque chose manque dans une demande, demande les détails
+- Pour les observations avec des données numériques, utilise le champ metadata
 
 Date actuelle : ${new Date().toISOString().split('T')[0]}`;
 
@@ -309,18 +460,20 @@ async function executeTool(supabase: any, toolName: string, args: any): Promise<
           clientId = client.id;
         }
         
-        const [clientRes, sessionsRes, tasksRes, deliverablesRes] = await Promise.all([
+        const [clientRes, sessionsRes, tasksRes, deliverablesRes, observationsRes] = await Promise.all([
           supabase.from('clients').select('*, profiles:user_id(full_name)').eq('id', clientId).single(),
           supabase.from('sessions').select('*').eq('client_id', clientId).order('scheduled_at', { ascending: false }),
           supabase.from('tasks').select('*').eq('client_id', clientId).order('due_date'),
-          supabase.from('deliverables').select('*').eq('client_id', clientId).order('created_at', { ascending: false })
+          supabase.from('deliverables').select('*').eq('client_id', clientId).order('created_at', { ascending: false }),
+          supabase.from('client_observations').select('*').eq('client_id', clientId).order('created_at', { ascending: false }).limit(10)
         ]);
         
         return JSON.stringify({
           client: { ...clientRes.data, name: clientRes.data?.profiles?.full_name },
           sessions: sessionsRes.data,
           tasks: tasksRes.data,
-          deliverables: deliverablesRes.data
+          deliverables: deliverablesRes.data,
+          recent_observations: observationsRes.data
         });
       }
 
@@ -613,6 +766,267 @@ async function executeTool(supabase: any, toolName: string, args: any): Promise<
         return JSON.stringify({ success: true, message: 'Livrable créé', deliverable: data });
       }
 
+      // ========== NEW OBSERVATION TOOLS IMPLEMENTATION ==========
+      
+      case 'add_observation': {
+        let clientId = args.client_id;
+        if (!clientId && args.client_name) {
+          const client = await findClientByName(supabase, args.client_name);
+          if (!client) return JSON.stringify({ error: `Client "${args.client_name}" non trouvé` });
+          clientId = client.id;
+        }
+        
+        if (!clientId) return JSON.stringify({ error: 'Client non spécifié' });
+        
+        const metadata = args.metadata || {};
+        if (args.is_private) metadata.is_private = true;
+        
+        const { data, error } = await supabase.from('client_observations').insert({
+          client_id: clientId,
+          type: args.type,
+          title: args.title || null,
+          content: args.content,
+          image_url: args.image_url || null,
+          metadata
+        }).select().single();
+        
+        if (error) return JSON.stringify({ error: error.message });
+        return JSON.stringify({ 
+          success: true, 
+          message: `Observation de type "${args.type}" ajoutée`, 
+          observation: data 
+        });
+      }
+      
+      case 'get_client_observations': {
+        let clientId = args.client_id;
+        if (!clientId && args.client_name) {
+          const client = await findClientByName(supabase, args.client_name);
+          if (!client) return JSON.stringify({ error: `Client "${args.client_name}" non trouvé` });
+          clientId = client.id;
+        }
+        
+        if (!clientId) return JSON.stringify({ error: 'Client non spécifié' });
+        
+        let query = supabase
+          .from('client_observations')
+          .select('*')
+          .eq('client_id', clientId)
+          .order('created_at', { ascending: false })
+          .limit(args.limit || 20);
+        
+        if (args.type) {
+          query = query.eq('type', args.type);
+        }
+        
+        const { data, error } = await query;
+        
+        if (error) return JSON.stringify({ error: error.message });
+        return JSON.stringify(data);
+      }
+      
+      case 'search_observations': {
+        let clientId = args.client_id;
+        if (!clientId && args.client_name) {
+          const client = await findClientByName(supabase, args.client_name);
+          if (client) clientId = client.id;
+        }
+        
+        let query = supabase
+          .from('client_observations')
+          .select('*, clients!inner(id, profiles:user_id(full_name))')
+          .or(`title.ilike.%${args.query}%,content.ilike.%${args.query}%`)
+          .order('created_at', { ascending: false })
+          .limit(20);
+        
+        if (clientId) {
+          query = query.eq('client_id', clientId);
+        }
+        
+        if (args.type) {
+          query = query.eq('type', args.type);
+        }
+        
+        const { data, error } = await query;
+        
+        if (error) return JSON.stringify({ error: error.message });
+        return JSON.stringify(data?.map((o: any) => ({
+          ...o,
+          client_name: o.clients?.profiles?.full_name
+        })));
+      }
+      
+      case 'update_observation': {
+        const updates: any = {};
+        if (args.title !== undefined) updates.title = args.title;
+        if (args.content !== undefined) updates.content = args.content;
+        if (args.type !== undefined) updates.type = args.type;
+        if (args.metadata !== undefined) updates.metadata = args.metadata;
+        if (args.is_private !== undefined) {
+          updates.metadata = { ...updates.metadata, is_private: args.is_private };
+        }
+        
+        const { error } = await supabase
+          .from('client_observations')
+          .update(updates)
+          .eq('id', args.observation_id);
+        
+        if (error) return JSON.stringify({ error: error.message });
+        return JSON.stringify({ success: true, message: 'Observation mise à jour' });
+      }
+      
+      case 'delete_observation': {
+        const { error } = await supabase
+          .from('client_observations')
+          .delete()
+          .eq('id', args.observation_id);
+        
+        if (error) return JSON.stringify({ error: error.message });
+        return JSON.stringify({ success: true, message: 'Observation supprimée' });
+      }
+      
+      case 'analyze_image': {
+        // Use OpenAI GPT-4 Vision to analyze the image
+        const visionResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${OPENAI_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o',
+            messages: [
+              {
+                role: 'user',
+                content: [
+                  {
+                    type: 'text',
+                    text: `Analyse cette image${args.context ? ` (contexte: ${args.context})` : ''}. 
+                    
+Extrais toutes les informations pertinentes, notamment :
+- Si c'est une capture de stats (TikTok, Instagram, etc.) : vues, likes, commentaires, partages, engagement, followers
+- Si c'est une photo de progression : observations visuelles
+- Si c'est un screenshot : informations clés visibles
+
+Retourne un JSON structuré avec :
+{
+  "summary": "résumé en une phrase",
+  "type": "stats|progression|screenshot|other",
+  "data": { /* données extraites */ },
+  "insights": ["insight 1", "insight 2"]
+}`
+                  },
+                  {
+                    type: 'image_url',
+                    image_url: { url: args.image_url }
+                  }
+                ]
+              }
+            ],
+            max_tokens: 1000
+          }),
+        });
+        
+        if (!visionResponse.ok) {
+          const errorText = await visionResponse.text();
+          console.error('Vision API error:', errorText);
+          return JSON.stringify({ error: 'Erreur lors de l\'analyse de l\'image' });
+        }
+        
+        const visionData = await visionResponse.json();
+        const analysisText = visionData.choices[0]?.message?.content || '';
+        
+        // Try to parse as JSON
+        let analysisJson: any = { raw_analysis: analysisText };
+        try {
+          const jsonMatch = analysisText.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            analysisJson = JSON.parse(jsonMatch[0]);
+          }
+        } catch (e) {
+          // Keep raw analysis if JSON parsing fails
+        }
+        
+        // Optionally save as observation
+        if (args.save_as_observation) {
+          let clientId = args.client_id;
+          if (!clientId && args.client_name) {
+            const client = await findClientByName(supabase, args.client_name);
+            if (client) clientId = client.id;
+          }
+          
+          if (clientId) {
+            await supabase.from('client_observations').insert({
+              client_id: clientId,
+              type: 'image_analysis',
+              title: analysisJson.summary || 'Analyse d\'image',
+              content: analysisText,
+              image_url: args.image_url,
+              metadata: { 
+                analysis_data: analysisJson.data,
+                insights: analysisJson.insights,
+                context: args.context
+              }
+            });
+            analysisJson.saved_as_observation = true;
+          }
+        }
+        
+        return JSON.stringify(analysisJson);
+      }
+      
+      case 'get_client_evolution': {
+        let clientId = args.client_id;
+        if (!clientId && args.client_name) {
+          const client = await findClientByName(supabase, args.client_name);
+          if (!client) return JSON.stringify({ error: `Client "${args.client_name}" non trouvé` });
+          clientId = client.id;
+        }
+        
+        if (!clientId) return JSON.stringify({ error: 'Client non spécifié' });
+        
+        const days = args.days || 30;
+        const since = new Date();
+        since.setDate(since.getDate() - days);
+        
+        const [clientRes, observationsRes, sessionsRes, tasksRes] = await Promise.all([
+          supabase.from('clients').select('*, profiles:user_id(full_name)').eq('id', clientId).single(),
+          supabase.from('client_observations')
+            .select('*')
+            .eq('client_id', clientId)
+            .gte('created_at', since.toISOString())
+            .order('created_at', { ascending: false }),
+          supabase.from('sessions')
+            .select('*')
+            .eq('client_id', clientId)
+            .gte('scheduled_at', since.toISOString())
+            .order('scheduled_at', { ascending: false }),
+          supabase.from('tasks')
+            .select('*')
+            .eq('client_id', clientId)
+            .order('updated_at', { ascending: false })
+        ]);
+        
+        const completedTasks = tasksRes.data?.filter((t: any) => t.status === 'done') || [];
+        const completedSessions = sessionsRes.data?.filter((s: any) => s.status === 'completed') || [];
+        
+        return JSON.stringify({
+          client: { 
+            name: clientRes.data?.profiles?.full_name,
+            status: clientRes.data?.status,
+            offer: clientRes.data?.offer
+          },
+          period_days: days,
+          observations: observationsRes.data,
+          observations_count: observationsRes.data?.length || 0,
+          sessions_completed: completedSessions.length,
+          tasks_completed: completedTasks.length,
+          milestones: observationsRes.data?.filter((o: any) => o.type === 'milestone'),
+          concerns: observationsRes.data?.filter((o: any) => o.type === 'concern'),
+          measures: observationsRes.data?.filter((o: any) => o.type === 'measure')
+        });
+      }
+
       default:
         return JSON.stringify({ error: `Outil inconnu: ${toolName}` });
     }
@@ -664,16 +1078,29 @@ serve(async (req) => {
       });
     }
 
-    const { messages } = await req.json();
+    const { messages, image_url } = await req.json();
 
     if (!OPENAI_API_KEY) {
       throw new Error('OPENAI_API_KEY non configurée');
     }
 
+    // If an image URL is provided, add it to the last message
+    let processedMessages = [...messages];
+    if (image_url && processedMessages.length > 0) {
+      const lastMessage = processedMessages[processedMessages.length - 1];
+      processedMessages[processedMessages.length - 1] = {
+        role: lastMessage.role,
+        content: [
+          { type: 'text', text: lastMessage.content },
+          { type: 'image_url', image_url: { url: image_url } }
+        ]
+      };
+    }
+
     // Initial OpenAI request with tools
     let openaiMessages = [
       { role: 'system', content: systemPrompt },
-      ...messages
+      ...processedMessages
     ];
 
     let response = await fetch('https://api.openai.com/v1/chat/completions', {

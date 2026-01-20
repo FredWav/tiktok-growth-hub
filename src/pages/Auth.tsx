@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2, Mail, Lock, User, Shield, ArrowLeft } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const loginSchema = z.object({
   email: z.string().email("Email invalide"),
@@ -20,7 +21,11 @@ const adminSetupSchema = z.object({
   secretCode: z.string().min(1, "Le code secret est requis"),
 });
 
-type AuthMode = 'login' | 'adminSetup';
+const forgotPasswordSchema = z.object({
+  email: z.string().email("Email invalide"),
+});
+
+type AuthMode = 'login' | 'adminSetup' | 'forgotPassword';
 
 const Auth: React.FC = () => {
   const [mode, setMode] = useState<AuthMode>('login');
@@ -149,6 +154,43 @@ const Auth: React.FC = () => {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setFieldErrors({});
+
+    const result = forgotPasswordSchema.safeParse({ email });
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0]) {
+          errors[err.path[0].toString()] = err.message;
+        }
+      });
+      setFieldErrors(errors);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
+      });
+
+      if (error) {
+        setError(error.message);
+        return;
+      }
+
+      setSuccess('Un email de réinitialisation a été envoyé. Vérifiez votre boîte de réception.');
+      toast.success('Email de réinitialisation envoyé');
+    } catch (err) {
+      setError("Une erreur inattendue s'est produite");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const resetForm = () => {
     setError(null);
     setSuccess(null);
@@ -166,6 +208,7 @@ const Auth: React.FC = () => {
           <p className="text-cream/60 mt-2">
             {mode === 'login' && "Connectez-vous à votre espace"}
             {mode === 'adminSetup' && "Configuration administrateur"}
+            {mode === 'forgotPassword' && "Réinitialiser votre mot de passe"}
           </p>
         </div>
 
@@ -210,9 +253,17 @@ const Auth: React.FC = () => {
                     disabled={isLoading}
                   />
                 </div>
-                {fieldErrors.password && (
+              {fieldErrors.password && (
                   <p className="text-red-400 text-sm">{fieldErrors.password}</p>
                 )}
+                <button
+                  type="button"
+                  onClick={() => { setMode('forgotPassword'); resetForm(); }}
+                  className="text-primary/80 hover:text-primary text-sm transition-colors"
+                  disabled={isLoading}
+                >
+                  Mot de passe oublié ?
+                </button>
               </div>
 
               {error && (
@@ -358,6 +409,71 @@ const Auth: React.FC = () => {
                   </>
                 ) : (
                   "Créer le compte admin"
+                )}
+              </Button>
+
+              <button
+                type="button"
+                onClick={() => { setMode('login'); resetForm(); }}
+                className="w-full flex items-center justify-center gap-2 text-cream/60 hover:text-cream text-sm transition-colors mt-4"
+                disabled={isLoading}
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Retour à la connexion
+              </button>
+            </form>
+          )}
+
+          {/* Forgot password form */}
+          {mode === 'forgotPassword' && (
+            <form onSubmit={handleForgotPassword} className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="resetEmail" className="text-cream">
+                  Email
+                </Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-cream/40" />
+                  <Input
+                    id="resetEmail"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="votre@email.com"
+                    className="pl-10 bg-noir border-primary/30 text-cream placeholder:text-cream/40"
+                    disabled={isLoading}
+                  />
+                </div>
+                {fieldErrors.email && (
+                  <p className="text-red-400 text-sm">{fieldErrors.email}</p>
+                )}
+              </div>
+
+              {error && (
+                <div className="bg-red-500/10 border border-red-500/30 rounded-md p-3">
+                  <p className="text-red-400 text-sm">{error}</p>
+                </div>
+              )}
+
+              {success && (
+                <div className="bg-green-500/10 border border-green-500/30 rounded-md p-3">
+                  <p className="text-green-400 text-sm">{success}</p>
+                </div>
+              )}
+
+              <Button
+                type="submit"
+                className="w-full"
+                variant="hero"
+                size="lg"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Envoi...
+                  </>
+                ) : (
+                  "Envoyer le lien de réinitialisation"
                 )}
               </Button>
 

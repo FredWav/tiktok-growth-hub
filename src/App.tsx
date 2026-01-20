@@ -14,6 +14,7 @@ import APropos from "./pages/APropos";
 import Preuves from "./pages/Preuves";
 import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 // Admin pages
@@ -53,6 +54,7 @@ const App = () => (
             <Route path="/preuves" element={<Preuves />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/reset-password" element={<ResetPassword />} />
 
             {/* Admin routes */}
             <Route

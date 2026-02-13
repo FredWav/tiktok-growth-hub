@@ -8,3 +8,15 @@ verify_jwt = false
 
 [functions.setup-admin]
 verify_jwt = false
+
+[functions.create-vip-checkout]
+verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.discord-role]
+verify_jwt = false
+
+[functions.check-vip-expiry]
+verify_jwt = false

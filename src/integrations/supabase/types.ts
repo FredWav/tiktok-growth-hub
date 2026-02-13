@@ -462,6 +462,59 @@ export type Database = {
         }
         Relationships: []
       }
+      vip_subscriptions: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          discord_role_granted: boolean
+          discord_user_id: string | null
+          duration_months: number
+          expires_at: string
+          id: string
+          starts_at: string
+          status: string
+          stripe_session_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          discord_role_granted?: boolean
+          discord_user_id?: string | null
+          duration_months: number
+          expires_at: string
+          id?: string
+          starts_at?: string
+          status?: string
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          discord_role_granted?: boolean
+          discord_user_id?: string | null
+          duration_months?: number
+          expires_at?: string
+          id?: string
+          starts_at?: string
+          status?: string
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vip_subscriptions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

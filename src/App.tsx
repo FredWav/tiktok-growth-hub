@@ -9,6 +9,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 // Public pages
 import Home from "./pages/Home";
 import Offres from "./pages/Offres";
+import VipCheckout from "./pages/VipCheckout";
 import OneShot from "./pages/OneShot";
 import APropos from "./pages/APropos";
 import Preuves from "./pages/Preuves";
@@ -48,7 +49,7 @@ const App = () => (
             <Route path="/" element={<Home />} />
             <Route path="/offres" element={<Offres />} />
             <Route path="/offres/45-jours" element={<Offres />} />
-            <Route path="/offres/vip" element={<Offres />} />
+            <Route path="/offres/vip" element={<VipCheckout />} />
             <Route path="/one-shot" element={<OneShot />} />
             <Route path="/a-propos" element={<APropos />} />
             <Route path="/preuves" element={<Preuves />} />

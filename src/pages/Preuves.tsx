@@ -57,7 +57,7 @@ const caseStudies = [
   },
   {
     title: "Multiplication x5 du CA",
-    category: "VIP à Vie",
+    category: "VIP",
     description: "Une marque e-commerce qui a utilisé TikTok comme levier principal d'acquisition.",
     metrics: [
       { label: "CA mensuel", value: "x5" },

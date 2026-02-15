@@ -11,6 +11,7 @@ import Home from "./pages/Home";
 import Offres from "./pages/Offres";
 import VipCheckout from "./pages/VipCheckout";
 import OneShot from "./pages/OneShot";
+import OneShotSuccess from "./pages/OneShotSuccess";
 import APropos from "./pages/APropos";
 import Preuves from "./pages/Preuves";
 import Contact from "./pages/Contact";
@@ -51,6 +52,7 @@ const App = () => (
             <Route path="/offres/45-jours" element={<Offres />} />
             <Route path="/offres/vip" element={<VipCheckout />} />
             <Route path="/one-shot" element={<OneShot />} />
+            <Route path="/one-shot/success" element={<OneShotSuccess />} />
             <Route path="/a-propos" element={<APropos />} />
             <Route path="/preuves" element={<Preuves />} />
             <Route path="/contact" element={<Contact />} />

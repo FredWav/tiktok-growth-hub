@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Check, Clock, Video, FileText, HelpCircle, Zap } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const steps = [
   {
@@ -70,6 +73,24 @@ const faqs = [
 ];
 
 export default function OneShot() {
+  const [loading, setLoading] = useState(false);
+
+  const handleCheckout = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-oneshot-checkout");
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (err: any) {
+      toast.error("Erreur lors de la création du paiement. Réessayez.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Layout>
       {/* Hero */}
@@ -89,11 +110,9 @@ export default function OneShot() {
             En 1h30, on pose les bases d'une présence TikTok qui génère des résultats.
           </p>
 
-          <Button variant="hero" size="xl" asChild>
-            <Link to="/reservation">
-              Réserver ma session — 179€
+          <Button variant="hero" size="xl" onClick={handleCheckout} disabled={loading}>
+              {loading ? "Redirection..." : "Réserver ma session — 179€"}
               <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
           </Button>
 
           <p className="text-sm text-muted-foreground mt-4">
@@ -280,11 +299,9 @@ export default function OneShot() {
             179€ pour repartir avec un plan d'action clair.
             Pas de bullshit, que du concret.
           </p>
-          <Button variant="hero" size="xl" asChild>
-            <Link to="/reservation">
-              Réserver ma session maintenant
+          <Button variant="hero" size="xl" onClick={handleCheckout} disabled={loading}>
+              {loading ? "Redirection..." : "Réserver ma session maintenant"}
               <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
           </Button>
         </div>
       </Section>

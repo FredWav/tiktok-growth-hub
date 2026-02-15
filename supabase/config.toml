@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.check-vip-expiry]
 verify_jwt = false
+
+[functions.create-oneshot-checkout]
+verify_jwt = false

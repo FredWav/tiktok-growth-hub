@@ -1,43 +1,37 @@
 
-# Flow de reservation One Shot
 
-## Objectif
-Permettre a un visiteur de payer 179EUR via Stripe puis d'etre redirige vers une page de confirmation avec le lien Calendly pour reserver son creneau.
+# VIP : page de succes apres paiement
 
-## Architecture
+## Constat
 
-Le flow sera :
-1. Page One Shot (existante) -- clic sur "Reserver"
-2. Redirection vers Stripe Checkout (paiement 179EUR)
-3. Retour sur une page de succes avec le lien Calendly + message de contact
+Le flow VIP est deja en grande partie implemente :
+- Page de checkout avec selection du plan (3/6/12 mois) et saisie de l'ID Discord
+- Fonction backend pour creer la session Stripe
+- Webhook Stripe pour creer l'abonnement VIP et attribuer le role Discord
+- Fonctions d'attribution/revocation du role Discord
+- Verification automatique des expirations
 
-Pas besoin d'authentification : le paiement est ouvert a tous (checkout invite).
+**Ce qui manque** : apres le paiement, l'utilisateur est redirige vers `/offres/vip?success=true`, mais la page ne gere pas ce parametre. Il faut afficher un message de confirmation avec le lien vers le serveur Discord.
 
-## Etapes d'implementation
+## Ce qui sera fait
 
-### 1. Creer la fonction backend `create-oneshot-checkout`
-- Cree une session Stripe Checkout en mode `payment` avec le prix One Shot (`price_1SHp2SBfuzQl0PTiBCmEAq2l` = 179EUR)
-- Pas d'authentification requise (checkout invite, Stripe collecte l'email)
-- URL de succes : `/one-shot/success`
-- URL d'annulation : `/one-shot`
+### 1. Gerer le retour apres paiement sur VipCheckout
 
-### 2. Creer la page de succes `/one-shot/success`
-- Message de confirmation du paiement
-- Bouton principal vers le Calendly : `https://calendly.com/fredwavcm/accompagnement-one-shot`
-- Mention : "Si les horaires proposes ne sont pas possibles pour vous, merci de me contacter a fredwavcm@gmail.com"
-- Lien de retour vers l'accueil
+Detecter les query params `success=true` et `cancelled=true` dans l'URL :
+- **Succes** : afficher un ecran de confirmation avec :
+  - Message de bienvenue dans le club VIP
+  - Bouton principal vers le serveur Discord (lien d'invitation a fournir)
+  - Mention que le role VIP a ete attribue automatiquement
+  - Lien de retour vers l'accueil
+- **Annulation** : afficher un toast informant que le paiement a ete annule
 
-### 3. Mettre a jour la page One Shot
-- Les boutons "Reserver" appellent la fonction backend pour creer la session Stripe
-- Redirection automatique vers la page de paiement Stripe
+### 2. Clarification necessaire
 
-### 4. Ajouter la route dans App.tsx
-- `/one-shot/success` pointe vers la nouvelle page de succes
+Il me faudra le **lien d'invitation Discord** vers ton serveur (ex: `https://discord.gg/xxx`) pour le bouton de la page de succes.
 
 ## Details techniques
 
-- Fonction backend : `supabase/functions/create-oneshot-checkout/index.ts`
-- Utilise le prix Stripe existant `price_1SHp2SBfuzQl0PTiBCmEAq2l` (179EUR, one-time)
-- Mode guest : pas de verification d'authentification, Stripe collecte l'email du client
-- Nouvelle page : `src/pages/OneShotSuccess.tsx`
-- Nouvelle route : `/one-shot/success` dans `App.tsx`
+- Fichier modifie : `src/pages/VipCheckout.tsx`
+- Utilisation de `useSearchParams` de react-router-dom pour detecter `success` et `cancelled`
+- Affichage conditionnel : si `success=true`, on montre l'ecran de confirmation au lieu du formulaire de checkout
+- Pas de nouvelle route ni de nouveau fichier necessaire

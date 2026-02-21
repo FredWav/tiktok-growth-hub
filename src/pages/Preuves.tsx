@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { ArrowRight, Quote, TrendingUp, Users, Eye, Play } from "lucide-react";
+import { ArrowRight, Quote, TrendingUp, Users, Eye, Play, Check, X, Target } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -86,37 +86,28 @@ const testimonials = [
 
 const caseStudies = [
   {
-    title: "Structuration et premières performances",
     category: "Accompagnement 45 jours",
-    description: "Créateur débutant qui avait du mal à publier régulièrement et à comprendre ses statistiques. Travail sur la régularité, la rétention et les premiers leads entrants.",
-    metrics: [
-      { label: "Progression des vues", value: "<1K → 20K" },
-      { label: "Ligne éditoriale", value: "Structure claire" },
-      { label: "Demandes entrantes", value: "1-3/semaine" },
+    title: "Passer du chaos à une stratégie claire",
+    before: ["Publications irrégulières", "Aucun système", "Aucune lecture des stats"],
+    after: ["Calendrier éditorial structuré", "Hooks retravaillés", "CTA optimisés", "Premières demandes entrantes"],
+    resultLabel: "Résultat type observé",
+    results: [
+      "Vidéos qui dépassent régulièrement les 5k-15k vues",
+      "1 à 3 prospects qualifiés par semaine",
+      "Compréhension réelle des métriques",
     ],
-    disclaimer: "Pas de promesse de viralité. Travail sur la méthode.",
   },
   {
-    title: "Optimisation d'un compte actif",
     category: "Accompagnement Business",
-    description: "Créateur déjà présent sur TikTok mais sans stratégie de conversion. Travail sur les hooks, scripts, positionnement offre et optimisation des CTA.",
-    metrics: [
-      { label: "Engagement", value: "En hausse" },
-      { label: "Rétention", value: "Améliorée" },
-      { label: "Leads", value: "Croissance" },
+    title: "Transformer l'audience en chiffre d'affaires",
+    before: ["Des vues", "Peu de conversion", "Positionnement flou"],
+    after: ["Offre clarifiée", "CTA stratégique", "Contenu orienté acquisition"],
+    resultLabel: "Effet constaté",
+    results: [
+      "Plus de leads qualifiés",
+      "Moins de perte d'audience",
+      "Meilleur ratio vues / ventes",
     ],
-    disclaimer: "Focus : performance durable, pas coup d'éclat.",
-  },
-  {
-    title: "Clarification et repositionnement",
-    category: "One Shot stratégique",
-    description: "Consultant ou coach avec contenu flou ou mal perçu. Audit du profil, refonte bio, clarification de la promesse et ajustement éditorial.",
-    metrics: [
-      { label: "Positionnement", value: "Plus clair" },
-      { label: "Autorité", value: "Signaux forts" },
-      { label: "Leads qualifiés", value: "Invitations & collabs" },
-    ],
-    disclaimer: "Résultats progressifs. Pas de raccourci.",
   },
 ];
 
@@ -209,33 +200,76 @@ export default function Preuves() {
           subtitle="Des transformations mesurables et documentées."
         />
 
-        <div className="space-y-6">
+        <div className="space-y-8">
           {caseStudies.map((study, index) => (
             <div
               key={index}
               className="bg-background rounded-2xl p-8 md:p-10 border border-border/50 hover:border-primary/30 hover:shadow-xl transition-all duration-300"
             >
-              <div className="grid lg:grid-cols-2 gap-8 items-center">
-                <div>
-                  <span className="text-xs font-semibold uppercase tracking-widest text-primary">{study.category}</span>
-                  <h3 className="font-display text-2xl md:text-3xl font-bold mt-3 mb-4 tracking-tight">
-                    {study.title}
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed">{study.description}</p>
-                  <p className="text-xs text-muted-foreground/60 italic mt-4 border-l-2 border-primary/20 pl-3">{study.disclaimer}</p>
+              <span className="text-xs font-semibold uppercase tracking-widest text-primary">{study.category}</span>
+              <h3 className="font-display text-2xl md:text-3xl font-bold mt-3 mb-8 tracking-tight">
+                {study.title}
+              </h3>
+
+              <div className="grid md:grid-cols-2 gap-6 mb-8">
+                {/* Avant */}
+                <div className="bg-noir/90 rounded-xl p-6">
+                  <div className="text-xs font-bold uppercase tracking-widest text-cream/40 mb-4">Avant</div>
+                  <ul className="space-y-3">
+                    {study.before.map((item, i) => (
+                      <li key={i} className="flex items-start gap-3 text-cream/50 line-through decoration-cream/20">
+                        <X className="h-4 w-4 mt-0.5 shrink-0 text-destructive/60" />
+                        <span className="text-sm">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
 
-                <div className="grid grid-cols-3 gap-3">
-                  {study.metrics.map((metric, i) => (
-                    <div key={i} className="text-center bg-noir rounded-xl p-5 shadow-md">
-                      <div className="text-lg md:text-xl font-bold text-primary mb-1">{metric.value}</div>
-                      <div className="text-[11px] uppercase tracking-wider text-cream/60 font-medium">{metric.label}</div>
-                    </div>
-                  ))}
+                {/* Après */}
+                <div className="bg-primary/10 rounded-xl p-6 border border-primary/20">
+                  <div className="text-xs font-bold uppercase tracking-widest text-primary mb-4">Après</div>
+                  <ul className="space-y-3">
+                    {study.after.map((item, i) => (
+                      <li key={i} className="flex items-start gap-3 text-foreground">
+                        <Check className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
+                        <span className="text-sm font-medium">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
+              </div>
+
+              {/* Résultats */}
+              <div className="bg-muted/50 rounded-xl p-6">
+                <div className="text-xs font-bold uppercase tracking-widest text-primary mb-4">{study.resultLabel}</div>
+                <ul className="grid md:grid-cols-3 gap-3">
+                  {study.results.map((result, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-foreground/80">
+                      <Check className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
+                      {result}
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           ))}
+
+          {/* One Shot -- format manifeste */}
+          <div className="bg-noir rounded-2xl p-10 md:p-14 text-center border border-primary/20 hover:border-primary/40 hover:shadow-xl transition-all duration-300">
+            <span className="text-xs font-semibold uppercase tracking-widest text-primary">One Shot stratégique</span>
+            <h3 className="font-display text-2xl md:text-3xl font-bold mt-3 mb-8 tracking-tight text-cream">
+              Arrêter de poster pour rien
+            </h3>
+            <div className="space-y-2 text-cream/70 text-lg max-w-md mx-auto mb-8">
+              <p>Diagnostic direct.</p>
+              <p>Ajustement clair.</p>
+              <p>Repositionnement immédiat.</p>
+            </div>
+            <div className="flex items-center justify-center gap-3 text-primary font-semibold">
+              <Target className="h-5 w-5" />
+              <span>Objectif : faire en sorte que chaque vidéo serve une stratégie.</span>
+            </div>
+          </div>
         </div>
       </Section>
 

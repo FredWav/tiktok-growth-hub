@@ -1,37 +1,41 @@
 
 
-# Renforcer l'argumentaire VIP sur toutes les pages
+# Mise a jour de la page A Propos -- ajout des stats reseaux sociaux
 
-## Selection des elements les plus convertissants
+## Contexte
 
-Parmi tout ce qui a ete fourni, voici ce qui va le plus pousser a l'achat :
+La page A Propos est en cours de refonte complete (plan precedemment approuve). Les nouvelles stats d'audience fournies (280K TikTok, 35K Instagram, 30K YouTube) viennent s'ajouter aux chiffres deja prevus.
 
-1. **La phrase de positionnement** : "Transforme un createur motive en createur structure" -- c'est le hook principal
-2. **La description anti-bullshit** : ce n'est PAS un groupe motivation flou, c'est un environnement oriente performance
-3. **Les benefices concrets recrits** : hook engineering, lecture analytique des stats, CTA strategique, positionnement business
-4. **La cible clarifiee** : createurs bloques en croissance, debutants ambitieux, intermediaires qui veulent scaler
+## Section Stats mise a jour
 
-## Changements prevus
+Le bandeau de stats passera de 4 a 8 elements, organises en 2 lignes de 4 :
 
-### 1. Page Offres (`src/pages/Offres.tsx`) -- bloc VIP (id: "vip")
+| Stat | Label |
+|---|---|
+| 300+ | Createurs accompagnes |
+| 10M+ | Vues generees via strategies deployees |
+| 18 ans | D'experience en creation video |
+| 20 ans | Dans la musique et la creation artistique |
+| 280K | Abonnes TikTok cumules |
+| 35K | Abonnes Instagram |
+| 30K | Abonnes YouTube |
+| 95% | Taux de satisfaction |
 
-- **Description** : remplacer le texte generique par quelque chose de plus percutant oriente transformation
-- **Includes** : enrichir la liste avec les elements education avancee (hook engineering, lecture stats, strategie CTA, positionnement business)
-- **forWho** : mettre a jour avec la cible exacte (bloque en croissance, debutant ambitieux, intermediaire qui veut scaler)
-- **notForWho** : ajuster pour coller au positionnement exigeant (pas pour ceux qui cherchent de la motivation sans action)
+Grille : `grid-cols-2 md:grid-cols-4` pour garder une lecture propre sur toutes les tailles d'ecran.
 
-### 2. Page VIP Checkout (`src/pages/VipCheckout.tsx`)
+## Rappel des autres changements (plan precedent, toujours valide)
 
-- **Sous-titre** : remplacer "Le club prive" par quelque chose de plus fort comme "Le hub strategique des createurs ambitieux"
-- **VIP_BENEFITS** : enrichir avec les elements cles (feedback sur hooks/scripts, education avancee, environnement exigeant)
-- **Ajouter un bloc "pitch"** au-dessus des plans de prix : une ou deux phrases de positionnement fort qui resument la valeur ("Ce n'est pas un serveur motivation...")
+- **Hero** : texte mis a jour avec "Strategiste en contenu TikTok et formats courts", ton authentique
+- **Parcours** : remplacement par le vrai parcours (18 ans de video, musique, technique son, analyse de milliers de videos)
+- **Philosophie** : nouveau bloc "On ne poste pas pour exister. On poste pour convertir."
+- **Valeurs** : descriptions mises a jour (300+ createurs, 18 ans, transparence sans filtre)
+- **CTA** : inchange
 
 ## Details techniques
 
-- **Fichiers modifies** :
-  - `src/pages/Offres.tsx` : mise a jour de l'objet VIP dans le tableau `offers` (description, includes, forWho, notForWho)
-  - `src/pages/VipCheckout.tsx` : mise a jour de `VIP_BENEFITS`, du sous-titre, et ajout d'un bloc pitch entre le titre et les plans de prix
-
-- Aucun fichier cree ou supprime
-- Aucun changement backend
+- **Fichier modifie** : `src/pages/APropos.tsx`
+- Le tableau `stats` passe de 4 a 8 elements
+- La grille stats garde `grid-cols-2 md:grid-cols-4` (2 lignes de 4 sur desktop)
+- On retire le stat "13 ans en technique son" pour eviter la surcharge -- 8 stats c'est le maximum lisible. L'info reste dans le texte du parcours.
+- Aucun fichier cree ou supprime, aucun changement backend
 

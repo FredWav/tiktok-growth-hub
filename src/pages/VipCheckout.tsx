@@ -12,7 +12,7 @@ const DISCORD_INVITE_URL = "https://discord.gg/KUgFunVhKY";
 const VIP_PLANS = [
   { months: 3, priceId: "price_1T0UXNBfuzQl0PTiKGR1SBTV", total: 297, monthly: 99, savings: null, label: "3 mois" },
   { months: 6, priceId: "price_1T0UXRBfuzQl0PTir9qz5lUy", total: 495, monthly: 82.5, savings: "1 mois offert", label: "6 mois" },
-  { months: 12, priceId: "price_1T0UXTBfuzQl0PTi6KK2azBu", total: 990, monthly: 82.5, savings: "2 mois offerts", label: "12 mois" },
+  { months: 12, priceId: "price_1T0UXTBfuzQl0PTi6KK2azBu", total: 891, monthly: 74.25, savings: "3 mois offerts", label: "12 mois", featured: true },
 ];
 
 const VIP_BENEFITS = [
@@ -68,7 +68,7 @@ function VipSuccessView() {
 }
 
 function VipCheckoutForm() {
-  const [selectedPlan, setSelectedPlan] = useState(0);
+  const [selectedPlan, setSelectedPlan] = useState(2);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -112,14 +112,17 @@ function VipCheckoutForm() {
           </div>
 
           <div className="grid grid-cols-3 gap-3 mb-8">
-            {VIP_PLANS.map((p, i) => (
-              <button key={p.months} onClick={() => setSelectedPlan(i)} className={`relative rounded-xl p-4 text-center border-2 transition-all ${selectedPlan === i ? "border-primary bg-primary/5 shadow-md" : "border-border bg-background hover:border-primary/50"}`}>
-                {p.savings && <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">{p.savings}</span>}
-                <div className="font-semibold text-lg">{p.label}</div>
-                <div className="text-2xl font-bold mt-1">{p.total}€</div>
-                <div className="text-xs text-muted-foreground">soit {p.monthly.toFixed(p.monthly % 1 === 0 ? 0 : 1)}€/mois</div>
-              </button>
-            ))}
+            {VIP_PLANS.map((p, i) => {
+              const isFeatured = (p as any).featured;
+              return (
+                <button key={p.months} onClick={() => setSelectedPlan(i)} className={`relative rounded-xl p-4 text-center border-2 transition-all ${isFeatured ? "scale-105 z-10" : ""} ${selectedPlan === i ? "border-primary bg-primary/5 shadow-md ring-2 ring-primary/30" : isFeatured ? "border-primary/40 bg-primary/5 hover:border-primary" : "border-border bg-background hover:border-primary/50"}`}>
+                  {p.savings && <span className={`absolute -top-2.5 left-1/2 -translate-x-1/2 text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap ${isFeatured ? "bg-primary text-primary-foreground px-3 py-1 text-sm shadow-lg" : "bg-primary text-primary-foreground"}`}>{p.savings}</span>}
+                  <div className="font-semibold text-lg">{p.label}</div>
+                  <div className="text-2xl font-bold mt-1">{p.total}€</div>
+                  <div className="text-xs text-muted-foreground">soit {p.monthly.toFixed(p.monthly % 1 === 0 ? 0 : 1)}€/mois</div>
+                </button>
+              );
+            })}
           </div>
 
           <div className="bg-muted/50 rounded-xl p-6 mb-8">

@@ -12,6 +12,7 @@ const videoTestimonials = [
   "hwTyjA6BORY",
   "FrMFqiAqAkU",
   "s-VaJvfFqbM",
+  "wu2CPcqp-yU",
 ];
 
 function VideoCard({ id }: { id: string }) {
@@ -141,12 +142,7 @@ export default function Preuves() {
         />
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {videoTestimonials.slice(0, 3).map((id) => (
-            <VideoCard key={id} id={id} />
-          ))}
-        </div>
-        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mt-6">
-          {videoTestimonials.slice(3).map((id) => (
+          {videoTestimonials.map((id) => (
             <VideoCard key={id} id={id} />
           ))}
         </div>

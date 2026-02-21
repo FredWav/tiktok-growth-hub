@@ -86,34 +86,37 @@ const testimonials = [
 
 const caseStudies = [
   {
-    title: "De 0 à 50K en 3 mois",
+    title: "Structuration et premières performances",
     category: "Accompagnement 45 jours",
-    description: "Un coach business qui partait de zéro et qui a construit une audience engagée en appliquant la méthode.",
+    description: "Créateur débutant qui avait du mal à publier régulièrement et à comprendre ses statistiques. Travail sur la régularité, la rétention et les premiers leads entrants.",
     metrics: [
-      { label: "Followers", value: "0 → 52K" },
-      { label: "Vues/mois", value: "1.2M" },
-      { label: "Clients via TikTok", value: "+30" },
+      { label: "Progression des vues", value: "<1K → 20K" },
+      { label: "Ligne éditoriale", value: "Structure claire" },
+      { label: "Demandes entrantes", value: "1-3/semaine" },
     ],
+    disclaimer: "Pas de promesse de viralité. Travail sur la méthode.",
   },
   {
-    title: "Multiplication x5 du CA",
-    category: "VIP",
-    description: "Une marque e-commerce qui a utilisé TikTok comme levier principal d'acquisition.",
+    title: "Optimisation d'un compte actif",
+    category: "Accompagnement Business",
+    description: "Créateur déjà présent sur TikTok mais sans stratégie de conversion. Travail sur les hooks, scripts, positionnement offre et optimisation des CTA.",
     metrics: [
-      { label: "CA mensuel", value: "x5" },
-      { label: "Coût d'acquisition", value: "-60%" },
-      { label: "ROI TikTok", value: "800%" },
+      { label: "Engagement", value: "En hausse" },
+      { label: "Rétention", value: "Améliorée" },
+      { label: "Leads", value: "Croissance" },
     ],
+    disclaimer: "Focus : performance durable, pas coup d'éclat.",
   },
   {
-    title: "Positionnement expert",
-    category: "One Shot + 45 jours",
-    description: "Un consultant qui a voulu se positionner comme référence dans sa niche grâce au contenu.",
+    title: "Clarification et repositionnement",
+    category: "One Shot stratégique",
+    description: "Consultant ou coach avec contenu flou ou mal perçu. Audit du profil, refonte bio, clarification de la promesse et ajustement éditorial.",
     metrics: [
-      { label: "Autorité perçue", value: "++++" },
-      { label: "Invitations podcast", value: "12" },
-      { label: "Nouveaux clients HG", value: "+8" },
+      { label: "Positionnement", value: "Plus clair" },
+      { label: "Autorité", value: "Signaux forts" },
+      { label: "Leads qualifiés", value: "Invitations & collabs" },
     ],
+    disclaimer: "Résultats progressifs. Pas de raccourci.",
   },
 ];
 
@@ -203,7 +206,7 @@ export default function Preuves() {
       <Section variant="cream" size="lg">
         <SectionHeader
           title="Études de cas"
-          subtitle="Des exemples concrets de transformations."
+          subtitle="Des transformations mesurables et documentées."
         />
 
         <div className="space-y-8">
@@ -218,10 +221,11 @@ export default function Preuves() {
                   <h3 className="font-display text-2xl font-semibold mt-2 mb-4">
                     {study.title}
                   </h3>
-                  <p className="text-muted-foreground">{study.description}</p>
-                </div>
+                   <p className="text-muted-foreground">{study.description}</p>
+                   <p className="text-xs text-muted-foreground/70 italic mt-3">{study.disclaimer}</p>
+                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
+                 <div className="grid grid-cols-3 gap-4">
                   {study.metrics.map((metric, i) => (
                     <div key={i} className="text-center bg-muted/50 rounded-lg p-4">
                       <div className="text-xl font-bold text-primary">{metric.value}</div>

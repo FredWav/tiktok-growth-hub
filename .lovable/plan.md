@@ -1,47 +1,43 @@
 
+# Refonte complete de la section Etudes de cas -- format Avant/Apres
 
-# Remplacement des etudes de cas par des donnees reelles
+## Ce qui change
 
-## Probleme
+La structure actuelle (description + 3 metriques en grille) est remplacee par un format **Avant / Apres + Resultat type**, beaucoup plus percutant et lisible.
 
-Les 3 etudes de cas actuelles contiennent des chiffres inventes (52K followers, x5 CA, 800% ROI, etc.). Le contenu doit etre remplace par des resultats reels, presentes de maniere vendeuse mais honnete.
+## Nouveau contenu et structure
 
-## Nouveau contenu -- 3 etudes de cas
+### Etude 1 -- Accompagnement 45 jours
+- **Titre** : "Passer du chaos a une strategie claire"
+- **Avant** : Publications irregulieres / Aucun systeme / Aucune lecture des stats
+- **Apres** : Calendrier editorial structure / Hooks retravailles / CTA optimises / Premieres demandes entrantes
+- **Resultat type** : Videos qui depassent regulierement les 5k-15k vues / 1 a 3 prospects qualifies par semaine / Comprehension reelle des metriques
 
-### 1. Accompagnement 45 jours -- "Structuration et premieres performances"
+### Etude 2 -- Accompagnement Business
+- **Titre** : "Transformer l'audience en chiffre d'affaires"
+- **Avant** : Des vues / Peu de conversion / Positionnement flou
+- **Apres** : Offre clarifiee / CTA strategique / Contenu oriente acquisition
+- **Effet constate** : Plus de leads qualifies / Moins de perte d'audience / Meilleur ratio vues/ventes
 
-- Description : Createur debutant qui avait du mal a publier regulierement et a comprendre ses statistiques.
-- Metriques affichees (format vente optimisee) :
-  - `<1K -> 20K vues` / Progression des vues
-  - `Ligne editoriale` / Structure claire en place
-  - `1-3 leads/semaine` / Demandes entrantes
+### Etude 3 -- One Shot strategique
+- **Titre** : "Arreter de poster pour rien"
+- **Description** : Diagnostic direct. Ajustement clair. Repositionnement immediat.
+- **Objectif** : Faire en sorte que chaque video serve une strategie.
+- Format plus court et punch, pas de avant/apres classique
 
-### 2. Accompagnement Business -- "Optimisation d'un compte actif"
+## Mise en page
 
-- Description : Createur deja present sur TikTok mais sans strategie de conversion. Travail sur les hooks, scripts, positionnement offre et CTA.
-- Metriques :
-  - `Engagement` / En hausse mesurable
-  - `Retention` / Amelioration moyenne
-  - `Leads` / Croissance progressive
-
-### 3. One Shot strategique -- "Clarification et repositionnement"
-
-- Description : Consultant ou coach avec contenu flou ou mal percu. Audit du profil, refonte bio, clarification promesse, ajustement editorial.
-- Metriques :
-  - `Positionnement` / Plus clair et coherent
-  - `Autorite` / Premiers signaux forts
-  - `Leads qualifies` / Invitations et collabs
-
-## Changements de mise en page
-
-- Le sous-titre passe de "Des exemples concrets de transformations." a "Des transformations mesurables et documentees."
-- Ajout d'une mention discrete sous chaque etude : une phrase de contexte type "Pas de promesse de viralite. Travail sur la methode." ou "Focus : performance durable, pas coup d'eclat."
-- Les metriques restent dans le meme format visuel (3 colonnes chiffrees) mais avec des valeurs qualitatives/realistes au lieu de chiffres gonfles
+- Chaque etude de cas est une carte avec :
+  - Tag categorie en haut
+  - Titre en gros
+  - Deux colonnes **Avant** (fond sombre, texte barre ou grise) et **Apres** (fond accent, texte vif)
+  - Bloc "Resultat type observe" en bas avec icones check
+- Le 3e (One Shot) a un format special : texte centre, phrases courtes, style manifeste
+- Les disclaimers actuels sont retires (le ton honnete est deja dans le contenu)
 
 ## Details techniques
 
 - **Fichier modifie** : `src/pages/Preuves.tsx`
-- Seul le tableau `caseStudies` et le sous-titre de la section sont modifies
-- Aucun changement de structure, composants ou layout
-- Aucun fichier cree ou supprime
-
+- Remplacement complet du tableau `caseStudies` et de son rendu JSX dans la section "Etudes de cas"
+- Import de `Check` et `X` depuis lucide-react pour les listes avant/apres
+- Aucun nouveau fichier, aucune dependance ajoutee

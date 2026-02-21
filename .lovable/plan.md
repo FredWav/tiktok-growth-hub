@@ -1,73 +1,42 @@
 
 
-# One Shot : formulaire pre-reservation + envoi par email
+# Simplifier le checkout VIP : supprimer le champ Discord ID
 
-## Objectif
+## Probleme
 
-Apres le paiement Stripe, le client remplit un formulaire avec ses infos avant d'acceder au lien Calendly. Les informations collectees sont envoyees par email a fredwavcm@gmail.com.
+Le lien Discord `https://discord.gg/KUgFunVhKY` octroie deja automatiquement le bon role VIP. Demander l'ID Discord en plus ajoute de la friction inutile et complique le parcours d'achat.
 
-## Flow utilisateur
+## Ce qui va changer
 
-```text
-Paiement Stripe OK
-       |
-       v
-Page de succes - Etape 1 : Formulaire
-  (Nom, Email, WhatsApp, Compte TikTok, Objectifs)
-       |
-       v
-Soumission du formulaire
-       |
-       v
-Envoi email a fredwavcm@gmail.com (via fonction backend)
-       |
-       v
-Page de succes - Etape 2 : Lien Calendly affiche
-  + message contact si horaires impossibles
-```
+### 1. Page de checkout (`VipCheckout.tsx`)
 
-## Ce qui sera fait
+- Supprimer le champ "Ton ID Discord" (tout le bloc avec l'input, le label et les instructions)
+- Supprimer la validation qui bloque le paiement si l'ID Discord n'est pas rempli
+- Supprimer les imports inutiles (`Input`, `Label`, `MessageCircle`, `Info`)
+- Supprimer le state `discordId`
+- Ne plus envoyer `discordUserId` dans l'appel a `create-vip-checkout`
 
-### 1. Service d'envoi d'emails
+### 2. Page de succes (deja en place)
 
-Il faut un service d'envoi d'emails. **Resend** est le plus simple a integrer. Il faudra :
-- Creer un compte gratuit sur [resend.com](https://resend.com) (100 emails/jour gratuits)
-- Recuperer la cle API
-- La stocker comme secret du projet (`RESEND_API_KEY`)
+- Mettre a jour le texte : au lieu de "Ton role VIP a ete attribue automatiquement", indiquer de rejoindre le serveur Discord via le lien pour obtenir le role
+- Le bouton "Rejoindre le serveur Discord" reste en place
 
-### 2. Fonction backend `send-oneshot-form`
+### 3. Fonction `create-vip-checkout`
 
-Nouvelle fonction qui :
-- Recoit les donnees du formulaire (nom, email, whatsapp, tiktok, objectifs)
-- Envoie un email formate a fredwavcm@gmail.com avec toutes les infos
-- Utilise Resend pour l'envoi
-- Pas d'authentification requise (le client vient de payer)
+- Retirer `discordUserId` des champs requis et des metadata Stripe
+- Simplifier la validation
 
-### 3. Mise a jour de `OneShotSuccess.tsx`
+### 4. Fonction `stripe-webhook`
 
-Transformer la page en 2 etapes :
-- **Etape 1** : Formulaire avec les champs suivants :
-  - Nom / Prenom (obligatoire)
-  - Email (obligatoire, validation format)
-  - WhatsApp (obligatoire, numero de telephone)
-  - Compte TikTok (obligatoire, @handle ou lien)
-  - Objectifs / Situation (obligatoire, textarea)
-- **Etape 2** (apres soumission) : Message de confirmation + bouton Calendly + message contact
-
-Validation cote client avec zod + react-hook-form (deja installes).
-
-### 4. Configuration
-
-- Ajouter `send-oneshot-form` dans `supabase/config.toml` avec `verify_jwt = false`
+- Retirer la logique d'attribution de role Discord via le bot (appel a `discord-role`)
+- Ne plus stocker `discord_user_id` ni `discord_role_granted` dans la table `vip_subscriptions`
 
 ## Details techniques
 
-- Fichiers crees :
-  - `supabase/functions/send-oneshot-form/index.ts`
 - Fichiers modifies :
-  - `src/pages/OneShotSuccess.tsx` (ajout formulaire 2 etapes)
-  - `supabase/config.toml` (ajout config fonction)
-- Secret necessaire : `RESEND_API_KEY` (a fournir apres creation du compte Resend)
-- Validation : zod schema avec tous les champs obligatoires
-- Email envoye au format HTML lisible avec toutes les infos du client
+  - `src/pages/VipCheckout.tsx` (suppression champ + simplification)
+  - `supabase/functions/create-vip-checkout/index.ts` (retrait discordUserId)
+  - `supabase/functions/stripe-webhook/index.ts` (retrait logique bot Discord)
+- Aucun fichier cree ou supprime
+- Les fonctions `discord-role` et `check-vip-expiry` restent disponibles si besoin futur
 

@@ -154,22 +154,37 @@ export default function APropos() {
       </Section>
 
       {/* Valeurs */}
-      <Section variant="default" size="lg">
+      <Section variant="cream" size="lg">
         <SectionHeader
           title="Ma façon de travailler"
         />
 
-        <div className="grid md:grid-cols-3 gap-6">
-          {values.map((value, index) => (
+        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {values.slice(0, 3).map((value, index) => (
             <div
               key={index}
-              className="bg-background rounded-xl p-8 hover:shadow-lg transition-shadow border border-border"
+              className="group bg-background rounded-2xl p-8 border border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-[0_8px_30px_-12px_hsl(var(--primary)/0.15)]"
             >
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                <value.icon className="h-6 w-6 text-primary" />
+              <div className="w-14 h-14 bg-gradient-to-br from-primary/15 to-primary/5 rounded-xl flex items-center justify-center mb-5 group-hover:from-primary/25 group-hover:to-primary/10 transition-all duration-300">
+                <value.icon className="h-6 w-6 text-primary" strokeWidth={1.5} />
               </div>
-              <h3 className="font-semibold text-xl mb-2">{value.title}</h3>
-              <p className="text-muted-foreground">{value.description}</p>
+              <h3 className="font-display font-semibold text-xl mb-3">{value.title}</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">{value.description}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto mt-6">
+          {values.slice(3).map((value, index) => (
+            <div
+              key={index + 3}
+              className="group bg-background rounded-2xl p-8 border border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-[0_8px_30px_-12px_hsl(var(--primary)/0.15)]"
+            >
+              <div className="w-14 h-14 bg-gradient-to-br from-primary/15 to-primary/5 rounded-xl flex items-center justify-center mb-5 group-hover:from-primary/25 group-hover:to-primary/10 transition-all duration-300">
+                <value.icon className="h-6 w-6 text-primary" strokeWidth={1.5} />
+              </div>
+              <h3 className="font-display font-semibold text-xl mb-3">{value.title}</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">{value.description}</p>
             </div>
           ))}
         </div>

@@ -119,6 +119,9 @@ export default function OneShot() {
             <Clock className="inline h-4 w-4 mr-1" />
             Créneaux disponibles cette semaine
           </p>
+          <p className="text-xs text-muted-foreground mt-2">
+            Paiement en 3x avec Klarna et 4x avec PayPal disponible, sous réserve d'acceptation.
+          </p>
         </div>
       </Section>
 
@@ -303,6 +306,9 @@ export default function OneShot() {
               {loading ? "Redirection..." : "Réserver ma session maintenant"}
               <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
+          <p className="text-xs text-muted-foreground mt-3">
+            Paiement en 3x avec Klarna et 4x avec PayPal disponible, sous réserve d'acceptation.
+          </p>
         </div>
       </Section>
     </Layout>

@@ -180,6 +180,9 @@ export default function Offres() {
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Paiement en 3x avec Klarna et 4x avec PayPal disponible, sous réserve d'acceptation.
+                </p>
               </div>
 
               {/* Details */}

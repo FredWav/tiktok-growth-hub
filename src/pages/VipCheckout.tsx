@@ -142,6 +142,7 @@ function VipCheckoutForm() {
             {loading ? "Redirection..." : `Payer ${plan.total}€ — ${plan.label}`}
           </Button>
           <p className="text-xs text-center text-muted-foreground mt-4">Paiement sécurisé via Stripe. Tu seras redirigé vers la page de paiement.</p>
+          <p className="text-xs text-center text-muted-foreground mt-1">Paiement en 3x avec Klarna et 4x avec PayPal disponible, sous réserve d'acceptation.</p>
         </div>
       </Section>
     </Layout>

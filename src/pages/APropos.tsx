@@ -8,29 +8,33 @@ const values = [
   {
     icon: Target,
     title: "Focus résultats",
-    description: "Je ne travaille pas pour les vanity metrics. Tout ce qu'on fait ensemble vise un objectif business concret.",
+    description: "On vise des objectifs business clairs. Pas des vanity metrics.",
   },
   {
     icon: Users,
     title: "Approche personnalisée",
-    description: "Pas de template copié-collé. Chaque stratégie est construite sur mesure pour ta situation.",
+    description: "Pas de template universel. Chaque stratégie est construite sur ton positionnement, ton marché, ton niveau.",
   },
   {
     icon: TrendingUp,
     title: "Méthode éprouvée",
-    description: "3 ans d'expérience, +100 clients accompagnés. Mes méthodes ont été testées et affinées.",
+    description: "18 ans de création vidéo. 300+ créateurs accompagnés. Une méthode testée sur le terrain.",
   },
   {
     icon: Award,
     title: "Transparence totale",
-    description: "Je te dis ce qui marche et ce qui ne marchera pas. Pas de promesses vides ou de surprises.",
+    description: "Je te dis ce qui fonctionne. Je te dis aussi ce qui ne fonctionnera pas. Même si ce n'est pas agréable à entendre.",
   },
 ];
 
 const stats = [
-  { value: "100+", label: "Clients accompagnés" },
-  { value: "10M+", label: "Vues générées" },
-  { value: "3 ans", label: "D'expertise TikTok" },
+  { value: "300+", label: "Créateurs accompagnés" },
+  { value: "10M+", label: "Vues générées via stratégies déployées" },
+  { value: "18 ans", label: "D'expérience en création vidéo" },
+  { value: "20 ans", label: "Dans la musique et la création artistique" },
+  { value: "280K", label: "Abonnés TikTok cumulés" },
+  { value: "35K", label: "Abonnés Instagram" },
+  { value: "30K", label: "Abonnés YouTube" },
   { value: "95%", label: "Taux de satisfaction" },
 ];
 
@@ -45,12 +49,12 @@ export default function APropos() {
               Je suis là pour <span className="text-gold-gradient">tes résultats</span>, pas pour te vendre du rêve.
             </h1>
             <p className="text-lg text-muted-foreground mb-6">
-              Coach en stratégie de contenu TikTok, j'aide les entrepreneurs et créateurs 
-              à développer une présence qui génère des clients, pas juste des likes.
+              Stratégiste en contenu TikTok et formats courts, j'accompagne entrepreneurs et créateurs 
+              à construire une présence qui génère des clients — pas juste des likes.
             </p>
             <p className="text-muted-foreground">
-              Mon approche ? Du concret, de la stratégie, et des résultats mesurables. 
-              Pas de bullshit marketing, pas de hacks miracles. Juste ce qui fonctionne.
+              Mon approche est simple : stratégie, analyse, performance mesurable. 
+              Pas de hacks miracles. Pas de bullshit marketing. Juste ce qui fonctionne.
             </p>
           </div>
 
@@ -76,7 +80,7 @@ export default function APropos() {
         </div>
       </Section>
 
-      {/* Story */}
+      {/* Parcours */}
       <Section variant="default" size="lg">
         <div className="max-w-3xl mx-auto">
           <SectionHeader
@@ -86,28 +90,66 @@ export default function APropos() {
 
           <div className="prose prose-lg max-w-none text-muted-foreground space-y-4">
             <p>
-              J'ai commencé sur TikTok comme tout le monde : sans stratégie, à poster des vidéos 
-              en espérant que l'algorithme fasse le travail.
+              Je n'ai pas commencé avec TikTok.<br />
+              Mes premières vidéos remontent à mes 18 ans. J'en ai 19 cette année.
             </p>
             <p>
-              Après des mois de frustration, j'ai décidé de comprendre vraiment comment la plateforme 
-              fonctionnait. J'ai analysé des milliers de vidéos, testé des centaines de formats, 
-              et développé une méthode qui marche.
+              Ça fait 18 ans que je filme, monte, expérimente.<br />
+              20 ans que je fais de la musique.<br />
+              13 ans que je travaille le son, l'enregistrement et la technique.
             </p>
             <p>
-              Aujourd'hui, j'applique cette méthode pour mes clients. Des entrepreneurs, des créateurs, 
-              des marques qui veulent des résultats concrets. Pas des promesses.
+              TikTok n'a été qu'un terrain d'application supplémentaire.
             </p>
             <p>
-              Ma philosophie est simple : <strong>chaque contenu doit servir un objectif</strong>. 
-              Si ça ne génère pas de résultats business, ça ne sert à rien.
+              Comme tout le monde, j'ai posté sans stratégie au début.
+              Puis j'ai décidé de comprendre la plateforme en profondeur.
+            </p>
+            <p>
+              J'ai analysé des milliers de vidéos.
+              Testé des centaines de formats.
+              Observé les métriques.
+              Disséqué la rétention.
+              Comparé médiane et moyenne.
+              Compris les signaux faibles.
+            </p>
+            <p>
+              De là est née une méthode structurée.
+            </p>
+            <p>
+              Aujourd'hui, j'accompagne plus de 300 créateurs — entrepreneurs, experts, marques — 
+              qui veulent transformer leur contenu en levier business.
             </p>
           </div>
         </div>
       </Section>
 
-      {/* Values */}
+      {/* Philosophie */}
       <Section variant="cream" size="lg">
+        <div className="max-w-3xl mx-auto">
+          <SectionHeader
+            title="Ma philosophie"
+            align="left"
+          />
+
+          <div className="prose prose-lg max-w-none text-muted-foreground space-y-4">
+            <p>
+              <strong>Chaque contenu doit servir un objectif.</strong>
+            </p>
+            <p>
+              Un contenu qui ne génère ni autorité, ni audience qualifiée, ni clients 
+              est un divertissement personnel. Pas une stratégie.
+            </p>
+            <p className="text-foreground font-semibold text-xl">
+              On ne poste pas pour exister.<br />
+              On poste pour convertir.
+            </p>
+          </div>
+        </div>
+      </Section>
+
+      {/* Valeurs */}
+      <Section variant="default" size="lg">
         <SectionHeader
           title="Ma façon de travailler"
           subtitle="Des principes simples qui guident tous mes accompagnements."
@@ -117,7 +159,7 @@ export default function APropos() {
           {values.map((value, index) => (
             <div
               key={index}
-              className="bg-background rounded-xl p-8 hover:shadow-lg transition-shadow"
+              className="bg-background rounded-xl p-8 hover:shadow-lg transition-shadow border border-border"
             >
               <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
                 <value.icon className="h-6 w-6 text-primary" />
@@ -130,13 +172,13 @@ export default function APropos() {
       </Section>
 
       {/* CTA */}
-      <Section variant="default" size="lg">
+      <Section variant="cream" size="lg">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="font-display text-3xl font-semibold mb-4">
             Envie de travailler ensemble ?
           </h2>
           <p className="text-muted-foreground mb-6">
-            Commence par un One Shot pour voir si ma méthode te convient.
+            Commence par un One Shot. Tu verras rapidement si ma méthode est faite pour toi.
           </p>
           <Button variant="hero" size="lg" asChild>
             <Link to="/one-shot">

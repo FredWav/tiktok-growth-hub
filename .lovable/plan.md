@@ -1,35 +1,35 @@
 
+# Ajouter la mention Klarna (3x) et PayPal (4x) sur toutes les pages d'offres
 
-# VIP 12 mois : passer a 3 mois offerts et mise en avant visuelle
+## Objectif
 
-## Changements de prix
+Informer les clients qu'ils peuvent payer en 3 fois avec Klarna et en 4 fois avec PayPal, sous reserve d'acceptation, sur toutes les pages ou un bouton de paiement est present.
 
-| | Avant | Apres |
-|---|---|---|
-| Mois offerts | 2 | 3 |
-| Prix total | 990€ | 891€ |
-| Prix/mois | 82.5€ | 74.25€ |
-| Badge | "2 mois offerts" | "3 mois offerts" |
+## Pages concernees
 
-Les plans 3 mois (297€) et 6 mois (495€, 1 mois offert) restent inchanges.
+### 1. One Shot (`src/pages/OneShot.tsx`)
+- Sous le bouton CTA hero (ligne 116) : ajouter une mention sous le texte "Creneaux disponibles cette semaine"
+- Sous le bouton CTA final (ligne 303) : ajouter la meme mention
 
-## Mise en avant visuelle du plan 12 mois
+### 2. VIP Checkout (`src/pages/VipCheckout.tsx`)
+- Sous le bouton "Payer X€" (ligne 144) : remplacer ou completer le texte existant "Paiement securise via Stripe..."
 
-- Le plan 12 mois sera pre-selectionne par defaut (au lieu du plan 3 mois)
-- Ajout d'un style plus visible sur le badge "3 mois offerts" (plus grand, couleur or/primary plus marquee)
-- Legere mise en echelle ou bordure plus epaisse pour attirer l'oeil
+### 3. Page Offres (`src/pages/Offres.tsx`)
+- Sous chaque bouton CTA des 3 offres : ajouter la mention en petit texte
 
-## Impact Stripe
+## Texte a ajouter
 
-Le `priceId` du plan 12 mois (`price_1T0UXTBfuzQl0PTi6KK2azBu`) devra correspondre au nouveau prix de 891€ dans Stripe. Il faudra soit :
-- Mettre a jour le prix dans le dashboard Stripe
-- Ou creer un nouveau prix Stripe a 891€ et mettre a jour le `priceId` dans le code
+Le texte sera un paragraphe discret en dessous des boutons de paiement :
+
+> Paiement en 3x avec Klarna et 4x avec PayPal disponible, sous reserve d'acceptation.
+
+Style : `text-xs text-muted-foreground text-center mt-2`
 
 ## Details techniques
 
-- Fichier modifie : `src/pages/VipCheckout.tsx`
-  - Mettre a jour l'objet du plan 12 mois : `total: 891`, `monthly: 74.25`, `savings: "3 mois offerts"`
-  - Changer `selectedPlan` initial de `0` a `2` (pre-selection 12 mois)
-  - Ajouter un style visuel renforce sur le plan 12 mois (ex: `ring-2 ring-primary scale-105`)
-- Fichier modifie : `src/pages/Offres.tsx` (si le prix VIP y est mentionne, mettre a jour la coherence)
-
+- Fichiers modifies :
+  - `src/pages/OneShot.tsx` (2 ajouts sous les 2 boutons CTA)
+  - `src/pages/VipCheckout.tsx` (mise a jour du texte sous le bouton de paiement)
+  - `src/pages/Offres.tsx` (ajout sous chaque bouton CTA d'offre)
+- Aucun fichier cree ou supprime
+- Texte identique partout pour la coherence

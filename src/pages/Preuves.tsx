@@ -1,9 +1,55 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Quote, TrendingUp, Users, Eye } from "lucide-react";
+import { useState } from "react";
+import { ArrowRight, Quote, TrendingUp, Users, Eye, Play } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+
+const videoTestimonials = [
+  "97xyXqwszrM",
+  "cc1cRfCEJGE",
+  "hwTyjA6BORY",
+  "FrMFqiAqAkU",
+  "s-VaJvfFqbM",
+];
+
+function VideoCard({ id }: { id: string }) {
+  const [playing, setPlaying] = useState(false);
+
+  if (playing) {
+    return (
+      <div className="aspect-video rounded-xl overflow-hidden shadow-lg">
+        <iframe
+          src={`https://www.youtube.com/embed/${id}?autoplay=1`}
+          title="Témoignage client"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="w-full h-full"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <button
+      onClick={() => setPlaying(true)}
+      className="group relative aspect-video rounded-xl overflow-hidden shadow-lg cursor-pointer w-full"
+    >
+      <img
+        src={`https://img.youtube.com/vi/${id}/hqdefault.jpg`}
+        alt="Témoignage client"
+        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+        loading="lazy"
+      />
+      <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+        <div className="w-16 h-16 rounded-full bg-primary/90 flex items-center justify-center group-hover:scale-110 transition-transform shadow-xl">
+          <Play className="h-7 w-7 text-primary-foreground ml-1" fill="currentColor" />
+        </div>
+      </div>
+    </button>
+  );
+}
 
 const testimonials = [
   {
@@ -90,6 +136,25 @@ export default function Preuves() {
             Ce que mes clients ont accompli en appliquant la méthode.
             Pas de chiffres gonflés. Juste la réalité.
           </p>
+        </div>
+      </Section>
+
+      {/* Video Testimonials */}
+      <Section variant="cream" size="lg">
+        <SectionHeader
+          title="Ils témoignent en vidéo"
+          subtitle="Des retours authentiques, face caméra."
+        />
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          {videoTestimonials.slice(0, 3).map((id) => (
+            <VideoCard key={id} id={id} />
+          ))}
+        </div>
+        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mt-6">
+          {videoTestimonials.slice(3).map((id) => (
+            <VideoCard key={id} id={id} />
+          ))}
         </div>
       </Section>
 

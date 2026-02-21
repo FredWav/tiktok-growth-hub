@@ -209,27 +209,27 @@ export default function Preuves() {
           subtitle="Des transformations mesurables et documentées."
         />
 
-        <div className="space-y-8">
+        <div className="space-y-6">
           {caseStudies.map((study, index) => (
             <div
               key={index}
-              className="bg-background rounded-xl p-8 hover:shadow-lg transition-shadow"
+              className="bg-background rounded-2xl p-8 md:p-10 border border-border/50 hover:border-primary/30 hover:shadow-xl transition-all duration-300"
             >
               <div className="grid lg:grid-cols-2 gap-8 items-center">
                 <div>
-                  <span className="text-sm text-primary font-medium">{study.category}</span>
-                  <h3 className="font-display text-2xl font-semibold mt-2 mb-4">
+                  <span className="text-xs font-semibold uppercase tracking-widest text-primary">{study.category}</span>
+                  <h3 className="font-display text-2xl md:text-3xl font-bold mt-3 mb-4 tracking-tight">
                     {study.title}
                   </h3>
-                   <p className="text-muted-foreground">{study.description}</p>
-                   <p className="text-xs text-muted-foreground/70 italic mt-3">{study.disclaimer}</p>
-                 </div>
+                  <p className="text-muted-foreground leading-relaxed">{study.description}</p>
+                  <p className="text-xs text-muted-foreground/60 italic mt-4 border-l-2 border-primary/20 pl-3">{study.disclaimer}</p>
+                </div>
 
-                 <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 gap-3">
                   {study.metrics.map((metric, i) => (
-                    <div key={i} className="text-center bg-muted/50 rounded-lg p-4">
-                      <div className="text-xl font-bold text-primary">{metric.value}</div>
-                      <div className="text-xs text-muted-foreground mt-1">{metric.label}</div>
+                    <div key={i} className="text-center bg-noir rounded-xl p-5 shadow-md">
+                      <div className="text-lg md:text-xl font-bold text-primary mb-1">{metric.value}</div>
+                      <div className="text-[11px] uppercase tracking-wider text-cream/60 font-medium">{metric.label}</div>
                     </div>
                   ))}
                 </div>

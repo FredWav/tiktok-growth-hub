@@ -1,37 +1,73 @@
 
 
-# VIP : page de succes apres paiement
+# One Shot : formulaire pre-reservation + envoi par email
 
-## Constat
+## Objectif
 
-Le flow VIP est deja en grande partie implemente :
-- Page de checkout avec selection du plan (3/6/12 mois) et saisie de l'ID Discord
-- Fonction backend pour creer la session Stripe
-- Webhook Stripe pour creer l'abonnement VIP et attribuer le role Discord
-- Fonctions d'attribution/revocation du role Discord
-- Verification automatique des expirations
+Apres le paiement Stripe, le client remplit un formulaire avec ses infos avant d'acceder au lien Calendly. Les informations collectees sont envoyees par email a fredwavcm@gmail.com.
 
-**Ce qui manque** : apres le paiement, l'utilisateur est redirige vers `/offres/vip?success=true`, mais la page ne gere pas ce parametre. Il faut afficher un message de confirmation avec le lien vers le serveur Discord.
+## Flow utilisateur
+
+```text
+Paiement Stripe OK
+       |
+       v
+Page de succes - Etape 1 : Formulaire
+  (Nom, Email, WhatsApp, Compte TikTok, Objectifs)
+       |
+       v
+Soumission du formulaire
+       |
+       v
+Envoi email a fredwavcm@gmail.com (via fonction backend)
+       |
+       v
+Page de succes - Etape 2 : Lien Calendly affiche
+  + message contact si horaires impossibles
+```
 
 ## Ce qui sera fait
 
-### 1. Gerer le retour apres paiement sur VipCheckout
+### 1. Service d'envoi d'emails
 
-Detecter les query params `success=true` et `cancelled=true` dans l'URL :
-- **Succes** : afficher un ecran de confirmation avec :
-  - Message de bienvenue dans le club VIP
-  - Bouton principal vers le serveur Discord (lien d'invitation a fournir)
-  - Mention que le role VIP a ete attribue automatiquement
-  - Lien de retour vers l'accueil
-- **Annulation** : afficher un toast informant que le paiement a ete annule
+Il faut un service d'envoi d'emails. **Resend** est le plus simple a integrer. Il faudra :
+- Creer un compte gratuit sur [resend.com](https://resend.com) (100 emails/jour gratuits)
+- Recuperer la cle API
+- La stocker comme secret du projet (`RESEND_API_KEY`)
 
-### 2. Clarification necessaire
+### 2. Fonction backend `send-oneshot-form`
 
-Il me faudra le **lien d'invitation Discord** vers ton serveur (ex: `https://discord.gg/xxx`) pour le bouton de la page de succes.
+Nouvelle fonction qui :
+- Recoit les donnees du formulaire (nom, email, whatsapp, tiktok, objectifs)
+- Envoie un email formate a fredwavcm@gmail.com avec toutes les infos
+- Utilise Resend pour l'envoi
+- Pas d'authentification requise (le client vient de payer)
+
+### 3. Mise a jour de `OneShotSuccess.tsx`
+
+Transformer la page en 2 etapes :
+- **Etape 1** : Formulaire avec les champs suivants :
+  - Nom / Prenom (obligatoire)
+  - Email (obligatoire, validation format)
+  - WhatsApp (obligatoire, numero de telephone)
+  - Compte TikTok (obligatoire, @handle ou lien)
+  - Objectifs / Situation (obligatoire, textarea)
+- **Etape 2** (apres soumission) : Message de confirmation + bouton Calendly + message contact
+
+Validation cote client avec zod + react-hook-form (deja installes).
+
+### 4. Configuration
+
+- Ajouter `send-oneshot-form` dans `supabase/config.toml` avec `verify_jwt = false`
 
 ## Details techniques
 
-- Fichier modifie : `src/pages/VipCheckout.tsx`
-- Utilisation de `useSearchParams` de react-router-dom pour detecter `success` et `cancelled`
-- Affichage conditionnel : si `success=true`, on montre l'ecran de confirmation au lieu du formulaire de checkout
-- Pas de nouvelle route ni de nouveau fichier necessaire
+- Fichiers crees :
+  - `supabase/functions/send-oneshot-form/index.ts`
+- Fichiers modifies :
+  - `src/pages/OneShotSuccess.tsx` (ajout formulaire 2 etapes)
+  - `supabase/config.toml` (ajout config fonction)
+- Secret necessaire : `RESEND_API_KEY` (a fournir apres creation du compte Resend)
+- Validation : zod schema avec tous les champs obligatoires
+- Email envoye au format HTML lisible avec toutes les infos du client
+

@@ -1,42 +1,35 @@
 
 
-# Simplifier le checkout VIP : supprimer le champ Discord ID
+# VIP 12 mois : passer a 3 mois offerts et mise en avant visuelle
 
-## Probleme
+## Changements de prix
 
-Le lien Discord `https://discord.gg/KUgFunVhKY` octroie deja automatiquement le bon role VIP. Demander l'ID Discord en plus ajoute de la friction inutile et complique le parcours d'achat.
+| | Avant | Apres |
+|---|---|---|
+| Mois offerts | 2 | 3 |
+| Prix total | 990€ | 891€ |
+| Prix/mois | 82.5€ | 74.25€ |
+| Badge | "2 mois offerts" | "3 mois offerts" |
 
-## Ce qui va changer
+Les plans 3 mois (297€) et 6 mois (495€, 1 mois offert) restent inchanges.
 
-### 1. Page de checkout (`VipCheckout.tsx`)
+## Mise en avant visuelle du plan 12 mois
 
-- Supprimer le champ "Ton ID Discord" (tout le bloc avec l'input, le label et les instructions)
-- Supprimer la validation qui bloque le paiement si l'ID Discord n'est pas rempli
-- Supprimer les imports inutiles (`Input`, `Label`, `MessageCircle`, `Info`)
-- Supprimer le state `discordId`
-- Ne plus envoyer `discordUserId` dans l'appel a `create-vip-checkout`
+- Le plan 12 mois sera pre-selectionne par defaut (au lieu du plan 3 mois)
+- Ajout d'un style plus visible sur le badge "3 mois offerts" (plus grand, couleur or/primary plus marquee)
+- Legere mise en echelle ou bordure plus epaisse pour attirer l'oeil
 
-### 2. Page de succes (deja en place)
+## Impact Stripe
 
-- Mettre a jour le texte : au lieu de "Ton role VIP a ete attribue automatiquement", indiquer de rejoindre le serveur Discord via le lien pour obtenir le role
-- Le bouton "Rejoindre le serveur Discord" reste en place
-
-### 3. Fonction `create-vip-checkout`
-
-- Retirer `discordUserId` des champs requis et des metadata Stripe
-- Simplifier la validation
-
-### 4. Fonction `stripe-webhook`
-
-- Retirer la logique d'attribution de role Discord via le bot (appel a `discord-role`)
-- Ne plus stocker `discord_user_id` ni `discord_role_granted` dans la table `vip_subscriptions`
+Le `priceId` du plan 12 mois (`price_1T0UXTBfuzQl0PTi6KK2azBu`) devra correspondre au nouveau prix de 891€ dans Stripe. Il faudra soit :
+- Mettre a jour le prix dans le dashboard Stripe
+- Ou creer un nouveau prix Stripe a 891€ et mettre a jour le `priceId` dans le code
 
 ## Details techniques
 
-- Fichiers modifies :
-  - `src/pages/VipCheckout.tsx` (suppression champ + simplification)
-  - `supabase/functions/create-vip-checkout/index.ts` (retrait discordUserId)
-  - `supabase/functions/stripe-webhook/index.ts` (retrait logique bot Discord)
-- Aucun fichier cree ou supprime
-- Les fonctions `discord-role` et `check-vip-expiry` restent disponibles si besoin futur
+- Fichier modifie : `src/pages/VipCheckout.tsx`
+  - Mettre a jour l'objet du plan 12 mois : `total: 891`, `monthly: 74.25`, `savings: "3 mois offerts"`
+  - Changer `selectedPlan` initial de `0` a `2` (pre-selection 12 mois)
+  - Ajouter un style visuel renforce sur le plan 12 mois (ex: `ring-2 ring-primary scale-105`)
+- Fichier modifie : `src/pages/Offres.tsx` (si le prix VIP y est mentionne, mettre a jour la coherence)
 

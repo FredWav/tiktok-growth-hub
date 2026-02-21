@@ -49,7 +49,6 @@ serve(async (req) => {
 
       const userId = metadata.user_id;
       const durationMonths = parseInt(metadata.duration_months);
-      const discordUserId = metadata.discord_user_id || null;
 
       const startsAt = new Date();
       const expiresAt = new Date();
@@ -64,44 +63,12 @@ serve(async (req) => {
           duration_months: durationMonths,
           starts_at: startsAt.toISOString(),
           expires_at: expiresAt.toISOString(),
-          discord_user_id: discordUserId,
           status: "active",
         });
 
       if (subError) {
         console.error("Error creating vip_subscription:", subError);
         throw subError;
-      }
-
-      // Grant Discord role
-      if (discordUserId) {
-        try {
-          const discordResponse = await fetch(
-            `${Deno.env.get("SUPABASE_URL")}/functions/v1/discord-role`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${Deno.env.get("SUPABASE_ANON_KEY")}`,
-              },
-              body: JSON.stringify({
-                action: "grant",
-                discordUserId,
-              }),
-            }
-          );
-          const discordResult = await discordResponse.json();
-          console.log("Discord role grant result:", discordResult);
-
-          if (discordResult.success) {
-            await supabase
-              .from("vip_subscriptions")
-              .update({ discord_role_granted: true })
-              .eq("stripe_session_id", session.id);
-          }
-        } catch (discordErr) {
-          console.error("Discord role grant error:", discordErr);
-        }
       }
 
       console.log(`VIP subscription created for user ${userId}, ${durationMonths} months`);

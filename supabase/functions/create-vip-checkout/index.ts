@@ -24,8 +24,8 @@ serve(async (req) => {
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated");
 
-    const { priceId, durationMonths, discordUserId } = await req.json();
-    if (!priceId || !durationMonths || !discordUserId) {
+    const { priceId, durationMonths } = await req.json();
+    if (!priceId || !durationMonths) {
       throw new Error("Missing required fields");
     }
 
@@ -49,7 +49,6 @@ serve(async (req) => {
       metadata: {
         user_id: user.id,
         duration_months: String(durationMonths),
-        discord_user_id: discordUserId,
       },
     });
 

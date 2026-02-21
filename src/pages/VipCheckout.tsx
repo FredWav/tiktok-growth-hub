@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Crown, Check, MessageCircle, Info, PartyPopper, ExternalLink } from "lucide-react";
+import { ArrowLeft, Crown, Check, PartyPopper, ExternalLink } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -37,8 +35,8 @@ function VipSuccessView() {
             Bienvenue dans le club VIP ! 🎉
           </h1>
 
-          <p className="text-lg text-muted-foreground mb-8">
-            Ton paiement a bien été confirmé. Ton rôle VIP a été attribué automatiquement sur Discord.
+    <p className="text-lg text-muted-foreground mb-8">
+            Ton paiement a bien été confirmé. Rejoins le serveur Discord via le lien ci-dessous pour obtenir ton accès VIP.
           </p>
 
           <div className="bg-muted/50 rounded-xl p-6 mb-8 text-left">
@@ -71,17 +69,12 @@ function VipSuccessView() {
 
 function VipCheckoutForm() {
   const [selectedPlan, setSelectedPlan] = useState(0);
-  const [discordId, setDiscordId] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
   const plan = VIP_PLANS[selectedPlan];
 
   const handlePayment = async () => {
-    if (!discordId.trim()) {
-      toast({ title: "ID Discord requis", description: "Entre ton ID Discord pour recevoir le rôle VIP automatiquement.", variant: "destructive" });
-      return;
-    }
     setLoading(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -91,7 +84,7 @@ function VipCheckoutForm() {
         return;
       }
       const { data, error } = await supabase.functions.invoke("create-vip-checkout", {
-        body: { priceId: plan.priceId, durationMonths: plan.months, discordUserId: discordId.trim() },
+        body: { priceId: plan.priceId, durationMonths: plan.months },
       });
       if (error) throw error;
       if (data?.url) window.location.href = data.url;
@@ -141,18 +134,6 @@ function VipCheckoutForm() {
             </ul>
           </div>
 
-          <div className="bg-background rounded-xl border p-6 mb-8">
-            <div className="flex items-center gap-2 mb-4">
-              <MessageCircle className="h-5 w-5 text-primary" />
-              <h3 className="font-semibold">Ton ID Discord</h3>
-            </div>
-            <Label htmlFor="discord-id" className="text-sm text-muted-foreground mb-2 block">Nécessaire pour t'attribuer automatiquement le rôle VIP sur le serveur Discord.</Label>
-            <Input id="discord-id" placeholder="Ex: 123456789012345678" value={discordId} onChange={(e) => setDiscordId(e.target.value)} className="mb-2" />
-            <div className="flex items-start gap-2 text-xs text-muted-foreground">
-              <Info className="h-3.5 w-3.5 mt-0.5 shrink-0" />
-              <span>Pour trouver ton ID Discord : Active le mode développeur dans les paramètres Discord (Paramètres &gt; Avancé &gt; Mode développeur), puis fais un clic droit sur ton profil et clique "Copier l'identifiant".</span>
-            </div>
-          </div>
 
           <Button variant="hero" size="xl" className="w-full" onClick={handlePayment} disabled={loading}>
             {loading ? "Redirection..." : `Payer ${plan.total}€ — ${plan.label}`}

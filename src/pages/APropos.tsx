@@ -91,7 +91,7 @@ export default function APropos() {
           <div className="prose prose-lg max-w-none text-muted-foreground space-y-4">
             <p>
               Je n'ai pas commencé avec TikTok.<br />
-              Mes premières vidéos remontent à mes 18 ans. J'en ai 19 cette année.
+              Mes premières vidéos remontent à mes 16 ans. J'en ai 35 cette année.
             </p>
             <p>
               Ça fait 18 ans que je filme, monte, expérimente.<br />

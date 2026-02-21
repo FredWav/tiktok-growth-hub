@@ -7,40 +7,34 @@ import { Card, CardContent } from "@/components/ui/card";
 
 const testimonials = [
   {
-    name: "Marie L.",
-    role: "Coach business",
-    content: "En 45 jours, j'ai eu plus de résultats qu'en 6 mois à poster seule. La stratégie était claire dès le premier appel.",
-    result: "+15K followers",
+    name: "Estelle",
+    role: "Membre de la formation",
+    content: "Ce qui m'a le plus aidé, c'était l'analyse de compte. J'ai fait une autre formation social media, et ta valeur ajoutée est visible dès le début. La communauté qui se soutient, les feedbacks directs sur TikTok… Merci Fred pour tout ce boulot, c'est génial.",
+    result: "Analyse de compte",
   },
   {
-    name: "Thomas D.",
-    role: "E-commerçant",
-    content: "Le One Shot m'a donné une direction claire. J'ai enfin compris pourquoi mes vidéos ne performaient pas.",
-    result: "x3 en CA",
+    name: "Delphine",
+    role: "Membre de la formation",
+    content: "Grâce à ta patience et à tes conseils bienveillants, je me suis sentie tout de suite à l'aise. Tout est clair, concis et précis. En résumé : l'écoute, le professionnalisme, la disponibilité et les supports adaptés à tous. Je conseille vivement, même à ceux qui ne sont pas doués en informatique !",
+    result: "Mise en confiance",
   },
   {
-    name: "Sophie M.",
+    name: "Alex",
+    role: "Coffre à Cartes",
+    content: "J'ai pris la formation pour apprendre les dessous de l'application et me professionnaliser. L'accompagnement était total, l'interaction avec les autres juste parfait. Outils, tips, conseils et entraide, tout est réuni.",
+    result: "Professionnalisation",
+  },
+  {
+    name: "Betty",
+    role: "Entrepreneure",
+    content: "En tant qu'entrepreneure, j'ai besoin de toucher ma cible. L'analyse de compte, les prises de conscience et les choix à faire… j'ai obtenu des contrats depuis ! Le gros plus ? Le suivi sur la durée et la communauté. Je valide et je recommande.",
+    result: "Contrats obtenus",
+  },
+  {
+    name: "Reva",
     role: "Créatrice de contenu",
-    content: "L'accompagnement VIP, c'est un game-changer. J'ai accès à un expert quand j'en ai besoin, sans limite.",
-    result: "2M vues/mois",
-  },
-  {
-    name: "Lucas B.",
-    role: "Formateur en ligne",
-    content: "Pas de bullshit, que du concret. Exactement ce dont j'avais besoin pour structurer ma présence TikTok.",
-    result: "+50 clients",
-  },
-  {
-    name: "Emma R.",
-    role: "Photographe",
-    content: "J'étais sceptique au début, mais les résultats parlent d'eux-mêmes. TikTok est devenu ma source principale de clients.",
-    result: "+200% de DM",
-  },
-  {
-    name: "Antoine P.",
-    role: "Consultant",
-    content: "La méthode est simple mais efficace. J'applique les conseils du One Shot depuis 3 mois et ça marche.",
-    result: "10K en 3 mois",
+    content: "Ta formation, c'est bien plus qu'un programme : c'est une vraie mine de ressources, un espace de soutien et un accompagnement hyper précieux. Grâce à toi, j'ai appris énormément de choses. Je ne lâche pas !",
+    result: "Mine de ressources",
   },
 ];
 

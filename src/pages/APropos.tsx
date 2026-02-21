@@ -1,29 +1,34 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Target, Users, TrendingUp, Award } from "lucide-react";
+import { ArrowRight, Lightbulb, BarChart3, TrendingUp, Shield, RefreshCw } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 
 const values = [
   {
-    icon: Target,
-    title: "Focus résultats",
-    description: "On vise des objectifs business clairs. Pas des vanity metrics.",
+    icon: Lightbulb,
+    title: "Stratégie avant création",
+    description: "On définit l'objectif business, le positionnement, l'angle différenciant, puis seulement le contenu. Chaque vidéo a une fonction claire : autorité, acquisition, conversion ou préparation d'offre. Pas de contenu \"au hasard\".",
   },
   {
-    icon: Users,
-    title: "Approche personnalisée",
-    description: "Pas de template universel. Chaque stratégie est construite sur ton positionnement, ton marché, ton niveau.",
+    icon: BarChart3,
+    title: "Analyse avant opinion",
+    description: "Je ne donne pas d'avis. Je regarde les données. Rétention, chute d'audience, structure, cohérence éditoriale, positionnement perçu. On corrige sur des faits, pas sur des impressions.",
   },
   {
     icon: TrendingUp,
-    title: "Méthode éprouvée",
-    description: "18 ans de création vidéo. 300+ créateurs accompagnés. Une méthode testée sur le terrain.",
+    title: "Performance mesurable",
+    description: "On ne vise pas des vues. On vise des leads, des ventes, une audience qualifiée, une montée en autorité. Si ça ne génère pas de levier business, on ajuste.",
   },
   {
-    icon: Award,
-    title: "Transparence totale",
-    description: "Je te dis ce qui fonctionne. Je te dis aussi ce qui ne fonctionnera pas. Même si ce n'est pas agréable à entendre.",
+    icon: Shield,
+    title: "Exigence mutuelle",
+    description: "Je suis exigeant. Tu dois l'être aussi. Je ne travaille pas avec ceux qui veulent une validation, une excuse ou une solution magique. Je travaille avec ceux qui veulent comprendre et appliquer.",
+  },
+  {
+    icon: RefreshCw,
+    title: "Optimisation continue",
+    description: "TikTok évolue. Les formats courts évoluent. Le marché évolue. On teste, on ajuste, on mesure, on itère. La stratégie n'est jamais figée.",
   },
 ];
 
@@ -152,10 +157,9 @@ export default function APropos() {
       <Section variant="default" size="lg">
         <SectionHeader
           title="Ma façon de travailler"
-          subtitle="Des principes simples qui guident tous mes accompagnements."
         />
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
           {values.map((value, index) => (
             <div
               key={index}

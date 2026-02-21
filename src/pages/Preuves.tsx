@@ -113,7 +113,7 @@ const caseStudies = [
 ];
 
 const stats = [
-  { icon: Users, value: "100+", label: "Clients accompagnés" },
+  { icon: Users, value: "300+", label: "Clients accompagnés" },
   { icon: Eye, value: "10M+", label: "Vues générées" },
   { icon: TrendingUp, value: "95%", label: "Taux de satisfaction" },
 ];

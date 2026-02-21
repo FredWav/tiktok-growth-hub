@@ -17,9 +17,11 @@ const VIP_PLANS = [
 
 const VIP_BENEFITS = [
   "1 live par semaine en petit comité avec les membres VIP",
+  "Feedback sur tes hooks, scripts et positionnement",
+  "Éducation avancée : hook engineering, CTA stratégique, lecture analytique des stats",
   "Ressources nombreuses et régulièrement mises à jour",
   "Réponses et feedback 5/7 sur le serveur Discord",
-  "Accès au serveur Discord VIP privé",
+  "Environnement exigeant orienté performance",
 ];
 
 function VipSuccessView() {
@@ -107,8 +109,13 @@ function VipCheckoutForm() {
             <div className="p-2 rounded-lg bg-primary/10"><Crown className="h-6 w-6 text-primary" /></div>
             <div>
               <h1 className="font-display text-3xl md:text-4xl font-semibold">VIP</h1>
-              <p className="text-muted-foreground">Le club privé</p>
+              <p className="text-muted-foreground">Le hub stratégique des créateurs ambitieux</p>
             </div>
+          </div>
+
+          <div className="bg-muted/30 border border-border rounded-xl p-5 mb-8">
+            <p className="text-base font-medium mb-1">Ce n'est pas un serveur motivation. Ce n'est pas un groupe d'entraide flou.</p>
+            <p className="text-sm text-muted-foreground">C'est un environnement structuré, orienté performance — pour les créateurs qui veulent <strong className="text-foreground">réfléchir comme des stratèges, pas comme des amateurs</strong>.</p>
           </div>
 
           <div className="grid grid-cols-3 gap-3 mb-8">

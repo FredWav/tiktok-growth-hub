@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-const DISCORD_INVITE_URL = "https://discord.gg/REMPLACER";
+const DISCORD_INVITE_URL = "https://discord.gg/KUgFunVhKY";
 
 const VIP_PLANS = [
   { months: 3, priceId: "price_1T0UXNBfuzQl0PTiKGR1SBTV", total: 297, monthly: 99, savings: null, label: "3 mois" },

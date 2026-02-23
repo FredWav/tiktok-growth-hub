@@ -1,24 +1,49 @@
 
 
-## Supprimer les emojis de la section "A qui ca s'adresse"
+## Vérifier le paiement existant avant de rediriger vers Stripe
 
-Les trois profils de la landing page utilisent des emojis (😤, 👀, 🎯) comme element visuel principal. Il faut les remplacer par des icones Lucide coherentes avec le reste du design.
+### Objectif
+
+Quand l'utilisateur clique sur "Réserver mon One Shot (179€)", vérifier d'abord si un `oneshot_session_id` existe dans le `localStorage`. Si oui, cela signifie qu'il a déjà payé mais n'a pas terminé le questionnaire : on le redirige directement vers `/one-shot/success` au lieu de lui faire repayer.
 
 ### Modification
 
-**Fichier** : `src/pages/Home.tsx` (lignes 30-44)
+**Fichier** : `src/pages/OneShot.tsx`
 
-Remplacer les emojis par des icones Lucide deja importees ou disponibles :
+Modifier la fonction `handleCheckout` (lignes 89-103) :
 
-- 😤 "Tu postes, ca ne decolle pas" → icone `TrendingDown` (tendance descendante, represente la stagnation)
-- 👀 "Tu as des vues mais pas de clients" → icone `Eye` (des vues sans conversion)
-- 🎯 "Tu veux structurer ton contenu pour vendre" → icone `Target` (deja importee, objectif clair)
+```text
+const handleCheckout = async () => {
+  // Vérifier si un paiement existe déjà
+  const existingSessionId = localStorage.getItem("oneshot_session_id");
+  if (existingSessionId) {
+    // Rediriger vers la page success pour terminer le formulaire
+    window.location.href = `/one-shot/success`;
+    return;
+  }
 
-Dans le rendu des cards (lignes 161-175), remplacer le `<span>` emoji par un bloc icone stylise similaire aux cards d'offres (fond arrondi + icone coloree).
+  // Sinon, créer une nouvelle session Stripe
+  setLoading(true);
+  try {
+    const { data, error } = await supabase.functions.invoke("create-oneshot-checkout");
+    if (error) throw error;
+    if (data?.url) {
+      window.location.href = data.url;
+    }
+  } catch (err: any) {
+    toast.error("Erreur lors de la création du paiement. Réessayez.");
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
+```
 
-### Detail technique
+Ajouter aussi l'import de `useNavigate` depuis `react-router-dom` pour utiliser la navigation interne au lieu de `window.location.href` pour la redirection locale.
 
-1. Ajouter les imports `TrendingDown` et `Eye` depuis lucide-react
-2. Changer la structure `profiles` : remplacer `emoji: string` par `icon: LucideIcon`
-3. Dans le rendu, remplacer `<span className="text-4xl">{profile.emoji}</span>` par un conteneur avec l'icone stylisee
+### Résultat
+
+- Utilisateur qui a déjà payé mais fermé l'onglet : clic sur le bouton -> redirigé vers `/one-shot/success` pour remplir le formulaire
+- Utilisateur qui n'a jamais payé : clic sur le bouton -> redirection Stripe normale
+- Une fois le formulaire soumis, le `localStorage` est nettoyé et le bouton redirige à nouveau vers Stripe
 

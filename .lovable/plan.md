@@ -1,30 +1,68 @@
 
+## Remplacement de Resend par le serveur SMTP OVH
 
-## Probleme
+### Objectif
+Remplacer l'envoi d'email via l'API Resend par un envoi SMTP direct via le serveur OVH, en utilisant l'adresse `noreply@fredwav.com`.
 
-L'erreur `Failed to construct 'Request': 'headers' is not a valid ByteString` se produit a la ligne du `fetch` vers l'API Resend. Le header `Authorization: Bearer ${RESEND_API_KEY}` contient un caractere non-ASCII ou invisible (espace, retour a la ligne) provenant de la variable d'environnement `RESEND_API_KEY`.
+### Configuration SMTP
+- **Serveur** : ssl0.ovh.net
+- **Port** : 465 (SSL/TLS)
+- **Expediteur** : noreply@fredwav.com
 
-## Solution
+### Etapes
 
-Ajouter un `.trim()` sur la valeur de `RESEND_API_KEY` pour supprimer tout caractere invisible, et valider que la cle ne contient que des caracteres ASCII valides.
+#### 1. Ajouter le secret du mot de passe SMTP
+Demander la saisie securisee du mot de passe de l'adresse `noreply@fredwav.com` via le gestionnaire de secrets. Ce secret sera stocke sous le nom `SMTP_PASSWORD`.
 
-## Modification
+#### 2. Modifier la fonction `send-oneshot-form`
 
 **Fichier** : `supabase/functions/send-oneshot-form/index.ts`
 
-- Ligne 38 : ajouter `.trim()` sur la recuperation de la cle :
-  ```
-  const RESEND_API_KEY = (Deno.env.get("RESEND_API_KEY") || "").trim();
-  ```
-- Adapter la verification (ligne 39) pour verifier que la cle n'est pas vide apres le trim :
-  ```
-  if (!RESEND_API_KEY) { ... }
-  ```
+- Supprimer tout le code lie a Resend (API key, fetch vers api.resend.com)
+- Importer une librairie SMTP compatible Deno : `https://deno.land/x/smtp/mod.ts` (denomailer)
+- Configurer la connexion SMTP avec :
+  - hostname: `ssl0.ovh.net`
+  - port: `465`
+  - username: `noreply@fredwav.com`
+  - password: depuis le secret `SMTP_PASSWORD`
+  - tls: true
+- Envoyer l'email HTML existant (le contenu du mail ne change pas) depuis `noreply@fredwav.com` vers `fredwavcm@gmail.com`
 
-Cela corrige le probleme sans avoir besoin de re-saisir la cle API.
+#### 3. Redeployer la fonction
 
-## Etapes techniques
+La fonction sera automatiquement redeployee apres modification.
 
-1. Modifier la ligne 38 de `supabase/functions/send-oneshot-form/index.ts` pour ajouter `.trim()`
-2. Redeployer la fonction
+### Details techniques
 
+La librairie `denomailer` (`https://deno.land/x/denomailer/mod.ts`) est la solution standard pour envoyer des emails via SMTP depuis Deno/Edge Functions. Elle supporte :
+- Connexion TLS directe (port 465)
+- Authentification LOGIN/PLAIN
+- Contenu HTML
+
+Structure du code SMTP :
+```text
+import { SMTPClient } from denomailer
+
+client = new SMTPClient({
+  connection: {
+    hostname: "ssl0.ovh.net",
+    port: 465,
+    tls: true,
+    auth: {
+      username: "noreply@fredwav.com",
+      password: SMTP_PASSWORD
+    }
+  }
+})
+
+client.send({
+  from: "noreply@fredwav.com",
+  to: "fredwavcm@gmail.com",
+  subject: "...",
+  html: htmlBody
+})
+
+client.close()
+```
+
+Le reste de la fonction (validation des champs, verification Stripe) reste identique.

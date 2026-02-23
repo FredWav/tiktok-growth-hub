@@ -31,17 +31,17 @@ const deliverables = [
   {
     icon: Video,
     title: "Replay de la session",
-    description: "Tu pourras revoir nos échanges autant de fois que tu veux.",
+    description: "Tu peux revoir la session en entier pour ne rien oublier.",
   },
   {
     icon: FileText,
-    title: "Plan d'action PDF",
-    description: "Synthèse écrite avec toutes les actions à mettre en place.",
+    title: "Ressources personnalisées",
+    description: "Des ressources adaptées à ta situation et ton secteur.",
   },
   {
     icon: Zap,
-    title: "Stratégie 30 jours",
-    description: "Un calendrier de contenu adapté à ta situation.",
+    title: "Diagnostic complet",
+    description: "Analyse de ton compte, ta niche et tes axes d'amélioration.",
   },
 ];
 

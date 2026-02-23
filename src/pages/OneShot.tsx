@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Check, Clock, Video, FileText, HelpCircle, Zap } from "lucide-react";
+import { ArrowRight, Check, Clock, Video, FileText, HelpCircle, Zap, BarChart3, Lightbulb, Target, Play } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
@@ -30,19 +30,28 @@ const steps = [
 
 const deliverables = [
   {
-    icon: Video,
-    title: "Replay de la session",
-    description: "Tu peux revoir la session en entier pour ne rien oublier.",
+    icon: BarChart3,
+    title: "Diagnostic complet de ton compte et de ta niche",
   },
   {
     icon: FileText,
-    title: "Ressources personnalisées",
-    description: "Des ressources adaptées à ta situation et ton secteur.",
+    title: "Plan d'action personnalisé sur 30 jours",
   },
   {
-    icon: Zap,
-    title: "Diagnostic complet",
-    description: "Analyse de ton compte, ta niche et tes axes d'amélioration.",
+    icon: Lightbulb,
+    title: "Stratégie de hooks et scripts adaptés à ton secteur",
+  },
+  {
+    icon: Target,
+    title: "Optimisation de ton positionnement et de ta bio",
+  },
+  {
+    icon: Play,
+    title: "Replay de la session disponible après",
+  },
+  {
+    icon: FileText,
+    title: "Analyse de tes stats et recommandations concrètes",
   },
 ];
 
@@ -194,25 +203,29 @@ export default function OneShot() {
       </Section>
 
       {/* Deliverables */}
-      <Section variant="default" size="lg">
+      <Section variant="cream" size="lg">
         <SectionHeader
-          title="Ce que tu repars avec"
-          subtitle="Pas juste des conseils en l'air. Du concret."
+          title="Ce que tu obtiens en One Shot"
+          subtitle="1h30 de session. Un plan d'action complet. Zéro blabla."
         />
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
           {deliverables.map((item, index) => (
             <div
               key={index}
-              className="bg-muted/50 rounded-xl p-8 text-center hover:shadow-lg transition-shadow"
+              className="bg-background rounded-xl p-6 flex items-start gap-3 border border-border"
             >
-              <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <item.icon className="h-7 w-7 text-primary" />
-              </div>
-              <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
-              <p className="text-muted-foreground">{item.description}</p>
+              <item.icon className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+              <span className="font-medium text-sm">{item.title}</span>
             </div>
           ))}
+        </div>
+
+        <div className="max-w-3xl mx-auto mt-8 bg-primary/5 border border-primary/20 rounded-xl px-6 py-4 text-center">
+          <p className="text-sm text-muted-foreground">
+            <span className="font-semibold text-foreground">Ce que ce n'est PAS :</span>{" "}
+            Pas un coaching motivation. Pas quelqu'un qui poste à ta place. C'est une session stratégique, concrète, orientée résultats.
+          </p>
         </div>
       </Section>
 

@@ -14,9 +14,9 @@ import { SEOHead } from "@/components/SEOHead";
 const DISCORD_INVITE_URL = "https://discord.gg/KUgFunVhKY";
 
 const VIP_PLANS = [
-  { months: 3, priceId: "price_1T0UXNBfuzQl0PTiKGR1SBTV", total: 297, monthly: 99, savings: null, label: "3 mois" },
-  { months: 6, priceId: "price_1T0UXRBfuzQl0PTir9qz5lUy", total: 495, monthly: 82.5, savings: "1 mois offert", label: "6 mois" },
-  { months: 12, priceId: "price_1T0UXTBfuzQl0PTi6KK2azBu", total: 891, monthly: 74.25, savings: "3 mois offerts", label: "12 mois", featured: true },
+  { months: 3, priceId: "price_1T42XUBfuzQl0PTinQWdURaT", total: 297, monthly: 99, savings: null, label: "3 mois" },
+  { months: 6, priceId: "price_1T42XgBfuzQl0PTiHHToXEGl", total: 495, monthly: 82.5, savings: "1 mois offert", label: "6 mois" },
+  { months: 12, priceId: "price_1T42XxBfuzQl0PTik4vf6tWc", total: 891, monthly: 74.25, savings: "3 mois offerts", label: "12 mois", featured: true },
 ];
 
 const VIP_BENEFITS = [

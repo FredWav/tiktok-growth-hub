@@ -3,6 +3,13 @@ import { ArrowRight, Check, Zap, Target, Crown, Clock, Users, TrendingUp } from 
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
+import { trackEvent } from "@/lib/tracking";
+
+const profileSelector = [
+  { label: "Un diagnostic clair", target: "one-shot", icon: Zap },
+  { label: "Une transformation encadrée", target: "45-jours", icon: Target },
+  { label: "Un cadre continu", target: "vip", icon: Crown },
+];
 
 const offers = [
   {
@@ -10,7 +17,7 @@ const offers = [
     icon: Zap,
     title: "One Shot",
     subtitle: "La clarté en 1h30",
-    description: "Une session intensive pour repartir avec un plan d'action clair et actionnable.",
+    description: "Une session intensive pour repartir avec un diagnostic clair et des recommandations actionnables.",
     price: "179€",
     priceNote: "Paiement unique",
     duration: "1h30",
@@ -26,19 +33,21 @@ const offers = [
     includes: [
       "Diagnostic complet de ton compte",
       "Analyse de ton marché et ta niche",
-      "Plan d'action personnalisé",
-      "Stratégie de contenu sur 30 jours",
+      "Recommandations personnalisées",
+      "Ressources adaptées à ta situation",
       "Replay de la session",
     ],
-    cta: "Réserver maintenant",
+    cta: "Réserver mon One Shot (179€)",
     href: "/one-shot",
-    variant: "default" as const,
+    trackEvent: "cta_one_shot_click",
+    variant: "hero" as const,
+    recommended: true,
   },
   {
     id: "45-jours",
     icon: Target,
     title: "Accompagnement 45 Jours",
-    subtitle: "Transformation complète",
+    subtitle: "Transformation guidée",
     description: "45 jours pour transformer ta présence TikTok. Suivi hebdomadaire et accès direct.",
     price: "Sur candidature",
     priceNote: "Appel de qualification requis",
@@ -60,23 +69,24 @@ const offers = [
       "Templates et ressources exclusives",
       "Optimisation continue de ta stratégie",
     ],
-    cta: "Réserver un appel",
-    href: "/offres/45-jours",
+    cta: "Candidater au 45 jours",
+    href: "/45-jours",
+    trackEvent: "cta_45j_click",
     variant: "premium" as const,
-    featured: true,
+    recommended: false,
   },
   {
     id: "vip",
     icon: Crown,
     title: "VIP",
-    subtitle: "Le club privé",
-    description: "L'environnement structuré et exigeant qui transforme un créateur motivé en créateur stratège. Pas un groupe motivation — un hub performance.",
+    subtitle: "Progresser dans la durée",
+    description: "L'environnement structuré et exigeant qui transforme un créateur motivé en créateur stratège. Pas un groupe motivation - un hub performance.",
     price: "99€/mois",
     priceNote: "3 mois minimum",
     duration: "3, 6 ou 12 mois",
     forWho: [
       "Tu es bloqué en croissance et tu ne comprends pas pourquoi",
-      "Tu es débutant ambitieux et tu veux partir avec les bonnes bases stratégiques",
+      "Tu es débutant ambitieux et tu veux partir avec les bonnes bases",
       "Tu es intermédiaire et tu veux scaler proprement",
     ],
     notForWho: [
@@ -91,9 +101,11 @@ const offers = [
       "Réponses et feedback 5/7 sur le serveur Discord",
       "Environnement exigeant orienté performance",
     ],
-    cta: "Souscrire",
+    cta: "Rejoindre le VIP",
     href: "/offres/vip",
+    trackEvent: "cta_vip_click",
     variant: "premium" as const,
+    recommended: false,
   },
 ];
 
@@ -102,6 +114,13 @@ const stats = [
   { icon: TrendingUp, value: "10M+", label: "Vues générées" },
   { icon: Clock, value: "3 ans", label: "D'expertise TikTok" },
 ];
+
+const scrollTo = (id: string) => {
+  const element = document.getElementById(id);
+  if (element) {
+    element.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+};
 
 export default function Offres() {
   return (
@@ -112,10 +131,25 @@ export default function Offres() {
           <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">
             Trouve l'accompagnement <span className="text-gold-gradient">adapté à tes besoins</span>
           </h1>
-          <p className="text-lg text-muted-foreground">
-            Trois niveaux d'engagement pour trois types de profils. 
+          <p className="text-lg text-muted-foreground mb-8">
+            Trois niveaux d'engagement pour trois types de profils.
             Pas de formule standard : chaque accompagnement est personnalisé.
           </p>
+
+          {/* Profile Selector */}
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <span className="text-sm text-muted-foreground self-center mr-2">Je veux :</span>
+            {profileSelector.map((item) => (
+              <button
+                key={item.target}
+                onClick={() => scrollTo(item.target)}
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-full border border-border bg-background text-sm font-medium hover:border-primary hover:text-primary transition-all"
+              >
+                <item.icon className="h-4 w-4" />
+                {item.label}
+              </button>
+            ))}
+          </div>
         </div>
       </Section>
 
@@ -139,93 +173,104 @@ export default function Offres() {
             <div
               key={offer.id}
               id={offer.id}
-              className={`grid lg:grid-cols-2 gap-8 lg:gap-12 items-start ${
-                index % 2 === 1 ? "lg:direction-rtl" : ""
-              }`}
+              className="scroll-mt-24"
             >
-              {/* Info */}
-              <div className={index % 2 === 1 ? "lg:order-2" : ""}>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className={`p-2 rounded-lg ${offer.featured ? "bg-primary/10" : "bg-muted"}`}>
-                    <offer.icon className={`h-5 w-5 ${offer.featured ? "text-primary" : "text-muted-foreground"}`} />
-                  </div>
-                  <span className="text-sm text-primary font-medium">{offer.subtitle}</span>
-                </div>
-
-                <h2 className="font-display text-3xl md:text-4xl font-semibold mb-4">
-                  {offer.title}
-                </h2>
-
-                <p className="text-lg text-muted-foreground mb-6">
-                  {offer.description}
-                </p>
-
-                <div className="flex items-baseline gap-2 mb-6">
-                  <span className="text-3xl font-bold">{offer.price}</span>
-                  <span className="text-muted-foreground">{offer.priceNote}</span>
-                </div>
-
-                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-8">
-                  <span className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
-                    {offer.duration}
+              {offer.recommended && (
+                <div className="text-center mb-6">
+                  <span className="bg-primary text-primary-foreground text-xs font-semibold px-4 py-1.5 rounded-full">
+                    Recommandé pour commencer
                   </span>
                 </div>
+              )}
 
-                <Button
-                  variant={offer.featured ? "hero" : "premium"}
-                  size="lg"
-                  asChild
-                >
-                  <Link to={offer.href}>
-                    {offer.cta}
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Paiement en 3x avec Klarna et 4x avec PayPal disponible, sous réserve d'acceptation.
-                </p>
-              </div>
+              <div className={`grid lg:grid-cols-2 gap-8 lg:gap-12 items-start ${
+                index % 2 === 1 ? "lg:direction-rtl" : ""
+              }`}>
+                {/* Info */}
+                <div className={index % 2 === 1 ? "lg:order-2" : ""}>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className={`p-2 rounded-lg ${offer.recommended ? "bg-primary/10" : "bg-muted"}`}>
+                      <offer.icon className={`h-5 w-5 ${offer.recommended ? "text-primary" : "text-muted-foreground"}`} />
+                    </div>
+                    <span className="text-sm text-primary font-medium">{offer.subtitle}</span>
+                  </div>
 
-              {/* Details */}
-              <div className={`space-y-6 ${index % 2 === 1 ? "lg:order-1" : ""}`}>
-                {/* Includes */}
-                <div className="bg-muted/50 rounded-xl p-6">
-                  <h3 className="font-semibold mb-4">Ce qui est inclus</h3>
-                  <ul className="space-y-3">
-                    {offer.includes.map((item, i) => (
-                      <li key={i} className="flex items-start gap-3">
-                        <Check className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                        <span className="text-sm">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <h2 className="font-display text-3xl md:text-4xl font-semibold mb-4">
+                    {offer.title}
+                  </h2>
+
+                  <p className="text-lg text-muted-foreground mb-6">
+                    {offer.description}
+                  </p>
+
+                  <div className="flex items-baseline gap-2 mb-6">
+                    <span className="text-3xl font-bold">{offer.price}</span>
+                    <span className="text-muted-foreground">{offer.priceNote}</span>
+                  </div>
+
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground mb-8">
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-4 w-4" />
+                      {offer.duration}
+                    </span>
+                  </div>
+
+                  <Button
+                    variant={offer.recommended ? "hero" : "premium"}
+                    size="lg"
+                    asChild
+                    onClick={() => trackEvent(offer.trackEvent, { location: "offres_detail" })}
+                  >
+                    <Link to={offer.href}>
+                      {offer.cta}
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Paiement en 3x avec Klarna et 4x avec PayPal disponible, sous réserve d'acceptation.
+                  </p>
                 </div>
 
-                {/* For Who */}
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div className="bg-green-50 rounded-xl p-5">
-                    <h4 className="font-medium text-green-900 mb-3">Pour toi si...</h4>
-                    <ul className="space-y-2">
-                      {offer.forWho.map((item, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-green-800">
-                          <Check className="h-4 w-4 mt-0.5 shrink-0" />
-                          <span>{item}</span>
+                {/* Details */}
+                <div className={`space-y-6 ${index % 2 === 1 ? "lg:order-1" : ""}`}>
+                  {/* Includes */}
+                  <div className="bg-muted/50 rounded-xl p-6">
+                    <h3 className="font-semibold mb-4">Ce qui est inclus</h3>
+                    <ul className="space-y-3">
+                      {offer.includes.map((item, i) => (
+                        <li key={i} className="flex items-start gap-3">
+                          <Check className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                          <span className="text-sm">{item}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
 
-                  <div className="bg-red-50 rounded-xl p-5">
-                    <h4 className="font-medium text-red-900 mb-3">Pas pour toi si...</h4>
-                    <ul className="space-y-2">
-                      {offer.notForWho.map((item, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-red-800">
-                          <span className="h-4 w-4 mt-0.5 shrink-0 text-center">✕</span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
+                  {/* For Who */}
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="bg-accent/50 rounded-xl p-5">
+                      <h4 className="font-medium mb-3">Pour toi si...</h4>
+                      <ul className="space-y-2">
+                        {offer.forWho.map((item, i) => (
+                          <li key={i} className="flex items-start gap-2 text-sm">
+                            <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="bg-destructive/5 rounded-xl p-5">
+                      <h4 className="font-medium mb-3">Pas pour toi si...</h4>
+                      <ul className="space-y-2">
+                        {offer.notForWho.map((item, i) => (
+                          <li key={i} className="flex items-start gap-2 text-sm">
+                            <span className="h-4 w-4 mt-0.5 shrink-0 text-center text-destructive">✕</span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -243,9 +288,15 @@ export default function Offres() {
           <p className="text-muted-foreground mb-6">
             Commence par un One Shot. On fera le point ensemble et je te conseillerai la suite adaptée à ta situation.
           </p>
-          <Button variant="hero" size="lg" asChild>
+          <Button
+            variant="hero"
+            size="lg"
+            asChild
+            onClick={() => trackEvent("cta_one_shot_click", { location: "offres_bottom" })}
+          >
             <Link to="/one-shot">
-              Commencer par un One Shot — 179€
+              Réserver mon One Shot (179€)
+              <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
         </div>

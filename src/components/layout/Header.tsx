@@ -7,8 +7,9 @@ const navItems = [
   { label: "Accueil", href: "/" },
   { label: "Offres", href: "/offres" },
   { label: "One Shot", href: "/one-shot" },
-  { label: "À propos", href: "/a-propos" },
+  { label: "45 Jours", href: "/45-jours" },
   { label: "Preuves", href: "/preuves" },
+  { label: "À propos", href: "/a-propos" },
   { label: "Contact", href: "/contact" },
 ];
 

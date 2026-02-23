@@ -4,8 +4,11 @@ import { ArrowLeft, Crown, Check, PartyPopper, ExternalLink } from "lucide-react
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { trackEvent } from "@/lib/tracking";
 
 const DISCORD_INVITE_URL = "https://discord.gg/KUgFunVhKY";
 
@@ -37,7 +40,7 @@ function VipSuccessView() {
             Bienvenue dans le club VIP ! 🎉
           </h1>
 
-    <p className="text-lg text-muted-foreground mb-8">
+          <p className="text-lg text-muted-foreground mb-8">
             Ton paiement a bien été confirmé. Rejoins le serveur Discord via le lien ci-dessous pour obtenir ton accès VIP.
           </p>
 
@@ -71,22 +74,33 @@ function VipSuccessView() {
 
 function VipCheckoutForm() {
   const [selectedPlan, setSelectedPlan] = useState(2);
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
   const plan = VIP_PLANS[selectedPlan];
 
-  const handlePayment = async () => {
-    setLoading(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast({ title: "Connexion requise", description: "Tu dois être connecté pour souscrire au VIP.", variant: "destructive" });
-        setLoading(false);
-        return;
+  // Pre-fill email if user is logged in
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user?.email) {
+        setEmail(session.user.email);
       }
+    });
+  }, []);
+
+  const handlePayment = async () => {
+    if (!email || !email.includes("@")) {
+      toast({ title: "Email requis", description: "Entre ton email pour continuer.", variant: "destructive" });
+      return;
+    }
+
+    setLoading(true);
+    trackEvent("cta_vip_click", { plan: plan.label });
+
+    try {
       const { data, error } = await supabase.functions.invoke("create-vip-checkout", {
-        body: { priceId: plan.priceId, durationMonths: plan.months },
+        body: { priceId: plan.priceId, durationMonths: plan.months, email },
       });
       if (error) throw error;
       if (data?.url) window.location.href = data.url;
@@ -115,7 +129,7 @@ function VipCheckoutForm() {
 
           <div className="bg-muted/30 border border-border rounded-xl p-5 mb-8">
             <p className="text-base font-medium mb-1">Ce n'est pas un serveur motivation. Ce n'est pas un groupe d'entraide flou.</p>
-            <p className="text-sm text-muted-foreground">C'est un environnement structuré, orienté performance — pour les créateurs qui veulent <strong className="text-foreground">réfléchir comme des stratèges, pas comme des amateurs</strong>.</p>
+            <p className="text-sm text-muted-foreground">C'est un environnement structuré, orienté performance - pour les créateurs qui veulent <strong className="text-foreground">réfléchir comme des stratèges, pas comme des amateurs</strong>.</p>
           </div>
 
           <div className="grid grid-cols-3 gap-3 mb-8">
@@ -144,9 +158,23 @@ function VipCheckoutForm() {
             </ul>
           </div>
 
+          {/* Email field - no login required */}
+          <div className="mb-6">
+            <Label htmlFor="email" className="text-sm font-medium mb-2 block">
+              Ton email pour recevoir l'accès
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="ton@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="max-w-md"
+            />
+          </div>
 
-          <Button variant="hero" size="xl" className="w-full" onClick={handlePayment} disabled={loading}>
-            {loading ? "Redirection..." : `Payer ${plan.total}€ — ${plan.label}`}
+          <Button variant="hero" size="xl" className="w-full" onClick={handlePayment} disabled={loading || !email}>
+            {loading ? "Redirection..." : `Rejoindre le VIP - ${plan.total}€ (${plan.label})`}
           </Button>
           <p className="text-xs text-center text-muted-foreground mt-4">Paiement sécurisé via Stripe. Tu seras redirigé vers la page de paiement.</p>
           <p className="text-xs text-center text-muted-foreground mt-1">Paiement en 3x avec Klarna et 4x avec PayPal disponible, sous réserve d'acceptation.</p>

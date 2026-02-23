@@ -89,6 +89,9 @@ export function Footer() {
             <Link to="/cgv" className="hover:text-primary transition-colors">
               CGV
             </Link>
+            <Link to="/contact" className="hover:text-primary transition-colors">
+              Contact
+            </Link>
           </div>
         </div>
       </div>

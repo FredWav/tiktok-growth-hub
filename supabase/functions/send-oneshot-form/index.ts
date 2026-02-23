@@ -1,4 +1,5 @@
 import Stripe from "https://esm.sh/stripe@18.5.0";
+import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -35,9 +36,9 @@ Deno.serve(async (req) => {
       );
     }
 
-    const RESEND_API_KEY = (Deno.env.get("RESEND_API_KEY") || "").trim();
-    if (!RESEND_API_KEY) {
-      console.error("RESEND_API_KEY not configured");
+    const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD") || "";
+    if (!SMTP_PASSWORD) {
+      console.error("SMTP_PASSWORD not configured");
       return new Response(
         JSON.stringify({ error: "Service email non configuré" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -76,29 +77,27 @@ Deno.serve(async (req) => {
       </div>
     `;
 
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${RESEND_API_KEY}`,
+    const client = new SMTPClient({
+      connection: {
+        hostname: "ssl0.ovh.net",
+        port: 465,
+        tls: true,
+        auth: {
+          username: "noreply@fredwav.com",
+          password: SMTP_PASSWORD,
+        },
       },
-      body: JSON.stringify({
-        from: "One Shot <onboarding@resend.dev>",
-        to: ["fredwavcm@gmail.com"],
-        subject: `🎯 Nouvelle réservation One Shot — ${name}`,
-        html: htmlBody,
-      }),
     });
 
-    const data = await res.json();
+    await client.send({
+      from: "noreply@fredwav.com",
+      to: "fredwavcm@gmail.com",
+      subject: `🎯 Nouvelle réservation One Shot — ${name}`,
+      content: "auto",
+      html: htmlBody,
+    });
 
-    if (!res.ok) {
-      console.error("Resend error:", data);
-      return new Response(
-        JSON.stringify({ error: "Erreur lors de l'envoi de l'email" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    await client.close();
 
     return new Response(
       JSON.stringify({ success: true }),

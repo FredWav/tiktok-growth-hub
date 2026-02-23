@@ -1,49 +1,47 @@
 
 
-## Vérifier le paiement existant avant de rediriger vers Stripe
+## Corriger les balises SEO manquantes sur toutes les pages
 
-### Objectif
+### Probleme
 
-Quand l'utilisateur clique sur "Réserver mon One Shot (179€)", vérifier d'abord si un `oneshot_session_id` existe dans le `localStorage`. Si oui, cela signifie qu'il a déjà payé mais n'a pas terminé le questionnaire : on le redirige directement vers `/one-shot/success` au lieu de lui faire repayer.
+Le composant `SEOHead` ne gere que 4 balises (`description`, `og:title`, `og:description`, `og:url`, `canonical`). Il manque plusieurs balises importantes pour le referencement et le partage sur les reseaux sociaux.
+
+### Balises manquantes
+
+- `og:type` (website)
+- `og:image` (image de partage)
+- `og:locale` (fr_FR)
+- `og:site_name` (Fred Wav)
+- `twitter:card` (summary_large_image) -- present dans index.html mais pas mis a jour par page
+- `twitter:title`
+- `twitter:description`
+- `twitter:image`
 
 ### Modification
 
-**Fichier** : `src/pages/OneShot.tsx`
+**Fichier** : `src/components/SEOHead.tsx`
 
-Modifier la fonction `handleCheckout` (lignes 89-103) :
+Enrichir le composant pour ajouter toutes les balises manquantes automatiquement, sans changer l'interface des pages existantes :
 
 ```text
-const handleCheckout = async () => {
-  // Vérifier si un paiement existe déjà
-  const existingSessionId = localStorage.getItem("oneshot_session_id");
-  if (existingSessionId) {
-    // Rediriger vers la page success pour terminer le formulaire
-    window.location.href = `/one-shot/success`;
-    return;
-  }
+Balises ajoutees dans le useEffect :
 
-  // Sinon, créer une nouvelle session Stripe
-  setLoading(true);
-  try {
-    const { data, error } = await supabase.functions.invoke("create-oneshot-checkout");
-    if (error) throw error;
-    if (data?.url) {
-      window.location.href = data.url;
-    }
-  } catch (err: any) {
-    toast.error("Erreur lors de la création du paiement. Réessayez.");
-    console.error(err);
-  } finally {
-    setLoading(false);
-  }
-};
+setMeta("og:type", "website", "property");
+setMeta("og:locale", "fr_FR", "property");
+setMeta("og:site_name", "Fred Wav", "property");
+setMeta("og:image", "https://lovable.dev/opengraph-image-p98pqg.png", "property");
+setMeta("twitter:card", "summary_large_image");
+setMeta("twitter:title", title);
+setMeta("twitter:description", description);
+setMeta("twitter:site", "@FredWav");
+setMeta("twitter:image", "https://lovable.dev/opengraph-image-p98pqg.png");
 ```
 
-Ajouter aussi l'import de `useNavigate` depuis `react-router-dom` pour utiliser la navigation interne au lieu de `window.location.href` pour la redirection locale.
+### Aucun changement dans les pages
 
-### Résultat
+Toutes les pages utilisent deja `SEOHead` avec `title`, `description` et `path`. Les nouvelles balises seront ajoutees automatiquement par le composant enrichi. Aucune modification necessaire dans les fichiers de pages.
 
-- Utilisateur qui a déjà payé mais fermé l'onglet : clic sur le bouton -> redirigé vers `/one-shot/success` pour remplir le formulaire
-- Utilisateur qui n'a jamais payé : clic sur le bouton -> redirection Stripe normale
-- Une fois le formulaire soumis, le `localStorage` est nettoyé et le bouton redirige à nouveau vers Stripe
+### Detail technique
+
+Le composant utilise la meme fonction `setMeta` existante pour creer ou mettre a jour les balises. Les balises Twitter utilisent `attr="name"` (par defaut), les balises OpenGraph utilisent `attr="property"`. Les valeurs statiques (og:type, og:locale, og:site_name, images) sont codees en dur car identiques sur toutes les pages.
 

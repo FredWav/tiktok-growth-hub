@@ -1,58 +1,24 @@
 
 
-## Corriger l'envoi d'email SMTP et supprimer Resend
+## Supprimer les emojis de la section "A qui ca s'adresse"
 
-### Probleme
+Les trois profils de la landing page utilisent des emojis (😤, 👀, 🎯) comme element visuel principal. Il faut les remplacer par des icones Lucide coherentes avec le reste du design.
 
-La bibliothèque `denomailer` ne fonctionne pas dans l'environnement Edge Functions. Les erreurs `BadResource` et `invalid cmd` dans les logs montrent que les connexions TCP/TLS brutes ne sont pas supportees correctement par le runtime.
+### Modification
 
-De plus, la page admin Settings affiche encore "Resend" dans les integrations.
+**Fichier** : `src/pages/Home.tsx` (lignes 30-44)
 
-### Solution
+Remplacer les emojis par des icones Lucide deja importees ou disponibles :
 
-Remplacer `denomailer` par `nodemailer` via le specifier `npm:`. Deno supporte les modules npm nativement, et `nodemailer` est la bibliothèque d'envoi d'email la plus stable et testee.
+- 😤 "Tu postes, ca ne decolle pas" → icone `TrendingDown` (tendance descendante, represente la stagnation)
+- 👀 "Tu as des vues mais pas de clients" → icone `Eye` (des vues sans conversion)
+- 🎯 "Tu veux structurer ton contenu pour vendre" → icone `Target` (deja importee, objectif clair)
 
-### Modifications
+Dans le rendu des cards (lignes 161-175), remplacer le `<span>` emoji par un bloc icone stylise similaire aux cards d'offres (fond arrondi + icone coloree).
 
-#### 1. `supabase/functions/send-oneshot-form/index.ts`
+### Detail technique
 
-- Remplacer l'import `denomailer` par `npm:nodemailer`
-- Adapter la configuration du transporteur SMTP :
-
-```text
-import nodemailer from "npm:nodemailer@6.9.16";
-
-const transporter = nodemailer.createTransport({
-  host: "ssl0.ovh.net",
-  port: 465,
-  secure: true,
-  auth: {
-    user: "noreply@fredwav.com",
-    pass: SMTP_PASSWORD,
-  },
-});
-
-await transporter.sendMail({
-  from: "noreply@fredwav.com",
-  to: "fredwavcm@gmail.com",
-  subject: "...",
-  html: htmlBody,
-});
-```
-
-- Le reste du code (validation, verification Stripe, contenu HTML) reste identique
-
-#### 2. `src/pages/admin/Settings.tsx` (lignes 66-72)
-
-Remplacer la section "Resend" par "OVH Mail" :
-
-- "Resend" devient "OVH Mail"
-- "Envoi d'emails" devient "Envoi d'emails (SMTP)"
-
-### Pourquoi nodemailer
-
-- Bibliothèque la plus utilisee pour l'envoi d'email (5M+ telechargements/semaine)
-- Support natif via `npm:` dans Deno Edge Functions
-- Gère correctement TLS implicite (port 465) et STARTTLS (port 587)
-- Pas de problème avec les connexions TCP brutes comme denomailer
+1. Ajouter les imports `TrendingDown` et `Eye` depuis lucide-react
+2. Changer la structure `profiles` : remplacer `emoji: string` par `icon: LucideIcon`
+3. Dans le rendu, remplacer `<span className="text-4xl">{profile.emoji}</span>` par un conteneur avec l'icone stylisee
 

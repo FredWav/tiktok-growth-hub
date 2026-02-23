@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { ArrowRight, Calendar, CheckCircle, Loader2, Mail } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { ArrowRight, Calendar, CheckCircle, Loader2, Mail, XCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -23,7 +23,14 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+type VerifyState = "loading" | "verified" | "error";
+
 export default function OneShotSuccess() {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const sessionId = searchParams.get("session_id");
+
+  const [verifyState, setVerifyState] = useState<VerifyState>("loading");
   const [step, setStep] = useState<1 | 2>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -32,15 +39,42 @@ export default function OneShotSuccess() {
     defaultValues: { name: "", email: "", whatsapp: "", tiktok: "", objectives: "" },
   });
 
+  useEffect(() => {
+    if (!sessionId) {
+      setVerifyState("error");
+      return;
+    }
+
+    const verify = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke("verify-oneshot-payment", {
+          body: { session_id: sessionId },
+        });
+
+        if (error || !data?.verified) {
+          setVerifyState("error");
+          return;
+        }
+
+        if (data.customer_email) {
+          form.setValue("email", data.customer_email);
+        }
+        setVerifyState("verified");
+      } catch {
+        setVerifyState("error");
+      }
+    };
+
+    verify();
+  }, [sessionId]);
+
   const onSubmit = async (values: FormValues) => {
     setIsSubmitting(true);
     try {
-      const { data, error } = await supabase.functions.invoke("send-oneshot-form", {
-        body: values,
+      const { error } = await supabase.functions.invoke("send-oneshot-form", {
+        body: { ...values, session_id: sessionId },
       });
-
       if (error) throw error;
-
       setStep(2);
     } catch (err) {
       console.error("Error submitting form:", err);
@@ -53,6 +87,42 @@ export default function OneShotSuccess() {
       setIsSubmitting(false);
     }
   };
+
+  if (verifyState === "loading") {
+    return (
+      <Layout>
+        <Section variant="cream" size="lg">
+          <div className="max-w-2xl mx-auto text-center">
+            <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+            <p className="text-lg text-muted-foreground">Vérification du paiement en cours...</p>
+          </div>
+        </Section>
+      </Layout>
+    );
+  }
+
+  if (verifyState === "error") {
+    return (
+      <Layout>
+        <Section variant="cream" size="lg">
+          <div className="max-w-2xl mx-auto text-center">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <XCircle className="h-8 w-8 text-red-600" />
+            </div>
+            <h1 className="font-display text-3xl md:text-4xl font-semibold tracking-tight mb-4">
+              Paiement non vérifié
+            </h1>
+            <p className="text-lg text-muted-foreground mb-8">
+              Nous n'avons pas pu vérifier ton paiement. Si tu penses qu'il s'agit d'une erreur, contacte-nous.
+            </p>
+            <Button variant="hero" size="lg" asChild>
+              <Link to="/one-shot">Retour à l'offre One Shot</Link>
+            </Button>
+          </div>
+        </Section>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -75,86 +145,46 @@ export default function OneShotSuccess() {
               <div className="text-left bg-background rounded-xl p-6 md:p-8 shadow-sm border">
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-                    <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Nom / Prénom</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Jean Dupont" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input type="email" placeholder="jean@exemple.com" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="whatsapp"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>WhatsApp</FormLabel>
-                          <FormControl>
-                            <Input placeholder="+33 6 12 34 56 78" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="tiktok"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Compte TikTok</FormLabel>
-                          <FormControl>
-                            <Input placeholder="@toncompte" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="objectives"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Objectifs / Situation actuelle</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              placeholder="Décris ta situation actuelle et ce que tu aimerais atteindre..."
-                              className="min-h-[120px]"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
+                    <FormField control={form.control} name="name" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nom / Prénom</FormLabel>
+                        <FormControl><Input placeholder="Jean Dupont" {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="email" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl><Input type="email" placeholder="jean@exemple.com" {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="whatsapp" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>WhatsApp</FormLabel>
+                        <FormControl><Input placeholder="+33 6 12 34 56 78" {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="tiktok" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Compte TikTok</FormLabel>
+                        <FormControl><Input placeholder="@toncompte" {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="objectives" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Objectifs / Situation actuelle</FormLabel>
+                        <FormControl>
+                          <Textarea placeholder="Décris ta situation actuelle et ce que tu aimerais atteindre..." className="min-h-[120px]" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
                     <Button type="submit" variant="hero" size="lg" className="w-full" disabled={isSubmitting}>
                       {isSubmitting ? (
-                        <>
-                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                          Envoi en cours...
-                        </>
+                        <><Loader2 className="mr-2 h-5 w-5 animate-spin" />Envoi en cours...</>
                       ) : (
                         "Valider et accéder à la réservation"
                       )}
@@ -168,39 +198,24 @@ export default function OneShotSuccess() {
               <p className="text-lg text-muted-foreground mb-8">
                 Merci pour ces infos ! Il ne te reste plus qu'à réserver ton créneau pour notre session.
               </p>
-
               <Button variant="hero" size="xl" asChild>
-                <a
-                  href="https://calendly.com/fredwavcm/accompagnement-one-shot"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <a href="https://calendly.com/fredwavcm/accompagnement-one-shot" target="_blank" rel="noopener noreferrer">
                   <Calendar className="mr-2 h-5 w-5" />
                   Réserver mon créneau
                 </a>
               </Button>
-
               <div className="mt-8 p-6 bg-muted/50 rounded-xl text-left">
                 <div className="flex items-start gap-3">
                   <Mail className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
                   <p className="text-muted-foreground text-sm">
                     Si les horaires proposés ne sont pas possibles pour toi, contacte-moi à{" "}
-                    <a
-                      href="mailto:fredwavcm@gmail.com"
-                      className="text-primary font-medium hover:underline"
-                    >
-                      fredwavcm@gmail.com
-                    </a>
+                    <a href="mailto:fredwavcm@gmail.com" className="text-primary font-medium hover:underline">fredwavcm@gmail.com</a>
                   </p>
                 </div>
               </div>
-
               <div className="mt-8">
                 <Button variant="ghost" asChild>
-                  <Link to="/">
-                    Retour à l'accueil
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
+                  <Link to="/">Retour à l'accueil<ArrowRight className="ml-2 h-4 w-4" /></Link>
                 </Button>
               </div>
             </>

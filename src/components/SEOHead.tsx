@@ -26,6 +26,15 @@ export function SEOHead({ title, description, path }: SEOHeadProps) {
     setMeta("og:title", title, "property");
     setMeta("og:description", description, "property");
     setMeta("og:url", `${BASE_URL}${path}`, "property");
+    setMeta("og:type", "website", "property");
+    setMeta("og:locale", "fr_FR", "property");
+    setMeta("og:site_name", "Fred Wav", "property");
+    setMeta("og:image", "https://lovable.dev/opengraph-image-p98pqg.png", "property");
+    setMeta("twitter:card", "summary_large_image");
+    setMeta("twitter:title", title);
+    setMeta("twitter:description", description);
+    setMeta("twitter:site", "@FredWav");
+    setMeta("twitter:image", "https://lovable.dev/opengraph-image-p98pqg.png");
 
     let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
     if (!canonical) {

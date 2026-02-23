@@ -80,8 +80,8 @@ Deno.serve(async (req) => {
     const client = new SMTPClient({
       connection: {
         hostname: "ssl0.ovh.net",
-        port: 465,
-        tls: true,
+        port: 587,
+        tls: false,
         auth: {
           username: "noreply@fredwav.com",
           password: SMTP_PASSWORD,

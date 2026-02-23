@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle, Zap, Target, Crown, TrendingUp, FileText, Video, BarChart3, Lightbulb, MessageSquare } from "lucide-react";
+import { ArrowRight, CheckCircle, Zap, Target, Crown, TrendingUp, TrendingDown, Eye, FileText, Video, BarChart3, Lightbulb, MessageSquare, type LucideIcon } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -22,19 +22,19 @@ const proofStrip = [
   "Sans bullshit",
 ];
 
-const profiles = [
+const profiles: { icon: LucideIcon; title: string; description: string }[] = [
   {
-    emoji: "😤",
+    icon: TrendingDown,
     title: "Tu postes, ça ne décolle pas",
     description: "Tu fais des efforts mais tes vidéos stagnent à 200 vues. Tu ne sais pas ce qui cloche.",
   },
   {
-    emoji: "👀",
+    icon: Eye,
     title: "Tu as des vues mais pas de clients",
     description: "L'algo te pousse mais personne n'achète. Ton contenu divertit au lieu de convertir.",
   },
   {
-    emoji: "🎯",
+    icon: Target,
     title: "Tu veux structurer ton contenu pour vendre",
     description: "Tu sais que TikTok peut rapporter, tu veux juste la bonne méthode pour y arriver.",
   },
@@ -187,7 +187,9 @@ export default function Home() {
           {profiles.map((profile) => (
             <Card key={profile.title} className="border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
               <CardHeader className="text-center pb-2">
-                <span className="text-4xl mb-3 block">{profile.emoji}</span>
+                <div className="mx-auto mb-3 p-3 rounded-full bg-primary/10 w-fit">
+                  <profile.icon className="h-6 w-6 text-primary" />
+                </div>
                 <CardTitle className="font-display text-xl">{profile.title}</CardTitle>
               </CardHeader>
               <CardContent>

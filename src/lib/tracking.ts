@@ -1,6 +1,12 @@
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+    dataLayer?: unknown[];
+  }
+}
+
 export function trackEvent(event: string, data?: Record<string, string>) {
-  // Placeholder - brancher analytics ici (GA, Plausible, etc.)
-  if (typeof window !== "undefined") {
-    console.debug("[track]", event, data);
+  if (typeof window !== "undefined" && window.gtag) {
+    window.gtag("event", event, data);
   }
 }

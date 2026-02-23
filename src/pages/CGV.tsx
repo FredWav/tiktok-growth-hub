@@ -12,7 +12,7 @@ export default function CGV() {
           {/* IDENTIFICATION */}
           <h2 className="font-display text-xl font-semibold mt-10 mb-3">Identification du vendeur</h2>
           <ul className="text-muted-foreground mb-4 list-none pl-0 space-y-1">
-            <li><strong>Éditeur et vendeur :</strong> Fred Wav</li>
+            <li><strong>Éditeur et vendeur :</strong> Frédéric Olalde, entrepreneur individuel, exploitant sous le nom commercial Fred Wav</li>
             <li><strong>Statut :</strong> Entrepreneur individuel (EI)</li>
             <li><strong>SIRET :</strong> 92174972700019</li>
             <li><strong>Adresse :</strong> 2 route de Malagué, 86270 Coussay-les-Bois, France</li>

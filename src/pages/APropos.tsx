@@ -48,7 +48,7 @@ const stats = [
 export default function APropos() {
   return (
     <Layout>
-      <SEOHead title="À propos de Fred Wav | Expert Stratégie TikTok" description="18 ans d'expérience vidéo, 300+ créateurs accompagnés, 10M+ vues générées. Découvre le parcours et la méthode." path="/a-propos" />
+      <SEOHead title="À propos de Fred Wav | Expert Stratégie TikTok" description="18 ans d'expérience vidéo, 300+ créateurs accompagnés, 10M+ vues générées. Découvre le parcours et la méthode." path="/a-propos" keywords="Fred Wav, expert tiktok, parcours, méthode data-driven, accompagnement créateur" />
       <Section variant="cream" size="lg">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>

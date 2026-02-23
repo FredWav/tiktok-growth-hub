@@ -112,7 +112,7 @@ export default function OneShot() {
 
   return (
     <Layout>
-      <SEOHead title="One Shot - Session Stratégie TikTok 179€ | Fred Wav" description="1h30 de diagnostic et plan d'action personnalisé pour ta stratégie TikTok. Réservation en ligne, paiement sécurisé." path="/one-shot" />
+      <SEOHead title="One Shot - Session Stratégie TikTok 179€ | Fred Wav" description="1h30 de diagnostic et plan d'action personnalisé pour ta stratégie TikTok. Réservation en ligne, paiement sécurisé." path="/one-shot" keywords="one shot tiktok, session stratégie, diagnostic tiktok, coaching individuel, plan action, 179 euros" />
       <Section variant="cream" size="lg">
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">

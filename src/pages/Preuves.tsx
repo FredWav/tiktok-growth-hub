@@ -6,6 +6,7 @@ import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { trackEvent } from "@/lib/tracking";
+import { SEOHead } from "@/components/SEOHead";
 
 const videoTestimonials = [
   "97xyXqwszrM",
@@ -149,7 +150,7 @@ const chooseOffers = [
 export default function Preuves() {
   return (
     <Layout>
-      {/* Hero */}
+      <SEOHead title="Témoignages et Résultats Clients | Fred Wav" description="Découvre les résultats concrets de nos clients : témoignages vidéo, études de cas et retours d'expérience." path="/preuves" />
       <Section variant="cream" size="lg">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">

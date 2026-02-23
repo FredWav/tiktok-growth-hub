@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Check, Clock, Video, FileText, HelpCircle, Zap, BarChart3, Lightbulb, Target, Play } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
+import { SEOHead } from "@/components/SEOHead";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -103,7 +104,7 @@ export default function OneShot() {
 
   return (
     <Layout>
-      {/* Hero */}
+      <SEOHead title="One Shot - Session Stratégie TikTok 179€ | Fred Wav" description="1h30 de diagnostic et plan d'action personnalisé pour ta stratégie TikTok. Réservation en ligne, paiement sécurisé." path="/one-shot" />
       <Section variant="cream" size="lg">
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">

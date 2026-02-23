@@ -1,5 +1,6 @@
 import { Mail, Clock, ArrowRight, Instagram, Youtube, Facebook } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
+import { SEOHead } from "@/components/SEOHead";
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ const socials = [
 export default function Contact() {
   return (
     <Layout>
+      <SEOHead title="Contact - Fred Wav | Expert TikTok" description="Contacte Fred Wav par email ou réseaux sociaux. Réponse sous 24-48h en semaine." path="/contact" />
       <Section variant="cream" size="lg">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">

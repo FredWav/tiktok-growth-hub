@@ -4,6 +4,7 @@ import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/tracking";
+import { SEOHead } from "@/components/SEOHead";
 
 const profileSelector = [
   { label: "Un diagnostic clair", target: "one-shot", icon: Zap },
@@ -125,7 +126,7 @@ const scrollTo = (id: string) => {
 export default function Offres() {
   return (
     <Layout>
-      {/* Hero */}
+      <SEOHead title="Offres et Tarifs - Fred Wav | Coaching TikTok" description="Découvre les offres d'accompagnement TikTok : One Shot (179€), 45 Jours et VIP. Trouve la formule adaptée à tes besoins." path="/offres" />
       <Section variant="cream" size="lg">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">

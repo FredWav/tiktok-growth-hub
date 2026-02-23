@@ -1,5 +1,5 @@
 import Stripe from "https://esm.sh/stripe@18.5.0";
-import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
+import nodemailer from "npm:nodemailer@6.9.16";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -77,30 +77,22 @@ Deno.serve(async (req) => {
       </div>
     `;
 
-    const client = new SMTPClient({
-      connection: {
-        hostname: "smtp.mail.ovh.net",
-        port: 465,
-        tls: {
-          enabled: true,
-          requireTLS: true,
-        },
-        auth: {
-          username: "noreply@fredwav.com",
-          password: SMTP_PASSWORD,
-        },
+    const transporter = nodemailer.createTransport({
+      host: "ssl0.ovh.net",
+      port: 465,
+      secure: true,
+      auth: {
+        user: "noreply@fredwav.com",
+        pass: SMTP_PASSWORD,
       },
     });
 
-    await client.send({
+    await transporter.sendMail({
       from: "noreply@fredwav.com",
       to: "fredwavcm@gmail.com",
       subject: `🎯 Nouvelle réservation One Shot — ${name}`,
-      content: "auto",
       html: htmlBody,
     });
-
-    await client.close();
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

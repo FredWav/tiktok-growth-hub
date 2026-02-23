@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Check, Clock, Video, FileText, HelpCircle, Zap } from "lucide-react";
+import { trackEvent } from "@/lib/tracking";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -98,7 +99,7 @@ export default function OneShot() {
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
             <Zap className="h-4 w-4" />
-            Session unique — 179€
+            Session unique - 179€
           </div>
           
           <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">
@@ -110,8 +111,8 @@ export default function OneShot() {
             En 1h30, on pose les bases d'une présence TikTok qui génère des résultats.
           </p>
 
-          <Button variant="hero" size="xl" onClick={handleCheckout} disabled={loading}>
-              {loading ? "Redirection..." : "Réserver ma session — 179€"}
+          <Button variant="hero" size="xl" onClick={() => { trackEvent("cta_one_shot_click", { location: "oneshot_hero" }); handleCheckout(); }} disabled={loading}>
+              {loading ? "Redirection..." : "Réserver mon One Shot (179€)"}
               <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
 
@@ -302,8 +303,8 @@ export default function OneShot() {
             179€ pour repartir avec un plan d'action clair.
             Pas de bullshit, que du concret.
           </p>
-          <Button variant="hero" size="xl" onClick={handleCheckout} disabled={loading}>
-              {loading ? "Redirection..." : "Réserver ma session maintenant"}
+          <Button variant="hero" size="xl" onClick={() => { trackEvent("cta_one_shot_click", { location: "oneshot_footer" }); handleCheckout(); }} disabled={loading}>
+              {loading ? "Redirection..." : "Réserver mon One Shot (179€)"}
               <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
           <p className="text-xs text-muted-foreground mt-3">

@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { ArrowRight, Quote, TrendingUp, Users, Eye, Play, Check, X, Target } from "lucide-react";
+import { ArrowRight, Quote, TrendingUp, Users, Eye, Play, Check, X, Target, Zap, Crown } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { trackEvent } from "@/lib/tracking";
 
 const videoTestimonials = [
   "97xyXqwszrM",
@@ -56,7 +57,7 @@ const testimonials = [
   {
     name: "Estelle",
     role: "Membre de la formation",
-    content: "Ce qui m'a le plus aidé, c'était l'analyse de compte. J'ai fait une autre formation social media, et ta valeur ajoutée est visible dès le début. La communauté qui se soutient, les feedbacks directs sur TikTok… Merci Fred pour tout ce boulot, c'est génial.",
+    content: "Ce qui m'a le plus aidé, c'était l'analyse de compte. J'ai fait une autre formation social media, et ta valeur ajoutée est visible dès le début. La communauté qui se soutient, les feedbacks directs sur TikTok... Merci Fred pour tout ce boulot, c'est génial.",
     result: "Analyse de compte",
   },
   {
@@ -74,7 +75,7 @@ const testimonials = [
   {
     name: "Betty",
     role: "Entrepreneure",
-    content: "En tant qu'entrepreneure, j'ai besoin de toucher ma cible. L'analyse de compte, les prises de conscience et les choix à faire… j'ai obtenu des contrats depuis ! Le gros plus ? Le suivi sur la durée et la communauté. Je valide et je recommande.",
+    content: "En tant qu'entrepreneure, j'ai besoin de toucher ma cible. L'analyse de compte, les prises de conscience et les choix à faire... j'ai obtenu des contrats depuis ! Le gros plus ? Le suivi sur la durée et la communauté. Je valide et je recommande.",
     result: "Contrats obtenus",
   },
   {
@@ -118,6 +119,33 @@ const stats = [
   { icon: TrendingUp, value: "95%", label: "Taux de satisfaction" },
 ];
 
+const chooseOffers = [
+  {
+    icon: Zap,
+    title: "One Shot",
+    description: "Diagnostic + plan d'action en 1h30",
+    cta: "Réserver mon One Shot (179€)",
+    href: "/one-shot",
+    trackEvent: "cta_one_shot_click",
+  },
+  {
+    icon: Target,
+    title: "45 Jours",
+    description: "Transformation encadrée sur 45 jours",
+    cta: "Candidater au 45 jours",
+    href: "/45-jours",
+    trackEvent: "cta_45j_click",
+  },
+  {
+    icon: Crown,
+    title: "VIP",
+    description: "Suivi continu, lives, feedback Discord",
+    cta: "Rejoindre le VIP",
+    href: "/offres/vip",
+    trackEvent: "cta_vip_click",
+  },
+];
+
 export default function Preuves() {
   return (
     <Layout>
@@ -148,13 +176,46 @@ export default function Preuves() {
         </div>
       </Section>
 
+      {/* CTA after videos */}
+      <Section variant="dark" size="md">
+        <div className="max-w-2xl mx-auto text-center">
+          <h2 className="font-display text-2xl md:text-3xl font-semibold text-cream mb-4">
+            Prêt à obtenir les mêmes résultats ?
+          </h2>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              variant="hero"
+              size="lg"
+              asChild
+              onClick={() => trackEvent("cta_one_shot_click", { location: "preuves_mid" })}
+            >
+              <Link to="/one-shot">
+                Réserver mon One Shot (179€)
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button
+              variant="premium"
+              size="lg"
+              asChild
+              onClick={() => trackEvent("cta_45j_click", { location: "preuves_mid" })}
+            >
+              <Link to="/45-jours">
+                Candidater au 45 jours
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </Section>
+
       {/* Stats */}
-      <Section variant="dark" size="sm">
+      <Section variant="default" size="sm">
         <div className="flex flex-wrap justify-center gap-12">
           {stats.map((stat, index) => (
             <div key={index} className="text-center">
               <stat.icon className="h-6 w-6 text-primary mx-auto mb-2" />
-              <div className="text-2xl font-bold text-cream">{stat.value}</div>
+              <div className="text-2xl font-bold">{stat.value}</div>
               <div className="text-sm text-muted-foreground">{stat.label}</div>
             </div>
           ))}
@@ -208,12 +269,11 @@ export default function Preuves() {
               </h3>
 
               <div className="grid md:grid-cols-2 gap-6 mb-8">
-                {/* Avant */}
-                <div className="bg-noir/90 rounded-xl p-6">
-                  <div className="text-xs font-bold uppercase tracking-widest text-cream/40 mb-4">Avant</div>
+                <div className="bg-destructive/5 rounded-xl p-6">
+                  <div className="text-xs font-bold uppercase tracking-widest text-destructive/60 mb-4">Avant</div>
                   <ul className="space-y-3">
                     {study.before.map((item, i) => (
-                      <li key={i} className="flex items-start gap-3 text-cream/50 line-through decoration-cream/20">
+                      <li key={i} className="flex items-start gap-3 text-muted-foreground line-through decoration-muted-foreground/30">
                         <X className="h-4 w-4 mt-0.5 shrink-0 text-destructive/60" />
                         <span className="text-sm">{item}</span>
                       </li>
@@ -221,7 +281,6 @@ export default function Preuves() {
                   </ul>
                 </div>
 
-                {/* Après */}
                 <div className="bg-primary/10 rounded-xl p-6 border border-primary/20">
                   <div className="text-xs font-bold uppercase tracking-widest text-primary mb-4">Après</div>
                   <ul className="space-y-3">
@@ -235,7 +294,6 @@ export default function Preuves() {
                 </div>
               </div>
 
-              {/* Résultats */}
               <div className="bg-muted/50 rounded-xl p-6">
                 <div className="text-xs font-bold uppercase tracking-widest text-primary mb-4">{study.resultLabel}</div>
                 <ul className="grid md:grid-cols-3 gap-3">
@@ -250,7 +308,7 @@ export default function Preuves() {
             </div>
           ))}
 
-          {/* One Shot -- format manifeste */}
+          {/* One Shot manifeste */}
           <div className="bg-noir rounded-2xl p-10 md:p-14 text-center border border-primary/20 hover:border-primary/40 hover:shadow-xl transition-all duration-300">
             <span className="text-xs font-semibold uppercase tracking-widest text-primary">One Shot stratégique</span>
             <h3 className="font-display text-2xl md:text-3xl font-bold mt-3 mb-8 tracking-tight text-cream">
@@ -269,21 +327,34 @@ export default function Preuves() {
         </div>
       </Section>
 
-      {/* CTA */}
+      {/* Quel accompagnement choisir */}
       <Section variant="default" size="lg">
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="font-display text-3xl font-semibold mb-4">
-            À ton tour ?
-          </h2>
-          <p className="text-muted-foreground mb-6">
-            Ces résultats sont accessibles. Il suffit de commencer.
-          </p>
-          <Button variant="hero" size="lg" asChild>
-            <Link to="/one-shot">
-              Réserver un One Shot — 179€
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
+        <SectionHeader
+          title="Quel accompagnement choisir ?"
+          subtitle="Trois formules selon ton besoin."
+        />
+
+        <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-8">
+          {chooseOffers.map((offer) => (
+            <div key={offer.title} className="bg-muted/50 rounded-xl p-6 text-center border border-border hover:border-primary/30 transition-all">
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <offer.icon className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="font-semibold text-lg mb-2">{offer.title}</h3>
+              <p className="text-sm text-muted-foreground mb-4">{offer.description}</p>
+              <Button
+                variant="premium"
+                size="sm"
+                asChild
+                onClick={() => trackEvent(offer.trackEvent, { location: "preuves_bottom" })}
+              >
+                <Link to={offer.href}>
+                  {offer.cta}
+                  <ArrowRight className="ml-2 h-3 w-3" />
+                </Link>
+              </Button>
+            </div>
+          ))}
         </div>
       </Section>
     </Layout>

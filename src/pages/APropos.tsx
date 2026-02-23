@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Lightbulb, BarChart3, TrendingUp, Shield, RefreshCw } from "lucide-react";
+import { trackEvent } from "@/lib/tracking";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -199,9 +200,9 @@ export default function APropos() {
           <p className="text-muted-foreground mb-6">
             Commence par un One Shot. Tu verras rapidement si ma méthode est faite pour toi.
           </p>
-          <Button variant="hero" size="lg" asChild>
+          <Button variant="hero" size="lg" asChild onClick={() => trackEvent("cta_one_shot_click", { location: "apropos" })}>
             <Link to="/one-shot">
-              Découvrir le One Shot
+              Réserver mon One Shot (179€)
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>

@@ -1,4 +1,5 @@
 import { Mail, Clock, ArrowRight, Instagram, Youtube, Facebook } from "lucide-react";
+import { trackEvent } from "@/lib/tracking";
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -93,9 +94,9 @@ export default function Contact() {
             <p className="text-muted-foreground text-sm mb-6">
               Pas besoin d'attendre. Réserve un One Shot et on en parle directement.
             </p>
-            <Button variant="hero" size="lg" asChild>
+            <Button variant="hero" size="lg" asChild onClick={() => trackEvent("cta_one_shot_click", { location: "contact" })}>
               <Link to="/one-shot">
-                Réserver un One Shot — 179€
+                Réserver mon One Shot (179€)
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>

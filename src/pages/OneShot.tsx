@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Check, Clock, Video, FileText, HelpCircle, Zap, BarChart3, Lightbulb, Target, Play } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
 import { SEOHead } from "@/components/SEOHead";
@@ -84,9 +84,17 @@ const faqs = [
 ];
 
 export default function OneShot() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
   const handleCheckout = async () => {
+    // Vérifier si un paiement existe déjà
+    const existingSessionId = localStorage.getItem("oneshot_session_id");
+    if (existingSessionId) {
+      navigate("/one-shot/success");
+      return;
+    }
+
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("create-oneshot-checkout");

@@ -1,18 +1,21 @@
 
 
-## Scroll to top on navigation
+## Mise a jour des Mentions Legales
 
-When clicking a link and navigating to a new page, the browser stays at the current scroll position instead of scrolling to the top. This is a common issue with React Router.
+Mise a jour de la page `src/pages/MentionsLegales.tsx` avec les informations completes fournies.
 
-### Solution
+### Changements
 
-Create a `ScrollToTop` component that listens for route changes and scrolls the window to the top automatically. Then add it to the app's router.
+Le contenu de la page sera remplace avec les nouvelles informations :
 
-### Technical details
+- **Editeur du site** : ajout du SIRET (92174972700019), de l'adresse postale (2 route de Malague, 86270 Coussay-les-Bois, France), de la mention TVA (franchise en base), et du directeur de la publication.
+- **Hebergement** : ajout des details complets de Lovable Labs Inc (adresse Dover, telephone, email feedback@lovable.dev) et de l'adresse UE (Lovable Labs Sweden AB, Stockholm).
+- **Propriete intellectuelle** : inchange.
+- **Donnees personnelles** : inchange.
+- **Cookies** : inchange.
+- **Date de mise a jour** : inchangee (fevrier 2026).
 
-1. **Create `src/components/ScrollToTop.tsx`** - A small component using `useEffect` + `useLocation` from react-router-dom that calls `window.scrollTo(0, 0)` on every pathname change.
+### Fichier modifie
 
-2. **Update `src/App.tsx`** - Add `<ScrollToTop />` inside the `<BrowserRouter>` so it triggers on every navigation.
-
-This is a standard React Router pattern -- no dependencies needed, and it applies globally to all route transitions.
+- `src/pages/MentionsLegales.tsx` : remplacement du contenu des sections "Editeur du site" et "Hebergement" avec les informations completes.
 

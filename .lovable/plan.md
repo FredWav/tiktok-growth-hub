@@ -11,10 +11,10 @@ Remplacer les price IDs de production par les IDs de test qui viennent d'être c
 
 | Offre | Ancien (prod) | Nouveau (test) |
 |-------|---------------|----------------|
-| One Shot 179 EUR | `price_1SHp2SBfuzQl0PTiBCmEAq2l` | `price_1T42X9BfuzQl0PTiuNshWAOv` |
-| VIP 3 mois 297 EUR | `price_1T0UXNBfuzQl0PTiKGR1SBTV` | `price_1T42XUBfuzQl0PTinQWdURaT` |
-| VIP 6 mois 495 EUR | `price_1T0UXRBfuzQl0PTir9qz5lUy` | `price_1T42XgBfuzQl0PTiHHToXEGl` |
-| VIP 12 mois 891 EUR | `price_1T0UXTBfuzQl0PTi6KK2azBu` | `price_1T42XxBfuzQl0PTik4vf6tWc` |
+| One Shot 179 EUR | `price_1SHp2SBfuzQl0PTiBCmEAq2l` | `price_1T42hpBfuzQl0PTiAwqezEJq` |
+| VIP 3 mois 297 EUR | `price_1T0UXNBfuzQl0PTiKGR1SBTV` | `price_1T42jJBfuzQl0PTiye7QprqB` |
+| VIP 6 mois 495 EUR | `price_1T0UXRBfuzQl0PTir9qz5lUy` | `price_1T42jYBfuzQl0PTiHSBOxz7g` |
+| VIP 12 mois 891 EUR | `price_1T0UXTBfuzQl0PTi6KK2azBu` | `price_1T42jnBfuzQl0PTi8YWlge0U` |
 
 ### Fichiers modifiés
 

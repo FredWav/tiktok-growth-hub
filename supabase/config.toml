@@ -26,3 +26,6 @@ verify_jwt = false
 
 [functions.send-oneshot-form]
 verify_jwt = false
+
+[functions.verify-oneshot-payment]
+verify_jwt = false

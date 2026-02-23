@@ -1,4 +1,4 @@
-
+import Stripe from "https://esm.sh/stripe@18.5.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -12,13 +12,26 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { name, email, whatsapp, tiktok, objectives } = await req.json();
+    const { name, email, whatsapp, tiktok, objectives, session_id } = await req.json();
 
     // Validation
-    if (!name || !email || !whatsapp || !tiktok || !objectives) {
+    if (!name || !email || !whatsapp || !tiktok || !objectives || !session_id) {
       return new Response(
         JSON.stringify({ error: "Tous les champs sont obligatoires" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Verify payment with Stripe
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+      apiVersion: "2025-08-27.basil",
+    });
+
+    const session = await stripe.checkout.sessions.retrieve(session_id);
+    if (session.payment_status !== "paid") {
+      return new Response(
+        JSON.stringify({ error: "Paiement non confirmé" }),
+        { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 

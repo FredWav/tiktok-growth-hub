@@ -1,18 +1,26 @@
 
 
-## Ajout de Google Analytics (gtag.js)
+## Mise a jour des Conditions Generales de Vente
 
-Ajout du script de tracking Google Analytics avec l'identifiant `G-E361JPZX7D`.
+Remplacement complet du contenu de la page `src/pages/CGV.tsx` avec les nouvelles CGV detaillees fournies.
 
-### Changements
+### Contenu
 
-1. **`index.html`** -- Ajouter les deux balises `<script>` Google Analytics dans le `<head>`, juste avant la fermeture `</head>`.
+Les nouvelles CGV comprennent 25 articles et 2 annexes :
 
-2. **`src/lib/tracking.ts`** -- Mettre a jour la fonction `trackEvent` pour envoyer les evenements a Google Analytics via `gtag()` au lieu de simplement les afficher dans la console.
+- Identification du vendeur, objet, champ d'application (B2C/B2B), definitions
+- Description detaillee des 3 offres (One Shot 179 EUR, Wav Premium 45 jours, VIP 99 EUR/mois)
+- Conditions d'acces, commande, prix, paiement (incidents, chargeback)
+- Execution des prestations, annulation/report/no-show
+- Droit de retractation detaille (14 jours, demarrage anticipe, perte du droit)
+- Obligation de moyens, responsabilite, propriete intellectuelle, confidentialite
+- Regles communaute VIP, donnees personnelles, reclamations
+- Mediation (SAS Mediation Solution Conso), ODR/RLL, droit applicable
+- Force majeure, nullite partielle, modification des CGV
+- Annexe 1 : consentements obligatoires (cases a cocher)
+- Annexe 2 : resume des elements inclus
 
-### Details techniques
+### Fichier modifie
 
-- Le script gtag.js sera charge de maniere asynchrone (`async`) pour ne pas bloquer le rendu de la page.
-- La fonction `trackEvent` utilisera `window.gtag('event', ...)` pour envoyer les evenements personnalises.
-- Une declaration TypeScript pour `window.gtag` et `window.dataLayer` sera ajoutee pour eviter les erreurs de typage.
+- `src/pages/CGV.tsx` : remplacement integral du contenu avec les 25 articles et 2 annexes, en conservant la structure Layout/Section existante.
 

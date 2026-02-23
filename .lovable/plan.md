@@ -1,44 +1,58 @@
 
 
-## Probleme
+## Corriger l'envoi d'email SMTP et supprimer Resend
 
-L'erreur `UnexpectedEof: peer closed connection without sending TLS close_notify` se produit lors de la connexion SMTP au serveur OVH `ssl0.ovh.net` sur le port 465 (TLS implicite). C'est un probleme de compatibilite connu entre denomailer et le runtime Deno des Edge Functions pour les connexions TLS implicites.
+### Probleme
 
-## Solution
+La bibliothèque `denomailer` ne fonctionne pas dans l'environnement Edge Functions. Les erreurs `BadResource` et `invalid cmd` dans les logs montrent que les connexions TCP/TLS brutes ne sont pas supportees correctement par le runtime.
 
-Passer du port 465 (TLS implicite) au port 587 (STARTTLS) qui est mieux supporte par denomailer dans l'environnement Edge Functions. Avec STARTTLS, la connexion demarre en clair puis est mise a niveau vers TLS, ce qui evite le probleme de negociation TLS initiale.
+De plus, la page admin Settings affiche encore "Resend" dans les integrations.
 
-## Modification
+### Solution
 
-**Fichier** : `supabase/functions/send-oneshot-form/index.ts`
+Remplacer `denomailer` par `nodemailer` via le specifier `npm:`. Deno supporte les modules npm nativement, et `nodemailer` est la bibliothèque d'envoi d'email la plus stable et testee.
 
-Remplacer la configuration du SMTPClient (lignes 80-90) :
+### Modifications
+
+#### 1. `supabase/functions/send-oneshot-form/index.ts`
+
+- Remplacer l'import `denomailer` par `npm:nodemailer`
+- Adapter la configuration du transporteur SMTP :
 
 ```text
-// Avant (TLS implicite - port 465)
-const client = new SMTPClient({
-  connection: {
-    hostname: "ssl0.ovh.net",
-    port: 465,
-    tls: true,
-    auth: { ... },
+import nodemailer from "npm:nodemailer@6.9.16";
+
+const transporter = nodemailer.createTransport({
+  host: "ssl0.ovh.net",
+  port: 465,
+  secure: true,
+  auth: {
+    user: "noreply@fredwav.com",
+    pass: SMTP_PASSWORD,
   },
 });
 
-// Apres (STARTTLS - port 587)
-const client = new SMTPClient({
-  connection: {
-    hostname: "ssl0.ovh.net",
-    port: 587,
-    tls: false,
-    auth: { ... },
-  },
+await transporter.sendMail({
+  from: "noreply@fredwav.com",
+  to: "fredwavcm@gmail.com",
+  subject: "...",
+  html: htmlBody,
 });
 ```
 
-Le parametre `tls: false` indique a denomailer de ne pas ouvrir une connexion TLS directe, mais d'utiliser la commande STARTTLS pour passer en mode securise apres la connexion initiale. C'est le comportement standard du port 587.
+- Le reste du code (validation, verification Stripe, contenu HTML) reste identique
 
-## Etapes
+#### 2. `src/pages/admin/Settings.tsx` (lignes 66-72)
 
-1. Modifier la configuration SMTP dans `send-oneshot-form/index.ts` (port 465 -> 587, tls: true -> false)
-2. Redeployer la fonction
+Remplacer la section "Resend" par "OVH Mail" :
+
+- "Resend" devient "OVH Mail"
+- "Envoi d'emails" devient "Envoi d'emails (SMTP)"
+
+### Pourquoi nodemailer
+
+- Bibliothèque la plus utilisee pour l'envoi d'email (5M+ telechargements/semaine)
+- Support natif via `npm:` dans Deno Edge Functions
+- Gère correctement TLS implicite (port 465) et STARTTLS (port 587)
+- Pas de problème avec les connexions TCP brutes comme denomailer
+

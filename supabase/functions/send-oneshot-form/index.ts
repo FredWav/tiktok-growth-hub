@@ -17,10 +17,10 @@ Deno.serve(async (req) => {
 
     // Validation
     if (!name || !email || !whatsapp || !tiktok || !objectives || !session_id) {
-      return new Response(
-        JSON.stringify({ error: "Tous les champs sont obligatoires" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "Tous les champs sont obligatoires" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     // Verify payment with Stripe
@@ -30,19 +30,19 @@ Deno.serve(async (req) => {
 
     const session = await stripe.checkout.sessions.retrieve(session_id);
     if (session.payment_status !== "paid") {
-      return new Response(
-        JSON.stringify({ error: "Paiement non confirmé" }),
-        { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "Paiement non confirmé" }), {
+        status: 402,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD") || "";
     if (!SMTP_PASSWORD) {
       console.error("SMTP_PASSWORD not configured");
-      return new Response(
-        JSON.stringify({ error: "Service email non configuré" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "Service email non configuré" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const htmlBody = `
@@ -79,9 +79,12 @@ Deno.serve(async (req) => {
 
     const client = new SMTPClient({
       connection: {
-        hostname: "ssl0.ovh.net",
-        port: 587,
-        tls: false,
+        hostname: "smtp.mail.ovh.net",
+        port: 465,
+        tls: {
+          enabled: true,
+          requireTLS: true,
+        },
         auth: {
           username: "noreply@fredwav.com",
           password: SMTP_PASSWORD,
@@ -99,16 +102,15 @@ Deno.serve(async (req) => {
 
     await client.close();
 
-    return new Response(
-      JSON.stringify({ success: true }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (error) {
     console.error("Error:", error);
-    return new Response(
-      JSON.stringify({ error: "Erreur interne du serveur" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: "Erreur interne du serveur" }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });
 

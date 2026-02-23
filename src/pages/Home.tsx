@@ -41,7 +41,7 @@ const profiles = [
 
 const deliverables = [
   { icon: BarChart3, text: "Diagnostic complet de ton compte et de ta niche" },
-  { icon: FileText, text: "Plan d'action personnalisé sur 30 jours" },
+  { icon: FileText, text: "Ressources personnalisées adaptées à ta situation" },
   { icon: Lightbulb, text: "Stratégie de hooks et scripts adaptés à ton secteur" },
   { icon: TrendingUp, text: "Optimisation de ton positionnement et de ta bio" },
   { icon: Video, text: "Replay de la session disponible après" },

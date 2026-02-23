@@ -49,7 +49,7 @@ export function Header() {
           {/* CTA Button */}
           <div className="hidden lg:block">
             <Button asChild>
-              <Link to="/one-shot">Réserver un One Shot</Link>
+              <Link to="/one-shot">Réserver mon One Shot (179€)</Link>
             </Button>
           </div>
 
@@ -83,7 +83,7 @@ export function Header() {
               ))}
               <Button asChild className="mt-2">
                 <Link to="/one-shot" onClick={() => setIsOpen(false)}>
-                  Réserver un One Shot
+                  Réserver mon One Shot (179€)
                 </Link>
               </Button>
             </div>

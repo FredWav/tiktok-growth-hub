@@ -4,11 +4,12 @@ interface SEOHeadProps {
   title: string;
   description: string;
   path: string;
+  keywords?: string;
 }
 
 const BASE_URL = "https://fredwav.com";
 
-export function SEOHead({ title, description, path }: SEOHeadProps) {
+export function SEOHead({ title, description, path, keywords }: SEOHeadProps) {
   useEffect(() => {
     document.title = title;
 
@@ -23,6 +24,7 @@ export function SEOHead({ title, description, path }: SEOHeadProps) {
     };
 
     setMeta("description", description);
+    if (keywords) setMeta("keywords", keywords);
     setMeta("og:title", title, "property");
     setMeta("og:description", description, "property");
     setMeta("og:url", `${BASE_URL}${path}`, "property");

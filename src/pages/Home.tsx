@@ -130,7 +130,7 @@ const faqItems = [
 export default function Home() {
   return (
     <Layout>
-      <SEOHead title="Fred Wav - Expert Stratégie TikTok | Coaching et Accompagnement" description="Transforme ton TikTok en machine à clients. Diagnostic, stratégie de contenu et plan d'action avec Fred Wav, expert TikTok." path="/" />
+      <SEOHead title="Fred Wav - Expert Stratégie TikTok | Coaching et Accompagnement" description="Transforme ton TikTok en machine à clients. Diagnostic, stratégie de contenu et plan d'action avec Fred Wav, expert TikTok." path="/" keywords="stratégie tiktok, coaching tiktok, expert tiktok, plan action tiktok, Fred Wav, audience tiktok, monétiser tiktok" />
       <Section variant="default" size="xl" className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-cream via-background to-primary/5 -z-10" />
 

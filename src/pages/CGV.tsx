@@ -5,7 +5,7 @@ import { SEOHead } from "@/components/SEOHead";
 export default function CGV() {
   return (
     <Layout>
-      <SEOHead title="Conditions Générales de Vente | Fred Wav" description="CGV applicables aux prestations de conseil en stratégie TikTok proposées par Fred Wav." path="/cgv" />
+      <SEOHead title="Conditions Générales de Vente | Fred Wav" description="CGV applicables aux prestations de conseil en stratégie TikTok proposées par Fred Wav." path="/cgv" keywords="conditions générales, cgv, mentions légales" />
       <Section variant="default" size="lg">
         <div className="max-w-3xl mx-auto prose prose-neutral">
           <h1 className="font-display text-3xl md:text-4xl font-semibold mb-2">Conditions Générales de Vente (CGV) — Fred Wav</h1>

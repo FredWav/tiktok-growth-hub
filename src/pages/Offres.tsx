@@ -126,7 +126,7 @@ const scrollTo = (id: string) => {
 export default function Offres() {
   return (
     <Layout>
-      <SEOHead title="Offres et Tarifs - Fred Wav | Coaching TikTok" description="Découvre les offres d'accompagnement TikTok : One Shot (179€), 45 Jours et VIP. Trouve la formule adaptée à tes besoins." path="/offres" />
+      <SEOHead title="Offres et Tarifs - Fred Wav | Coaching TikTok" description="Découvre les offres d'accompagnement TikTok : One Shot (179€), 45 Jours et VIP. Trouve la formule adaptée à tes besoins." path="/offres" keywords="tarifs coaching tiktok, offres tiktok, one shot, 45 jours, vip, accompagnement créateur" />
       <Section variant="cream" size="lg">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">

@@ -114,7 +114,7 @@ function VipCheckoutForm() {
 
   return (
     <Layout>
-      <SEOHead title="VIP - Accompagnement Continu TikTok | Fred Wav" description="Rejoins le hub VIP : lives hebdo, feedback Discord 5/7, ressources exclusives. À partir de 99€/mois." path="/offres/vip" />
+      <SEOHead title="VIP - Accompagnement Continu TikTok | Fred Wav" description="Rejoins le hub VIP : lives hebdo, feedback Discord 5/7, ressources exclusives. À partir de 99€/mois." path="/offres/vip" keywords="vip tiktok, accompagnement continu, discord tiktok, lives hebdo, feedback créateur" />
       <Section variant="cream" size="lg">
         <div className="max-w-3xl mx-auto">
           <Link to="/offres#vip" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-8">

@@ -5,7 +5,7 @@ import { SEOHead } from "@/components/SEOHead";
 export default function MentionsLegales() {
   return (
     <Layout>
-      <SEOHead title="Mentions Légales | Fred Wav" description="Mentions légales du site fredwav.com - Éditeur, hébergeur, propriété intellectuelle et données personnelles." path="/mentions-legales" />
+      <SEOHead title="Mentions Légales | Fred Wav" description="Mentions légales du site fredwav.com - Éditeur, hébergeur, propriété intellectuelle et données personnelles." path="/mentions-legales" keywords="mentions légales, éditeur, hébergeur" />
       <Section variant="default" size="lg">
         <div className="max-w-3xl mx-auto prose prose-neutral">
           <h1 className="font-display text-3xl md:text-4xl font-semibold mb-8">Mentions légales</h1>

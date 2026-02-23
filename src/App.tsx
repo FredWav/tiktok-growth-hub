@@ -17,6 +17,8 @@ import Preuves from "./pages/Preuves";
 import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
+import MentionsLegales from "./pages/MentionsLegales";
+import CGV from "./pages/CGV";
 import NotFound from "./pages/NotFound";
 
 // Admin pages
@@ -58,6 +60,8 @@ const App = () => (
             <Route path="/contact" element={<Contact />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/auth/reset-password" element={<ResetPassword />} />
+            <Route path="/mentions-legales" element={<MentionsLegales />} />
+            <Route path="/cgv" element={<CGV />} />
 
             {/* Admin routes */}
             <Route

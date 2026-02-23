@@ -1,21 +1,18 @@
 
 
-## Mise a jour des Mentions Legales
+## Ajout de Google Analytics (gtag.js)
 
-Mise a jour de la page `src/pages/MentionsLegales.tsx` avec les informations completes fournies.
+Ajout du script de tracking Google Analytics avec l'identifiant `G-E361JPZX7D`.
 
 ### Changements
 
-Le contenu de la page sera remplace avec les nouvelles informations :
+1. **`index.html`** -- Ajouter les deux balises `<script>` Google Analytics dans le `<head>`, juste avant la fermeture `</head>`.
 
-- **Editeur du site** : ajout du SIRET (92174972700019), de l'adresse postale (2 route de Malague, 86270 Coussay-les-Bois, France), de la mention TVA (franchise en base), et du directeur de la publication.
-- **Hebergement** : ajout des details complets de Lovable Labs Inc (adresse Dover, telephone, email feedback@lovable.dev) et de l'adresse UE (Lovable Labs Sweden AB, Stockholm).
-- **Propriete intellectuelle** : inchange.
-- **Donnees personnelles** : inchange.
-- **Cookies** : inchange.
-- **Date de mise a jour** : inchangee (fevrier 2026).
+2. **`src/lib/tracking.ts`** -- Mettre a jour la fonction `trackEvent` pour envoyer les evenements a Google Analytics via `gtag()` au lieu de simplement les afficher dans la console.
 
-### Fichier modifie
+### Details techniques
 
-- `src/pages/MentionsLegales.tsx` : remplacement du contenu des sections "Editeur du site" et "Hebergement" avec les informations completes.
+- Le script gtag.js sera charge de maniere asynchrone (`async`) pour ne pas bloquer le rendu de la page.
+- La fonction `trackEvent` utilisera `window.gtag('event', ...)` pour envoyer les evenements personnalises.
+- Une declaration TypeScript pour `window.gtag` et `window.dataLayer` sera ajoutee pour eviter les erreurs de typage.
 

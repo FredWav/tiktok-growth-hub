@@ -67,7 +67,7 @@ const App = () => (
             <Route path="/mentions-legales" element={<MentionsLegales />} />
             <Route path="/cgv" element={<CGV />} />
 
-            {/* Admin routes */}
+            {/* Admin routes 
             <Route
               path="/admin"
               element={
@@ -139,7 +139,7 @@ const App = () => (
                   <AdminSettings />
                 </ProtectedRoute>
               }
-            />
+            /> */}
 
             {/* Client routes */}
             <Route

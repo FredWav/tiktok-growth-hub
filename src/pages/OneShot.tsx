@@ -35,7 +35,7 @@ const deliverables = [
   },
   {
     icon: FileText,
-    title: "Plan d'action personnalisé sur 30 jours",
+    title: "Ressources personnalisées adaptées à ta situation",
   },
   {
     icon: Lightbulb,

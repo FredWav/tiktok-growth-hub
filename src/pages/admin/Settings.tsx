@@ -65,8 +65,8 @@ const Settings: React.FC = () => {
             </div>
             <div className="flex items-center justify-between py-3">
               <div>
-                <p className="text-cream">Resend</p>
-                <p className="text-cream/60 text-sm">Envoi d'emails</p>
+                <p className="text-cream">OVH Mail</p>
+                <p className="text-cream/60 text-sm">Envoi d'emails (SMTP)</p>
               </div>
               <span className="text-cream/40 text-sm">Non connecté</span>
             </div>

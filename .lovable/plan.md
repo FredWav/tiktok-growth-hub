@@ -1,34 +1,42 @@
 
 
-## Ajouter les meta keywords sur toutes les pages
+## Probleme identifie
 
-### Modification
+Les logs backend montrent cette erreur :
+> "No such price: 'price_1T42hpBfuzQl0PTiAwqezEJq'; **a similar object exists in test mode, but a live mode key was used**"
 
-**Fichier** : `src/components/SEOHead.tsx`
+Les 4 Price IDs dans ton code ont ete crees en **mode test** sur Stripe. Maintenant que la cle secrete est en **mode live**, ces IDs ne sont pas reconnus.
 
-1. Ajouter une prop optionnelle `keywords` a l'interface `SEOHeadProps`
-2. Ajouter `setMeta("keywords", keywords)` dans le `useEffect` quand la prop est fournie
+## Solution
 
-**Fichiers pages** : Ajouter la prop `keywords` a chaque appel de `SEOHead` avec des mots-cles pertinents :
+Creer les produits et prix en **mode live** sur Stripe, puis mettre a jour les 4 Price IDs dans le code.
 
-| Page | Keywords |
-|------|----------|
-| `Home.tsx` | strategie tiktok, coaching tiktok, expert tiktok, plan action tiktok, Fred Wav, audience tiktok, monetiser tiktok |
-| `OneShot.tsx` | one shot tiktok, session strategie, diagnostic tiktok, coaching individuel, plan action, 179 euros |
-| `QuarantecinqJours.tsx` | accompagnement 45 jours, transformation tiktok, suivi personnalise, coaching tiktok intensif |
-| `VipCheckout.tsx` | vip tiktok, accompagnement continu, discord tiktok, lives hebdo, feedback createur |
-| `Offres.tsx` | tarifs coaching tiktok, offres tiktok, one shot, 45 jours, vip, accompagnement createur |
-| `APropos.tsx` | Fred Wav, expert tiktok, parcours, methode data-driven, accompagnement createur |
-| `Preuves.tsx` | temoignages tiktok, resultats clients, etudes de cas, retours experience, preuves |
-| `Contact.tsx` | contact Fred Wav, question tiktok, reseaux sociaux, email |
-| `CGV.tsx` | conditions generales, cgv, mentions legales |
-| `MentionsLegales.tsx` | mentions legales, editeur, hebergeur |
-| `OneShotSuccess.tsx` | confirmation, paiement, one shot |
+## Etapes
 
-### Detail technique
+### 1. Creer les produits et prix live sur Stripe (via outils Stripe)
 
-- La prop `keywords` est de type `string` optionnelle
-- Si elle n'est pas fournie, aucune balise `keywords` n'est ajoutee
-- Chaque page passe ses mots-cles separes par des virgules
-- On utilise la meme fonction `setMeta` existante : `setMeta("keywords", keywords)`
+| Produit | Prix |
+|---------|------|
+| One Shot - Session Strategie TikTok | 179 EUR (paiement unique) |
+| VIP 3 mois | 297 EUR (paiement unique) |
+| VIP 6 mois | 495 EUR (paiement unique) |
+| VIP 12 mois | 891 EUR (paiement unique) |
 
+### 2. Mettre a jour les Price IDs dans le code
+
+Trois fichiers a modifier :
+
+- **`supabase/functions/create-oneshot-checkout/index.ts`** : remplacer le price ID a la ligne 24
+- **`src/pages/VipCheckout.tsx`** : remplacer les 3 price IDs aux lignes 17-19
+
+### 3. Redeployer les fonctions backend
+
+La fonction `create-oneshot-checkout` sera automatiquement redeployee apres modification.
+
+### 4. Tester le flux de paiement
+
+Verifier que le bouton "Reserver mon One Shot" redirige bien vers la page de paiement Stripe en mode live.
+
+## Details techniques
+
+Les modifications sont mineures : 4 chaines de caracteres (Price IDs) a remplacer par les nouveaux IDs live. Aucun changement de logique ou d'architecture.

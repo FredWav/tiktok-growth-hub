@@ -28,7 +28,9 @@ type VerifyState = "loading" | "verified" | "error";
 export default function OneShotSuccess() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const sessionId = searchParams.get("session_id");
+  const paramSessionId = searchParams.get("session_id");
+  const storedSessionId = localStorage.getItem("oneshot_session_id");
+  const sessionId = paramSessionId || storedSessionId;
 
   const [verifyState, setVerifyState] = useState<VerifyState>("loading");
   const [step, setStep] = useState<1 | 2>(1);
@@ -56,6 +58,9 @@ export default function OneShotSuccess() {
           return;
         }
 
+        // Persist session_id so user can return after closing the tab
+        localStorage.setItem("oneshot_session_id", sessionId);
+
         if (data.customer_email) {
           form.setValue("email", data.customer_email);
         }
@@ -75,6 +80,8 @@ export default function OneShotSuccess() {
         body: { ...values, session_id: sessionId },
       });
       if (error) throw error;
+      // Payment process complete, clear stored session
+      localStorage.removeItem("oneshot_session_id");
       setStep(2);
     } catch (err) {
       console.error("Error submitting form:", err);

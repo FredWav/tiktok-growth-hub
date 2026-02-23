@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/tracking";
+import { SEOHead } from "@/components/SEOHead";
 
 const DISCORD_INVITE_URL = "https://discord.gg/KUgFunVhKY";
 
@@ -113,6 +114,7 @@ function VipCheckoutForm() {
 
   return (
     <Layout>
+      <SEOHead title="VIP - Accompagnement Continu TikTok | Fred Wav" description="Rejoins le hub VIP : lives hebdo, feedback Discord 5/7, ressources exclusives. À partir de 99€/mois." path="/offres/vip" />
       <Section variant="cream" size="lg">
         <div className="max-w-3xl mx-auto">
           <Link to="/offres#vip" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-8">

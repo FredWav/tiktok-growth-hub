@@ -5,6 +5,7 @@ import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trackEvent } from "@/lib/tracking";
+import { SEOHead } from "@/components/SEOHead";
 import {
   Accordion,
   AccordionContent,
@@ -129,7 +130,7 @@ const faqItems = [
 export default function Home() {
   return (
     <Layout>
-      {/* ===== HERO - Above the fold ===== */}
+      <SEOHead title="Fred Wav - Expert Stratégie TikTok | Coaching et Accompagnement" description="Transforme ton TikTok en machine à clients. Diagnostic, stratégie de contenu et plan d'action avec Fred Wav, expert TikTok." path="/" />
       <Section variant="default" size="xl" className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-cream via-background to-primary/5 -z-10" />
 

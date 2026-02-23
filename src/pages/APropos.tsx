@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Lightbulb, BarChart3, TrendingUp, Shield, RefreshCw } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
+import { SEOHead } from "@/components/SEOHead";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -47,7 +48,7 @@ const stats = [
 export default function APropos() {
   return (
     <Layout>
-      {/* Hero */}
+      <SEOHead title="À propos de Fred Wav | Expert Stratégie TikTok" description="18 ans d'expérience vidéo, 300+ créateurs accompagnés, 10M+ vues générées. Découvre le parcours et la méthode." path="/a-propos" />
       <Section variant="cream" size="lg">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>

@@ -1,68 +1,44 @@
 
-## Remplacement de Resend par le serveur SMTP OVH
 
-### Objectif
-Remplacer l'envoi d'email via l'API Resend par un envoi SMTP direct via le serveur OVH, en utilisant l'adresse `noreply@fredwav.com`.
+## Probleme
 
-### Configuration SMTP
-- **Serveur** : ssl0.ovh.net
-- **Port** : 465 (SSL/TLS)
-- **Expediteur** : noreply@fredwav.com
+L'erreur `UnexpectedEof: peer closed connection without sending TLS close_notify` se produit lors de la connexion SMTP au serveur OVH `ssl0.ovh.net` sur le port 465 (TLS implicite). C'est un probleme de compatibilite connu entre denomailer et le runtime Deno des Edge Functions pour les connexions TLS implicites.
 
-### Etapes
+## Solution
 
-#### 1. Ajouter le secret du mot de passe SMTP
-Demander la saisie securisee du mot de passe de l'adresse `noreply@fredwav.com` via le gestionnaire de secrets. Ce secret sera stocke sous le nom `SMTP_PASSWORD`.
+Passer du port 465 (TLS implicite) au port 587 (STARTTLS) qui est mieux supporte par denomailer dans l'environnement Edge Functions. Avec STARTTLS, la connexion demarre en clair puis est mise a niveau vers TLS, ce qui evite le probleme de negociation TLS initiale.
 
-#### 2. Modifier la fonction `send-oneshot-form`
+## Modification
 
 **Fichier** : `supabase/functions/send-oneshot-form/index.ts`
 
-- Supprimer tout le code lie a Resend (API key, fetch vers api.resend.com)
-- Importer une librairie SMTP compatible Deno : `https://deno.land/x/smtp/mod.ts` (denomailer)
-- Configurer la connexion SMTP avec :
-  - hostname: `ssl0.ovh.net`
-  - port: `465`
-  - username: `noreply@fredwav.com`
-  - password: depuis le secret `SMTP_PASSWORD`
-  - tls: true
-- Envoyer l'email HTML existant (le contenu du mail ne change pas) depuis `noreply@fredwav.com` vers `fredwavcm@gmail.com`
+Remplacer la configuration du SMTPClient (lignes 80-90) :
 
-#### 3. Redeployer la fonction
-
-La fonction sera automatiquement redeployee apres modification.
-
-### Details techniques
-
-La librairie `denomailer` (`https://deno.land/x/denomailer/mod.ts`) est la solution standard pour envoyer des emails via SMTP depuis Deno/Edge Functions. Elle supporte :
-- Connexion TLS directe (port 465)
-- Authentification LOGIN/PLAIN
-- Contenu HTML
-
-Structure du code SMTP :
 ```text
-import { SMTPClient } from denomailer
-
-client = new SMTPClient({
+// Avant (TLS implicite - port 465)
+const client = new SMTPClient({
   connection: {
     hostname: "ssl0.ovh.net",
     port: 465,
     tls: true,
-    auth: {
-      username: "noreply@fredwav.com",
-      password: SMTP_PASSWORD
-    }
-  }
-})
+    auth: { ... },
+  },
+});
 
-client.send({
-  from: "noreply@fredwav.com",
-  to: "fredwavcm@gmail.com",
-  subject: "...",
-  html: htmlBody
-})
-
-client.close()
+// Apres (STARTTLS - port 587)
+const client = new SMTPClient({
+  connection: {
+    hostname: "ssl0.ovh.net",
+    port: 587,
+    tls: false,
+    auth: { ... },
+  },
+});
 ```
 
-Le reste de la fonction (validation des champs, verification Stripe) reste identique.
+Le parametre `tls: false` indique a denomailer de ne pas ouvrir une connexion TLS directe, mais d'utiliser la commande STARTTLS pour passer en mode securise apres la connexion initiale. C'est le comportement standard du port 587.
+
+## Etapes
+
+1. Modifier la configuration SMTP dans `send-oneshot-form/index.ts` (port 465 -> 587, tls: true -> false)
+2. Redeployer la fonction

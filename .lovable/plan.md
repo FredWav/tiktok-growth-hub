@@ -1,34 +1,21 @@
 
 
-## Plan: Modal de confirmation du nom d'utilisateur avant paiement
+## Plan : Corriger le header d'authentification de l'API WavSocialScan
 
-### Contexte
-Quand l'utilisateur clique sur "Lancer l'analyse", on affiche un modal de confirmation pour s'assurer qu'il a bien entré son **nom d'utilisateur** (le @) et non son **pseudo/nom d'affichage**.
+### Diagnostic
 
-### Ce qui sera fait
+L'API externe WavSocialScan retourne une 401 avec le message `"Missing X-API-Key header"`. Le code actuel envoie la clé via `Authorization: Bearer <key>`, mais l'API attend un header `X-API-Key: <key>`.
 
-**Fichier modifié : `src/pages/AnalyseExpress.tsx`**
+### Correction
 
-1. Ajouter un state `showConfirmModal` (boolean)
-2. Au `handleSubmit`, au lieu de lancer directement le paiement Stripe, ouvrir le modal
-3. Le modal contiendra :
-   - Un titre explicatif : "Vérifie ton nom d'utilisateur"
-   - L'image uploadée (screenshot TikTok) copiée dans `src/assets/` comme référence visuelle, avec une flèche/encadré montrant où se trouve le @username sur TikTok
-   - Le username saisi affiché en gras avec le @
-   - Un texte : "Attention, entre bien ton **nom d'utilisateur** (le @) et non ton pseudo affiché."
-   - Deux boutons :
-     - "Ha je me suis trompé !" (secondary/outline) → ferme le modal, remet le focus sur l'input
-     - "Je valide" (primary/hero) → lance le paiement Stripe (logique actuelle du `handleSubmit`)
-4. Utiliser le composant `Dialog` existant de shadcn/ui
+**Fichier : `supabase/functions/express-analysis/index.ts`**
 
-**Fichier copié : `user-uploads://image-23.png` → `src/assets/tiktok-username-example.png`**
+Remplacer les headers d'authentification aux deux endroits :
 
-L'image sera affichée dans le modal comme illustration.
+1. **Ligne 41** (appel POST /analyze) : remplacer `"Authorization": \`Bearer ${apiKey}\`` par `"X-API-Key": apiKey`
+2. **Ligne 59** (appel GET /accounts) : même remplacement `"Authorization": \`Bearer ${apiKey}\`` par `"X-API-Key": apiKey`
 
-### Détails techniques
+### Résultat attendu
 
-- Le `Dialog` sera contrôlé via `open={showConfirmModal}` / `onOpenChange={setShowConfirmModal}`
-- La logique de paiement Stripe sera extraite dans une fonction `proceedToPayment()` appelée uniquement au clic sur "Je valide"
-- Le formulaire `onSubmit` ne fera que valider l'input et ouvrir le modal
-- L'image sera importée via ES6 module (`import tiktokExample from "@/assets/tiktok-username-example.png"`)
+L'API WavSocialScan recevra le bon header et ne retournera plus de 401. L'analyse TikTok pourra se lancer normalement après paiement.
 

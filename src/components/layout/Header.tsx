@@ -7,8 +7,6 @@ const navItems = [
   { label: "Accueil", href: "/" },
   { label: "Offres", href: "/offres" },
   { label: "Analyse Express", href: "/analyse-express" },
-  { label: "One Shot", href: "/one-shot" },
-  { label: "Wav Premium", href: "/45-jours" },
   { label: "Preuves", href: "/preuves" },
   { label: "À propos", href: "/a-propos" },
   { label: "Contact", href: "/contact" },

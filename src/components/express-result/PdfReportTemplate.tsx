@@ -96,7 +96,7 @@ export function PdfReportTemplate({ data, username }: PdfReportTemplateProps) {
   };
 
   return (
-    <div id="pdf-report-template" style={{ position: "fixed", left: 0, top: 0, width: "800px", visibility: "hidden", zIndex: -9999, overflow: "hidden", height: 0 }}>
+    <div id="pdf-report-template" style={{ position: "fixed", left: 0, top: 0, width: "800px", visibility: "hidden", height: 0, overflow: "hidden", pointerEvents: "none", zIndex: -1 }}>
       <div style={s.page}>
         {/* Header */}
         <div style={s.header}>

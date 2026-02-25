@@ -78,7 +78,7 @@ const process = [
 const proofs = [
   {
     title: "Des créateurs qui passent à l'action",
-    excerpt: "L'accompagnement 45 jours est conçu pour des résultats concrets et mesurables, pas des promesses vagues.",
+    excerpt: "Le Wav Premium est conçu pour des résultats concrets et mesurables, pas des promesses vagues.",
   },
   {
     title: "Une méthode testée sur le terrain",
@@ -112,17 +112,16 @@ const faqs = [
 export default function QuarantecinqJours() {
   return (
     <Layout>
-      <SEOHead title="Accompagnement 45 Jours - Transformation TikTok | Fred Wav" description="45 jours d'accompagnement intensif pour transformer ta présence TikTok en levier business. Sur candidature." path="/45-jours" keywords="accompagnement 45 jours, transformation tiktok, suivi personnalisé, coaching tiktok intensif" />
+      <SEOHead title="Wav Premium - Transformation TikTok en 45 Jours | Fred Wav" description="Wav Premium : 45 jours d'accompagnement intensif pour transformer ta présence TikTok en levier business. Sur candidature." path="/45-jours" keywords="wav premium, accompagnement tiktok, transformation tiktok, suivi personnalisé, coaching tiktok intensif" />
       <Section variant="cream" size="lg">
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
             <Target className="h-4 w-4" />
-            Accompagnement intensif - 45 jours
+            Wav Premium — Accompagnement intensif
           </div>
 
           <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">
-            45 jours pour transformer{" "}
-            <span className="text-gold-gradient">ta présence TikTok</span>
+            <span className="text-gold-gradient">Wav Premium</span> — 45 jours pour transformer ta présence TikTok
           </h1>
 
           <p className="text-lg text-muted-foreground mb-8">
@@ -137,7 +136,7 @@ export default function QuarantecinqJours() {
             onClick={() => trackEvent("cta_45j_click", { location: "hero" })}
           >
             <Link to="/contact">
-              Candidater au 45 jours
+              Candidater au Wav Premium
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
@@ -301,7 +300,7 @@ export default function QuarantecinqJours() {
             Prêt pour la transformation ?
           </h2>
           <p className="text-muted-foreground text-lg mb-8">
-            45 jours pour construire une présence TikTok qui génère des résultats pour ton business.
+            Le Wav Premium : 45 jours pour construire une présence TikTok qui génère des résultats pour ton business.
           </p>
           <Button
             variant="hero"
@@ -310,7 +309,7 @@ export default function QuarantecinqJours() {
             onClick={() => trackEvent("cta_45j_click", { location: "footer_cta" })}
           >
             <Link to="/contact">
-              Candidater au 45 jours
+              Candidater au Wav Premium
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>

@@ -79,11 +79,11 @@ const offers = [
   },
   {
     icon: Target,
-    title: "45 Jours",
+    title: "Wav Premium",
     subtitle: "Transformation guidée",
     description: "Pour ceux qui veulent une transformation encadrée sur 45 jours. Suivi, livrables, résultats.",
     price: "Sur candidature",
-    cta: "Candidater au 45 jours",
+    cta: "Candidater au Wav Premium",
     href: "/45-jours",
     recommended: false,
     trackEvent: "cta_45j_click",
@@ -107,8 +107,8 @@ const faqItems = [
     answer: "C'est une session de 1h30 en visio où je fais un diagnostic complet de ton compte TikTok, ta niche et ta stratégie. Tu repars avec un plan d'action concret et personnalisé.",
   },
   {
-    question: "Est-ce que le One Shot suffit ou je dois prendre le 45 jours ?",
-    answer: "Le One Shot peut suffire si tu exécutes seul. Si je pense que tu as le profil, je te dirai si le 45 jours est pertinent. Aucun forcing.",
+    question: "Est-ce que le One Shot suffit ou je dois prendre le Wav Premium ?",
+    answer: "Le One Shot peut suffire si tu exécutes seul. Si je pense que tu as le profil, je te dirai si le Wav Premium est pertinent. Aucun forcing.",
   },
   {
     question: "Est-ce que ça marche dans ma niche ?",
@@ -161,7 +161,7 @@ export default function Home() {
             style={{ animationDelay: "0.3s" }}
             onClick={() => trackEvent("cta_45j_click", { location: "hero_secondary" })}
           >
-            Voir si je suis éligible au 45 jours →
+            Voir si je suis éligible au Wav Premium →
           </Link>
         </div>
       </Section>

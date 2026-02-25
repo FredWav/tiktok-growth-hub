@@ -437,7 +437,7 @@ const ClientNew = () => {
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="one_shot">One Shot</SelectItem>
-                            <SelectItem value="45_jours">45 Jours</SelectItem>
+                            <SelectItem value="45_jours">Wav Premium</SelectItem>
                             <SelectItem value="vip">VIP</SelectItem>
                           </SelectContent>
                         </Select>

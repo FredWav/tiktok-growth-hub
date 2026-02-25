@@ -13,7 +13,7 @@ const offerConfig: Record<OfferType, { label: string; className: string }> = {
     className: "bg-primary/20 text-primary border-primary/30",
   },
   "45_jours": {
-    label: "45 Jours",
+    label: "Wav Premium",
     className: "bg-secondary/30 text-secondary-foreground border-secondary/50",
   },
   vip: {

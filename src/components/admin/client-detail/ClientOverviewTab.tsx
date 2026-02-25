@@ -159,7 +159,7 @@ export const ClientOverviewTab: React.FC<ClientOverviewTabProps> = ({
                 à {format(new Date(nextSession.scheduled_at), "HH:mm", { locale: fr })}
               </p>
               <p className="text-sm text-cream/40">
-                {nextSession.type === "closing_45j" && "Closing 45 jours"}
+                {nextSession.type === "closing_45j" && "Closing Wav Premium"}
                 {nextSession.type === "closing_vip" && "Closing VIP"}
                 {nextSession.type === "suivi" && "Suivi"}
                 {nextSession.type === "one_shot" && "One Shot"}

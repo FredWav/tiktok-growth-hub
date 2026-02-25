@@ -79,7 +79,7 @@ const faqs = [
   },
   {
     question: "Et si je veux continuer après ?",
-    answer: "Si tu veux aller plus loin, on discutera de l'accompagnement 45 jours. Mais aucune obligation, le One Shot se suffit à lui-même.",
+    answer: "Si tu veux aller plus loin, on discutera de l'accompagnement Wav Premium. Mais aucune obligation, le One Shot se suffit à lui-même.",
   },
 ];
 

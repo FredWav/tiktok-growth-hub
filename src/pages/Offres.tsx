@@ -8,7 +8,7 @@ import { SEOHead } from "@/components/SEOHead";
 
 const profileSelector = [
   { label: "Un diagnostic clair", target: "one-shot", icon: Zap },
-  { label: "Une transformation encadrée", target: "45-jours", icon: Target },
+  { label: "Une transformation encadrée", target: "wav-premium", icon: Target },
   { label: "Un cadre continu", target: "vip", icon: Crown },
 ];
 
@@ -45,9 +45,9 @@ const offers = [
     recommended: true,
   },
   {
-    id: "45-jours",
+    id: "wav-premium",
     icon: Target,
-    title: "Accompagnement 45 Jours",
+    title: "Wav Premium",
     subtitle: "Transformation guidée",
     description: "45 jours pour transformer ta présence TikTok. Suivi hebdomadaire et accès direct.",
     price: "Sur candidature",
@@ -70,7 +70,7 @@ const offers = [
       "Templates et ressources exclusives",
       "Optimisation continue de ta stratégie",
     ],
-    cta: "Candidater au 45 jours",
+    cta: "Candidater au Wav Premium",
     href: "/45-jours",
     trackEvent: "cta_45j_click",
     variant: "premium" as const,
@@ -126,7 +126,7 @@ const scrollTo = (id: string) => {
 export default function Offres() {
   return (
     <Layout>
-      <SEOHead title="Offres et Tarifs - Fred Wav | Coaching TikTok" description="Découvre les offres d'accompagnement TikTok : One Shot (179€), 45 Jours et VIP. Trouve la formule adaptée à tes besoins." path="/offres" keywords="tarifs coaching tiktok, offres tiktok, one shot, 45 jours, vip, accompagnement créateur" />
+      <SEOHead title="Offres et Tarifs - Fred Wav | Coaching TikTok" description="Découvre les offres d'accompagnement TikTok : One Shot (179€), Wav Premium et VIP. Trouve la formule adaptée à tes besoins." path="/offres" keywords="tarifs coaching tiktok, offres tiktok, one shot, wav premium, vip, accompagnement créateur" />
       <Section variant="cream" size="lg">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">

@@ -47,11 +47,12 @@ export const ChatImageUpload: React.FC<ChatImageUploadProps> = ({
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
+      const { data: signedData, error: signError } = await supabase.storage
         .from("observations")
-        .getPublicUrl(fileName);
+        .createSignedUrl(fileName, 3600);
 
-      onImageUploaded(publicUrl);
+      if (signError || !signedData?.signedUrl) throw signError || new Error('Failed to create signed URL');
+      onImageUploaded(signedData.signedUrl);
       toast.success("Image prête à être analysée");
     } catch (error) {
       console.error("Upload error:", error);

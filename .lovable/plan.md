@@ -1,42 +1,44 @@
 
 
-## Probleme identifie
+## Plan : Conformite cookies (bandeau RGPD) + mise a jour politique de confidentialite
 
-Les logs backend montrent cette erreur :
-> "No such price: 'price_1T42hpBfuzQl0PTiAwqezEJq'; **a similar object exists in test mode, but a live mode key was used**"
+### Ce qui sera fait
 
-Les 4 Price IDs dans ton code ont ete crees en **mode test** sur Stripe. Maintenant que la cle secrete est en **mode live**, ces IDs ne sont pas reconnus.
+**1. Bandeau de consentement cookies (cookie banner)**
 
-## Solution
+Creation d'un composant `CookieConsent` qui s'affiche en bas de page pour tous les visiteurs :
+- Deux boutons : "Accepter" et "Refuser"
+- Un lien vers la politique de confidentialite
+- Le choix est sauvegarde dans `localStorage` pour ne plus reafficher le bandeau
+- Si l'utilisateur refuse, Google Analytics (gtag) ne se charge pas / ne tracke pas
+- Si l'utilisateur accepte, Google Analytics fonctionne normalement
+- Design discret, fixe en bas de page
 
-Creer les produits et prix en **mode live** sur Stripe, puis mettre a jour les 4 Price IDs dans le code.
+**2. Blocage conditionnel de Google Analytics**
 
-## Etapes
+Actuellement, le script Google Analytics (G-E361JPZX7D) se charge systematiquement dans `index.html`. Pour etre conforme :
+- Le script dans `index.html` sera modifie pour ne pas envoyer de donnees par defaut (`window['ga-disable-G-E361JPZX7D'] = true`)
+- Le composant `CookieConsent` activera Analytics uniquement si l'utilisateur accepte
+- La fonction `trackEvent` dans `src/lib/tracking.ts` continuera de fonctionner normalement (elle ne fait rien si gtag n'est pas actif)
 
-### 1. Creer les produits et prix live sur Stripe (via outils Stripe)
+**3. Mise a jour de la page Politique de Confidentialite**
 
-| Produit | Prix |
-|---------|------|
-| One Shot - Session Strategie TikTok | 179 EUR (paiement unique) |
-| VIP 3 mois | 297 EUR (paiement unique) |
-| VIP 6 mois | 495 EUR (paiement unique) |
-| VIP 12 mois | 891 EUR (paiement unique) |
+Le contenu de `src/pages/PolitiqueConfidentialite.tsx` sera remplace par le texte complet fourni, avec les 10 articles, et la mention de Google Analytics dans la section cookies. L'hebergeur sera indique comme "Lovable Labs Inc" (coherent avec les mentions legales existantes).
 
-### 2. Mettre a jour les Price IDs dans le code
+### Details techniques
 
-Trois fichiers a modifier :
+**Fichiers modifies :**
+- `index.html` : ajout de `window['ga-disable-G-E361JPZX7D'] = true` avant le chargement de gtag, pour bloquer Analytics par defaut
+- `src/pages/PolitiqueConfidentialite.tsx` : remplacement complet du contenu avec le nouveau texte
+- `src/App.tsx` : ajout du composant `CookieConsent` au niveau global (a cote des Toasters)
 
-- **`supabase/functions/create-oneshot-checkout/index.ts`** : remplacer le price ID a la ligne 24
-- **`src/pages/VipCheckout.tsx`** : remplacer les 3 price IDs aux lignes 17-19
+**Fichier cree :**
+- `src/components/CookieConsent.tsx` : bandeau cookie avec logique d'acceptation/refus et activation/desactivation de Google Analytics
 
-### 3. Redeployer les fonctions backend
+**Logique du bandeau :**
+- Au chargement, verifie `localStorage.getItem("cookie_consent")`
+- Si absent : affiche le bandeau
+- Si "accepted" : active Google Analytics silencieusement
+- Si "refused" : ne fait rien, pas de bandeau
+- Le bandeau propose "Accepter" et "Refuser", avec un lien vers `/politique-de-confidentialite`
 
-La fonction `create-oneshot-checkout` sera automatiquement redeployee apres modification.
-
-### 4. Tester le flux de paiement
-
-Verifier que le bouton "Reserver mon One Shot" redirige bien vers la page de paiement Stripe en mode live.
-
-## Details techniques
-
-Les modifications sont mineures : 4 chaines de caracteres (Price IDs) a remplacer par les nouveaux IDs live. Aucun changement de logique ou d'architecture.

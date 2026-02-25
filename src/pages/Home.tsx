@@ -138,12 +138,12 @@ export default function Home() {
 
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 animate-fade-in">
-            Transforme ton TikTok en{" "}
-            <span className="text-gold-gradient">machine à clients.</span>
+            Clarifie ta stratégie TikTok.{" "}
+            <span className="text-gold-gradient">Augmente ta visibilité.</span>
           </h1>
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-            Clarifie ta stratégie TikTok. Augmente ta visibilité.
+            J'aide les créateurs et entrepreneurs à passer de "je poste au hasard" à "chaque vidéo a un objectif". Diagnostic, stratégie, plan d'action.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{ animationDelay: "0.2s" }}>

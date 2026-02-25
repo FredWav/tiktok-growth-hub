@@ -89,7 +89,7 @@ const testimonials = [
 
 const caseStudies = [
   {
-    category: "Accompagnement 45 jours",
+    category: "Accompagnement Wav Premium",
     title: "Passer du chaos à une stratégie claire",
     before: ["Publications irrégulières", "Aucun système", "Aucune lecture des stats"],
     after: ["Calendrier éditorial structuré", "Hooks retravaillés", "CTA optimisés", "Premières demandes entrantes"],
@@ -131,9 +131,9 @@ const chooseOffers = [
   },
   {
     icon: Target,
-    title: "45 Jours",
+    title: "Wav Premium",
     description: "Transformation encadrée sur 45 jours",
-    cta: "Candidater au 45 jours",
+    cta: "Candidater au Wav Premium",
     href: "/45-jours",
     trackEvent: "cta_45j_click",
   },
@@ -202,7 +202,7 @@ export default function Preuves() {
               onClick={() => trackEvent("cta_45j_click", { location: "preuves_mid" })}
             >
               <Link to="/45-jours">
-                Candidater au 45 jours
+                Candidater au Wav Premium
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>

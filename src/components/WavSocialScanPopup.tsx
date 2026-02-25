@@ -13,8 +13,11 @@ export function WavSocialScanPopup() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const dismissed = sessionStorage.getItem("wavsocialscan_dismissed");
-    if (dismissed) return;
+    const lastShown = localStorage.getItem("wavsocialscan_last_shown");
+    if (lastShown) {
+      const elapsed = Date.now() - parseInt(lastShown, 10);
+      if (elapsed < 24 * 60 * 60 * 1000) return;
+    }
 
     const timer = setTimeout(() => setOpen(true), 5000);
     return () => clearTimeout(timer);
@@ -22,7 +25,7 @@ export function WavSocialScanPopup() {
 
   const handleClose = () => {
     setOpen(false);
-    sessionStorage.setItem("wavsocialscan_dismissed", "1");
+    localStorage.setItem("wavsocialscan_last_shown", Date.now().toString());
   };
 
   return (

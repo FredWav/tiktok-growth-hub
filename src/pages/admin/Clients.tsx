@@ -102,7 +102,7 @@ const Clients: React.FC = () => {
             <SelectContent>
               <SelectItem value="all">Toutes les offres</SelectItem>
               <SelectItem value="one_shot">One Shot</SelectItem>
-              <SelectItem value="45_jours">45 Jours</SelectItem>
+              <SelectItem value="45_jours">Wav Premium</SelectItem>
               <SelectItem value="vip">VIP</SelectItem>
             </SelectContent>
           </Select>

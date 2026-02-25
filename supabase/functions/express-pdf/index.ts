@@ -131,10 +131,17 @@ function generateReport(username: string, data: any): string {
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:'Inter',sans-serif; background:#fff; color:#0F0F0F; max-width:800px; margin:0 auto; padding:40px 32px; line-height:1.5; }
+  /* Prevent page breaks inside sections */
+  .section-block { break-inside:avoid; page-break-inside:avoid; }
+  h2, h3, h4 { break-after:avoid; page-break-after:avoid; }
+  ul, ol { break-inside:avoid; page-break-inside:avoid; }
+  .print-btn { position:fixed; bottom:24px; right:24px; background:#C4A34A; color:#fff; border:none; padding:14px 28px; border-radius:10px; font-family:'Inter',sans-serif; font-size:15px; font-weight:600; cursor:pointer; box-shadow:0 4px 20px rgba(0,0,0,0.15); z-index:9999; display:flex; align-items:center; gap:8px; transition:transform 0.2s; }
+  .print-btn:hover { transform:scale(1.05); }
   @media print {
     body { padding:20px; }
     @page { margin:15mm; size:A4; }
     .no-print { display:none !important; }
+    .section-block { break-inside:avoid; page-break-inside:avoid; }
   }
 </style>
 </head>
@@ -153,7 +160,7 @@ function generateReport(username: string, data: any): string {
 </div>
 
 <!-- PROFILE -->
-<div style="display:flex;align-items:center;gap:18px;background:#FAFAF5;border:1px solid #e5e5e5;border-radius:12px;padding:20px;margin-bottom:8px;">
+<div class="section-block" style="display:flex;align-items:center;gap:18px;background:#FAFAF5;border:1px solid #e5e5e5;border-radius:12px;padding:20px;margin-bottom:8px;">
   ${account.avatar_url ? `<img src="${escapeHtml(account.avatar_url)}" alt="Avatar" style="width:72px;height:72px;border-radius:50%;border:3px solid #C4A34A;object-fit:cover;">` : `<div style="width:72px;height:72px;border-radius:50%;background:#e5e5e5;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#737373;">${(username[0] || "?").toUpperCase()}</div>`}
   <div>
     <div style="display:flex;align-items:center;gap:8px;">
@@ -169,7 +176,7 @@ function generateReport(username: string, data: any): string {
 <!-- HEALTH SCORE -->
 ${healthScore?.total_score != null ? `
 ${sectionTitle("💊", "Score de Santé")}
-<div style="display:flex;align-items:center;gap:20px;background:#FAFAF5;border:1px solid #e5e5e5;border-radius:12px;padding:20px;margin-bottom:16px;">
+<div class="section-block" style="display:flex;align-items:center;gap:20px;background:#FAFAF5;border:1px solid #e5e5e5;border-radius:12px;padding:20px;margin-bottom:16px;">
   <div style="position:relative;width:90px;height:90px;">
     <svg viewBox="0 0 36 36" style="width:90px;height:90px;transform:rotate(-90deg);">
       <circle cx="18" cy="18" r="15.91" fill="none" stroke="#e5e5e5" stroke-width="3"/>
@@ -185,7 +192,7 @@ ${sectionTitle("💊", "Score de Santé")}
     ${healthScore.overall_status ? `<p style="font-size:12px;color:#737373;margin-top:4px;">${escapeHtml(healthScore.overall_status)}</p>` : ""}
   </div>
 </div>
-${componentKeys.length > 0 ? `<div style="background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:18px;margin-bottom:8px;">
+${componentKeys.length > 0 ? `<div class="section-block" style="background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:18px;margin-bottom:8px;">
   ${componentKeys.map(k => {
     const c = healthComponents[k];
     return scoreBar(c.label || k, c.score || 0, c.status || "");
@@ -301,10 +308,15 @@ ${sectionTitle("🤖", "Analyse Détaillée (IA)")}
 </div>` : ""}
 
 <!-- FOOTER -->
-<div style="margin-top:40px;padding-top:16px;border-top:2px solid #C4A34A;display:flex;justify-content:space-between;align-items:center;">
+<div class="section-block" style="margin-top:40px;padding-top:16px;border-top:2px solid #C4A34A;display:flex;justify-content:space-between;align-items:center;">
   <p style="font-size:11px;color:#737373;">Généré par <strong style="color:#C4A34A;">FredWav</strong> — ${escapeHtml(dateStr)}</p>
   <p style="font-size:11px;color:#737373;">fredwav.lovable.app</p>
 </div>
+
+<!-- PRINT BUTTON -->
+<button class="print-btn no-print" onclick="window.print()">🖨️ Enregistrer en PDF</button>
+
+<script>window.onload = function() { setTimeout(function() { window.print(); }, 800); };</script>
 
 </body>
 </html>`;

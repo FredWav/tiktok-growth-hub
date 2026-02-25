@@ -1,92 +1,69 @@
 
 
-## Plan : Corriger définitivement le PDF blanc
+## Plan : Remplacer le système PDF par l'approche "HTML string + detached element"
 
-### Cause racine
+### Pourquoi ça marchera cette fois
 
-Le problème persiste car après avoir changé `visibility` et `height` via JavaScript, le navigateur n'a pas le temps de faire un **repaint/reflow** avant que `html2canvas` ne capture l'élément. De plus, `zIndex: -9999` peut empêcher le rendu dans certains navigateurs.
+L'approche actuelle essaie de rendre un composant React caché puis de le rendre visible pour `html2canvas`. Le problème : `html2canvas` ne capture pas correctement les éléments qui viennent d'être rendus visibles, même avec des délais.
 
-### Solution
-
-1. Sauvegarder les styles originaux avant modification
-2. Rendre l'élément **complètement visible** (y compris `zIndex` positif et `pointerEvents: none` pour ne pas interférer avec l'UI)
-3. Attendre un **tick de repaint** (`requestAnimationFrame` + petit délai) avant la capture
-4. Restaurer tous les styles après
+L'approche du fichier uploadé est différente et plus fiable :
+- Génère une **string HTML complète** (avec `<style>` intégré)
+- Crée un `document.createElement("div")` **détaché du DOM visible**
+- Passe ce div directement à `html2pdf()` → pas besoin de visibilité, pas de repaint
 
 ### Modifications
 
-| Fichier | Changement |
-|---------|-----------|
-| `src/components/express-result/PdfReportTemplate.tsx` | Simplifier le style initial : `position: fixed`, `left: 0`, `top: 0`, `width: 800px`, `visibility: hidden`, `height: 0`, `overflow: hidden`, `pointerEvents: none` (sans `zIndex` négatif extrême) |
-| `src/pages/AnalyseExpressResult.tsx` | Refactorer `handleDownloadPdf` pour : sauvegarder les styles originaux, tout rendre visible, attendre un repaint via `requestAnimationFrame` + `setTimeout(100ms)`, capturer, puis restaurer |
+| Fichier | Action |
+|---------|--------|
+| `src/lib/pdf-markdown-parser.ts` | **Créer** — parser markdown → sections structurées |
+| `src/lib/pdf-data-mapper.ts` | **Créer** — mapper les données account vers le format PDF |
+| `src/pages/AnalyseExpressResult.tsx` | **Modifier** — remplacer `handleDownloadPdf` par la génération HTML string + detached div, supprimer l'import de `PdfReportTemplate` |
+| `src/components/express-result/PdfReportTemplate.tsx` | **Supprimer** — plus nécessaire |
 
 ### Détail technique
 
-**`PdfReportTemplate.tsx`** — ligne 99, wrapper :
-
-```tsx
-<div id="pdf-report-template" style={{ 
-  position: "fixed", left: 0, top: 0, width: "800px", 
-  visibility: "hidden", height: 0, overflow: "hidden", 
-  pointerEvents: "none", zIndex: -1 
-}}>
-```
-
-**`AnalyseExpressResult.tsx`** — `handleDownloadPdf` complet :
+**1. `handleDownloadPdf` refactorisé**
 
 ```typescript
 const handleDownloadPdf = async () => {
-  if (!username) return;
-  const element = document.getElementById("pdf-report-template");
-  if (!element) return;
+  if (!username || !data?.account) return;
   setPdfLoading(true);
-
-  // Sauvegarder les styles originaux
-  const orig = {
-    visibility: element.style.visibility,
-    height: element.style.height,
-    overflow: element.style.overflow,
-    zIndex: element.style.zIndex,
-    pointerEvents: element.style.pointerEvents,
-  };
-
-  // Rendre visible pour html2canvas
-  element.style.visibility = "visible";
-  element.style.height = "auto";
-  element.style.overflow = "visible";
-  element.style.zIndex = "99999";
-  element.style.pointerEvents = "none";
-
-  // Attendre le repaint du navigateur
-  await new Promise<void>((resolve) => {
-    requestAnimationFrame(() => {
-      setTimeout(resolve, 150);
-    });
-  });
-
   try {
-    await (html2pdf() as any).set({
-      margin: [10, 10, 10, 10],
+    const pdfData = mapAccountDataForPDF(data.account);
+    const htmlContent = generateCompletePDFHTML(pdfData, data.account.ai_insights || "", data.account.recent_videos || []);
+    
+    // Élément détaché — pas dans le DOM visible
+    const element = document.createElement("div");
+    element.innerHTML = htmlContent;
+    
+    await html2pdf().set({
+      margin: [10, 0, 10, 0],
       filename: `analyse-tiktok-${username}.pdf`,
       image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, logging: false },
+      html2canvas: { scale: 2, useCORS: true, allowTaint: true },
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-      pagebreak: { mode: ["avoid-all", "css", "legacy"] },
+      pagebreak: { mode: ["avoid-all", "css", "legacy"], avoid: [".stat-card", ".header", ".bio-section"] },
     }).from(element).save();
+    
     toast.success("Rapport PDF téléchargé !");
   } catch (err: any) {
     toast.error(err.message || "Erreur lors du téléchargement");
   } finally {
-    // Restaurer les styles originaux
-    element.style.visibility = orig.visibility;
-    element.style.height = orig.height;
-    element.style.overflow = orig.overflow;
-    element.style.zIndex = orig.zIndex;
-    element.style.pointerEvents = orig.pointerEvents;
     setPdfLoading(false);
   }
 };
 ```
 
-Le `requestAnimationFrame` + `setTimeout(150ms)` garantit que le navigateur a effectivement rendu le contenu avant que `html2canvas` ne le capture. Le `zIndex: 99999` assure que l'élément est au premier plan pour le rendu.
+**2. `generateCompletePDFHTML`** — Fonction qui produit le HTML complet du rapport avec CSS intégré, même design violet/moderne que les fichiers uploadés : header hero avec gradient, grille de stats, bio, hashtags, vidéos top, insights IA formatés, footer.
+
+**3. Le composant `PdfReportTemplate`** est supprimé car on n'a plus besoin d'un composant React rendu dans le DOM.
+
+### Pourquoi c'est fiable
+
+```text
+Avant :  Composant React caché → toggle visibility → repaint → html2canvas → PDF (instable)
+Après :  String HTML → createElement("div") → html2pdf directement (stable, pas de DOM visible)
+```
+
+`html2pdf.js` sait rendre un élément détaché car `html2canvas` l'ajoute temporairement au `<body>` lui-même pour le capturer.
 

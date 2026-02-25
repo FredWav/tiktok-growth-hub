@@ -127,14 +127,27 @@ export default function AnalyseExpressResult() {
         body: { session_id: sessionId, username, data },
       });
       if (fnError || result?.error) throw new Error(result?.error || fnError?.message || "Erreur PDF");
-      const newTab = window.open("", "_blank");
-      if (!newTab) {
-        toast.error("Veuillez autoriser les popups pour télécharger le PDF");
-        return;
+      if (!result?.pdf_base64) throw new Error("PDF non généré");
+
+      // Decode base64 to Uint8Array
+      const binaryString = atob(result.pdf_base64);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
       }
-      newTab.document.write(result.html);
-      newTab.document.close();
-      toast.success("La boîte d'impression va s'ouvrir — choisissez « Enregistrer en PDF »");
+
+      // Create blob and trigger download
+      const blob = new Blob([bytes], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `analyse-tiktok-${username}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success("Rapport PDF téléchargé !");
     } catch (err: any) {
       toast.error(err.message || "Erreur lors du téléchargement");
     } finally {

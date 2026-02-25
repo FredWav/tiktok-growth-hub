@@ -38,7 +38,7 @@ serve(async (req) => {
     const analyzeRes = await fetch(`${API_BASE}/accounts/${encodeURIComponent(username)}/analyze`, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${apiKey}`,
+        "X-API-Key": apiKey,
         "Content-Type": "application/json",
       },
     });
@@ -56,7 +56,7 @@ serve(async (req) => {
 
       const getRes = await fetch(`${API_BASE}/accounts/${encodeURIComponent(username)}`, {
         headers: {
-          "Authorization": `Bearer ${apiKey}`,
+          "X-API-Key": apiKey,
         },
       });
 

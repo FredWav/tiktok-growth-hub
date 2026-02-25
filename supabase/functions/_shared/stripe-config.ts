@@ -7,8 +7,17 @@
 
 type StripeMode = "test" | "live";
 
-// Reads from STRIPE_MODE env var, defaults to "live"
-const STRIPE_MODE: StripeMode = (Deno.env.get("STRIPE_MODE") as StripeMode) || "live";
+// Detect mode: env var first, then auto-detect from STRIPE_SECRET_KEY prefix
+function detectStripeMode(): StripeMode {
+  const envMode = Deno.env.get("STRIPE_MODE");
+  if (envMode === "test" || envMode === "live") return envMode;
+  // Auto-detect from the secret key
+  const key = Deno.env.get("STRIPE_SECRET_KEY") || "";
+  if (key.startsWith("sk_test_")) return "test";
+  return "live";
+}
+
+const STRIPE_MODE: StripeMode = detectStripeMode();
 
 const PRICE_IDS = {
   test: {

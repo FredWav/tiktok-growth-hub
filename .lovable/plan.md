@@ -1,53 +1,75 @@
 
 
-## Plan : Corriger le PDF blanc
+## Plan : Corriger définitivement le PDF blanc
 
-### Cause
+### Cause racine
 
-Le composant `PdfReportTemplate` est positionné hors écran (`left: -9999px`). `html2canvas` ne peut pas capturer les éléments hors du viewport — il produit un canvas vide, donc un PDF blanc.
+Le problème persiste car après avoir changé `visibility` et `height` via JavaScript, le navigateur n'a pas le temps de faire un **repaint/reflow** avant que `html2canvas` ne capture l'élément. De plus, `zIndex: -9999` peut empêcher le rendu dans certains navigateurs.
 
 ### Solution
 
-Dans `handleDownloadPdf`, temporairement repositionner l'élément dans le viewport (mais visuellement caché via `opacity: 0` et `overflow: hidden` sur un wrapper), capturer le PDF, puis remettre l'élément hors écran.
+1. Sauvegarder les styles originaux avant modification
+2. Rendre l'élément **complètement visible** (y compris `zIndex` positif et `pointerEvents: none` pour ne pas interférer avec l'UI)
+3. Attendre un **tick de repaint** (`requestAnimationFrame` + petit délai) avant la capture
+4. Restaurer tous les styles après
 
 ### Modifications
 
 | Fichier | Changement |
 |---------|-----------|
-| `src/components/express-result/PdfReportTemplate.tsx` | Supprimer le positionnement hors écran du wrapper. Utiliser `visibility: hidden; height: 0; overflow: hidden` à la place (reste dans le flux DOM mais invisible) |
-| `src/pages/AnalyseExpressResult.tsx` | Dans `handleDownloadPdf`, temporairement rendre l'élément visible (`visibility: visible; height: auto; position: fixed; left: 0; top: 0`) avant la capture, puis restaurer après |
+| `src/components/express-result/PdfReportTemplate.tsx` | Simplifier le style initial : `position: fixed`, `left: 0`, `top: 0`, `width: 800px`, `visibility: hidden`, `height: 0`, `overflow: hidden`, `pointerEvents: none` (sans `zIndex` négatif extrême) |
+| `src/pages/AnalyseExpressResult.tsx` | Refactorer `handleDownloadPdf` pour : sauvegarder les styles originaux, tout rendre visible, attendre un repaint via `requestAnimationFrame` + `setTimeout(100ms)`, capturer, puis restaurer |
 
 ### Détail technique
 
-**`PdfReportTemplate.tsx`** — ligne 99, changer le style du wrapper :
+**`PdfReportTemplate.tsx`** — ligne 99, wrapper :
 
 ```tsx
-// Avant (invisible pour html2canvas)
-<div id="pdf-report-template" style={{ position: "absolute", left: "-9999px", top: 0, zIndex: -1 }}>
-
-// Après (dans le DOM mais caché visuellement, sans décaler hors viewport)
-<div id="pdf-report-template" style={{ position: "fixed", left: 0, top: 0, width: "800px", visibility: "hidden", zIndex: -9999, overflow: "hidden", height: 0 }}>
+<div id="pdf-report-template" style={{ 
+  position: "fixed", left: 0, top: 0, width: "800px", 
+  visibility: "hidden", height: 0, overflow: "hidden", 
+  pointerEvents: "none", zIndex: -1 
+}}>
 ```
 
-**`AnalyseExpressResult.tsx`** — dans `handleDownloadPdf`, rendre visible avant capture :
+**`AnalyseExpressResult.tsx`** — `handleDownloadPdf` complet :
 
 ```typescript
 const handleDownloadPdf = async () => {
+  if (!username) return;
   const element = document.getElementById("pdf-report-template");
   if (!element) return;
   setPdfLoading(true);
 
-  // Rendre visible temporairement pour html2canvas
+  // Sauvegarder les styles originaux
+  const orig = {
+    visibility: element.style.visibility,
+    height: element.style.height,
+    overflow: element.style.overflow,
+    zIndex: element.style.zIndex,
+    pointerEvents: element.style.pointerEvents,
+  };
+
+  // Rendre visible pour html2canvas
   element.style.visibility = "visible";
   element.style.height = "auto";
   element.style.overflow = "visible";
+  element.style.zIndex = "99999";
+  element.style.pointerEvents = "none";
+
+  // Attendre le repaint du navigateur
+  await new Promise<void>((resolve) => {
+    requestAnimationFrame(() => {
+      setTimeout(resolve, 150);
+    });
+  });
 
   try {
     await (html2pdf() as any).set({
       margin: [10, 10, 10, 10],
       filename: `analyse-tiktok-${username}.pdf`,
       image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
+      html2canvas: { scale: 2, useCORS: true, logging: false },
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
       pagebreak: { mode: ["avoid-all", "css", "legacy"] },
     }).from(element).save();
@@ -55,14 +77,16 @@ const handleDownloadPdf = async () => {
   } catch (err: any) {
     toast.error(err.message || "Erreur lors du téléchargement");
   } finally {
-    // Recacher
-    element.style.visibility = "hidden";
-    element.style.height = "0";
-    element.style.overflow = "hidden";
+    // Restaurer les styles originaux
+    element.style.visibility = orig.visibility;
+    element.style.height = orig.height;
+    element.style.overflow = orig.overflow;
+    element.style.zIndex = orig.zIndex;
+    element.style.pointerEvents = orig.pointerEvents;
     setPdfLoading(false);
   }
 };
 ```
 
-Cela garantit que `html2canvas` voit un élément rendu dans le DOM avec des dimensions réelles, et produit un canvas non vide.
+Le `requestAnimationFrame` + `setTimeout(150ms)` garantit que le navigateur a effectivement rendu le contenu avant que `html2canvas` ne le capture. Le `zIndex: 99999` assure que l'élément est au premier plan pour le rendu.
 

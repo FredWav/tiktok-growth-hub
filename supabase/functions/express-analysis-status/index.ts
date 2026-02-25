@@ -32,25 +32,30 @@ serve(async (req) => {
     const apiKey = Deno.env.get("WAV_SOCIAL_SCAN_API_KEY");
     if (!apiKey) throw new Error("Clé API WavSocialScan non configurée");
 
-    // Trigger analysis (fire and forget)
-    const analyzeRes = await fetch(`${API_BASE}/accounts/${encodeURIComponent(username)}/analyze`, {
-      method: "POST",
-      headers: {
-        "X-API-Key": apiKey,
-        "Content-Type": "application/json",
-      },
+    const getRes = await fetch(`${API_BASE}/accounts/${encodeURIComponent(username)}`, {
+      headers: { "X-API-Key": apiKey },
     });
 
-    if (!analyzeRes.ok) {
-      const errText = await analyzeRes.text();
-      console.error("Analyze error:", errText);
-      throw new Error(`Erreur lors du lancement de l'analyse: ${analyzeRes.status}`);
-    } else {
-      await analyzeRes.text(); // consume body
+    if (!getRes.ok) {
+      const errText = await getRes.text();
+      console.error("Status check error:", errText);
+      // Not ready yet or error — return processing
+      return new Response(JSON.stringify({ status: "processing", username }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
     }
 
-    // Return immediately — client will poll express-analysis-status
-    return new Response(JSON.stringify({ username, status: "processing" }), {
+    const result = await getRes.json();
+
+    if (result && result.health_score?.total !== undefined && result.health_score?.total !== null) {
+      return new Response(JSON.stringify({ status: "complete", data: result, username }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
+    return new Response(JSON.stringify({ status: "processing", username }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });

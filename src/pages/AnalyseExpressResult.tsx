@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { Download, Loader2, AlertCircle, BarChart3, TrendingUp, Users, Heart, RefreshCw, Clock, Zap, Eye, Star, Shield, Target } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
@@ -10,6 +10,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+const POLL_INTERVAL = 3000;
+const MAX_POLL_DURATION = 180_000; // 3 minutes
+
 export default function AnalyseExpressResult() {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("session_id");
@@ -20,13 +23,52 @@ export default function AnalyseExpressResult() {
   const [username, setUsername] = useState<string>("");
   const [pdfLoading, setPdfLoading] = useState(false);
 
-  useEffect(() => {
-    if (sessionId) {
-      localStorage.setItem("express_session_id", sessionId);
-    }
-  }, [sessionId]);
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const startTimeRef = useRef<number>(0);
+  const launchedRef = useRef(false);
 
-  const fetchAnalysis = async () => {
+  const stopPolling = useCallback(() => {
+    if (pollingRef.current) {
+      clearInterval(pollingRef.current);
+      pollingRef.current = null;
+    }
+  }, []);
+
+  const checkStatus = useCallback(async () => {
+    if (!sessionId) return;
+
+    // Timeout after 3 minutes
+    if (Date.now() - startTimeRef.current > MAX_POLL_DURATION) {
+      stopPolling();
+      setError("L'analyse prend plus de temps que prévu. Réessayez dans quelques instants.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const { data: result, error: fnError } = await supabase.functions.invoke("express-analysis-status", {
+        body: { session_id: sessionId },
+      });
+
+      if (fnError || result?.error) {
+        // Don't stop polling on transient errors
+        console.warn("Status check error:", result?.error || fnError?.message);
+        return;
+      }
+
+      if (result.username) setUsername(result.username);
+
+      if (result.status === "complete" && result.data) {
+        stopPolling();
+        setData(result.data);
+        setLoading(false);
+      }
+    } catch (err) {
+      console.warn("Status check exception:", err);
+    }
+  }, [sessionId, stopPolling]);
+
+  const launchAnalysis = useCallback(async () => {
     if (!sessionId) {
       setError("Session de paiement introuvable");
       setLoading(false);
@@ -35,6 +77,7 @@ export default function AnalyseExpressResult() {
 
     setLoading(true);
     setError(null);
+    launchedRef.current = true;
 
     try {
       const { data: result, error: fnError } = await supabase.functions.invoke("express-analysis", {
@@ -42,21 +85,39 @@ export default function AnalyseExpressResult() {
       });
 
       if (fnError || result?.error) {
-        throw new Error(result?.error || fnError?.message || "Erreur lors de l'analyse");
+        throw new Error(result?.error || fnError?.message || "Erreur lors du lancement de l'analyse");
       }
 
-      setData(result.data);
-      setUsername(result.username);
+      if (result.username) setUsername(result.username);
+
+      // Start client-side polling
+      startTimeRef.current = Date.now();
+      pollingRef.current = setInterval(checkStatus, POLL_INTERVAL);
+      // Also check immediately after a short delay
+      setTimeout(checkStatus, 1500);
     } catch (err: any) {
       setError(err.message);
-    } finally {
       setLoading(false);
     }
-  };
+  }, [sessionId, checkStatus]);
 
   useEffect(() => {
-    fetchAnalysis();
+    if (sessionId) {
+      localStorage.setItem("express_session_id", sessionId);
+    }
   }, [sessionId]);
+
+  useEffect(() => {
+    if (!launchedRef.current) {
+      launchAnalysis();
+    }
+    return () => stopPolling();
+  }, [launchAnalysis, stopPolling]);
+
+  const handleRetry = () => {
+    launchedRef.current = false;
+    launchAnalysis();
+  };
 
   const handleDownloadPdf = async () => {
     if (!sessionId || !username) return;
@@ -98,12 +159,6 @@ export default function AnalyseExpressResult() {
     return "text-red-500";
   };
 
-  const getProgressColor = (score: number) => {
-    if (score >= 70) return "bg-green-500";
-    if (score >= 40) return "bg-yellow-500";
-    return "bg-red-500";
-  };
-
   return (
     <Layout>
       <SEOHead
@@ -137,7 +192,7 @@ export default function AnalyseExpressResult() {
               <h2 className="font-display text-2xl font-semibold">Oups, une erreur est survenue</h2>
               <p className="text-muted-foreground">{error}</p>
               <div className="flex gap-4 justify-center">
-                <Button onClick={fetchAnalysis} variant="outline">
+                <Button onClick={handleRetry} variant="outline">
                   <RefreshCw className="h-4 w-4 mr-2" />
                   Réessayer
                 </Button>
@@ -151,7 +206,6 @@ export default function AnalyseExpressResult() {
           {/* Results */}
           {!loading && !error && data && (
             <div className="space-y-8">
-              {/* Header */}
               <div className="text-center">
                 <h1 className="font-display text-3xl md:text-4xl font-semibold mb-2">
                   Analyse de <span className="text-primary">@{username}</span>
@@ -238,7 +292,7 @@ export default function AnalyseExpressResult() {
                       </div>
                     </div>
                   )}
-                  {data.analysis.best_posting_times && data.analysis.best_posting_times.length > 0 && (
+                  {data.analysis.best_posting_times?.length > 0 && (
                     <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-3 md:col-span-2">
                       <Clock className="h-5 w-5 text-primary shrink-0" />
                       <div>
@@ -262,7 +316,7 @@ export default function AnalyseExpressResult() {
                       <span className="font-medium text-foreground">Niche :</span> {data.persona.niche_principale}
                     </p>
                   )}
-                  {data.persona.forces && data.persona.forces.length > 0 && (
+                  {data.persona.forces?.length > 0 && (
                     <div>
                       <span className="font-medium text-sm">Forces</span>
                       <ul className="mt-1 space-y-1">
@@ -274,7 +328,7 @@ export default function AnalyseExpressResult() {
                       </ul>
                     </div>
                   )}
-                  {data.persona.faiblesses && data.persona.faiblesses.length > 0 && (
+                  {data.persona.faiblesses?.length > 0 && (
                     <div>
                       <span className="font-medium text-sm">Points d'amélioration</span>
                       <ul className="mt-1 space-y-1">
@@ -290,7 +344,7 @@ export default function AnalyseExpressResult() {
               )}
 
               {/* Recommendations */}
-              {data.persona?.recommandations && data.persona.recommandations.length > 0 && (
+              {data.persona?.recommandations?.length > 0 && (
                 <div className="bg-card border border-border rounded-xl p-6">
                   <h3 className="font-semibold mb-3">Recommandations</h3>
                   <ul className="space-y-2">

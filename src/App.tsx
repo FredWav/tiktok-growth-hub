@@ -24,6 +24,8 @@ import MentionsLegales from "./pages/MentionsLegales";
 import PolitiqueConfidentialite from "./pages/PolitiqueConfidentialite";
 import CGV from "./pages/CGV";
 import NotFound from "./pages/NotFound";
+import AnalyseExpress from "./pages/AnalyseExpress";
+import AnalyseExpressResult from "./pages/AnalyseExpressResult";
 
 // Admin pages
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -70,6 +72,8 @@ const App = () => (
             <Route path="/mentions-legales" element={<MentionsLegales />} />
             <Route path="/politique-de-confidentialite" element={<PolitiqueConfidentialite />} />
             <Route path="/cgv" element={<CGV />} />
+            <Route path="/analyse-express" element={<AnalyseExpress />} />
+            <Route path="/analyse-express/result" element={<AnalyseExpressResult />} />
 
             {/* Admin routes 
             <Route

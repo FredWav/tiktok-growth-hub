@@ -29,3 +29,12 @@ verify_jwt = false
 
 [functions.verify-oneshot-payment]
 verify_jwt = false
+
+[functions.create-express-checkout]
+verify_jwt = false
+
+[functions.express-analysis]
+verify_jwt = false
+
+[functions.express-pdf]
+verify_jwt = false

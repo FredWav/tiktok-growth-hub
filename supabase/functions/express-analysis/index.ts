@@ -32,7 +32,7 @@ serve(async (req) => {
     const apiKey = Deno.env.get("WAV_SOCIAL_SCAN_API_KEY");
     if (!apiKey) throw new Error("Clé API WavSocialScan non configurée");
 
-    // Trigger analysis (fire and forget)
+    // Trigger analysis — returns 202 with job_id
     const analyzeRes = await fetch(`${API_BASE}/accounts/${encodeURIComponent(username)}/analyze`, {
       method: "POST",
       headers: {
@@ -45,12 +45,18 @@ serve(async (req) => {
       const errText = await analyzeRes.text();
       console.error("Analyze error:", errText);
       throw new Error(`Erreur lors du lancement de l'analyse: ${analyzeRes.status}`);
-    } else {
-      await analyzeRes.text(); // consume body
     }
 
-    // Return immediately — client will poll express-analysis-status
-    return new Response(JSON.stringify({ username, status: "processing" }), {
+    const analyzeData = await analyzeRes.json();
+    const jobId = analyzeData.job_id;
+
+    if (!jobId) {
+      console.error("No job_id in response:", analyzeData);
+      throw new Error("job_id non retourné par l'API");
+    }
+
+    // Return job_id so client can poll status
+    return new Response(JSON.stringify({ username, job_id: jobId, status: "processing" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });

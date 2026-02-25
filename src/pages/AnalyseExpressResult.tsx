@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const POLL_INTERVAL = 3000;
+const POLL_INTERVAL = 5000;
 const MAX_POLL_DURATION = 180_000; // 3 minutes
 
 export default function AnalyseExpressResult() {
@@ -22,10 +22,13 @@ export default function AnalyseExpressResult() {
   const [data, setData] = useState<any>(null);
   const [username, setUsername] = useState<string>("");
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [currentStep, setCurrentStep] = useState<string | null>(null);
 
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const startTimeRef = useRef<number>(0);
   const launchedRef = useRef(false);
+  const jobIdRef = useRef<string | null>(null);
 
   const stopPolling = useCallback(() => {
     if (pollingRef.current) {
@@ -35,9 +38,8 @@ export default function AnalyseExpressResult() {
   }, []);
 
   const checkStatus = useCallback(async () => {
-    if (!sessionId) return;
+    if (!sessionId || !jobIdRef.current) return;
 
-    // Timeout after 3 minutes
     if (Date.now() - startTimeRef.current > MAX_POLL_DURATION) {
       stopPolling();
       setError("L'analyse prend plus de temps que prévu. Réessayez dans quelques instants.");
@@ -47,20 +49,25 @@ export default function AnalyseExpressResult() {
 
     try {
       const { data: result, error: fnError } = await supabase.functions.invoke("express-analysis-status", {
-        body: { session_id: sessionId },
+        body: { session_id: sessionId, job_id: jobIdRef.current },
       });
 
       if (fnError || result?.error) {
-        // Don't stop polling on transient errors
         console.warn("Status check error:", result?.error || fnError?.message);
         return;
       }
 
       if (result.username) setUsername(result.username);
+      if (result.progress !== undefined) setProgress(result.progress);
+      if (result.current_step) setCurrentStep(result.current_step);
 
       if (result.status === "complete" && result.data) {
         stopPolling();
         setData(result.data);
+        setLoading(false);
+      } else if (result.status === "failed") {
+        stopPolling();
+        setError(result.error || "L'analyse a échoué. Réessayez.");
         setLoading(false);
       }
     } catch (err) {
@@ -77,6 +84,8 @@ export default function AnalyseExpressResult() {
 
     setLoading(true);
     setError(null);
+    setProgress(0);
+    setCurrentStep(null);
     launchedRef.current = true;
 
     try {
@@ -89,11 +98,10 @@ export default function AnalyseExpressResult() {
       }
 
       if (result.username) setUsername(result.username);
+      if (result.job_id) jobIdRef.current = result.job_id;
 
-      // Start client-side polling
       startTimeRef.current = Date.now();
       pollingRef.current = setInterval(checkStatus, POLL_INTERVAL);
-      // Also check immediately after a short delay
       setTimeout(checkStatus, 1500);
     } catch (err: any) {
       setError(err.message);
@@ -159,6 +167,14 @@ export default function AnalyseExpressResult() {
     return "text-red-500";
   };
 
+  const stepLabels: Record<string, string> = {
+    scraping: "Collecte des données du profil…",
+    metrics: "Calcul des métriques…",
+    analysis: "Analyse approfondie…",
+    persona: "Construction du persona…",
+    health_score: "Calcul du score de santé…",
+  };
+
   return (
     <Layout>
       <SEOHead
@@ -177,10 +193,14 @@ export default function AnalyseExpressResult() {
               <p className="text-muted-foreground">
                 Nous analysons le compte @{username || "..."} – cela peut prendre jusqu'à 2 minutes.
               </p>
-              <div className="max-w-xs mx-auto space-y-2">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
+              <div className="max-w-xs mx-auto space-y-3">
+                <Progress value={progress} className="h-3" />
+                <p className="text-sm font-medium text-primary">{progress}%</p>
+                {currentStep && (
+                  <p className="text-sm text-muted-foreground">
+                    {stepLabels[currentStep] || currentStep}
+                  </p>
+                )}
               </div>
             </div>
           )}

@@ -14,8 +14,9 @@ serve(async (req) => {
   }
 
   try {
-    const { session_id } = await req.json();
+    const { session_id, job_id } = await req.json();
     if (!session_id) throw new Error("session_id manquant");
+    if (!job_id) throw new Error("job_id manquant");
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
@@ -32,30 +33,47 @@ serve(async (req) => {
     const apiKey = Deno.env.get("WAV_SOCIAL_SCAN_API_KEY");
     if (!apiKey) throw new Error("Clé API WavSocialScan non configurée");
 
-    const getRes = await fetch(`${API_BASE}/accounts/${encodeURIComponent(username)}`, {
+    // Poll job status
+    const jobRes = await fetch(`${API_BASE}/jobs/${encodeURIComponent(job_id)}`, {
       headers: { "X-API-Key": apiKey },
     });
 
-    if (!getRes.ok) {
-      const errText = await getRes.text();
-      console.error("Status check error:", errText);
-      // Not ready yet or error — return processing
-      return new Response(JSON.stringify({ status: "processing", username }), {
+    if (!jobRes.ok) {
+      const errText = await jobRes.text();
+      console.error("Job status check error:", errText);
+      return new Response(JSON.stringify({ status: "processing", username, progress: 0 }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
       });
     }
 
-    const result = await getRes.json();
+    const job = await jobRes.json();
 
-    if (result && result.health_score?.total !== undefined && result.health_score?.total !== null) {
-      return new Response(JSON.stringify({ status: "complete", data: result, username }), {
+    if (job.status === "completed" && job.result) {
+      return new Response(JSON.stringify({ status: "complete", data: job.result, username }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
       });
     }
 
-    return new Response(JSON.stringify({ status: "processing", username }), {
+    if (job.status === "failed") {
+      return new Response(JSON.stringify({
+        status: "failed",
+        error: job.result?.error || "L'analyse a échoué",
+        username,
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
+    // Still processing (queued, processing, retrying)
+    return new Response(JSON.stringify({
+      status: "processing",
+      progress: job.progress || 0,
+      current_step: job.current_step || null,
+      username,
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });

@@ -32,7 +32,7 @@ serve(async (req) => {
     const pdfRes = await fetch(`${API_BASE}/accounts/${encodeURIComponent(username)}/pdf`, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${apiKey}`,
+        "X-API-Key": apiKey,
         "Content-Type": "application/json",
       },
     });

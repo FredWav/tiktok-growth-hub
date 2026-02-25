@@ -145,11 +145,12 @@ export const useUploadObservationImage = () => {
       
       if (uploadError) throw uploadError;
       
-      const { data: { publicUrl } } = supabase.storage
+      const { data, error: signError } = await supabase.storage
         .from('observations')
-        .getPublicUrl(filePath);
+        .createSignedUrl(filePath, 3600);
       
-      return publicUrl;
+      if (signError || !data?.signedUrl) throw signError || new Error('Failed to create signed URL');
+      return data.signedUrl;
     },
   });
 };

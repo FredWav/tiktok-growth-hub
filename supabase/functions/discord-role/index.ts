@@ -10,6 +10,17 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // This function is internal-only: restrict to service-role key
+  const authHeader = req.headers.get("Authorization");
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
+  if (!authHeader || !serviceKey || !authHeader.includes(serviceKey)) {
+    return new Response(
+      JSON.stringify({ error: "Service role required" }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 403 }
+    );
+  }
+
   try {
     const { action, discordUserId } = await req.json();
 
@@ -42,7 +53,6 @@ serve(async (req) => {
       throw new Error(`Discord API error: ${response.status}`);
     }
 
-    // Consume body if any
     if (response.status !== 204) {
       await response.text();
     }

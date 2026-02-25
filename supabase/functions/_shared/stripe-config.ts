@@ -1,23 +1,11 @@
 /**
  * Stripe Price IDs configuration.
  * 
- * Switch between test and production by changing STRIPE_MODE.
- * The STRIPE_SECRET_KEY secret must match the mode (sk_test_ or sk_live_).
+ * Auto-detects mode from STRIPE_SECRET_KEY prefix (sk_test_ vs sk_live_).
+ * Can be overridden with STRIPE_MODE env var.
  */
 
 type StripeMode = "test" | "live";
-
-// Detect mode: env var first, then auto-detect from STRIPE_SECRET_KEY prefix
-function detectStripeMode(): StripeMode {
-  const envMode = Deno.env.get("STRIPE_MODE");
-  if (envMode === "test" || envMode === "live") return envMode;
-  // Auto-detect from the secret key
-  const key = Deno.env.get("STRIPE_SECRET_KEY") || "";
-  if (key.startsWith("sk_test_")) return "test";
-  return "live";
-}
-
-const STRIPE_MODE: StripeMode = detectStripeMode();
 
 const PRICE_IDS = {
   test: {
@@ -36,5 +24,25 @@ const PRICE_IDS = {
   },
 } as const;
 
-export const stripePrices = PRICE_IDS[STRIPE_MODE];
-export const stripeMode = STRIPE_MODE;
+/** Returns prices matching the current Stripe key mode. Called at request time. */
+export function getStripePrices() {
+  const mode = getStripeMode();
+  console.log(`[stripe-config] mode=${mode}`);
+  return PRICE_IDS[mode];
+}
+
+export function getStripeMode(): StripeMode {
+  const envMode = Deno.env.get("STRIPE_MODE");
+  if (envMode === "test" || envMode === "live") return envMode;
+  const key = Deno.env.get("STRIPE_SECRET_KEY") || "";
+  if (key.startsWith("sk_test_")) return "test";
+  return "live";
+}
+
+// Keep backwards-compat exports (lazy getters)
+export const stripePrices = new Proxy({} as typeof PRICE_IDS["live"], {
+  get(_target, prop: string) {
+    return getStripePrices()[prop as keyof typeof PRICE_IDS["live"]];
+  },
+});
+export const stripeMode = "live"; // deprecated, use getStripeMode()

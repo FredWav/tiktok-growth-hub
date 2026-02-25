@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { Download, Loader2, AlertCircle, RefreshCw, ChevronDown, Target } from "lucide-react";
+// @ts-ignore - html2pdf.js doesn't have proper types
+import html2pdf from "html2pdf.js";
 import { SEOHead } from "@/components/SEOHead";
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
@@ -17,6 +19,7 @@ import { HashtagsSection } from "@/components/express-result/HashtagsSection";
 import { BestTimesSection } from "@/components/express-result/BestTimesSection";
 import { RegularityBreakdown } from "@/components/express-result/RegularityBreakdown";
 import { MarkdownRenderer } from "@/components/express-result/MarkdownRenderer";
+import { PdfReportTemplate } from "@/components/express-result/PdfReportTemplate";
 
 const POLL_INTERVAL = 5000;
 const MAX_POLL_DURATION = 600_000;
@@ -120,33 +123,19 @@ export default function AnalyseExpressResult() {
   };
 
   const handleDownloadPdf = async () => {
-    if (!sessionId || !username) return;
+    if (!username) return;
+    const element = document.getElementById("pdf-report-template");
+    if (!element) return;
     setPdfLoading(true);
     try {
-      const { data: result, error: fnError } = await supabase.functions.invoke("express-pdf", {
-        body: { session_id: sessionId, username, data },
-      });
-      if (fnError || result?.error) throw new Error(result?.error || fnError?.message || "Erreur PDF");
-      if (!result?.pdf_base64) throw new Error("PDF non généré");
-
-      // Decode base64 to Uint8Array
-      const binaryString = atob(result.pdf_base64);
-      const bytes = new Uint8Array(binaryString.length);
-      for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-      }
-
-      // Create blob and trigger download
-      const blob = new Blob([bytes], { type: "application/pdf" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `analyse-tiktok-${username}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
+      await (html2pdf() as any).set({
+        margin: [10, 10, 10, 10],
+        filename: `analyse-tiktok-${username}.pdf`,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        pagebreak: { mode: ["avoid-all", "css", "legacy"] },
+      }).from(element).save();
       toast.success("Rapport PDF téléchargé !");
     } catch (err: any) {
       toast.error(err.message || "Erreur lors du téléchargement");
@@ -296,6 +285,9 @@ export default function AnalyseExpressResult() {
                   </div>
                 </Collapsible>
               )}
+
+              {/* Hidden PDF template */}
+              <PdfReportTemplate data={data} username={username} />
 
               {/* Download */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">

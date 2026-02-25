@@ -99,7 +99,11 @@ export default function AnalyseExpressResult() {
         throw new Error(result?.error || fnError?.message || "Erreur lors du lancement de l'analyse");
       }
       if (result.username) setUsername(result.username);
-      if (result.job_id) jobIdRef.current = result.job_id;
+      if (result.job_id) {
+        jobIdRef.current = result.job_id;
+        // Cache job_id in localStorage for refresh deduplication
+        localStorage.setItem(`express_job_${sessionId}`, result.job_id);
+      }
       startTimeRef.current = Date.now();
       pollingRef.current = setInterval(checkStatus, POLL_INTERVAL);
       setTimeout(checkStatus, 1500);
@@ -114,9 +118,23 @@ export default function AnalyseExpressResult() {
   }, [sessionId]);
 
   useEffect(() => {
-    if (!launchedRef.current) launchAnalysis();
+    if (launchedRef.current) return;
+    launchedRef.current = true;
+
+    // Check localStorage for cached job_id (refresh deduplication)
+    const cachedJobId = sessionId ? localStorage.getItem(`express_job_${sessionId}`) : null;
+    if (cachedJobId && sessionId) {
+      jobIdRef.current = cachedJobId;
+      setLoading(true);
+      startTimeRef.current = Date.now();
+      pollingRef.current = setInterval(checkStatus, POLL_INTERVAL);
+      setTimeout(checkStatus, 500);
+    } else {
+      launchAnalysis();
+    }
+
     return () => stopPolling();
-  }, [launchAnalysis, stopPolling]);
+  }, [sessionId, launchAnalysis, checkStatus, stopPolling]);
 
   const handleRetry = () => {
     launchedRef.current = false;

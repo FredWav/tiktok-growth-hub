@@ -29,6 +29,16 @@ serve(async (req) => {
     const username = session.metadata?.tiktok_username;
     if (!username) throw new Error("Username TikTok introuvable dans la session");
 
+    // Server-side deduplication: check if job_id already exists in metadata
+    const existingJobId = session.metadata?.job_id;
+    if (existingJobId) {
+      console.log(`Returning existing job_id ${existingJobId} for session ${session_id}`);
+      return new Response(JSON.stringify({ username, job_id: existingJobId, status: "processing" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
     const apiKey = Deno.env.get("WAV_SOCIAL_SCAN_API_KEY");
     if (!apiKey) throw new Error("Clé API WavSocialScan non configurée");
 
@@ -53,6 +63,16 @@ serve(async (req) => {
     if (!jobId) {
       console.error("No job_id in response:", analyzeData);
       throw new Error("job_id non retourné par l'API");
+    }
+
+    // Store job_id in Stripe session metadata for deduplication
+    try {
+      await stripe.checkout.sessions.update(session_id, {
+        metadata: { ...session.metadata, job_id: jobId },
+      });
+    } catch (updateErr) {
+      console.warn("Failed to update Stripe session metadata with job_id:", updateErr);
+      // Non-blocking: continue even if metadata update fails
     }
 
     // Return job_id so client can poll status

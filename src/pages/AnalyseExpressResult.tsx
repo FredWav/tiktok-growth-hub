@@ -124,7 +124,7 @@ export default function AnalyseExpressResult() {
     setPdfLoading(true);
     try {
       const { data: result, error: fnError } = await supabase.functions.invoke("express-pdf", {
-        body: { session_id: sessionId, username },
+        body: { session_id: sessionId, username, data },
       });
       if (fnError || result?.error) throw new Error(result?.error || fnError?.message || "Erreur PDF");
       const blob = new Blob([result.html], { type: "text/html" });

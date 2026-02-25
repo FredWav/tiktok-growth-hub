@@ -1,76 +1,68 @@
 
 
-## Plan : Générer le PDF côté client avec html2pdf.js
+## Plan : Corriger le PDF blanc
 
-### Pourquoi côté client ?
+### Cause
 
-`html2pdf.js` est une bibliothèque **navigateur** qui utilise `html2canvas` + `jsPDF` sous le capot. Elle a besoin du DOM du navigateur pour fonctionner — elle ne peut pas tourner dans une edge function (environnement Deno sans DOM).
+Le composant `PdfReportTemplate` est positionné hors écran (`left: -9999px`). `html2canvas` ne peut pas capturer les éléments hors du viewport — il produit un canvas vide, donc un PDF blanc.
 
-La bonne approche : générer le PDF directement dans le navigateur de l'utilisateur, en utilisant les données déjà disponibles côté client. Plus besoin d'appeler l'edge function pour le PDF.
+### Solution
 
-### Avantages
-
-- Zéro problème d'encodage (HTML natif, emojis, accents, tout passe)
-- Zéro API externe, zéro clé API, gratuit
-- Rendu fidèle au HTML affiché
-- Bibliothèque stable et maintenue (900K+ téléchargements/semaine)
+Dans `handleDownloadPdf`, temporairement repositionner l'élément dans le viewport (mais visuellement caché via `opacity: 0` et `overflow: hidden` sur un wrapper), capturer le PDF, puis remettre l'élément hors écran.
 
 ### Modifications
 
 | Fichier | Changement |
 |---------|-----------|
-| `package.json` | Ajouter `html2pdf.js` comme dépendance |
-| `src/pages/AnalyseExpressResult.tsx` | Remplacer l'appel à l'edge function par la génération client avec html2pdf.js |
-| `src/components/express-result/PdfReportTemplate.tsx` | **Nouveau** — composant HTML caché (hors écran) qui contient le template complet du rapport, stylisé avec le même design doré/noir |
-| `supabase/functions/express-pdf/index.ts` | Supprimer (plus nécessaire) |
+| `src/components/express-result/PdfReportTemplate.tsx` | Supprimer le positionnement hors écran du wrapper. Utiliser `visibility: hidden; height: 0; overflow: hidden` à la place (reste dans le flux DOM mais invisible) |
+| `src/pages/AnalyseExpressResult.tsx` | Dans `handleDownloadPdf`, temporairement rendre l'élément visible (`visibility: visible; height: auto; position: fixed; left: 0; top: 0`) avant la capture, puis restaurer après |
 
-### Détails techniques
+### Détail technique
 
-**1. Nouveau composant `PdfReportTemplate`**
+**`PdfReportTemplate.tsx`** — ligne 99, changer le style du wrapper :
 
-Un composant React rendu hors écran (`position: absolute; left: -9999px`) qui contient tout le rapport en HTML avec CSS inline :
-- En-tête FredWav + date + @username
-- Score de santé avec barres de progression CSS
-- Grilles de métriques (moyennes, médianes)
-- Top hashtags en badges dorés
-- Meilleurs créneaux
-- Régularité détaillée
-- Persona (forces/faiblesses)
-- Analyse IA formatée (titres, listes, paragraphes)
-- Footer "Généré par FredWav"
+```tsx
+// Avant (invisible pour html2canvas)
+<div id="pdf-report-template" style={{ position: "absolute", left: "-9999px", top: 0, zIndex: -1 }}>
 
-Le composant reçoit les mêmes `data` et `username` déjà disponibles dans la page.
+// Après (dans le DOM mais caché visuellement, sans décaler hors viewport)
+<div id="pdf-report-template" style={{ position: "fixed", left: 0, top: 0, width: "800px", visibility: "hidden", zIndex: -9999, overflow: "hidden", height: 0 }}>
+```
 
-**2. Génération PDF dans `handleDownloadPdf`**
+**`AnalyseExpressResult.tsx`** — dans `handleDownloadPdf`, rendre visible avant capture :
 
 ```typescript
-import html2pdf from 'html2pdf.js';
-
 const handleDownloadPdf = async () => {
-  const element = document.getElementById('pdf-report-template');
+  const element = document.getElementById("pdf-report-template");
   if (!element) return;
+  setPdfLoading(true);
 
-  await html2pdf().set({
-    margin: [10, 10, 10, 10],
-    filename: `analyse-tiktok-${username}.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
-  }).from(element).save();
+  // Rendre visible temporairement pour html2canvas
+  element.style.visibility = "visible";
+  element.style.height = "auto";
+  element.style.overflow = "visible";
+
+  try {
+    await (html2pdf() as any).set({
+      margin: [10, 10, 10, 10],
+      filename: `analyse-tiktok-${username}.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+      pagebreak: { mode: ["avoid-all", "css", "legacy"] },
+    }).from(element).save();
+    toast.success("Rapport PDF téléchargé !");
+  } catch (err: any) {
+    toast.error(err.message || "Erreur lors du téléchargement");
+  } finally {
+    // Recacher
+    element.style.visibility = "hidden";
+    element.style.height = "0";
+    element.style.overflow = "hidden";
+    setPdfLoading(false);
+  }
 };
 ```
 
-Plus d'appel à l'edge function, plus de Stripe verification pour le PDF (le paiement est déjà vérifié en amont lors de l'analyse).
-
-**3. Suppression de l'edge function `express-pdf`**
-
-L'edge function `express-pdf/index.ts` n'est plus nécessaire et sera supprimée pour nettoyer le code.
-
-### Flux simplifié
-
-```text
-Avant :  Client → Edge Function (pdf-lib + sanitize) → PDF base64 → téléchargement
-Après :  Client → html2pdf.js (HTML → canvas → PDF) → téléchargement direct
-```
+Cela garantit que `html2canvas` voit un élément rendu dans le DOM avec des dimensions réelles, et produit un canvas non vide.
 

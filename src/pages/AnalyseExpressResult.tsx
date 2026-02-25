@@ -127,7 +127,7 @@ export default function AnalyseExpressResult() {
     if (!username || !data?.account) return;
     setPdfLoading(true);
     try {
-      const pdfData = mapAccountDataForPDF(data.account);
+      const pdfData = mapAccountDataForPDF(data.account, persona, pubPattern);
       const htmlContent = generateCompletePDFHTML(
         pdfData,
         data.account.ai_insights || "",

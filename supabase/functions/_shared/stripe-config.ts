@@ -7,8 +7,8 @@
 
 type StripeMode = "test" | "live";
 
-// ⬇️ CHANGE THIS TO SWITCH BETWEEN TEST AND PRODUCTION ⬇️
-const STRIPE_MODE: StripeMode = "live";
+// Reads from STRIPE_MODE env var, defaults to "live"
+const STRIPE_MODE: StripeMode = (Deno.env.get("STRIPE_MODE") as StripeMode) || "live";
 
 const PRICE_IDS = {
   test: {

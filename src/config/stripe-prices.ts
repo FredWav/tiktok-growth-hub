@@ -1,14 +1,14 @@
 /**
  * Stripe Price IDs configuration (frontend).
  * 
- * Switch between test and production by changing STRIPE_MODE.
+ * Reads VITE_STRIPE_MODE env var ("test" | "live"), defaults to "live".
  * The STRIPE_SECRET_KEY secret must match the mode (sk_test_ or sk_live_).
  */
 
 type StripeMode = "test" | "live";
 
-// ⬇️ CHANGE THIS TO SWITCH BETWEEN TEST AND PRODUCTION ⬇️
-const STRIPE_MODE: StripeMode = "live";
+// Reads from VITE_STRIPE_MODE env var, defaults to "live"
+const STRIPE_MODE: StripeMode = (import.meta.env.VITE_STRIPE_MODE as StripeMode) || "live";
 
 const PRICE_IDS = {
   test: {

@@ -128,17 +128,35 @@ export default function AnalyseExpressResult() {
     if (!element) return;
     setPdfLoading(true);
 
-    // Rendre visible temporairement pour html2canvas
+    // Sauvegarder les styles originaux
+    const orig = {
+      visibility: element.style.visibility,
+      height: element.style.height,
+      overflow: element.style.overflow,
+      zIndex: element.style.zIndex,
+      pointerEvents: element.style.pointerEvents,
+    };
+
+    // Rendre visible pour html2canvas
     element.style.visibility = "visible";
     element.style.height = "auto";
     element.style.overflow = "visible";
+    element.style.zIndex = "99999";
+    element.style.pointerEvents = "none";
+
+    // Attendre le repaint du navigateur
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => {
+        setTimeout(resolve, 150);
+      });
+    });
 
     try {
       await (html2pdf() as any).set({
         margin: [10, 10, 10, 10],
         filename: `analyse-tiktok-${username}.pdf`,
         image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
         jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
         pagebreak: { mode: ["avoid-all", "css", "legacy"] },
       }).from(element).save();
@@ -146,10 +164,12 @@ export default function AnalyseExpressResult() {
     } catch (err: any) {
       toast.error(err.message || "Erreur lors du téléchargement");
     } finally {
-      // Recacher
-      element.style.visibility = "hidden";
-      element.style.height = "0";
-      element.style.overflow = "hidden";
+      // Restaurer les styles originaux
+      element.style.visibility = orig.visibility;
+      element.style.height = orig.height;
+      element.style.overflow = orig.overflow;
+      element.style.zIndex = orig.zIndex;
+      element.style.pointerEvents = orig.pointerEvents;
       setPdfLoading(false);
     }
   };

@@ -1,69 +1,48 @@
 
 
-## Plan : Afficher toutes les données API et rendre le markdown
+## Plan : Générer le rapport HTML en interne
 
-L'API retourne beaucoup de données qui ne sont pas affichées actuellement. Voici ce qui manque et comment l'ajouter.
+Au lieu d'appeler l'API externe pour le PDF, l'edge function `express-pdf` va construire elle-même un rapport HTML complet et qualitatif à partir des données d'analyse déjà disponibles.
 
-### Données manquantes à afficher
+### Approche
 
-| Donnée | Source dans l'API | Actuellement affiché |
-|--------|-------------------|---------------------|
-| Avatar + display_name + bio | `data.account.avatar_url`, `display_name`, `bio` | Non |
-| Niche détectée | `data.account.detected_niche` | Non |
-| Verified badge | `data.account.verified` | Non |
-| Métriques médianes (vues, likes, comments, saves, shares) | `data.account.median_*` | Non |
-| Moyennes détaillées (likes, comments, saves, shares) | `data.account.avg_*` | Non |
-| Top hashtags | `data.account.top_hashtags` | Non |
-| AI Insights (markdown complet) | `data.account.ai_insights` | Non |
-| Health score labels + status | `healthComponents.*.label`, `*.status` | Non |
-| Priority actions | `data.health_score.priority_actions` | Non |
-| Overall status | `data.health_score.overall_status` | Non |
-| Meilleurs horaires (depuis persona) | `data.persona.style_contenu.publication_pattern.best_times` | Non |
-| Recommendations de publication | `data.persona.style_contenu.publication_pattern.recommendations` | Non |
-| Consistency score | `data.persona.style_contenu.publication_pattern.consistency_score` | Non |
-| Regularity breakdown | `data.persona.style_contenu.publication_pattern.regularity_details.tiktok_breakdown` | Non |
-| Publication frequency | `data.persona.style_contenu.publication_pattern.publication_frequency` | Non |
+L'edge function recevra `session_id`, `username` et surtout `data` (l'objet complet de l'analyse) directement depuis le frontend. Elle n'appellera plus l'API externe - elle construira un document HTML autonome avec CSS inline, prêt à être imprimé en PDF depuis le navigateur.
 
-### Modifications dans `src/pages/AnalyseExpressResult.tsx`
+### Design du rapport
 
-**1. Profil header avec avatar**
-- Ajouter en haut des résultats : avatar circulaire, display_name, bio, niche détectée, badge vérifié
+- Palette : noir (#0F0F0F), or (#C4A34A), crème (#FAFAF5), blanc, gris (#737373)
+- Typographies : Inter (body) + Playfair Display (titres) via Google Fonts
+- Mise en page A4 avec `@media print` pour impression propre
+- Sections avec bordures fines, coins arrondis, barres de progression colorées
 
-**2. Grille de métriques étendue**
-- Ajouter : avg_likes, avg_comments, avg_saves, avg_shares, median_views, median_likes
-- Organiser en 2 grilles : "Moyennes" et "Médianes"
+### Structure du rapport HTML
 
-**3. Labels dans les ScoreBars**
-- Afficher le `label` (ex: "Bon (>5%)") et le `status` à côté de chaque barre de score
-
-**4. Priority actions + overall status**
-- Ajouter sous le health score global
-
-**5. Top Hashtags**
-- Afficher les hashtags sous forme de badges/chips
-
-**6. Meilleurs horaires de publication**
-- Afficher les top 5 créneaux depuis `persona.style_contenu.publication_pattern.best_times` avec jour + heure traduits en français
-
-**7. Régularité détaillée**
-- Afficher le `tiktok_breakdown` (5 sous-scores avec détails)
-- Afficher les `recommendations` de publication
-
-**8. AI Insights — rendu markdown**
-- Parser le markdown `data.account.ai_insights` et le rendre en HTML stylé
-- Utiliser une fonction simple de rendu markdown (pas de lib externe) : convertir `#`, `##`, `###`, `**`, `-`, `\n` en éléments HTML/JSX
-- Afficher dans une section collapsible "Analyse détaillée" pour ne pas surcharger la page
+1. **En-tête** : logo/titre "FredWav - Analyse TikTok", date, nom du compte
+2. **Profil** : avatar, display_name, @username, bio, niche, badge vérifié
+3. **Health Score** : score global + jauge visuelle + statut + 5 composants avec barres
+4. **Métriques clés** : grille abonnés/likes/vidéos/engagement + moyennes + médianes
+5. **Top Hashtags** : badges stylés
+6. **Meilleurs créneaux** : top 5 horaires avec jours en français
+7. **Régularité** : 5 sous-scores avec barres + détails
+8. **Persona** : niche, forces, faiblesses
+9. **Analyse IA** : rendu du markdown `ai_insights` en HTML (h1-h3, bold, listes, paragraphes)
+10. **Pied de page** : mention "Généré par FredWav" + date
 
 ### Fichiers modifiés
 
 | Fichier | Changement |
 |---------|-----------|
-| `src/pages/AnalyseExpressResult.tsx` | Ajout de toutes les sections listées ci-dessus + fonction de rendu markdown simple |
+| `supabase/functions/express-pdf/index.ts` | Remplacement complet : suppression de l'appel API externe, construction du HTML en interne à partir de `data` |
+| `src/pages/AnalyseExpressResult.tsx` | Modifier `handleDownloadPdf` pour envoyer `data` en plus de `session_id` et `username` |
 
 ### Détails techniques
 
-- Fonction `renderMarkdown(md: string)` : convertit le markdown en JSX en splittant par lignes et en détectant les patterns `#`, `##`, `###`, `**text**`, `- item`
-- Les AI Insights seront dans un `Collapsible` (déjà installé) pour garder la page lisible
-- Les jours (0-6) seront traduits : `["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"]`
-- Les heures seront formatées en `HH:00`
+**Edge function** : reçoit `{ session_id, username, data }`, vérifie le paiement Stripe, puis génère un HTML autonome (pas de CSS externe sauf Google Fonts) avec :
+- Fonction `renderMarkdownToHtml(md)` pour convertir les `ai_insights` en HTML
+- Fonction `formatNumber(n)` pour les métriques
+- Fonction `getScoreColor(score)` pour les couleurs des barres
+- Traduction des jours (0=Dimanche..6=Samedi)
+- CSS inline avec variables, `@media print` pour suppression header/footer navigateur
+
+**Frontend** : le bouton "Télécharger le rapport" enverra désormais l'objet `data` complet à l'edge function, évitant tout rappel API.
 

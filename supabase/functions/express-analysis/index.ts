@@ -62,7 +62,7 @@ serve(async (req) => {
 
       if (getRes.ok) {
         const result = await getRes.json();
-        if (result && result.health_score !== undefined && result.health_score !== null) {
+        if (result && result.health_score?.total !== undefined && result.health_score?.total !== null) {
           data = result;
           break;
         }

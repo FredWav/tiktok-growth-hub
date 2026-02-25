@@ -243,20 +243,20 @@ export default function AnalyseExpressResult() {
                 <div className="bg-card border border-border rounded-xl p-6">
                   <h3 className="font-semibold mb-4">Détail du score</h3>
                   <div className="space-y-3">
-                    {healthComponents.engagement !== undefined && (
-                      <ScoreBar label="Engagement" score={healthComponents.engagement} icon={Heart} />
+                    {healthComponents.engagement?.score !== undefined && (
+                      <ScoreBar label="Engagement" score={healthComponents.engagement.score} icon={Heart} />
                     )}
-                    {healthComponents.consistency !== undefined && (
-                      <ScoreBar label="Régularité" score={healthComponents.consistency} icon={RefreshCw} />
+                    {healthComponents.consistency?.score !== undefined && (
+                      <ScoreBar label="Régularité" score={healthComponents.consistency.score} icon={RefreshCw} />
                     )}
-                    {healthComponents.content_quality !== undefined && (
-                      <ScoreBar label="Qualité du contenu" score={healthComponents.content_quality} icon={Star} />
+                    {healthComponents.content_quality?.score !== undefined && (
+                      <ScoreBar label="Qualité du contenu" score={healthComponents.content_quality.score} icon={Star} />
                     )}
-                    {healthComponents.growth_potential !== undefined && (
-                      <ScoreBar label="Potentiel de croissance" score={healthComponents.growth_potential} icon={TrendingUp} />
+                    {healthComponents.growth_potential?.score !== undefined && (
+                      <ScoreBar label="Potentiel de croissance" score={healthComponents.growth_potential.score} icon={TrendingUp} />
                     )}
-                    {healthComponents.technical_seo !== undefined && (
-                      <ScoreBar label="SEO technique" score={healthComponents.technical_seo} icon={Shield} />
+                    {healthComponents.technical_seo?.score !== undefined && (
+                      <ScoreBar label="SEO technique" score={healthComponents.technical_seo.score} icon={Shield} />
                     )}
                   </div>
                 </div>
@@ -276,18 +276,18 @@ export default function AnalyseExpressResult() {
                 {data.account?.video_count !== undefined && (
                   <MetricCard icon={BarChart3} label="Vidéos" value={formatNumber(data.account.video_count)} />
                 )}
-                {data.metrics?.engagement_rate !== undefined && (
-                  <MetricCard icon={TrendingUp} label="Engagement" value={`${data.metrics.engagement_rate}%`} />
+                {data.account?.engagement_rate != null && (
+                  <MetricCard icon={TrendingUp} label="Engagement" value={`${data.account.engagement_rate}%`} />
                 )}
-                {data.metrics?.avg_views !== undefined && (
-                  <MetricCard icon={Eye} label="Vues moy." value={formatNumber(data.metrics.avg_views)} />
+                {data.account?.avg_views != null && (
+                  <MetricCard icon={Eye} label="Vues moy." value={formatNumber(data.account.avg_views)} />
                 )}
               </div>
 
               {/* Analysis insights */}
               {data.analysis && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {data.analysis.viral_potential !== undefined && (
+                  {data.analysis.viral_potential != null && (
                     <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
                       <Zap className="h-5 w-5 text-primary shrink-0" />
                       <div>

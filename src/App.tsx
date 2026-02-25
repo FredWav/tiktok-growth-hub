@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import ScrollToTop from "@/components/ScrollToTop";
+import { CookieConsent } from "@/components/CookieConsent";
 
 // Public pages
 import Home from "./pages/Home";
@@ -49,6 +50,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <CookieConsent />
         <ScrollToTop />
         <AuthProvider>
           <Routes>

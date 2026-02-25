@@ -7,7 +7,7 @@ const navItems = [
   { label: "Accueil", href: "/" },
   { label: "Offres", href: "/offres" },
   { label: "Analyse Express", href: "/analyse-express" },
-  { label: "Preuves", href: "/preuves" },
+  { label: "Témoignages", href: "/preuves" },
   { label: "À propos", href: "/a-propos" },
   { label: "Contact", href: "/contact" },
 ];

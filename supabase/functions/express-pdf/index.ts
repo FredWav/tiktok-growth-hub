@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
+import { PDFDocument, rgb, StandardFonts } from "https://esm.sh/pdf-lib@1.17.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -8,6 +9,16 @@ const corsHeaders = {
 
 const DAYS = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
 
+const GOLD = rgb(0.769, 0.639, 0.29);
+const BLACK = rgb(0.059, 0.059, 0.059);
+const GRAY = rgb(0.451, 0.451, 0.451);
+const LIGHT_GRAY = rgb(0.898, 0.898, 0.898);
+const BG_CREAM = rgb(0.98, 0.98, 0.957);
+const WHITE = rgb(1, 1, 1);
+const GREEN = rgb(0.133, 0.773, 0.369);
+const ORANGE = rgb(0.976, 0.451, 0.086);
+const RED = rgb(0.937, 0.267, 0.267);
+
 function formatNumber(n: number): string {
   if (n == null) return "—";
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -15,11 +26,11 @@ function formatNumber(n: number): string {
   return String(Math.round(n * 100) / 100);
 }
 
-function getScoreColor(score: number): string {
-  if (score >= 80) return "#22c55e";
-  if (score >= 60) return "#C4A34A";
-  if (score >= 40) return "#f97316";
-  return "#ef4444";
+function getScoreColor(score: number) {
+  if (score >= 80) return GREEN;
+  if (score >= 60) return GOLD;
+  if (score >= 40) return ORANGE;
+  return RED;
 }
 
 function getScoreLabel(score: number): string {
@@ -29,86 +40,132 @@ function getScoreLabel(score: number): string {
   return "Faible";
 }
 
-function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
+// Helper to wrap text and return lines
+function wrapText(text: string, font: any, fontSize: number, maxWidth: number): string[] {
+  const words = text.split(" ");
+  const lines: string[] = [];
+  let currentLine = "";
 
-function renderMarkdownToHtml(md: string): string {
-  if (!md) return "";
-  const lines = md.split("\n");
-  let html = "";
-  let inList = false;
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-
-    if (!trimmed) {
-      if (inList) { html += "</ul>"; inList = false; }
-      continue;
-    }
-
-    // Bold
-    const processed = escapeHtml(trimmed).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-
-    if (trimmed.startsWith("### ")) {
-      if (inList) { html += "</ul>"; inList = false; }
-      html += `<h4 style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin:18px 0 8px;color:#0F0F0F;">${processed.slice(5)}</h4>`;
-    } else if (trimmed.startsWith("## ")) {
-      if (inList) { html += "</ul>"; inList = false; }
-      html += `<h3 style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;margin:22px 0 10px;color:#C4A34A;">${processed.slice(4)}</h3>`;
-    } else if (trimmed.startsWith("# ")) {
-      if (inList) { html += "</ul>"; inList = false; }
-      html += `<h2 style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin:24px 0 12px;color:#0F0F0F;">${processed.slice(3)}</h2>`;
-    } else if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
-      if (!inList) { html += `<ul style="margin:6px 0;padding-left:20px;color:#737373;">`; inList = true; }
-      html += `<li style="margin:3px 0;font-size:13px;line-height:1.6;">${processed.slice(2)}</li>`;
-    } else if (/^\d+\.\s+/.test(trimmed)) {
-      if (!inList) { html += `<ul style="margin:6px 0;padding-left:20px;color:#737373;list-style:decimal;">`; inList = true; }
-      html += `<li style="margin:3px 0;font-size:13px;line-height:1.6;">${processed.replace(/^\d+\.\s+/, "")}</li>`;
+  for (const word of words) {
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    const width = font.widthOfTextAtSize(testLine, fontSize);
+    if (width > maxWidth && currentLine) {
+      lines.push(currentLine);
+      currentLine = word;
     } else {
-      if (inList) { html += "</ul>"; inList = false; }
-      html += `<p style="margin:6px 0;font-size:13px;line-height:1.7;color:#737373;">${processed}</p>`;
+      currentLine = testLine;
     }
   }
-  if (inList) html += "</ul>";
-  return html;
+  if (currentLine) lines.push(currentLine);
+  return lines;
 }
 
-function scoreBar(label: string, score: number, detail?: string): string {
-  const color = getScoreColor(score);
-  return `
-    <div style="margin-bottom:12px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-        <span style="font-size:13px;font-weight:600;color:#0F0F0F;">${escapeHtml(label)}</span>
-        <span style="font-size:13px;font-weight:700;color:${color};">${score}/100 · ${getScoreLabel(score)}</span>
-      </div>
-      <div style="background:#e5e5e5;border-radius:6px;height:8px;overflow:hidden;">
-        <div style="width:${score}%;height:100%;background:${color};border-radius:6px;transition:width 0.3s;"></div>
-      </div>
-      ${detail ? `<p style="font-size:11px;color:#737373;margin-top:3px;">${escapeHtml(detail)}</p>` : ""}
-    </div>`;
+class PdfBuilder {
+  doc: any;
+  page: any;
+  y: number;
+  pageWidth = 595.28; // A4
+  pageHeight = 841.89;
+  marginLeft = 50;
+  marginRight = 50;
+  marginTop = 50;
+  marginBottom = 60;
+  contentWidth: number;
+  fontRegular: any;
+  fontBold: any;
+
+  constructor(doc: any, fontRegular: any, fontBold: any) {
+    this.doc = doc;
+    this.fontRegular = fontRegular;
+    this.fontBold = fontBold;
+    this.contentWidth = this.pageWidth - this.marginLeft - this.marginRight;
+    this.page = doc.addPage([this.pageWidth, this.pageHeight]);
+    this.y = this.pageHeight - this.marginTop;
+  }
+
+  ensureSpace(needed: number) {
+    if (this.y - needed < this.marginBottom) {
+      this.addFooter();
+      this.page = this.doc.addPage([this.pageWidth, this.pageHeight]);
+      this.y = this.pageHeight - this.marginTop;
+    }
+  }
+
+  addFooter() {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+    this.page.drawLine({ start: { x: this.marginLeft, y: 45 }, end: { x: this.pageWidth - this.marginRight, y: 45 }, color: GOLD, thickness: 1.5 });
+    this.page.drawText(`Généré par FredWav — ${dateStr}`, { x: this.marginLeft, y: 30, size: 8, font: this.fontRegular, color: GRAY });
+    this.page.drawText("fredwav.lovable.app", { x: this.pageWidth - this.marginRight - this.fontRegular.widthOfTextAtSize("fredwav.lovable.app", 8), y: 30, size: 8, font: this.fontRegular, color: GRAY });
+  }
+
+  drawText(text: string, opts: { font?: any; size?: number; color?: any; x?: number; maxWidth?: number; lineHeight?: number }) {
+    const font = opts.font || this.fontRegular;
+    const size = opts.size || 10;
+    const color = opts.color || BLACK;
+    const x = opts.x || this.marginLeft;
+    const maxWidth = opts.maxWidth || this.contentWidth;
+    const lineHeight = opts.lineHeight || size * 1.4;
+
+    const lines = wrapText(text, font, size, maxWidth);
+    for (const line of lines) {
+      this.ensureSpace(lineHeight);
+      this.page.drawText(line, { x, y: this.y, size, font, color });
+      this.y -= lineHeight;
+    }
+  }
+
+  drawSectionTitle(icon: string, title: string) {
+    this.ensureSpace(35);
+    this.y -= 12;
+    // Gold line
+    this.page.drawLine({ start: { x: this.marginLeft, y: this.y - 2 }, end: { x: this.pageWidth - this.marginRight, y: this.y - 2 }, color: GOLD, thickness: 1.5 });
+    this.page.drawText(`${icon}  ${title}`, { x: this.marginLeft, y: this.y + 5, size: 14, font: this.fontBold, color: BLACK });
+    this.y -= 22;
+  }
+
+  drawScoreBar(label: string, score: number, detail?: string) {
+    this.ensureSpace(35);
+    const color = getScoreColor(score);
+    const barY = this.y;
+    
+    // Label
+    this.page.drawText(label, { x: this.marginLeft, y: barY, size: 10, font: this.fontBold, color: BLACK });
+    const scoreText = `${score}/100 · ${getScoreLabel(score)}`;
+    const scoreTextWidth = this.fontBold.widthOfTextAtSize(scoreText, 10);
+    this.page.drawText(scoreText, { x: this.pageWidth - this.marginRight - scoreTextWidth, y: barY, size: 10, font: this.fontBold, color });
+    
+    // Bar background
+    const barWidth = this.contentWidth;
+    this.y -= 14;
+    this.page.drawRectangle({ x: this.marginLeft, y: this.y, width: barWidth, height: 6, color: LIGHT_GRAY, borderRadius: 3 });
+    // Bar fill
+    this.page.drawRectangle({ x: this.marginLeft, y: this.y, width: barWidth * (score / 100), height: 6, color, borderRadius: 3 });
+    this.y -= 8;
+
+    if (detail) {
+      this.drawText(detail, { size: 8, color: GRAY });
+    }
+    this.y -= 6;
+  }
+
+  drawMetricBox(x: number, y: number, w: number, h: number, label: string, value: string) {
+    this.page.drawRectangle({ x, y, width: w, height: h, color: BG_CREAM, borderColor: LIGHT_GRAY, borderWidth: 0.5 });
+    // Label centered
+    const labelWidth = this.fontRegular.widthOfTextAtSize(label, 7);
+    this.page.drawText(label.toUpperCase(), { x: x + (w - labelWidth) / 2, y: y + h - 14, size: 7, font: this.fontRegular, color: GRAY });
+    // Value centered
+    const valWidth = this.fontBold.widthOfTextAtSize(value, 14);
+    this.page.drawText(value, { x: x + (w - valWidth) / 2, y: y + 10, size: 14, font: this.fontBold, color: BLACK });
+  }
 }
 
-function metricCard(label: string, value: string | number, sub?: string): string {
-  return `
-    <div style="background:#FAFAF5;border:1px solid #e5e5e5;border-radius:10px;padding:14px 16px;text-align:center;">
-      <div style="font-size:11px;color:#737373;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">${escapeHtml(label)}</div>
-      <div style="font-size:20px;font-weight:700;color:#0F0F0F;">${typeof value === "number" ? formatNumber(value) : escapeHtml(String(value))}</div>
-      ${sub ? `<div style="font-size:11px;color:#737373;margin-top:2px;">${escapeHtml(sub)}</div>` : ""}
-    </div>`;
-}
-
-function sectionTitle(icon: string, title: string): string {
-  return `<h2 style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#0F0F0F;margin:32px 0 14px;padding-bottom:8px;border-bottom:2px solid #C4A34A;display:flex;align-items:center;gap:8px;">
-    <span style="font-size:18px;">${icon}</span> ${escapeHtml(title)}
-  </h2>`;
-}
-
-function generateReport(username: string, data: any): string {
+async function generatePdf(username: string, data: any): Promise<Uint8Array> {
+  const doc = await PDFDocument.create();
+  const fontRegular = await doc.embedFont(StandardFonts.Helvetica);
+  const fontBold = await doc.embedFont(StandardFonts.HelveticaBold);
+  
+  const b = new PdfBuilder(doc, fontRegular, fontBold);
   const account = data?.account || {};
   const persona = data?.persona || {};
   const healthScore = data?.health_score || account?.health_score || {};
@@ -117,209 +174,266 @@ function generateReport(username: string, data: any): string {
   const now = new Date();
   const dateStr = now.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
 
-  const healthComponents = healthScore?.components || {};
-  const componentKeys = Object.keys(healthComponents);
+  // ===== HEADER =====
+  b.page.drawText("FredWav", { x: b.marginLeft, y: b.y, size: 22, font: fontBold, color: BLACK });
+  b.page.drawText("Analyse TikTok Express", { x: b.marginLeft, y: b.y - 18, size: 10, font: fontBold, color: GOLD });
+  
+  const dateWidth = fontRegular.widthOfTextAtSize(dateStr, 9);
+  b.page.drawText(dateStr, { x: b.pageWidth - b.marginRight - dateWidth, y: b.y, size: 9, font: fontRegular, color: GRAY });
+  const userLabel = `@${username}`;
+  const userWidth = fontBold.widthOfTextAtSize(userLabel, 11);
+  b.page.drawText(userLabel, { x: b.pageWidth - b.marginRight - userWidth, y: b.y - 16, size: 11, font: fontBold, color: BLACK });
+  
+  b.y -= 32;
+  b.page.drawLine({ start: { x: b.marginLeft, y: b.y }, end: { x: b.pageWidth - b.marginRight, y: b.y }, color: GOLD, thickness: 2 });
+  b.y -= 20;
 
-  return `<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Analyse TikTok — @${escapeHtml(username)} — FredWav</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-<style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Inter',sans-serif; background:#fff; color:#0F0F0F; max-width:800px; margin:0 auto; padding:40px 32px; line-height:1.5; }
-  /* Prevent page breaks inside sections */
-  .section-block { break-inside:avoid; page-break-inside:avoid; }
-  h2, h3, h4 { break-after:avoid; page-break-after:avoid; }
-  ul, ol { break-inside:avoid; page-break-inside:avoid; }
-  .print-btn { position:fixed; bottom:24px; right:24px; background:#C4A34A; color:#fff; border:none; padding:14px 28px; border-radius:10px; font-family:'Inter',sans-serif; font-size:15px; font-weight:600; cursor:pointer; box-shadow:0 4px 20px rgba(0,0,0,0.15); z-index:9999; display:flex; align-items:center; gap:8px; transition:transform 0.2s; }
-  .print-btn:hover { transform:scale(1.05); }
-  @media print {
-    body { padding:20px; }
-    @page { margin:15mm; size:A4; }
-    .no-print { display:none !important; }
-    .section-block { break-inside:avoid; page-break-inside:avoid; }
+  // ===== PROFILE =====
+  b.ensureSpace(60);
+  const displayName = account.display_name || username;
+  b.page.drawText(displayName, { x: b.marginLeft, y: b.y, size: 16, font: fontBold, color: BLACK });
+  if (account.verified) {
+    const nameW = fontBold.widthOfTextAtSize(displayName, 16);
+    b.page.drawText(" ✓", { x: b.marginLeft + nameW + 4, y: b.y, size: 14, font: fontBold, color: GOLD });
   }
-</style>
-</head>
-<body>
+  b.y -= 16;
+  b.page.drawText(`@${username}`, { x: b.marginLeft, y: b.y, size: 10, font: fontRegular, color: GRAY });
+  b.y -= 14;
 
-<!-- HEADER -->
-<div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:20px;border-bottom:2px solid #C4A34A;margin-bottom:28px;">
-  <div>
-    <h1 style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:#0F0F0F;">FredWav</h1>
-    <p style="font-size:13px;color:#C4A34A;font-weight:600;letter-spacing:0.5px;">Analyse TikTok Express</p>
-  </div>
-  <div style="text-align:right;">
-    <p style="font-size:12px;color:#737373;">${escapeHtml(dateStr)}</p>
-    <p style="font-size:14px;font-weight:600;color:#0F0F0F;">@${escapeHtml(username)}</p>
-  </div>
-</div>
+  if (account.bio) {
+    b.drawText(account.bio, { size: 9, color: GRAY, maxWidth: b.contentWidth * 0.8 });
+  }
+  if (account.detected_niche) {
+    b.ensureSpace(16);
+    b.page.drawRectangle({ x: b.marginLeft, y: b.y - 4, width: fontBold.widthOfTextAtSize(account.detected_niche, 9) + 16, height: 16, color: GOLD });
+    b.page.drawText(account.detected_niche, { x: b.marginLeft + 8, y: b.y, size: 9, font: fontBold, color: WHITE });
+    b.y -= 22;
+  }
 
-<!-- PROFILE -->
-<div class="section-block" style="display:flex;align-items:center;gap:18px;background:#FAFAF5;border:1px solid #e5e5e5;border-radius:12px;padding:20px;margin-bottom:8px;">
-  ${account.avatar_url ? `<img src="${escapeHtml(account.avatar_url)}" alt="Avatar" style="width:72px;height:72px;border-radius:50%;border:3px solid #C4A34A;object-fit:cover;">` : `<div style="width:72px;height:72px;border-radius:50%;background:#e5e5e5;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#737373;">${(username[0] || "?").toUpperCase()}</div>`}
-  <div>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <span style="font-size:18px;font-weight:700;">${escapeHtml(account.display_name || username)}</span>
-      ${account.verified ? `<span style="color:#C4A34A;font-size:16px;">✓</span>` : ""}
-    </div>
-    <p style="font-size:13px;color:#737373;">@${escapeHtml(username)}</p>
-    ${account.bio ? `<p style="font-size:12px;color:#737373;margin-top:4px;max-width:500px;">${escapeHtml(account.bio)}</p>` : ""}
-    ${account.detected_niche ? `<span style="display:inline-block;margin-top:6px;background:#C4A34A;color:#fff;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">${escapeHtml(account.detected_niche)}</span>` : ""}
-  </div>
-</div>
+  // ===== HEALTH SCORE =====
+  if (healthScore?.total_score != null) {
+    b.drawSectionTitle("💊", "Score de Santé");
+    
+    b.ensureSpace(40);
+    const score = healthScore.total_score;
+    const scoreColor = getScoreColor(score);
+    b.page.drawText(`${score}/100`, { x: b.marginLeft, y: b.y, size: 28, font: fontBold, color: scoreColor });
+    const labelText = getScoreLabel(score);
+    b.page.drawText(labelText, { x: b.marginLeft + 100, y: b.y + 4, size: 14, font: fontBold, color: scoreColor });
+    b.y -= 16;
+    if (healthScore.overall_status) {
+      b.drawText(healthScore.overall_status, { size: 9, color: GRAY });
+    }
+    b.y -= 8;
 
-<!-- HEALTH SCORE -->
-${healthScore?.total_score != null ? `
-${sectionTitle("💊", "Score de Santé")}
-<div class="section-block" style="display:flex;align-items:center;gap:20px;background:#FAFAF5;border:1px solid #e5e5e5;border-radius:12px;padding:20px;margin-bottom:16px;">
-  <div style="position:relative;width:90px;height:90px;">
-    <svg viewBox="0 0 36 36" style="width:90px;height:90px;transform:rotate(-90deg);">
-      <circle cx="18" cy="18" r="15.91" fill="none" stroke="#e5e5e5" stroke-width="3"/>
-      <circle cx="18" cy="18" r="15.91" fill="none" stroke="${getScoreColor(healthScore.total_score)}" stroke-width="3" stroke-dasharray="${healthScore.total_score} ${100 - healthScore.total_score}" stroke-linecap="round"/>
-    </svg>
-    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-      <span style="font-size:22px;font-weight:800;color:${getScoreColor(healthScore.total_score)};">${healthScore.total_score}</span>
-      <span style="font-size:9px;color:#737373;">/100</span>
-    </div>
-  </div>
-  <div style="flex:1;">
-    <p style="font-size:15px;font-weight:700;color:${getScoreColor(healthScore.total_score)};">${getScoreLabel(healthScore.total_score)}</p>
-    ${healthScore.overall_status ? `<p style="font-size:12px;color:#737373;margin-top:4px;">${escapeHtml(healthScore.overall_status)}</p>` : ""}
-  </div>
-</div>
-${componentKeys.length > 0 ? `<div class="section-block" style="background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:18px;margin-bottom:8px;">
-  ${componentKeys.map(k => {
-    const c = healthComponents[k];
-    return scoreBar(c.label || k, c.score || 0, c.status || "");
-  }).join("")}
-</div>` : ""}
-${healthScore.priority_actions?.length ? `<div style="background:#FAFAF5;border:1px solid #e5e5e5;border-radius:10px;padding:14px 18px;margin-bottom:8px;">
-  <p style="font-size:13px;font-weight:600;margin-bottom:6px;">Actions prioritaires</p>
-  <ul style="padding-left:18px;margin:0;">
-    ${healthScore.priority_actions.map((a: string) => `<li style="font-size:12px;color:#737373;margin:3px 0;">${escapeHtml(a)}</li>`).join("")}
-  </ul>
-</div>` : ""}
-` : ""}
+    // Components
+    const componentKeys = Object.keys(healthScore.components || {});
+    for (const k of componentKeys) {
+      const c = healthScore.components[k];
+      b.drawScoreBar(c.label || k, c.score || 0, c.status || "");
+    }
 
-<!-- METRICS -->
-${sectionTitle("📈", "Métriques Clés")}
-<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;">
-  ${metricCard("Abonnés", account.followers_count)}
-  ${metricCard("Likes total", account.total_likes)}
-  ${metricCard("Vidéos", account.video_count)}
-  ${metricCard("Engagement", account.engagement_rate != null ? `${(account.engagement_rate * 100).toFixed(2)}%` : "—")}
-</div>
+    // Priority actions
+    if (healthScore.priority_actions?.length) {
+      b.ensureSpace(20);
+      b.drawText("Actions prioritaires :", { font: fontBold, size: 10 });
+      for (const action of healthScore.priority_actions) {
+        b.drawText(`  •  ${action}`, { size: 9, color: GRAY });
+      }
+      b.y -= 4;
+    }
+  }
 
-${(account.avg_views != null || account.avg_likes != null) ? `
-<p style="font-size:13px;font-weight:600;margin:14px 0 8px;color:#737373;">Moyennes par vidéo</p>
-<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px;">
-  ${metricCard("Vues", account.avg_views)}
-  ${metricCard("Likes", account.avg_likes)}
-  ${metricCard("Commentaires", account.avg_comments)}
-  ${metricCard("Saves", account.avg_saves)}
-  ${metricCard("Partages", account.avg_shares)}
-</div>` : ""}
+  // ===== METRICS =====
+  b.drawSectionTitle("📈", "Métriques Clés");
+  
+  // Main metrics row (4 boxes)
+  const boxH = 48;
+  const gap = 8;
+  const boxW = (b.contentWidth - gap * 3) / 4;
+  b.ensureSpace(boxH + 10);
+  
+  const mainMetrics = [
+    ["Abonnés", formatNumber(account.followers_count)],
+    ["Likes total", formatNumber(account.total_likes)],
+    ["Vidéos", formatNumber(account.video_count)],
+    ["Engagement", account.engagement_rate != null ? `${(account.engagement_rate * 100).toFixed(2)}%` : "—"],
+  ];
+  for (let i = 0; i < mainMetrics.length; i++) {
+    b.drawMetricBox(b.marginLeft + i * (boxW + gap), b.y - boxH, boxW, boxH, mainMetrics[i][0], mainMetrics[i][1]);
+  }
+  b.y -= boxH + 14;
 
-${(account.median_views != null || account.median_likes != null) ? `
-<p style="font-size:13px;font-weight:600;margin:14px 0 8px;color:#737373;">Médianes par vidéo</p>
-<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:8px;">
-  ${metricCard("Vues", account.median_views)}
-  ${metricCard("Likes", account.median_likes)}
-  ${metricCard("Commentaires", account.median_comments)}
-  ${metricCard("Saves", account.median_saves)}
-  ${metricCard("Partages", account.median_shares)}
-</div>` : ""}
+  // Averages (5 boxes)
+  if (account.avg_views != null || account.avg_likes != null) {
+    b.drawText("Moyennes par vidéo", { font: fontBold, size: 10, color: GRAY });
+    b.y -= 4;
+    const box5W = (b.contentWidth - gap * 4) / 5;
+    b.ensureSpace(boxH + 10);
+    const avgMetrics = [
+      ["Vues", formatNumber(account.avg_views)],
+      ["Likes", formatNumber(account.avg_likes)],
+      ["Commentaires", formatNumber(account.avg_comments)],
+      ["Saves", formatNumber(account.avg_saves)],
+      ["Partages", formatNumber(account.avg_shares)],
+    ];
+    for (let i = 0; i < avgMetrics.length; i++) {
+      b.drawMetricBox(b.marginLeft + i * (box5W + gap), b.y - boxH, box5W, boxH, avgMetrics[i][0], avgMetrics[i][1]);
+    }
+    b.y -= boxH + 14;
+  }
 
-<!-- HASHTAGS -->
-${account.top_hashtags?.length ? `
-${sectionTitle("#", "Top Hashtags")}
-<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
-  ${account.top_hashtags.map((h: any) => {
-    const tag = typeof h === "string" ? h : h.tag || h.name;
-    const count = typeof h === "object" ? h.count : null;
-    return `<span style="display:inline-block;background:#0F0F0F;color:#C4A34A;font-size:12px;font-weight:600;padding:5px 14px;border-radius:20px;">#${escapeHtml(tag)}${count ? ` <span style="color:#737373;font-weight:400;">(${count})</span>` : ""}</span>`;
-  }).join("")}
-</div>` : ""}
+  // Medians (5 boxes)
+  if (account.median_views != null || account.median_likes != null) {
+    b.drawText("Médianes par vidéo", { font: fontBold, size: 10, color: GRAY });
+    b.y -= 4;
+    const box5W = (b.contentWidth - gap * 4) / 5;
+    b.ensureSpace(boxH + 10);
+    const medMetrics = [
+      ["Vues", formatNumber(account.median_views)],
+      ["Likes", formatNumber(account.median_likes)],
+      ["Commentaires", formatNumber(account.median_comments)],
+      ["Saves", formatNumber(account.median_saves)],
+      ["Partages", formatNumber(account.median_shares)],
+    ];
+    for (let i = 0; i < medMetrics.length; i++) {
+      b.drawMetricBox(b.marginLeft + i * (box5W + gap), b.y - boxH, box5W, boxH, medMetrics[i][0], medMetrics[i][1]);
+    }
+    b.y -= boxH + 14;
+  }
 
-<!-- BEST TIMES -->
-${pubPattern.best_times?.length ? `
-${sectionTitle("🕐", "Meilleurs Créneaux de Publication")}
-${pubPattern.publication_frequency?.weekly_pattern ? `<p style="font-size:12px;color:#737373;margin-bottom:8px;">Fréquence : <strong style="color:#0F0F0F;">${escapeHtml(pubPattern.publication_frequency.weekly_pattern)}</strong></p>` : ""}
-${pubPattern.consistency_score != null ? `<p style="font-size:12px;color:#737373;margin-bottom:10px;">Score de régularité : <strong style="color:#0F0F0F;">${pubPattern.consistency_score}/100</strong></p>` : ""}
-<div style="margin-bottom:8px;">
-  ${pubPattern.best_times.slice(0, 5).map((t: any, i: number) => `
-    <div style="display:flex;justify-content:space-between;align-items:center;background:${i % 2 === 0 ? "#FAFAF5" : "#fff"};border:1px solid #e5e5e5;border-radius:8px;padding:10px 16px;margin-bottom:6px;">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <span style="font-size:16px;font-weight:800;color:#C4A34A;">#${i + 1}</span>
-        <span style="font-size:13px;"><strong>${DAYS[t.day] || t.day}</strong> à ${String(t.hour).padStart(2, "0")}h00</span>
-      </div>
-      <div style="text-align:right;">
-        <span style="font-size:14px;font-weight:700;">${formatNumber(t.avg_views)}</span>
-        <span style="font-size:11px;color:#737373;"> vues moy.</span>
-      </div>
-    </div>
-  `).join("")}
-</div>
-${pubPattern.recommendations?.length ? `
-<div style="background:#FAFAF5;border:1px solid #e5e5e5;border-radius:10px;padding:14px 18px;margin-bottom:8px;">
-  <p style="font-size:13px;font-weight:600;margin-bottom:6px;">Recommandations</p>
-  <ul style="padding-left:18px;margin:0;">
-    ${pubPattern.recommendations.map((r: string) => `<li style="font-size:12px;color:#737373;margin:3px 0;">${escapeHtml(r)}</li>`).join("")}
-  </ul>
-</div>` : ""}
-` : ""}
+  // ===== HASHTAGS =====
+  if (account.top_hashtags?.length) {
+    b.drawSectionTitle("#", "Top Hashtags");
+    const tags = account.top_hashtags.map((h: any) => {
+      const tag = typeof h === "string" ? h : h.tag || h.name;
+      const count = typeof h === "object" ? h.count : null;
+      return count ? `#${tag} (${count})` : `#${tag}`;
+    });
+    // Print as comma-separated wrapping text
+    b.drawText(tags.join("   "), { size: 10, font: fontBold, color: GOLD });
+    b.y -= 4;
+  }
 
-<!-- REGULARITY -->
-${Object.keys(breakdown).length > 0 ? `
-${sectionTitle("📊", "Régularité Détaillée")}
-<div style="background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:18px;margin-bottom:8px;">
-  ${Object.entries(breakdown).map(([key, val]: [string, any]) => 
-    scoreBar(val.label || key, val.score || 0, val.detail || val.status || "")
-  ).join("")}
-</div>` : ""}
+  // ===== BEST TIMES =====
+  if (pubPattern.best_times?.length) {
+    b.drawSectionTitle("🕐", "Meilleurs Créneaux de Publication");
 
-<!-- PERSONA -->
-${persona.niche_principale || persona.forces?.length || persona.faiblesses?.length ? `
-${sectionTitle("🎯", "Persona Identifié")}
-<div style="background:#FAFAF5;border:1px solid #e5e5e5;border-radius:12px;padding:18px;margin-bottom:8px;">
-  ${persona.niche_principale ? `<p style="font-size:13px;margin-bottom:10px;"><strong>Niche :</strong> ${escapeHtml(persona.niche_principale)}</p>` : ""}
-  ${persona.forces?.length ? `
-    <p style="font-size:13px;font-weight:600;margin-bottom:4px;">Forces</p>
-    <ul style="padding-left:18px;margin:0 0 10px;">
-      ${persona.forces.map((f: string) => `<li style="font-size:12px;color:#737373;margin:2px 0;"><span style="color:#22c55e;font-weight:700;">✓</span> ${escapeHtml(f)}</li>`).join("")}
-    </ul>` : ""}
-  ${persona.faiblesses?.length ? `
-    <p style="font-size:13px;font-weight:600;margin-bottom:4px;">Points d'amélioration</p>
-    <ul style="padding-left:18px;margin:0;">
-      ${persona.faiblesses.map((f: string) => `<li style="font-size:12px;color:#737373;margin:2px 0;"><span style="color:#f97316;font-weight:700;">!</span> ${escapeHtml(f)}</li>`).join("")}
-    </ul>` : ""}
-</div>` : ""}
+    if (pubPattern.publication_frequency?.weekly_pattern) {
+      b.drawText(`Fréquence : ${pubPattern.publication_frequency.weekly_pattern}`, { size: 9, color: GRAY });
+    }
+    if (pubPattern.consistency_score != null) {
+      b.drawText(`Score de régularité : ${pubPattern.consistency_score}/100`, { size: 9, color: GRAY });
+    }
+    b.y -= 4;
 
-<!-- AI INSIGHTS -->
-${account.ai_insights ? `
-${sectionTitle("🤖", "Analyse Détaillée (IA)")}
-<div style="background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:18px;margin-bottom:8px;">
-  ${renderMarkdownToHtml(account.ai_insights)}
-</div>` : ""}
+    for (let i = 0; i < Math.min(5, pubPattern.best_times.length); i++) {
+      const t = pubPattern.best_times[i];
+      b.ensureSpace(18);
+      const rank = `#${i + 1}`;
+      const dayTime = `${DAYS[t.day] || t.day} à ${String(t.hour).padStart(2, "0")}h00`;
+      const views = `${formatNumber(t.avg_views)} vues moy.`;
+      
+      b.page.drawText(rank, { x: b.marginLeft, y: b.y, size: 12, font: fontBold, color: GOLD });
+      b.page.drawText(dayTime, { x: b.marginLeft + 30, y: b.y, size: 10, font: fontBold, color: BLACK });
+      const viewsW = fontRegular.widthOfTextAtSize(views, 9);
+      b.page.drawText(views, { x: b.pageWidth - b.marginRight - viewsW, y: b.y, size: 9, font: fontRegular, color: GRAY });
+      b.y -= 16;
+    }
 
-<!-- FOOTER -->
-<div class="section-block" style="margin-top:40px;padding-top:16px;border-top:2px solid #C4A34A;display:flex;justify-content:space-between;align-items:center;">
-  <p style="font-size:11px;color:#737373;">Généré par <strong style="color:#C4A34A;">FredWav</strong> — ${escapeHtml(dateStr)}</p>
-  <p style="font-size:11px;color:#737373;">fredwav.lovable.app</p>
-</div>
+    if (pubPattern.recommendations?.length) {
+      b.y -= 4;
+      b.drawText("Recommandations :", { font: fontBold, size: 10 });
+      for (const r of pubPattern.recommendations) {
+        b.drawText(`  •  ${r}`, { size: 9, color: GRAY });
+      }
+    }
+    b.y -= 4;
+  }
 
-<!-- PRINT BUTTON -->
-<button class="print-btn no-print" onclick="window.print()">🖨️ Enregistrer en PDF</button>
+  // ===== REGULARITY =====
+  const breakdownKeys = Object.keys(breakdown);
+  if (breakdownKeys.length > 0) {
+    b.drawSectionTitle("📊", "Régularité Détaillée");
+    for (const key of breakdownKeys) {
+      const val = breakdown[key];
+      b.drawScoreBar(val.label || key, val.score || 0, val.detail || val.status || "");
+    }
+  }
 
-<script>window.onload = function() { setTimeout(function() { window.print(); }, 800); };</script>
+  // ===== PERSONA =====
+  if (persona.niche_principale || persona.forces?.length || persona.faiblesses?.length) {
+    b.drawSectionTitle("🎯", "Persona Identifié");
+    
+    if (persona.niche_principale) {
+      b.drawText(`Niche : ${persona.niche_principale}`, { font: fontBold, size: 10 });
+      b.y -= 4;
+    }
 
-</body>
-</html>`;
+    if (persona.forces?.length) {
+      b.drawText("Forces", { font: fontBold, size: 10 });
+      for (const f of persona.forces) {
+        b.drawText(`  ✓  ${f}`, { size: 9, color: GRAY });
+      }
+      b.y -= 4;
+    }
+
+    if (persona.faiblesses?.length) {
+      b.drawText("Points d'amélioration", { font: fontBold, size: 10 });
+      for (const f of persona.faiblesses) {
+        b.drawText(`  !  ${f}`, { size: 9, color: GRAY });
+      }
+      b.y -= 4;
+    }
+  }
+
+  // ===== AI INSIGHTS =====
+  if (account.ai_insights) {
+    b.drawSectionTitle("🤖", "Analyse Détaillée (IA)");
+    
+    const lines = account.ai_insights.split("\n");
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed) { b.y -= 6; continue; }
+
+      if (trimmed.startsWith("### ")) {
+        b.y -= 4;
+        b.drawText(trimmed.slice(4).replace(/\*\*/g, ""), { font: fontBold, size: 11, color: BLACK });
+      } else if (trimmed.startsWith("## ")) {
+        b.y -= 6;
+        b.drawText(trimmed.slice(3).replace(/\*\*/g, ""), { font: fontBold, size: 12, color: GOLD });
+      } else if (trimmed.startsWith("# ")) {
+        b.y -= 8;
+        b.drawText(trimmed.slice(2).replace(/\*\*/g, ""), { font: fontBold, size: 14, color: BLACK });
+      } else if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+        b.drawText(`  •  ${trimmed.slice(2).replace(/\*\*/g, "")}`, { size: 9, color: GRAY });
+      } else if (/^\d+\.\s+/.test(trimmed)) {
+        b.drawText(`  ${trimmed.replace(/\*\*/g, "")}`, { size: 9, color: GRAY });
+      } else {
+        // Check for bold segments — render entire line, stripping ** for pdf-lib
+        const hasBold = /\*\*(.+?)\*\*/.test(trimmed);
+        if (hasBold) {
+          b.drawText(trimmed.replace(/\*\*/g, ""), { size: 9, color: BLACK });
+        } else {
+          b.drawText(trimmed, { size: 9, color: GRAY });
+        }
+      }
+    }
+  }
+
+  // Final footer
+  b.addFooter();
+
+  return await doc.save();
+}
+
+// Encode Uint8Array to base64
+function uint8ToBase64(bytes: Uint8Array): string {
+  let binary = "";
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
 }
 
 serve(async (req) => {
@@ -341,13 +455,15 @@ serve(async (req) => {
       throw new Error("Paiement non confirmé");
     }
 
-    const htmlContent = generateReport(username, data);
+    const pdfBytes = await generatePdf(username, data);
+    const pdfBase64 = uint8ToBase64(pdfBytes);
 
-    return new Response(JSON.stringify({ html: htmlContent }), {
+    return new Response(JSON.stringify({ pdf_base64: pdfBase64 }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error) {
+    console.error("PDF generation error:", error);
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,

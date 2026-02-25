@@ -127,6 +127,12 @@ export default function AnalyseExpressResult() {
     const element = document.getElementById("pdf-report-template");
     if (!element) return;
     setPdfLoading(true);
+
+    // Rendre visible temporairement pour html2canvas
+    element.style.visibility = "visible";
+    element.style.height = "auto";
+    element.style.overflow = "visible";
+
     try {
       await (html2pdf() as any).set({
         margin: [10, 10, 10, 10],
@@ -140,6 +146,10 @@ export default function AnalyseExpressResult() {
     } catch (err: any) {
       toast.error(err.message || "Erreur lors du téléchargement");
     } finally {
+      // Recacher
+      element.style.visibility = "hidden";
+      element.style.height = "0";
+      element.style.overflow = "hidden";
       setPdfLoading(false);
     }
   };

@@ -1,49 +1,69 @@
 
 
-## Diagnostic
+## Plan : Afficher toutes les données API et rendre le markdown
 
-L'erreur React #31 dit : **"Objects are not valid as a React child (object with keys {label, score, status})"**.
+L'API retourne beaucoup de données qui ne sont pas affichées actuellement. Voici ce qui manque et comment l'ajouter.
 
-La cause est claire : l'API retourne `health_score.components.engagement` comme un **objet** `{ label, score, status }`, pas un simple nombre. Le code passe cet objet directement à `ScoreBar` qui attend un `number` pour `score`.
+### Données manquantes à afficher
 
-Exemple de la réponse API :
-```json
-"engagement": { "label": "Bon (>5%)", "score": 70, "status": "good" }
-```
+| Donnée | Source dans l'API | Actuellement affiché |
+|--------|-------------------|---------------------|
+| Avatar + display_name + bio | `data.account.avatar_url`, `display_name`, `bio` | Non |
+| Niche détectée | `data.account.detected_niche` | Non |
+| Verified badge | `data.account.verified` | Non |
+| Métriques médianes (vues, likes, comments, saves, shares) | `data.account.median_*` | Non |
+| Moyennes détaillées (likes, comments, saves, shares) | `data.account.avg_*` | Non |
+| Top hashtags | `data.account.top_hashtags` | Non |
+| AI Insights (markdown complet) | `data.account.ai_insights` | Non |
+| Health score labels + status | `healthComponents.*.label`, `*.status` | Non |
+| Priority actions | `data.health_score.priority_actions` | Non |
+| Overall status | `data.health_score.overall_status` | Non |
+| Meilleurs horaires (depuis persona) | `data.persona.style_contenu.publication_pattern.best_times` | Non |
+| Recommendations de publication | `data.persona.style_contenu.publication_pattern.recommendations` | Non |
+| Consistency score | `data.persona.style_contenu.publication_pattern.consistency_score` | Non |
+| Regularity breakdown | `data.persona.style_contenu.publication_pattern.regularity_details.tiktok_breakdown` | Non |
+| Publication frequency | `data.persona.style_contenu.publication_pattern.publication_frequency` | Non |
 
-Le code actuel (ligne 247) :
-```tsx
-<ScoreBar score={healthComponents.engagement} />  // ← passe l'objet entier
-```
+### Modifications dans `src/pages/AnalyseExpressResult.tsx`
 
-Il faut passer `.score` :
-```tsx
-<ScoreBar score={healthComponents.engagement.score} />
-```
+**1. Profil header avec avatar**
+- Ajouter en haut des résultats : avatar circulaire, display_name, bio, niche détectée, badge vérifié
 
-Deuxième problème : `data.metrics` contient des zéros (engagement_rate: 0, avg_views: 0). Les vraies métriques sont dans `data.account` (engagement_rate: 5.93, avg_views: 8037). Il faut lire depuis `data.account` en priorité.
+**2. Grille de métriques étendue**
+- Ajouter : avg_likes, avg_comments, avg_saves, avg_shares, median_views, median_likes
+- Organiser en 2 grilles : "Moyennes" et "Médianes"
 
----
+**3. Labels dans les ScoreBars**
+- Afficher le `label` (ex: "Bon (>5%)") et le `status` à côté de chaque barre de score
 
-## Corrections
+**4. Priority actions + overall status**
+- Ajouter sous le health score global
 
-### Fichier : `src/pages/AnalyseExpressResult.tsx`
+**5. Top Hashtags**
+- Afficher les hashtags sous forme de badges/chips
 
-**1. ScoreBar — extraire `.score` de chaque composant (lignes 246-260)**
+**6. Meilleurs horaires de publication**
+- Afficher les top 5 créneaux depuis `persona.style_contenu.publication_pattern.best_times` avec jour + heure traduits en français
 
-Changer :
-- `healthComponents.engagement` → `healthComponents.engagement.score`
-- `healthComponents.consistency` → `healthComponents.consistency.score`
-- `healthComponents.content_quality` → `healthComponents.content_quality.score`
-- `healthComponents.growth_potential` → `healthComponents.growth_potential.score`
-- `healthComponents.technical_seo` → `healthComponents.technical_seo.score`
+**7. Régularité détaillée**
+- Afficher le `tiktok_breakdown` (5 sous-scores avec détails)
+- Afficher les `recommendations` de publication
 
-**2. Métriques — lire depuis `data.account` au lieu de `data.metrics` (lignes 279-284)**
+**8. AI Insights — rendu markdown**
+- Parser le markdown `data.account.ai_insights` et le rendre en HTML stylé
+- Utiliser une fonction simple de rendu markdown (pas de lib externe) : convertir `#`, `##`, `###`, `**`, `-`, `\n` en éléments HTML/JSX
+- Afficher dans une section collapsible "Analyse détaillée" pour ne pas surcharger la page
 
-- Engagement rate : `data.account.engagement_rate` au lieu de `data.metrics.engagement_rate`
-- Vues moyennes : `data.account.avg_views` au lieu de `data.metrics.avg_views`
+### Fichiers modifiés
 
-**3. Null-check sur viral_potential (ligne 290)**
+| Fichier | Changement |
+|---------|-----------|
+| `src/pages/AnalyseExpressResult.tsx` | Ajout de toutes les sections listées ci-dessus + fonction de rendu markdown simple |
 
-L'API retourne `viral_potential: null`. La condition `!== undefined` laisse passer `null`. Changer en `!= null` (ou `!== undefined && !== null`).
+### Détails techniques
+
+- Fonction `renderMarkdown(md: string)` : convertit le markdown en JSX en splittant par lignes et en détectant les patterns `#`, `##`, `###`, `**text**`, `- item`
+- Les AI Insights seront dans un `Collapsible` (déjà installé) pour garder la page lisible
+- Les jours (0-6) seront traduits : `["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"]`
+- Les heures seront formatées en `HH:00`
 

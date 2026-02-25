@@ -9,6 +9,26 @@ const corsHeaders = {
 
 const DAYS = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
 
+// Sanitize text to remove non-WinAnsi characters (emojis, special Unicode)
+function sanitize(text: string): string {
+  if (!text) return "";
+  // Replace common special chars with ASCII equivalents
+  let s = text
+    .replace(/—/g, "-")
+    .replace(/–/g, "-")
+    .replace(/'/g, "'")
+    .replace(/'/g, "'")
+    .replace(/"/g, '"')
+    .replace(/"/g, '"')
+    .replace(/•/g, "-")
+    .replace(/·/g, "-")
+    .replace(/✓/g, "v")
+    .replace(/…/g, "...");
+  // Strip any remaining non-WinAnsi characters (keep basic Latin + Latin-1 Supplement)
+  s = s.replace(/[^\x00-\xFF]/g, "");
+  return s;
+}
+
 const GOLD = rgb(0.769, 0.639, 0.29);
 const BLACK = rgb(0.059, 0.059, 0.059);
 const GRAY = rgb(0.451, 0.451, 0.451);
@@ -20,7 +40,7 @@ const ORANGE = rgb(0.976, 0.451, 0.086);
 const RED = rgb(0.937, 0.267, 0.267);
 
 function formatNumber(n: number): string {
-  if (n == null) return "—";
+  if (n == null) return "-";
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
   return String(Math.round(n * 100) / 100);
@@ -115,12 +135,11 @@ class PdfBuilder {
     }
   }
 
-  drawSectionTitle(icon: string, title: string) {
+  drawSectionTitle(title: string) {
     this.ensureSpace(35);
     this.y -= 12;
-    // Gold line
     this.page.drawLine({ start: { x: this.marginLeft, y: this.y - 2 }, end: { x: this.pageWidth - this.marginRight, y: this.y - 2 }, color: GOLD, thickness: 1.5 });
-    this.page.drawText(`${icon}  ${title}`, { x: this.marginLeft, y: this.y + 5, size: 14, font: this.fontBold, color: BLACK });
+    this.page.drawText(title, { x: this.marginLeft, y: this.y + 5, size: 14, font: this.fontBold, color: BLACK });
     this.y -= 22;
   }
 
@@ -131,7 +150,7 @@ class PdfBuilder {
     
     // Label
     this.page.drawText(label, { x: this.marginLeft, y: barY, size: 10, font: this.fontBold, color: BLACK });
-    const scoreText = `${score}/100 · ${getScoreLabel(score)}`;
+    const scoreText = `${score}/100 - ${getScoreLabel(score)}`;
     const scoreTextWidth = this.fontBold.widthOfTextAtSize(scoreText, 10);
     this.page.drawText(scoreText, { x: this.pageWidth - this.marginRight - scoreTextWidth, y: barY, size: 10, font: this.fontBold, color });
     
@@ -194,25 +213,26 @@ async function generatePdf(username: string, data: any): Promise<Uint8Array> {
   b.page.drawText(displayName, { x: b.marginLeft, y: b.y, size: 16, font: fontBold, color: BLACK });
   if (account.verified) {
     const nameW = fontBold.widthOfTextAtSize(displayName, 16);
-    b.page.drawText(" ✓", { x: b.marginLeft + nameW + 4, y: b.y, size: 14, font: fontBold, color: GOLD });
+    b.page.drawText(" [v]", { x: b.marginLeft + nameW + 4, y: b.y, size: 14, font: fontBold, color: GOLD });
   }
   b.y -= 16;
   b.page.drawText(`@${username}`, { x: b.marginLeft, y: b.y, size: 10, font: fontRegular, color: GRAY });
   b.y -= 14;
 
   if (account.bio) {
-    b.drawText(account.bio, { size: 9, color: GRAY, maxWidth: b.contentWidth * 0.8 });
+    b.drawText(sanitize(account.bio), { size: 9, color: GRAY, maxWidth: b.contentWidth * 0.8 });
   }
   if (account.detected_niche) {
     b.ensureSpace(16);
-    b.page.drawRectangle({ x: b.marginLeft, y: b.y - 4, width: fontBold.widthOfTextAtSize(account.detected_niche, 9) + 16, height: 16, color: GOLD });
-    b.page.drawText(account.detected_niche, { x: b.marginLeft + 8, y: b.y, size: 9, font: fontBold, color: WHITE });
+    const nicheText = sanitize(account.detected_niche);
+    b.page.drawRectangle({ x: b.marginLeft, y: b.y - 4, width: fontBold.widthOfTextAtSize(nicheText, 9) + 16, height: 16, color: GOLD });
+    b.page.drawText(nicheText, { x: b.marginLeft + 8, y: b.y, size: 9, font: fontBold, color: WHITE });
     b.y -= 22;
   }
 
   // ===== HEALTH SCORE =====
   if (healthScore?.total_score != null) {
-    b.drawSectionTitle("💊", "Score de Santé");
+    b.drawSectionTitle("Score de Sante");
     
     b.ensureSpace(40);
     const score = healthScore.total_score;
@@ -222,7 +242,7 @@ async function generatePdf(username: string, data: any): Promise<Uint8Array> {
     b.page.drawText(labelText, { x: b.marginLeft + 100, y: b.y + 4, size: 14, font: fontBold, color: scoreColor });
     b.y -= 16;
     if (healthScore.overall_status) {
-      b.drawText(healthScore.overall_status, { size: 9, color: GRAY });
+      b.drawText(sanitize(healthScore.overall_status), { size: 9, color: GRAY });
     }
     b.y -= 8;
 
@@ -230,7 +250,7 @@ async function generatePdf(username: string, data: any): Promise<Uint8Array> {
     const componentKeys = Object.keys(healthScore.components || {});
     for (const k of componentKeys) {
       const c = healthScore.components[k];
-      b.drawScoreBar(c.label || k, c.score || 0, c.status || "");
+      b.drawScoreBar(sanitize(c.label || k), c.score || 0, sanitize(c.status || ""));
     }
 
     // Priority actions
@@ -238,14 +258,14 @@ async function generatePdf(username: string, data: any): Promise<Uint8Array> {
       b.ensureSpace(20);
       b.drawText("Actions prioritaires :", { font: fontBold, size: 10 });
       for (const action of healthScore.priority_actions) {
-        b.drawText(`  •  ${action}`, { size: 9, color: GRAY });
+        b.drawText(`  -  ${sanitize(action)}`, { size: 9, color: GRAY });
       }
       b.y -= 4;
     }
   }
 
   // ===== METRICS =====
-  b.drawSectionTitle("📈", "Métriques Clés");
+  b.drawSectionTitle("Metriques Cles");
   
   // Main metrics row (4 boxes)
   const boxH = 48;
@@ -304,7 +324,7 @@ async function generatePdf(username: string, data: any): Promise<Uint8Array> {
 
   // ===== HASHTAGS =====
   if (account.top_hashtags?.length) {
-    b.drawSectionTitle("#", "Top Hashtags");
+    b.drawSectionTitle("Top Hashtags");
     const tags = account.top_hashtags.map((h: any) => {
       const tag = typeof h === "string" ? h : h.tag || h.name;
       const count = typeof h === "object" ? h.count : null;
@@ -317,7 +337,7 @@ async function generatePdf(username: string, data: any): Promise<Uint8Array> {
 
   // ===== BEST TIMES =====
   if (pubPattern.best_times?.length) {
-    b.drawSectionTitle("🕐", "Meilleurs Créneaux de Publication");
+    b.drawSectionTitle("Meilleurs Creneaux de Publication");
 
     if (pubPattern.publication_frequency?.weekly_pattern) {
       b.drawText(`Fréquence : ${pubPattern.publication_frequency.weekly_pattern}`, { size: 9, color: GRAY });
@@ -345,7 +365,7 @@ async function generatePdf(username: string, data: any): Promise<Uint8Array> {
       b.y -= 4;
       b.drawText("Recommandations :", { font: fontBold, size: 10 });
       for (const r of pubPattern.recommendations) {
-        b.drawText(`  •  ${r}`, { size: 9, color: GRAY });
+        b.drawText(`  -  ${sanitize(r)}`, { size: 9, color: GRAY });
       }
     }
     b.y -= 4;
@@ -354,26 +374,26 @@ async function generatePdf(username: string, data: any): Promise<Uint8Array> {
   // ===== REGULARITY =====
   const breakdownKeys = Object.keys(breakdown);
   if (breakdownKeys.length > 0) {
-    b.drawSectionTitle("📊", "Régularité Détaillée");
+    b.drawSectionTitle("Regularite Detaillee");
     for (const key of breakdownKeys) {
       const val = breakdown[key];
-      b.drawScoreBar(val.label || key, val.score || 0, val.detail || val.status || "");
+      b.drawScoreBar(sanitize(val.label || key), val.score || 0, sanitize(val.detail || val.status || ""));
     }
   }
 
   // ===== PERSONA =====
   if (persona.niche_principale || persona.forces?.length || persona.faiblesses?.length) {
-    b.drawSectionTitle("🎯", "Persona Identifié");
+    b.drawSectionTitle("Persona Identifie");
     
     if (persona.niche_principale) {
-      b.drawText(`Niche : ${persona.niche_principale}`, { font: fontBold, size: 10 });
+      b.drawText(`Niche : ${sanitize(persona.niche_principale)}`, { font: fontBold, size: 10 });
       b.y -= 4;
     }
 
     if (persona.forces?.length) {
       b.drawText("Forces", { font: fontBold, size: 10 });
       for (const f of persona.forces) {
-        b.drawText(`  ✓  ${f}`, { size: 9, color: GRAY });
+        b.drawText(`  v  ${sanitize(f)}`, { size: 9, color: GRAY });
       }
       b.y -= 4;
     }
@@ -381,7 +401,7 @@ async function generatePdf(username: string, data: any): Promise<Uint8Array> {
     if (persona.faiblesses?.length) {
       b.drawText("Points d'amélioration", { font: fontBold, size: 10 });
       for (const f of persona.faiblesses) {
-        b.drawText(`  !  ${f}`, { size: 9, color: GRAY });
+        b.drawText(`  !  ${sanitize(f)}`, { size: 9, color: GRAY });
       }
       b.y -= 4;
     }
@@ -389,7 +409,7 @@ async function generatePdf(username: string, data: any): Promise<Uint8Array> {
 
   // ===== AI INSIGHTS =====
   if (account.ai_insights) {
-    b.drawSectionTitle("🤖", "Analyse Détaillée (IA)");
+    b.drawSectionTitle("Analyse Detaillee (IA)");
     
     const lines = account.ai_insights.split("\n");
     for (const line of lines) {
@@ -398,24 +418,24 @@ async function generatePdf(username: string, data: any): Promise<Uint8Array> {
 
       if (trimmed.startsWith("### ")) {
         b.y -= 4;
-        b.drawText(trimmed.slice(4).replace(/\*\*/g, ""), { font: fontBold, size: 11, color: BLACK });
+        b.drawText(sanitize(trimmed.slice(4).replace(/\*\*/g, "")), { font: fontBold, size: 11, color: BLACK });
       } else if (trimmed.startsWith("## ")) {
         b.y -= 6;
-        b.drawText(trimmed.slice(3).replace(/\*\*/g, ""), { font: fontBold, size: 12, color: GOLD });
+        b.drawText(sanitize(trimmed.slice(3).replace(/\*\*/g, "")), { font: fontBold, size: 12, color: GOLD });
       } else if (trimmed.startsWith("# ")) {
         b.y -= 8;
-        b.drawText(trimmed.slice(2).replace(/\*\*/g, ""), { font: fontBold, size: 14, color: BLACK });
+        b.drawText(sanitize(trimmed.slice(2).replace(/\*\*/g, "")), { font: fontBold, size: 14, color: BLACK });
       } else if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
-        b.drawText(`  •  ${trimmed.slice(2).replace(/\*\*/g, "")}`, { size: 9, color: GRAY });
+        b.drawText(`  -  ${sanitize(trimmed.slice(2).replace(/\*\*/g, ""))}`, { size: 9, color: GRAY });
       } else if (/^\d+\.\s+/.test(trimmed)) {
-        b.drawText(`  ${trimmed.replace(/\*\*/g, "")}`, { size: 9, color: GRAY });
+        b.drawText(`  ${sanitize(trimmed.replace(/\*\*/g, ""))}`, { size: 9, color: GRAY });
       } else {
         // Check for bold segments — render entire line, stripping ** for pdf-lib
         const hasBold = /\*\*(.+?)\*\*/.test(trimmed);
         if (hasBold) {
-          b.drawText(trimmed.replace(/\*\*/g, ""), { size: 9, color: BLACK });
+          b.drawText(sanitize(trimmed.replace(/\*\*/g, "")), { size: 9, color: BLACK });
         } else {
-          b.drawText(trimmed, { size: 9, color: GRAY });
+          b.drawText(sanitize(trimmed), { size: 9, color: GRAY });
         }
       }
     }

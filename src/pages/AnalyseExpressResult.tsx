@@ -19,7 +19,8 @@ import { HashtagsSection } from "@/components/express-result/HashtagsSection";
 import { BestTimesSection } from "@/components/express-result/BestTimesSection";
 import { RegularityBreakdown } from "@/components/express-result/RegularityBreakdown";
 import { MarkdownRenderer } from "@/components/express-result/MarkdownRenderer";
-import { PdfReportTemplate } from "@/components/express-result/PdfReportTemplate";
+import { mapAccountDataForPDF } from "@/lib/pdf-data-mapper";
+import { generateCompletePDFHTML } from "@/lib/pdf-html-generator";
 
 const POLL_INTERVAL = 5000;
 const MAX_POLL_DURATION = 600_000;
@@ -123,53 +124,37 @@ export default function AnalyseExpressResult() {
   };
 
   const handleDownloadPdf = async () => {
-    if (!username) return;
-    const element = document.getElementById("pdf-report-template");
-    if (!element) return;
+    if (!username || !data?.account) return;
     setPdfLoading(true);
-
-    // Sauvegarder les styles originaux
-    const orig = {
-      visibility: element.style.visibility,
-      height: element.style.height,
-      overflow: element.style.overflow,
-      zIndex: element.style.zIndex,
-      pointerEvents: element.style.pointerEvents,
-    };
-
-    // Rendre visible pour html2canvas
-    element.style.visibility = "visible";
-    element.style.height = "auto";
-    element.style.overflow = "visible";
-    element.style.zIndex = "99999";
-    element.style.pointerEvents = "none";
-
-    // Attendre le repaint du navigateur
-    await new Promise<void>((resolve) => {
-      requestAnimationFrame(() => {
-        setTimeout(resolve, 150);
-      });
-    });
-
     try {
+      const pdfData = mapAccountDataForPDF(data.account);
+      const htmlContent = generateCompletePDFHTML(
+        pdfData,
+        data.account.ai_insights || "",
+        data.account.recent_videos || []
+      );
+
+      // Élément détaché — pas dans le DOM visible
+      const element = document.createElement("div");
+      element.innerHTML = htmlContent;
+
       await (html2pdf() as any).set({
-        margin: [10, 10, 10, 10],
+        margin: [10, 0, 10, 0],
         filename: `analyse-tiktok-${username}.pdf`,
         image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false },
+        html2canvas: { scale: 2, useCORS: true, allowTaint: true },
         jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-        pagebreak: { mode: ["avoid-all", "css", "legacy"] },
+        pagebreak: {
+          mode: ["avoid-all", "css", "legacy"],
+          avoid: [".video-item", ".stat-card", ".stats-grid", ".stats-section",
+                  ".bio-section", ".hashtags-section", ".header", ".hashtags-grid"],
+        },
       }).from(element).save();
+
       toast.success("Rapport PDF téléchargé !");
     } catch (err: any) {
       toast.error(err.message || "Erreur lors du téléchargement");
     } finally {
-      // Restaurer les styles originaux
-      element.style.visibility = orig.visibility;
-      element.style.height = orig.height;
-      element.style.overflow = orig.overflow;
-      element.style.zIndex = orig.zIndex;
-      element.style.pointerEvents = orig.pointerEvents;
       setPdfLoading(false);
     }
   };
@@ -315,9 +300,6 @@ export default function AnalyseExpressResult() {
                   </div>
                 </Collapsible>
               )}
-
-              {/* Hidden PDF template */}
-              <PdfReportTemplate data={data} username={username} />
 
               {/* Download */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">

@@ -143,7 +143,7 @@ export default function Home() {
           </h1>
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-            J'aide les créateurs et entrepreneurs à passer de "je poste au hasard" à "chaque vidéo a un objectif". Diagnostic, stratégie, plan d'action.
+            Clarifie ta stratégie TikTok. Augmente ta visibilité.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{ animationDelay: "0.2s" }}>

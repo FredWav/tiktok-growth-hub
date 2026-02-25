@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { Download, Loader2, AlertCircle, BarChart3, TrendingUp, Users, Heart, RefreshCw } from "lucide-react";
+import { Download, Loader2, AlertCircle, BarChart3, TrendingUp, Users, Heart, RefreshCw, Clock, Zap, Eye, Star, Shield, Target } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
@@ -20,7 +20,6 @@ export default function AnalyseExpressResult() {
   const [username, setUsername] = useState<string>("");
   const [pdfLoading, setPdfLoading] = useState(false);
 
-  // Persist session_id
   useEffect(() => {
     if (sessionId) {
       localStorage.setItem("express_session_id", sessionId);
@@ -72,7 +71,6 @@ export default function AnalyseExpressResult() {
         throw new Error(result?.error || fnError?.message || "Erreur lors de la génération du PDF");
       }
 
-      // Download HTML as file
       const blob = new Blob([result.html], { type: "text/html" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -91,11 +89,19 @@ export default function AnalyseExpressResult() {
     }
   };
 
-  const healthScore = data?.health_score;
+  const healthScore = data?.health_score?.total;
+  const healthComponents = data?.health_score?.components;
+
   const getScoreColor = (score: number) => {
     if (score >= 70) return "text-green-500";
     if (score >= 40) return "text-yellow-500";
     return "text-red-500";
+  };
+
+  const getProgressColor = (score: number) => {
+    if (score >= 70) return "bg-green-500";
+    if (score >= 40) return "bg-yellow-500";
+    return "bg-red-500";
   };
 
   return (
@@ -165,42 +171,130 @@ export default function AnalyseExpressResult() {
                 </div>
               )}
 
+              {/* Health Score Components */}
+              {healthComponents && (
+                <div className="bg-card border border-border rounded-xl p-6">
+                  <h3 className="font-semibold mb-4">Détail du score</h3>
+                  <div className="space-y-3">
+                    {healthComponents.engagement !== undefined && (
+                      <ScoreBar label="Engagement" score={healthComponents.engagement} icon={Heart} />
+                    )}
+                    {healthComponents.consistency !== undefined && (
+                      <ScoreBar label="Régularité" score={healthComponents.consistency} icon={RefreshCw} />
+                    )}
+                    {healthComponents.content_quality !== undefined && (
+                      <ScoreBar label="Qualité du contenu" score={healthComponents.content_quality} icon={Star} />
+                    )}
+                    {healthComponents.growth_potential !== undefined && (
+                      <ScoreBar label="Potentiel de croissance" score={healthComponents.growth_potential} icon={TrendingUp} />
+                    )}
+                    {healthComponents.technical_seo !== undefined && (
+                      <ScoreBar label="SEO technique" score={healthComponents.technical_seo} icon={Shield} />
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Metrics grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {data.followers !== undefined && (
-                  <MetricCard icon={Users} label="Abonnés" value={formatNumber(data.followers)} />
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {data.account?.follower_count !== undefined && (
+                  <MetricCard icon={Users} label="Abonnés" value={formatNumber(data.account.follower_count)} />
                 )}
-                {data.following !== undefined && (
-                  <MetricCard icon={Heart} label="Abonnements" value={formatNumber(data.following)} />
+                {data.account?.following_count !== undefined && (
+                  <MetricCard icon={Heart} label="Abonnements" value={formatNumber(data.account.following_count)} />
                 )}
-                {data.total_likes !== undefined && (
-                  <MetricCard icon={Heart} label="Likes totaux" value={formatNumber(data.total_likes)} />
+                {data.account?.like_count !== undefined && (
+                  <MetricCard icon={Heart} label="Likes totaux" value={formatNumber(data.account.like_count)} />
                 )}
-                {data.total_videos !== undefined && (
-                  <MetricCard icon={BarChart3} label="Vidéos" value={formatNumber(data.total_videos)} />
+                {data.account?.video_count !== undefined && (
+                  <MetricCard icon={BarChart3} label="Vidéos" value={formatNumber(data.account.video_count)} />
                 )}
-                {data.engagement_rate !== undefined && (
-                  <MetricCard icon={TrendingUp} label="Engagement" value={`${data.engagement_rate}%`} />
+                {data.metrics?.engagement_rate !== undefined && (
+                  <MetricCard icon={TrendingUp} label="Engagement" value={`${data.metrics.engagement_rate}%`} />
                 )}
-                {data.avg_views !== undefined && (
-                  <MetricCard icon={BarChart3} label="Vues moy." value={formatNumber(data.avg_views)} />
+                {data.metrics?.avg_views !== undefined && (
+                  <MetricCard icon={Eye} label="Vues moy." value={formatNumber(data.metrics.avg_views)} />
                 )}
               </div>
 
-              {/* Persona / Bio */}
+              {/* Analysis insights */}
+              {data.analysis && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {data.analysis.viral_potential !== undefined && (
+                    <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
+                      <Zap className="h-5 w-5 text-primary shrink-0" />
+                      <div>
+                        <div className="text-xs text-muted-foreground">Potentiel viral</div>
+                        <div className="font-semibold">{data.analysis.viral_potential}/10</div>
+                      </div>
+                    </div>
+                  )}
+                  {data.analysis.optimal_duration && (
+                    <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
+                      <Clock className="h-5 w-5 text-primary shrink-0" />
+                      <div>
+                        <div className="text-xs text-muted-foreground">Durée optimale</div>
+                        <div className="font-semibold">{data.analysis.optimal_duration}</div>
+                      </div>
+                    </div>
+                  )}
+                  {data.analysis.best_posting_times && data.analysis.best_posting_times.length > 0 && (
+                    <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-3 md:col-span-2">
+                      <Clock className="h-5 w-5 text-primary shrink-0" />
+                      <div>
+                        <div className="text-xs text-muted-foreground">Meilleurs horaires</div>
+                        <div className="font-semibold">{data.analysis.best_posting_times.join(", ")}</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Persona */}
               {data.persona && (
-                <div className="bg-card border border-border rounded-xl p-6">
-                  <h3 className="font-semibold mb-3">Persona identifié</h3>
-                  <p className="text-muted-foreground">{data.persona}</p>
+                <div className="bg-card border border-border rounded-xl p-6 space-y-4">
+                  <h3 className="font-semibold flex items-center gap-2">
+                    <Target className="h-5 w-5 text-primary" />
+                    Persona identifié
+                  </h3>
+                  {data.persona.niche_principale && (
+                    <p className="text-muted-foreground">
+                      <span className="font-medium text-foreground">Niche :</span> {data.persona.niche_principale}
+                    </p>
+                  )}
+                  {data.persona.forces && data.persona.forces.length > 0 && (
+                    <div>
+                      <span className="font-medium text-sm">Forces</span>
+                      <ul className="mt-1 space-y-1">
+                        {data.persona.forces.map((f: string, i: number) => (
+                          <li key={i} className="flex gap-2 text-muted-foreground text-sm">
+                            <span className="text-green-500 font-bold">✓</span> {f}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {data.persona.faiblesses && data.persona.faiblesses.length > 0 && (
+                    <div>
+                      <span className="font-medium text-sm">Points d'amélioration</span>
+                      <ul className="mt-1 space-y-1">
+                        {data.persona.faiblesses.map((f: string, i: number) => (
+                          <li key={i} className="flex gap-2 text-muted-foreground text-sm">
+                            <span className="text-yellow-500 font-bold">!</span> {f}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               )}
 
               {/* Recommendations */}
-              {data.recommendations && data.recommendations.length > 0 && (
+              {data.persona?.recommandations && data.persona.recommandations.length > 0 && (
                 <div className="bg-card border border-border rounded-xl p-6">
                   <h3 className="font-semibold mb-3">Recommandations</h3>
                   <ul className="space-y-2">
-                    {data.recommendations.map((rec: string, i: number) => (
+                    {data.persona.recommandations.map((rec: string, i: number) => (
                       <li key={i} className="flex gap-2 text-muted-foreground">
                         <span className="text-primary font-bold">→</span>
                         {rec}
@@ -229,6 +323,25 @@ export default function AnalyseExpressResult() {
         </div>
       </Section>
     </Layout>
+  );
+}
+
+function ScoreBar({ label, score, icon: Icon }: { label: string; score: number; icon: any }) {
+  const getColor = (s: number) => {
+    if (s >= 70) return "bg-green-500";
+    if (s >= 40) return "bg-yellow-500";
+    return "bg-red-500";
+  };
+
+  return (
+    <div className="flex items-center gap-3">
+      <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
+      <span className="text-sm w-40 shrink-0">{label}</span>
+      <div className="flex-1 bg-muted rounded-full h-2 overflow-hidden">
+        <div className={`h-full rounded-full ${getColor(score)}`} style={{ width: `${score}%` }} />
+      </div>
+      <span className="text-sm font-medium w-10 text-right">{score}</span>
+    </div>
   );
 }
 

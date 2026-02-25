@@ -1,23 +1,34 @@
 
 
-## Plan : Mettre à jour la clé Stripe vers le mode test
+## Plan: Modal de confirmation du nom d'utilisateur avant paiement
 
 ### Contexte
-Le projet utilise actuellement une clé Stripe **live** (`sk_live_`). Tu souhaites passer en mode **test** (`sk_test_`).
+Quand l'utilisateur clique sur "Lancer l'analyse", on affiche un modal de confirmation pour s'assurer qu'il a bien entré son **nom d'utilisateur** (le @) et non son **pseudo/nom d'affichage**.
 
 ### Ce qui sera fait
-1. **Mise à jour du secret `STRIPE_SECRET_KEY`** — Je vais te demander de saisir ta clé secrète Stripe de test (commençant par `sk_test_...`) via l'outil sécurisé de gestion des secrets.
 
-2. **Mise à jour des Price IDs** — Les Price IDs live ne fonctionnent pas avec une clé test. Tu devras me fournir les Price IDs de test correspondants (depuis ton Dashboard Stripe en mode Test) pour :
-   - Analyse Express (actuellement `price_1T4jWYBfuzQl0PTi49WCSZBy`)
-   - One Shot (actuellement `price_1T43v7BfuzQl0PTiIP3fmwFh`)
-   - VIP 3/6/12 mois (actuellement `price_1T43vg...`, `price_1T43w4...`, `price_1T43wE...`)
+**Fichier modifié : `src/pages/AnalyseExpress.tsx`**
 
-3. **Fichiers impactés** (après réception des Price IDs test) :
-   - `supabase/functions/create-express-checkout/index.ts`
-   - `supabase/functions/create-oneshot-checkout/index.ts`
-   - `supabase/functions/create-vip-checkout/index.ts`
+1. Ajouter un state `showConfirmModal` (boolean)
+2. Au `handleSubmit`, au lieu de lancer directement le paiement Stripe, ouvrir le modal
+3. Le modal contiendra :
+   - Un titre explicatif : "Vérifie ton nom d'utilisateur"
+   - L'image uploadée (screenshot TikTok) copiée dans `src/assets/` comme référence visuelle, avec une flèche/encadré montrant où se trouve le @username sur TikTok
+   - Le username saisi affiché en gras avec le @
+   - Un texte : "Attention, entre bien ton **nom d'utilisateur** (le @) et non ton pseudo affiché."
+   - Deux boutons :
+     - "Ha je me suis trompé !" (secondary/outline) → ferme le modal, remet le focus sur l'input
+     - "Je valide" (primary/hero) → lance le paiement Stripe (logique actuelle du `handleSubmit`)
+4. Utiliser le composant `Dialog` existant de shadcn/ui
 
-### Étape immédiate
-Je vais d'abord te demander de saisir ta nouvelle clé `STRIPE_SECRET_KEY` de test.
+**Fichier copié : `user-uploads://image-23.png` → `src/assets/tiktok-username-example.png`**
+
+L'image sera affichée dans le modal comme illustration.
+
+### Détails techniques
+
+- Le `Dialog` sera contrôlé via `open={showConfirmModal}` / `onOpenChange={setShowConfirmModal}`
+- La logique de paiement Stripe sera extraite dans une fonction `proceedToPayment()` appelée uniquement au clic sur "Je valide"
+- Le formulaire `onSubmit` ne fera que valider l'input et ouvrir le modal
+- L'image sera importée via ES6 module (`import tiktokExample from "@/assets/tiktok-username-example.png"`)
 

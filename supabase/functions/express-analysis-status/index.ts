@@ -59,7 +59,7 @@ serve(async (req) => {
     if (job.status === "failed") {
       return new Response(JSON.stringify({
         status: "failed",
-        error: job.result?.error || "L'analyse a échoué",
+        error: job.error || "L'analyse a échoué",
         username,
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

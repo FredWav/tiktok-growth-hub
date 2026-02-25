@@ -31,7 +31,7 @@ export function WavSocialScanPopup() {
         <DialogHeader>
           <DialogTitle className="text-xl">🔍 Tu cherches l'analyse automatique ?</DialogTitle>
           <DialogDescription className="text-base mt-2">
-            Mon outil d'analyse automatique de profil Instagram se trouve sur un site dédié. Rendez-vous sur{" "}
+            Mon outil d'analyse automatique de profil TikTok se trouve sur un site dédié. Rendez-vous sur{" "}
             <a
               href="https://www.wavsocialscan.com"
               target="_blank"

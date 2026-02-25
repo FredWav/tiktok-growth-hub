@@ -1,56 +1,85 @@
 
 
-## Plan : Corriger le bug d'encodage `\n` dans pdf-lib
+## Plan : HTML vers PDF via une API de conversion externe
 
 ### Diagnostic
 
-Le problème n'est **pas** pdf-lib en tant que bibliothèque — c'est la fonction `sanitize()` qui laisse passer les caractères de contrôle comme `\n` (newline, `0x0a`). pdf-lib refuse d'encoder `\n` dans `drawText()` car ce n'est pas un caractère imprimable WinAnsi, ce qui est le comportement correct.
+`pdf-lib` est une bibliothèque de bas niveau qui exige un encodage WinAnsi strict. Chaque caractère spécial (emoji, retour à la ligne, Unicode étendu) doit être manuellement filtré avant chaque appel `drawText`. C'est fragile car les données viennent d'une API externe imprévisible.
 
-Changer de bibliothèque ne résoudrait rien : **aucune** bibliothèque PDF ne peut dessiner un `\n` littéral dans du texte. Le vrai problème est que le texte contient des retours à la ligne qui ne sont pas découpés avant d'être passés à `drawText`.
+### Approche : générer le beau HTML + convertir via une API externe
 
-### Solution (ciblée et définitive)
+La solution la plus fiable est de :
+1. Recréer le template HTML stylisé (le "superbe HTML" d'avant) directement dans l'edge function
+2. Envoyer ce HTML à une API de conversion HTML→PDF (qui utilise un vrai moteur de rendu navigateur côté serveur)
+3. Récupérer le PDF binaire et le retourner au frontend
 
-Corriger `sanitize()` pour gérer les caractères de contrôle, et renforcer `drawText` pour découper les newlines.
+### API recommandée : **html2pdf.app** ou **PDFShift**
+
+Ces services acceptent un HTML complet (avec CSS inline) et retournent un vrai PDF binaire. Le rendu est identique à un navigateur : polices, couleurs, barres de progression, mise en page — tout fonctionne.
+
+| Service | Free tier | Fiabilité |
+|---------|-----------|-----------|
+| html2pdfapi.com | 200 PDF/mois | Haute |
+| pdfshift.io | 50 PDF/mois | Haute |
+
+Le volume d'Analyse Express étant faible, le free tier suffit.
 
 ### Modifications
 
 | Fichier | Changement |
 |---------|-----------|
-| `supabase/functions/express-pdf/index.ts` | Mettre à jour `sanitize()` + `drawText()` pour gérer `\n`, `\r`, `\t` |
+| `supabase/functions/express-pdf/index.ts` | Remplacement complet : générer le HTML stylisé + appeler l'API de conversion + retourner le PDF en base64 |
 
-### Détails
+Le frontend (`AnalyseExpressResult.tsx`) reste inchangé — il reçoit déjà un `pdf_base64` et le télécharge.
 
-**1. `sanitize()` — ajouter le nettoyage des caractères de contrôle :**
+### Détails techniques
+
+**1. Générer le HTML dans l'edge function**
+
+Le template HTML inclura tout le CSS inline (même style doré/noir que le site) :
+- En-tête FredWav avec logo texte + date
+- Profil : display_name, @username, bio, niche badge
+- Health Score : score global + barres de progression CSS
+- Métriques : grilles flexbox avec moyennes et médianes
+- Top Hashtags : badges dorés
+- Meilleurs créneaux : tableau formaté
+- Régularité : barres de progression
+- Persona : forces et faiblesses
+- Analyse IA : texte formaté avec titres, listes, paragraphes
+- Footer : "Généré par FredWav"
+
+Aucune restriction d'encodage — le HTML supporte nativement les emojis, accents, caractères spéciaux.
+
+**2. Appeler l'API de conversion**
+
 ```typescript
-function sanitize(text: string): string {
-  if (!text) return "";
-  let s = text
-    .replace(/\r\n/g, " ")
-    .replace(/\n/g, " ")
-    .replace(/\r/g, " ")
-    .replace(/\t/g, " ")
-    .replace(/—/g, "-")
-    .replace(/–/g, "-")
-    // ... reste identique
-  // Strip control chars (0x00-0x1F sauf espace 0x20) + non-WinAnsi
-  s = s.replace(/[\x00-\x09\x0B-\x1F]/g, "");
-  s = s.replace(/[^\x20-\xFF]/g, "");
-  return s;
-}
+const response = await fetch("https://api.html2pdfapi.com/v1/generate", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${apiKey}`,
+  },
+  body: JSON.stringify({
+    html: htmlString,
+    format: "A4",
+    margin: { top: 20, bottom: 20, left: 20, right: 20 },
+  }),
+});
+const pdfBuffer = await response.arrayBuffer();
 ```
 
-**2. `drawText()` dans PdfBuilder — découper par `\n` avant wrapping :**
+**3. Retourner le PDF**
 
-Le `drawText` actuel appelle `wrapText` directement. Si par sécurité un `\n` arrive malgré `sanitize`, il faut d'abord découper le texte en paragraphes :
-```typescript
-drawText(text: string, opts) {
-  const sanitized = sanitize(text); // double sécurité
-  const paragraphs = sanitized.split(/\n/);
-  for (const para of paragraphs) {
-    // wrapText + drawText existant pour chaque paragraphe
-  }
-}
-```
+Encoder le buffer en base64 et retourner `{ pdf_base64: "..." }` — le frontend existant gère déjà le téléchargement.
 
-Ces deux corrections rendent le PDF bulletproof contre tout caractère problématique, sans changer de bibliothèque.
+### Secret requis
+
+Un nouveau secret `HTML2PDF_API_KEY` devra être ajouté (clé gratuite obtenue en s'inscrivant sur le service choisi).
+
+### Avantages vs pdf-lib
+
+- Zéro problème d'encodage (le HTML gère tout nativement)
+- Rendu identique au navigateur (CSS, fonts, emojis)
+- Code beaucoup plus simple (HTML template vs. coordonnées manuelles)
+- Maintenance facile (modifier le HTML, pas des coordonnées pixel)
 

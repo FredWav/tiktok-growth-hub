@@ -40,7 +40,7 @@ export function WavSocialScanPopup() {
             >
               wavsocialscan.com
             </a>{" "}
-            pour scanner ton profil gratuitement.
+            pour scanner ton profil.
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col sm:flex-row gap-3 mt-2">

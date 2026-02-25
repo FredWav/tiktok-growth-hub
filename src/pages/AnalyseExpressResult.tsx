@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const POLL_INTERVAL = 5000;
-const MAX_POLL_DURATION = 180_000; // 3 minutes
+const MAX_POLL_DURATION = 600_000; // 10 minutes
 
 export default function AnalyseExpressResult() {
   const [searchParams] = useSearchParams();
@@ -167,13 +167,6 @@ export default function AnalyseExpressResult() {
     return "text-red-500";
   };
 
-  const stepLabels: Record<string, string> = {
-    scraping: "Collecte des données du profil…",
-    metrics: "Calcul des métriques…",
-    analysis: "Analyse approfondie…",
-    persona: "Construction du persona…",
-    health_score: "Calcul du score de santé…",
-  };
 
   return (
     <Layout>
@@ -198,7 +191,7 @@ export default function AnalyseExpressResult() {
                 <p className="text-sm font-medium text-primary">{progress}%</p>
                 {currentStep && (
                   <p className="text-sm text-muted-foreground">
-                    {stepLabels[currentStep] || currentStep}
+                    {currentStep}
                   </p>
                 )}
               </div>
@@ -299,7 +292,7 @@ export default function AnalyseExpressResult() {
                       <Zap className="h-5 w-5 text-primary shrink-0" />
                       <div>
                         <div className="text-xs text-muted-foreground">Potentiel viral</div>
-                        <div className="font-semibold">{data.analysis.viral_potential}/10</div>
+                        <div className="font-semibold">{Math.round(data.analysis.viral_potential * 100)}%</div>
                       </div>
                     </div>
                   )}

@@ -5,6 +5,23 @@
 
 import { parseAIInsightsToSections, ParsedSections } from './pdf-markdown-parser';
 
+export interface BestTime {
+  day: number;
+  hour: number;
+  avg_views: number;
+}
+
+export interface RegularityItem {
+  score: number;
+  details: string;
+}
+
+export interface PersonaData {
+  niche_principale?: string;
+  forces?: string[];
+  faiblesses?: string[];
+}
+
 export interface PDFDataFormat {
   platform: string;
   username: string;
@@ -48,6 +65,12 @@ export interface PDFDataFormat {
   health_score?: number;
   shadowban_status?: string;
   niche?: string;
+  best_times?: BestTime[];
+  regularity_breakdown?: Record<string, RegularityItem>;
+  consistency_score?: number;
+  publication_frequency?: { daily_avg?: number; weekly_pattern?: string };
+  recommendations?: string[];
+  persona?: PersonaData;
 }
 
 function cleanUsername(username: string | null | undefined): string {
@@ -97,7 +120,11 @@ function extractShadowbanStatus(accountData: any): string {
   return analysis.diagnosis || 'Statut inconnu';
 }
 
-export function mapAccountDataForPDF(accountData: any): PDFDataFormat {
+export function mapAccountDataForPDF(
+  accountData: any,
+  persona?: any,
+  pubPattern?: any
+): PDFDataFormat {
   const parsedSections = parseAIInsightsToSections(accountData.ai_insights || '');
   const popularHashtags = extractPopularHashtags(accountData);
   const totalLikes = accountData.like_count || 
@@ -147,6 +174,16 @@ export function mapAccountDataForPDF(accountData: any): PDFDataFormat {
     sections: parsedSections,
     health_score: extractHealthScore(accountData),
     shadowban_status: extractShadowbanStatus(accountData),
-    niche: accountData.detected_niche || accountData.niche || undefined
+    niche: accountData.detected_niche || accountData.niche || undefined,
+    best_times: pubPattern?.best_times || [],
+    regularity_breakdown: pubPattern?.regularity_details?.tiktok_breakdown || undefined,
+    consistency_score: pubPattern?.consistency_score,
+    publication_frequency: pubPattern?.publication_frequency,
+    recommendations: pubPattern?.recommendations || [],
+    persona: persona ? {
+      niche_principale: persona.niche_principale,
+      forces: persona.forces,
+      faiblesses: persona.faiblesses,
+    } : undefined,
   };
 }

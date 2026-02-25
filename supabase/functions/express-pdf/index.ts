@@ -12,8 +12,11 @@ const DAYS = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Sa
 // Sanitize text to remove non-WinAnsi characters (emojis, special Unicode)
 function sanitize(text: string): string {
   if (!text) return "";
-  // Replace common special chars with ASCII equivalents
   let s = text
+    .replace(/\r\n/g, " ")
+    .replace(/\n/g, " ")
+    .replace(/\r/g, " ")
+    .replace(/\t/g, " ")
     .replace(/—/g, "-")
     .replace(/–/g, "-")
     .replace(/'/g, "'")
@@ -24,8 +27,10 @@ function sanitize(text: string): string {
     .replace(/·/g, "-")
     .replace(/✓/g, "v")
     .replace(/…/g, "...");
-  // Strip any remaining non-WinAnsi characters (keep basic Latin + Latin-1 Supplement)
-  s = s.replace(/[^\x00-\xFF]/g, "");
+  // Strip control chars (0x00-0x1F except space 0x20) + non-printable
+  s = s.replace(/[\x00-\x09\x0B-\x1F]/g, "");
+  // Keep only printable WinAnsi range
+  s = s.replace(/[^\x20-\xFF]/g, "");
   return s;
 }
 
@@ -127,11 +132,17 @@ class PdfBuilder {
     const maxWidth = opts.maxWidth || this.contentWidth;
     const lineHeight = opts.lineHeight || size * 1.4;
 
-    const lines = wrapText(text, font, size, maxWidth);
-    for (const line of lines) {
-      this.ensureSpace(lineHeight);
-      this.page.drawText(line, { x, y: this.y, size, font, color });
-      this.y -= lineHeight;
+    // Double safety: sanitize + split by any remaining newlines
+    const sanitized = sanitize(text);
+    const paragraphs = sanitized.split(/\n/);
+    for (const para of paragraphs) {
+      if (!para.trim()) { this.y -= lineHeight * 0.5; continue; }
+      const lines = wrapText(para, font, size, maxWidth);
+      for (const line of lines) {
+        this.ensureSpace(lineHeight);
+        this.page.drawText(line, { x, y: this.y, size, font, color });
+        this.y -= lineHeight;
+      }
     }
   }
 

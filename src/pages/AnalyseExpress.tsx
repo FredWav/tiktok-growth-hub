@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Zap, BarChart3, FileText, TrendingUp, Search } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
@@ -6,8 +6,10 @@ import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import tiktokExample from "@/assets/tiktok-username-example.png";
 
 const features = [
   { icon: BarChart3, title: "Health Score", description: "Score de santé global de ton compte sur 100" },
@@ -19,23 +21,29 @@ const features = [
 export default function AnalyseExpress() {
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
-  // Check for existing session
   const existingSessionId = localStorage.getItem("express_session_id");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const cleanUsername = username.trim().replace(/^@/, "");
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const clean = username.trim().replace(/^@/, "");
-    if (clean.length < 2) {
+    if (cleanUsername.length < 2) {
       toast.error("Entre un nom d'utilisateur TikTok valide");
       return;
     }
+    setShowConfirmModal(true);
+  };
 
+  const proceedToPayment = async () => {
+    setShowConfirmModal(false);
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("create-express-checkout", {
-        body: { username: clean },
+        body: { username: cleanUsername },
       });
 
       if (error || !data?.url) {
@@ -47,6 +55,11 @@ export default function AnalyseExpress() {
       toast.error(err.message || "Une erreur est survenue");
       setLoading(false);
     }
+  };
+
+  const handleGoBack = () => {
+    setShowConfirmModal(false);
+    setTimeout(() => inputRef.current?.focus(), 100);
   };
 
   return (
@@ -79,6 +92,7 @@ export default function AnalyseExpress() {
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">@</span>
               <Input
+                ref={inputRef}
                 type="text"
                 placeholder="ton_username"
                 value={username}
@@ -124,6 +138,39 @@ export default function AnalyseExpress() {
           ))}
         </div>
       </Section>
+
+      {/* Confirmation Modal */}
+      <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl">Vérifie ton nom d'utilisateur</DialogTitle>
+            <DialogDescription>
+              Attention, entre bien ton <strong>nom d'utilisateur</strong> (le @) et non ton pseudo affiché.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <img
+              src={tiktokExample}
+              alt="Où trouver le nom d'utilisateur TikTok"
+              className="w-full rounded-lg border border-border"
+            />
+
+            <p className="text-center text-base">
+              Tu as saisi : <span className="font-bold text-primary text-lg">@{cleanUsername}</span>
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button variant="outline" className="flex-1" onClick={handleGoBack}>
+                Ha je me suis trompé !
+              </Button>
+              <Button variant="hero" className="flex-1" onClick={proceedToPayment}>
+                Je valide ✅
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }

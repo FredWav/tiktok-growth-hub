@@ -40,7 +40,7 @@ const applicationSchema = z.object({
   blockers: z.string().trim().min(10, "Décris tes points de blocage (10 caractères min.)").max(2000),
   goals: z.string().trim().min(10, "Décris tes objectifs (10 caractères min.)").max(2000),
   budget_confirmed: z.boolean().refine((v) => v === true, {
-    message: "Tu dois confirmer que ton budget est d'au moins 800€",
+    message: "Tu dois confirmer que ton budget est d'au moins 987€",
   }),
 });
 
@@ -279,7 +279,7 @@ export default function WavPremiumApplication() {
                   <div>
                     <p className="font-semibold mb-1">Information budget</p>
                     <p className="text-sm text-muted-foreground">
-                      Le Wav Premium est un accompagnement intensif qui demande un investissement minimum de 800€.
+                      Le Wav Premium est un accompagnement intensif qui demande un investissement minimum de 987€.
                       Si ton budget est inférieur, je te recommande de commencer par un{" "}
                       <Link to="/one-shot" className="text-primary underline hover:no-underline">
                         One Shot (179€)
@@ -302,7 +302,7 @@ export default function WavPremiumApplication() {
                       </FormControl>
                       <div className="space-y-1 leading-none">
                         <FormLabel className="font-normal cursor-pointer">
-                          Je confirme que mon budget est d'au moins 800€ pour cet accompagnement *
+                          Je confirme que mon budget est d'au moins 987€ pour cet accompagnement *
                         </FormLabel>
                         <FormMessage />
                       </div>

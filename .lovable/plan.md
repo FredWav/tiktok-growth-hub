@@ -1,19 +1,49 @@
-## Passer Stripe en mode test
 
-L'architecture multi-mode est déjà en place avec les Price IDs test et live dans les deux fichiers de config. Il suffit de basculer.
 
-### Changements
+## Aligner la génération PDF admin sur la logique user
 
-1. **Frontend (`src/config/stripe-prices.ts`)** — Changer le default de `"live"` à `"test"` pour que le frontend utilise les Price IDs test sans dépendre d'une variable d'environnement.
-2. **Secret `STRIPE_MODE**` — Mettre à jour la valeur du secret existant de `"live"` à `"test"` pour les Edge Functions.
-3. **Secret `STRIPE_SECRET_KEY**` — Tu devras remplacer ta clé `sk_live_...` par ta clé `sk_test_...` depuis ton dashboard Stripe. Je te demanderai de la saisir.
+### Différences identifiées
 
-### Ce qui est déjà sauvegardé
+La fonction `downloadPDF` dans l'admin diffère de `handleDownloadPdf` côté user sur plusieurs points :
 
-Les Price IDs live restent dans le code, dans l'objet `PRICE_IDS.live` des deux fichiers de config. Quand tu voudras repasser en prod, il suffira de :
+1. **Margins** : admin = `0`, user = `[10, 0, 10, 0]`
+2. **html2canvas** : admin manque `allowTaint: true`
+3. **pagebreak** : admin n'a pas les sélecteurs `avoid` (`.video-item`, `.stat-card`, etc.)
+4. **Élément DOM** : admin appende au DOM puis nettoie — user utilise un élément détaché (plus propre, même résultat)
+5. **Extraction persona/pubPattern** : admin extrait `result?.persona` et `result?.pubPattern` mais la structure stockée peut être `account.persona` ou `result.persona` selon le format retourné par l'API — le user utilise `data.persona` et `persona?.style_contenu?.publication_pattern`
 
-- Remettre le default à `"live"` dans `stripe-prices.ts`
-- Remettre `STRIPE_MODE` à `"live"`
-- Remettre la clé `sk_live_...` dans `STRIPE_SECRET_KEY`  
-  
-`Au lieu de remplacer la clé actuelle créer un nouveau secret de stripe scret key test et ça switch de key en fonction de si on est en live ou en test`
+### Plan
+
+Réécrire `downloadPDF` dans `ExpressAnalyses.tsx` pour copier exactement la logique user :
+
+```typescript
+async function downloadPDF(analysis: any) {
+  const result = analysis.result_data;
+  const account = result?.account || result;
+  const persona = result?.persona;
+  const pubPattern = persona?.style_contenu?.publication_pattern;
+
+  const pdfData = mapAccountDataForPDF(account, persona, pubPattern);
+  const htmlContent = generateCompletePDFHTML(pdfData, account.ai_insights || '', account.recent_videos || []);
+
+  const element = document.createElement("div");
+  element.innerHTML = htmlContent;
+
+  await html2pdf().set({
+    margin: [10, 0, 10, 0],
+    filename: `analyse-express-${analysis.tiktok_username}.pdf`,
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, allowTaint: true },
+    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+    pagebreak: {
+      mode: ["avoid-all", "css", "legacy"],
+      avoid: [".video-item", ".stat-card", ".stats-grid", ".stats-section",
+              ".bio-section", ".hashtags-section", ".header", ".hashtags-grid"],
+    },
+  }).from(element).save();
+}
+```
+
+### Fichier modifié
+- `src/pages/admin/ExpressAnalyses.tsx` — remplacement de la fonction `downloadPDF`
+

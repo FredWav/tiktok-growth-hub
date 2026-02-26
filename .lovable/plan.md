@@ -1,63 +1,48 @@
 
 
-## Suivi des Analyses Express dans le panneau admin
+## Retirer les références "TikTok" et les remplacer par "formats courts" / "réseaux sociaux"
 
-### Objectif
-Stocker chaque analyse express en base de données avec son statut (processing, complete, failed) pour que l'admin puisse voir l'historique et savoir si ça s'est bien passé.
+Le site fait actuellement reference a TikTok partout. On va remplacer toutes les mentions par des formulations generiques adaptees aux formats courts (TikTok, Instagram Reels, YouTube Shorts, etc.).
 
-### 1. Créer la table `express_analyses`
+### Principe de remplacement
 
-```sql
-CREATE TABLE public.express_analyses (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  stripe_session_id text NOT NULL,
-  tiktok_username text NOT NULL,
-  job_id text,
-  status text NOT NULL DEFAULT 'pending', -- pending, processing, complete, failed
-  error_message text,
-  health_score integer,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  completed_at timestamptz
-);
+- "TikTok" (seul) --> "formats courts" ou "réseaux sociaux" selon le contexte
+- "stratégie TikTok" --> "stratégie de contenu" ou "stratégie formats courts"
+- "présence TikTok" --> "présence en ligne" ou "présence sur les réseaux"
+- "compte TikTok" --> "compte" ou "comptes réseaux sociaux"
+- "Expert TikTok" --> "Expert formats courts"
+- Le lien TikTok dans le footer et la page contact reste (c'est un lien vers le profil social de Fred, pas une mention du service)
 
-ALTER TABLE public.express_analyses ENABLE ROW LEVEL SECURITY;
+### Fichiers modifies
 
-CREATE POLICY "Admins can manage all express_analyses"
-  ON public.express_analyses FOR ALL
-  TO authenticated
-  USING (has_role(auth.uid(), 'admin'::app_role));
-```
+**Pages principales :**
 
-### 2. Modifier les edge functions pour écrire en base
+1. **Home.tsx** -- Hero ("Clarifie ta stratégie TikTok" --> "Clarifie ta stratégie."), SEO meta, profils, FAQ
+2. **Offres.tsx** -- SEO meta, descriptions, stats ("3 ans d'expertise TikTok" --> "3 ans d'expertise formats courts"), forWho items
+3. **OneShot.tsx** -- Hero, SEO meta, FAQ ("un compte TikTok" --> "un compte sur les réseaux")
+4. **QuarantecinqJours.tsx** -- Hero, SEO meta, forYou items, CTA final
+5. **APropos.tsx** -- Description, SEO meta, parcours ("je n'ai pas commencé avec TikTok" --> "je n'ai pas commencé avec les formats courts")
+6. **Preuves.tsx** -- SEO meta, video testimonials alt texts, schema
+7. **VipCheckout.tsx** -- SEO meta
+8. **Contact.tsx** -- SEO meta
+9. **AnalyseExpress.tsx** -- SEO meta, toast, titre hero ("Analyse Express TikTok" --> "Analyse Express")
+10. **AnalyseExpressResult.tsx** -- SEO meta, nom fichier PDF
+11. **CGV.tsx** -- SEO meta, descriptions legales
+12. **PolitiqueConfidentialite.tsx** -- "Nom d'utilisateur TikTok" --> "Identifiant de compte"
 
-**`express-analysis/index.ts`** : Après le paiement vérifié, insérer une ligne `status: 'processing'` avec le `tiktok_username`, `stripe_session_id` et `job_id`.
+**Composants :**
 
-**`express-analysis-status/index.ts`** : Quand le job est `completed` ou `failed`, mettre à jour la ligne correspondante avec le statut final, le `health_score` (si disponible), et `completed_at`.
+13. **Footer.tsx** -- Description ("Expert stratégie TikTok" --> "Expert stratégie formats courts")
+14. **WavSocialScanPopup.tsx** -- "ton compte TikTok" --> "ton compte"
 
-### 3. Créer la page admin `/admin/analyses`
+**Donnees techniques (pas de changement visible) :**
+- `pdf-data-mapper.ts`, `pdf-html-generator.ts` : les champs internes `tiktok_breakdown`, `platform: 'tiktok'` restent car ce sont des identifiants techniques de l'API d'analyse, pas du texte visible
 
-**Nouveau fichier `src/pages/admin/ExpressAnalyses.tsx`** :
-- Table listant toutes les analyses express (date, username, statut, health score)
-- Badge de couleur selon le statut : vert (complete), jaune (processing), rouge (failed)
-- Tri par date décroissante
+### Detail du Hero (Home.tsx)
 
-### 4. Hook `useExpressAnalyses`
+Avant : "Clarifie ta stratégie TikTok. Augmente ta visibilité."
+Apres : "Clarifie ta stratégie. Augmente ta visibilité."
 
-**Nouveau fichier `src/hooks/useExpressAnalyses.ts`** :
-- Query React Query pour récupérer les analyses depuis la table `express_analyses`
+Le degrade doré reste sur "Augmente ta visibilité." comme dans l'image de reference.
 
-### 5. Ajouter au menu admin et aux routes
-
-**`src/components/layout/AdminLayout.tsx`** : Ajouter un lien "Analyses Express" avec l'icône `Zap` dans la navigation.
-
-**`src/App.tsx`** : Ajouter la route `/admin/analyses` (protégée admin).
-
-### 6. KPI sur le Dashboard admin
-
-**`src/pages/admin/Dashboard.tsx`** : Ajouter une carte avec le nombre d'analyses du mois et le taux de succès.
-
-### Fichiers modifiés/créés
-- **Migration SQL** : table `express_analyses`
-- **Modifiés** : `express-analysis/index.ts`, `express-analysis-status/index.ts`, `AdminLayout.tsx`, `App.tsx`, `Dashboard.tsx`
-- **Nouveaux** : `src/pages/admin/ExpressAnalyses.tsx`, `src/hooks/useExpressAnalyses.ts`
-
+### Nombre total de fichiers : ~14 fichiers a modifier

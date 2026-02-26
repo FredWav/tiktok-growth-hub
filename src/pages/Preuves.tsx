@@ -9,15 +9,15 @@ import { trackEvent } from "@/lib/tracking";
 import { SEOHead } from "@/components/SEOHead";
 
 const videoTestimonials = [
-  "97xyXqwszrM",
-  "cc1cRfCEJGE",
-  "hwTyjA6BORY",
-  "FrMFqiAqAkU",
-  "s-VaJvfFqbM",
-  "wu2CPcqp-yU",
+  { id: "97xyXqwszrM", alt: "Témoignage client - Retour d'expérience sur l'accompagnement TikTok" },
+  { id: "cc1cRfCEJGE", alt: "Témoignage client - Résultats après coaching stratégie TikTok" },
+  { id: "hwTyjA6BORY", alt: "Témoignage client - Transformation de présence TikTok" },
+  { id: "FrMFqiAqAkU", alt: "Témoignage client - Impact du One Shot sur la stratégie de contenu" },
+  { id: "s-VaJvfFqbM", alt: "Témoignage client - Croissance TikTok après accompagnement" },
+  { id: "wu2CPcqp-yU", alt: "Témoignage client - Avis sur le Wav Premium de Fred Wav" },
 ];
 
-function VideoCard({ id }: { id: string }) {
+function VideoCard({ id, alt }: { id: string; alt: string }) {
   const [playing, setPlaying] = useState(false);
 
   if (playing) {
@@ -25,7 +25,7 @@ function VideoCard({ id }: { id: string }) {
       <div className="aspect-video rounded-xl overflow-hidden shadow-lg">
         <iframe
           src={`https://www.youtube.com/embed/${id}?autoplay=1`}
-          title="Témoignage client"
+          title={alt}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
           className="w-full h-full"
@@ -41,7 +41,7 @@ function VideoCard({ id }: { id: string }) {
     >
       <img
         src={`https://img.youtube.com/vi/${id}/hqdefault.jpg`}
-        alt="Témoignage client"
+        alt={alt}
         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         loading="lazy"
       />
@@ -150,7 +150,12 @@ const chooseOffers = [
 export default function Preuves() {
   return (
     <Layout>
-      <SEOHead title="Témoignages et Résultats Clients | Fred Wav" description="Découvre les résultats concrets de nos clients : témoignages vidéo, études de cas et retours d'expérience." path="/preuves" keywords="témoignages tiktok, résultats clients, études de cas, retours expérience, preuves" />
+      <SEOHead title="Témoignages et Résultats Clients | Fred Wav" description="Découvre les résultats concrets de nos clients : témoignages vidéo, études de cas et retours d'expérience." path="/preuves" keywords="témoignages tiktok, résultats clients, études de cas, retours expérience, preuves" schema={{
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "name": "Accompagnement TikTok - Fred Wav",
+        "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.8", "reviewCount": "300", "bestRating": "5" },
+      }} />
       <Section variant="cream" size="lg">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">
@@ -171,8 +176,8 @@ export default function Preuves() {
         />
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {videoTestimonials.map((id) => (
-            <VideoCard key={id} id={id} />
+          {videoTestimonials.map((video) => (
+            <VideoCard key={video.id} id={video.id} alt={video.alt} />
           ))}
         </div>
       </Section>

@@ -112,7 +112,21 @@ export default function OneShot() {
 
   return (
     <Layout>
-      <SEOHead title="One Shot - Session Stratégie TikTok 179€ | Fred Wav" description="1h30 de diagnostic et plan d'action personnalisé pour ta stratégie TikTok. Réservation en ligne, paiement sécurisé." path="/one-shot" keywords="one shot tiktok, session stratégie, diagnostic tiktok, coaching individuel, plan action, 179 euros" />
+      <SEOHead title="One Shot - Session Stratégie TikTok 179€ | Fred Wav" description="1h30 de diagnostic et plan d'action personnalisé pour ta stratégie TikTok. Réservation en ligne, paiement sécurisé." path="/one-shot" keywords="one shot tiktok, session stratégie, diagnostic tiktok, coaching individuel, plan action, 179 euros" schema={[
+        {
+          "@context": "https://schema.org",
+          "@type": "Service",
+          "name": "One Shot - Session Stratégie TikTok",
+          "description": "1h30 de diagnostic complet et plan d'action personnalisé pour ta stratégie TikTok.",
+          "provider": { "@type": "Person", "name": "Fred Wav", "url": "https://fredwav.com" },
+          "offers": { "@type": "Offer", "price": "179", "priceCurrency": "EUR", "availability": "https://schema.org/InStock" },
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": faqs.map((faq) => ({ "@type": "Question", "name": faq.question, "acceptedAnswer": { "@type": "Answer", "text": faq.answer } })),
+        },
+      ]} />
       <Section variant="cream" size="lg">
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">

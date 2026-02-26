@@ -68,6 +68,19 @@ export default function AnalyseExpress() {
         title="Analyse Express TikTok – Diagnostic complet en 5 minutes | FredWav"
         description="Obtiens un diagnostic complet de ton compte TikTok : health score, métriques, persona et recommandations. Rapport PDF téléchargeable pour 11,90€."
         path="/analyse-express"
+        keywords="analyse tiktok, diagnostic tiktok, health score tiktok, rapport tiktok, audit compte tiktok, métriques tiktok"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "Product",
+          "name": "Analyse Express TikTok",
+          "description": "Diagnostic complet de ton compte TikTok avec health score, métriques clés, analyse de persona et rapport PDF téléchargeable.",
+          "offers": {
+            "@type": "Offer",
+            "price": "11.90",
+            "priceCurrency": "EUR",
+            "availability": "https://schema.org/InStock",
+          },
+        }}
       />
 
       {/* Hero */}

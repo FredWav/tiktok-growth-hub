@@ -48,7 +48,16 @@ const stats = [
 export default function APropos() {
   return (
     <Layout>
-      <SEOHead title="À propos de Fred Wav | Expert Stratégie TikTok" description="18 ans d'expérience vidéo, 300+ créateurs accompagnés, 10M+ vues générées. Découvre le parcours et la méthode." path="/a-propos" keywords="Fred Wav, expert tiktok, parcours, méthode data-driven, accompagnement créateur" />
+      <SEOHead title="À propos de Fred Wav | Expert Stratégie TikTok" description="18 ans d'expérience vidéo, 300+ créateurs accompagnés, 10M+ vues générées. Découvre le parcours et la méthode." path="/a-propos" keywords="Fred Wav, expert tiktok, parcours, méthode data-driven, accompagnement créateur" schema={{
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Fred Wav",
+        "jobTitle": "Expert Stratégie TikTok",
+        "url": "https://fredwav.com/a-propos",
+        "description": "Stratégiste en contenu TikTok et formats courts. 18 ans d'expérience vidéo, 300+ créateurs accompagnés, 10M+ vues générées.",
+        "knowsAbout": ["Stratégie TikTok", "Marketing vidéo", "Hook engineering", "Formats courts", "Croissance organique"],
+        "sameAs": ["https://www.tiktok.com/@fredwav", "https://www.instagram.com/levraifredwav/", "https://www.youtube.com/@Fredwavconseils"],
+      }} />
       <Section variant="cream" size="lg">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>

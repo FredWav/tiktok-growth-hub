@@ -13,6 +13,7 @@ import {
   LogOut,
   Menu,
   X,
+  Zap,
 } from "lucide-react";
 import { useState } from "react";
 import { AdminChatbot } from "@/components/admin/AdminChatbot";
@@ -28,6 +29,7 @@ const navItems = [
   { label: "Réservations", href: "/admin/bookings", icon: CreditCard },
   { label: "Livrables", href: "/admin/deliverables", icon: FileText },
   { label: "Templates", href: "/admin/templates", icon: Mail },
+  { label: "Analyses Express", href: "/admin/analyses", icon: Zap },
   { label: "Paramètres", href: "/admin/settings", icon: Settings },
 ];
 

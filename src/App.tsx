@@ -49,6 +49,7 @@ import AdminBookings from "./pages/admin/Bookings";
 import AdminDeliverables from "./pages/admin/Deliverables";
 import AdminTemplates from "./pages/admin/Templates";
 import AdminSettings from "./pages/admin/Settings";
+import AdminExpressAnalyses from "./pages/admin/ExpressAnalyses";
 
 // Client pages
 import ClientDashboard from "./pages/client/ClientDashboard";
@@ -159,6 +160,14 @@ const App = () => (
               element={
                 <ProtectedRoute requiredRole="admin">
                   <AdminSettings />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/analyses"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AdminExpressAnalyses />
                 </ProtectedRoute>
               }
             /> */}

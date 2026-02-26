@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -7,6 +8,13 @@ const corsHeaders = {
 };
 
 const API_BASE = "https://hesozoobtehszosdlnrn.supabase.co/functions/v1/api-gateway";
+
+function getSupabase() {
+  return createClient(
+    Deno.env.get("SUPABASE_URL") || "",
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || ""
+  );
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -48,8 +56,21 @@ serve(async (req) => {
     }
 
     const job = await jobRes.json();
+    const supabase = getSupabase();
 
     if (job.status === "completed" && job.result) {
+      // Update DB record to complete
+      try {
+        const healthScore = job.result?.health_score ?? job.result?.score ?? null;
+        await supabase.from("express_analyses").update({
+          status: "complete",
+          health_score: typeof healthScore === "number" ? healthScore : null,
+          completed_at: new Date().toISOString(),
+        }).eq("job_id", job_id);
+      } catch (dbErr) {
+        console.warn("Failed to update express_analyses:", dbErr);
+      }
+
       return new Response(JSON.stringify({ status: "complete", data: job.result, username }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -57,6 +78,17 @@ serve(async (req) => {
     }
 
     if (job.status === "failed") {
+      // Update DB record to failed
+      try {
+        await supabase.from("express_analyses").update({
+          status: "failed",
+          error_message: job.error || "L'analyse a échoué",
+          completed_at: new Date().toISOString(),
+        }).eq("job_id", job_id);
+      } catch (dbErr) {
+        console.warn("Failed to update express_analyses:", dbErr);
+      }
+
       return new Response(JSON.stringify({
         status: "failed",
         error: job.error || "L'analyse a échoué",
@@ -67,7 +99,7 @@ serve(async (req) => {
       });
     }
 
-    // Still processing (queued, processing, retrying)
+    // Still processing
     return new Response(JSON.stringify({
       status: "processing",
       progress: job.progress || 0,

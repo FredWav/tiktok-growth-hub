@@ -1,81 +1,51 @@
 
-## Optimisation SEO et GEO pour tout le site fredwav.com
 
-### Diagnostic actuel
+## Intégration PostHog – Tracking stratégique sur tout le site
 
-Le site a deja de bonnes bases SEO (balises meta, sitemap, robots.txt, schema.org, canonical). Voici les lacunes identifiees et les optimisations a appliquer :
+### 1. Installer posthog-js et initialiser
 
-### 1. Ajouter les `keywords` manquants sur les pages qui n'en ont pas
+**Nouveau fichier `src/lib/posthog.ts`** :
+- Initialiser PostHog avec la clé `phc_PtioXOoY4oT3GYJsV7xTpI3a2fscFeJfX6mzFGMWGDj` et host `https://us.i.posthog.com`
+- Respecter le consentement GDPR : PostHog ne démarre le tracking qu'après acceptation des cookies (comme Google Analytics)
+- Exporter des fonctions utilitaires : `initPostHog()`, `trackPostHogEvent(event, properties)`
 
-La page Analyse Express n'a pas de `keywords` dans son `SEOHead`. Il faut en ajouter.
+### 2. Intégrer au consentement cookies
 
-### 2. Enrichir le schema.org (structured data) dans `index.html`
+**Fichier `src/components/CookieConsent.tsx`** :
+- Appeler `initPostHog()` quand l'utilisateur accepte les cookies
+- Si déjà accepté au chargement, initialiser PostHog automatiquement
 
-Actuellement, seul un schema `ProfessionalService` basique existe. On va ajouter :
-- **FAQPage** schema sur la page d'accueil (les questions frequentes sont deja presentes dans le code)
-- **Service** schemas pour chaque offre (One Shot, Wav Premium, VIP)
-- **Person** schema pour Fred Wav
-- Ajouter le champ `"knowsAbout"` et `"hasOfferCatalog"` au schema existant
+### 3. Enrichir `src/lib/tracking.ts`
 
-### 3. Ameliorer le composant `SEOHead` pour le GEO (Generative Engine Optimization)
+- Ajouter PostHog en parallèle de Google Analytics dans `trackEvent()` → chaque appel existant envoie aussi à PostHog sans modifier les pages
 
-- Ajouter la balise `meta robots` avec `index, follow`
-- Ajouter `og:image:alt` pour l'accessibilite des images OG
-- Ajouter le support pour injecter du JSON-LD (schema.org) par page
+### 4. Ajouter le tracking automatique de navigation
 
-### 4. Ajouter du JSON-LD specifique par page
+**Fichier `src/App.tsx`** :
+- Ajouter un composant `PostHogPageTracker` qui capture un `$pageview` à chaque changement de route (via `useLocation`)
 
-Creer un composant `SchemaMarkup` reutilisable et l'integrer dans les pages principales :
-- **Home** : `FAQPage` + `ProfessionalService` enrichi
-- **Offres** : `OfferCatalog` avec les 3 offres
-- **One Shot** : `Service` + `Product` avec prix 179EUR
-- **Wav Premium (45-jours)** : `Service` avec prix 987EUR
-- **VIP** : `Service` avec prix a partir de 99EUR/mois
-- **Preuves** : `Review` / `AggregateRating`
-- **A propos** : `Person` schema pour Fred Wav
+### 5. Événements stratégiques à tracker (en plus des existants)
 
-### 5. Mettre a jour le sitemap avec les pages manquantes
+Les `trackEvent()` existants couvrent déjà les clics CTA. On ajoute des événements de conversion critiques :
 
-Ajouter les URLs manquantes :
-- `/analyse-express`
-- `/wav-premium/candidature`
+| Page | Événement | Déclencheur |
+|------|-----------|-------------|
+| `AnalyseExpress.tsx` | `express_checkout_start` | Clic "Lancer l'analyse" (validation username) |
+| `AnalyseExpressResult.tsx` | `express_pdf_download` | Clic téléchargement PDF |
+| `OneShot.tsx` | `oneshot_checkout_start` | Clic paiement |
+| `OneShotSuccess.tsx` | `oneshot_form_submit` | Soumission du formulaire post-paiement |
+| `VipCheckout.tsx` | `vip_plan_select` | Sélection d'un plan (3/6/12 mois) |
+| `VipCheckout.tsx` | `vip_checkout_start` | Clic paiement |
+| `WavPremiumApplication.tsx` | `wav_premium_apply` | Soumission candidature |
+| `Contact.tsx` | `contact_social_click` | Clic sur un réseau social |
+| `Home.tsx` | `faq_open` | Ouverture d'une question FAQ |
 
-### 6. Ajouter les attributs `lang` et `hreflang` pour le GEO
+### 6. Identifier les utilisateurs
 
-Le site est en francais et cible la France. Ajouter une balise `hreflang` dans le `SEOHead` pour signaler ca aux moteurs de recherche et aux IA generatives.
+- Sur les pages de paiement (`VipCheckout`, `OneShot`), appeler `posthog.identify(email)` quand un email est saisi pour lier les événements à un utilisateur
 
-### 7. Ameliorer les `alt` texts des images (Preuves)
+### Fichiers modifiés
 
-Les miniatures YouTube sur la page Preuves ont toutes le meme `alt` generique "Temoignage client". Il faut les rendre uniques.
+- **Nouveau** : `src/lib/posthog.ts`
+- **Modifiés** : `src/lib/tracking.ts`, `src/components/CookieConsent.tsx`, `src/App.tsx`, `src/pages/AnalyseExpress.tsx`, `src/pages/AnalyseExpressResult.tsx`, `src/pages/OneShot.tsx`, `src/pages/OneShotSuccess.tsx`, `src/pages/VipCheckout.tsx`, `src/pages/WavPremiumApplication.tsx`, `src/pages/Contact.tsx`, `src/pages/Home.tsx`
 
----
-
-### Modifications techniques
-
-**Fichier `src/components/SEOHead.tsx`** :
-- Ajouter support pour `robots` meta tag (`index, follow`)
-- Ajouter `og:image:alt`
-- Ajouter prop optionnelle `schema` pour injecter du JSON-LD par page
-- Ajouter `hreflang` link tag (fr-FR)
-
-**Fichier `index.html`** :
-- Enrichir le schema.org existant avec `knowsAbout`, `hasOfferCatalog`, `founder` (Person)
-
-**Fichier `public/sitemap.xml`** :
-- Ajouter `/analyse-express` et `/wav-premium/candidature`
-
-**Pages a modifier** (ajout de `keywords` manquants et injection de JSON-LD) :
-- `src/pages/AnalyseExpress.tsx` : ajouter `keywords`
-- `src/pages/Home.tsx` : ajouter JSON-LD `FAQPage`
-- `src/pages/OneShot.tsx` : ajouter JSON-LD `Service`
-- `src/pages/Offres.tsx` : ajouter JSON-LD `OfferCatalog`
-- `src/pages/QuarantecinqJours.tsx` : ajouter JSON-LD `Service`
-- `src/pages/VipCheckout.tsx` : ajouter JSON-LD `Service`
-- `src/pages/Preuves.tsx` : ameliorer les `alt` des miniatures + ajouter JSON-LD `AggregateRating`
-- `src/pages/APropos.tsx` : ajouter JSON-LD `Person`
-
-**Nouveau composant `src/components/SchemaMarkup.tsx`** :
-- Composant utilitaire qui injecte un `<script type="application/ld+json">` dans le `<head>` via `useEffect`
-- Accepte un objet JSON-LD en prop
-
-Cela represente environ 12 fichiers a modifier ou creer, avec un impact significatif sur le referencement naturel et la visibilite dans les moteurs IA generatifs (Perplexity, ChatGPT Search, Google AI Overviews).

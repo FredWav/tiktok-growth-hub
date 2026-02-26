@@ -135,7 +135,7 @@ export default function QuarantecinqJours() {
             asChild
             onClick={() => trackEvent("cta_45j_click", { location: "hero" })}
           >
-            <Link to="/contact">
+            <Link to="/wav-premium/candidature">
               Candidater au Wav Premium
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
@@ -308,7 +308,7 @@ export default function QuarantecinqJours() {
             asChild
             onClick={() => trackEvent("cta_45j_click", { location: "footer_cta" })}
           >
-            <Link to="/contact">
+            <Link to="/wav-premium/candidature">
               Candidater au Wav Premium
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>

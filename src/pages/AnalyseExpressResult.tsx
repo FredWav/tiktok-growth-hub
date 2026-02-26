@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useSearchParams, Link } from "react-router-dom";
+import { trackEvent } from "@/lib/tracking";
 import { Download, Loader2, AlertCircle, RefreshCw, ChevronDown, Target } from "lucide-react";
 // @ts-ignore - html2pdf.js doesn't have proper types
 import html2pdf from "html2pdf.js";
@@ -144,6 +145,7 @@ export default function AnalyseExpressResult() {
   const handleDownloadPdf = async () => {
     if (!username || !data?.account) return;
     setPdfLoading(true);
+    trackEvent("express_pdf_download", { username });
     try {
       const pdfData = mapAccountDataForPDF(data.account, persona, pubPattern);
       const htmlContent = generateCompletePDFHTML(

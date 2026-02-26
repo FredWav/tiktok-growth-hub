@@ -4,6 +4,7 @@ import { ArrowRight, Calendar, CheckCircle, Loader2, Mail, XCircle } from "lucid
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { trackEvent } from "@/lib/tracking";
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -75,6 +76,7 @@ export default function OneShotSuccess() {
 
   const onSubmit = async (values: FormValues) => {
     setIsSubmitting(true);
+    trackEvent("oneshot_form_submit");
     try {
       const { error } = await supabase.functions.invoke("send-oneshot-form", {
         body: { ...values, session_id: sessionId },

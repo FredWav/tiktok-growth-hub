@@ -58,6 +58,7 @@ export default function Contact() {
                 href={s.href}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackEvent("contact_social_click", { platform: s.name })}
                 className="flex items-center gap-4 p-5 rounded-xl border border-border/50 hover:border-primary/30 hover:shadow-lg transition-all duration-300 group"
               >
                 <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">

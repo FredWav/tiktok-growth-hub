@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,6 +9,15 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import ScrollToTop from "@/components/ScrollToTop";
 import { CookieConsent } from "@/components/CookieConsent";
+import { capturePageview } from "@/lib/posthog";
+
+function PostHogPageTracker() {
+  const location = useLocation();
+  useEffect(() => {
+    capturePageview();
+  }, [location.pathname]);
+  return null;
+}
 
 // Public pages
 import Home from "./pages/Home";
@@ -55,6 +66,7 @@ const App = () => (
       <BrowserRouter>
         <CookieConsent />
         <ScrollToTop />
+        <PostHogPageTracker />
         <AuthProvider>
           <Routes>
             {/* Public routes */}

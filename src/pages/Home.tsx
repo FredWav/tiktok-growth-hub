@@ -342,7 +342,7 @@ export default function Home() {
           <Accordion type="single" collapsible className="w-full">
             {faqItems.map((item, index) => (
               <AccordionItem key={index} value={`faq-${index}`}>
-                <AccordionTrigger className="text-left font-medium">
+                <AccordionTrigger className="text-left font-medium" onClick={() => trackEvent("faq_open", { question: item.question })}>
                   {item.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">

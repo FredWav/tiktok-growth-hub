@@ -39,6 +39,16 @@ export function getStripeMode(): StripeMode {
   return "live";
 }
 
+/** Returns the correct Stripe secret key for the current mode. */
+export function getStripeSecretKey(): string {
+  const mode = getStripeMode();
+  if (mode === "test") {
+    // Prefer dedicated test key, fall back to main key
+    return Deno.env.get("STRIPE_SECRET_KEY_TEST") || Deno.env.get("STRIPE_SECRET_KEY") || "";
+  }
+  return Deno.env.get("STRIPE_SECRET_KEY") || "";
+}
+
 // Keep backwards-compat exports (lazy getters)
 export const stripePrices = new Proxy({} as typeof PRICE_IDS["live"], {
   get(_target, prop: string) {

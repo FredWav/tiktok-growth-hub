@@ -29,29 +29,28 @@ async function downloadPDF(analysis: any) {
     const result = analysis.result_data;
     const account = result?.account || result;
     const persona = result?.persona;
-    const pubPattern = result?.pubPattern;
+    const pubPattern = persona?.style_contenu?.publication_pattern;
 
     const pdfData = mapAccountDataForPDF(account, persona, pubPattern);
     const htmlContent = generateCompletePDFHTML(pdfData, account.ai_insights || '', account.recent_videos || []);
 
-    const container = document.createElement('div');
-    container.innerHTML = htmlContent;
-    container.style.position = 'absolute';
-    container.style.left = '-9999px';
-    container.style.top = '0';
-    document.body.appendChild(container);
+    const element = document.createElement("div");
+    element.innerHTML = htmlContent;
 
     const html2pdf = (await import('html2pdf.js')).default;
     await (html2pdf().set as any)({
-      margin: 0,
+      margin: [10, 0, 10, 0],
       filename: `analyse-express-${analysis.tiktok_username}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, logging: false },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
-    }).from(container).save();
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, allowTaint: true },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+      pagebreak: {
+        mode: ["avoid-all", "css", "legacy"],
+        avoid: [".video-item", ".stat-card", ".stats-grid", ".stats-section",
+                ".bio-section", ".hashtags-section", ".header", ".hashtags-grid"],
+      },
+    }).from(element).save();
 
-    document.body.removeChild(container);
     toast.success("PDF téléchargé !");
   } catch (err) {
     console.error("PDF generation error:", err);

@@ -1,14 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Zap } from "lucide-react";
+import { Zap, X } from "lucide-react";
 
 export function WavSocialScanPopup() {
   const [open, setOpen] = useState(false);
@@ -35,25 +28,30 @@ export function WavSocialScanPopup() {
     navigate("/analyse-express");
   };
 
+  if (!open) return null;
+
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose(); }}>
-      <DialogContent className="sm:max-w-md bg-background border-primary/30">
-        <DialogHeader>
-          <DialogTitle className="text-xl">⚡ Analyse ton compte TikTok en 2 min</DialogTitle>
-          <DialogDescription className="text-base mt-2">
-            Obtiens un diagnostic complet de ton profil TikTok : health score, métriques clés et recommandations personnalisées. Rapport PDF inclus pour seulement 11,90€.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="flex flex-col sm:flex-row gap-3 mt-2">
-          <Button onClick={handleGo} className="flex-1 gap-2">
-            <Zap className="h-4 w-4" />
-            Lancer mon analyse
-          </Button>
-          <Button variant="outline" onClick={handleClose} className="flex-1">
-            Continuer ma visite
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+    <div className="fixed bottom-4 left-4 z-50 w-[340px] animate-fade-in rounded-xl border border-primary/30 bg-background shadow-lg p-4">
+      <button
+        onClick={handleClose}
+        className="absolute top-2 right-2 text-muted-foreground hover:text-foreground transition-colors"
+        aria-label="Fermer"
+      >
+        <X className="h-4 w-4" />
+      </button>
+      <p className="font-semibold text-sm mb-1">⚡ Analyse ton compte TikTok en 2 min</p>
+      <p className="text-xs text-muted-foreground mb-3">
+        Health score, métriques clés et recommandations. Rapport PDF inclus — 11,90€.
+      </p>
+      <div className="flex gap-2">
+        <Button size="sm" onClick={handleGo} className="flex-1 gap-1.5 text-xs">
+          <Zap className="h-3.5 w-3.5" />
+          Lancer mon analyse
+        </Button>
+        <Button variant="ghost" size="sm" onClick={handleClose} className="text-xs px-2">
+          Non merci
+        </Button>
+      </div>
+    </div>
   );
 }

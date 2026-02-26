@@ -9,6 +9,7 @@ export interface ExpressAnalysis {
   status: string;
   error_message: string | null;
   health_score: number | null;
+  result_data: any | null;
   created_at: string;
   completed_at: string | null;
 }

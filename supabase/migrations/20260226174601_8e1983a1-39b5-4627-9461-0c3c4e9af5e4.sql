@@ -1,0 +1,1 @@
+ALTER TABLE public.express_analyses ADD COLUMN result_data jsonb;

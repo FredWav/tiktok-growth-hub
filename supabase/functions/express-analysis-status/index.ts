@@ -65,6 +65,7 @@ serve(async (req) => {
         await supabase.from("express_analyses").update({
           status: "complete",
           health_score: typeof healthScore === "number" ? healthScore : null,
+          result_data: job.result,
           completed_at: new Date().toISOString(),
         }).eq("job_id", job_id);
       } catch (dbErr) {

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -7,10 +8,11 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ExternalLink } from "lucide-react";
+import { Zap } from "lucide-react";
 
 export function WavSocialScanPopup() {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const lastShown = localStorage.getItem("wavsocialscan_last_shown");
@@ -28,30 +30,24 @@ export function WavSocialScanPopup() {
     localStorage.setItem("wavsocialscan_last_shown", Date.now().toString());
   };
 
+  const handleGo = () => {
+    handleClose();
+    navigate("/analyse-express");
+  };
+
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose(); }}>
       <DialogContent className="sm:max-w-md bg-background border-primary/30">
         <DialogHeader>
-          <DialogTitle className="text-xl">🔍 Tu cherches l'analyse automatique ?</DialogTitle>
+          <DialogTitle className="text-xl">⚡ Analyse ton compte TikTok en 2 min</DialogTitle>
           <DialogDescription className="text-base mt-2">
-            Mon outil d'analyse automatique de profil TikTok se trouve sur un site dédié. Rendez-vous sur{" "}
-            <a
-              href="https://www.wavsocialscan.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary font-semibold underline underline-offset-2 hover:text-primary/80"
-            >
-              wavsocialscan.com
-            </a>{" "}
-            pour scanner ton profil.
+            Obtiens un diagnostic complet de ton profil TikTok : health score, métriques clés et recommandations personnalisées. Rapport PDF inclus pour seulement 11,90€.
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col sm:flex-row gap-3 mt-2">
-          <Button asChild className="flex-1 gap-2">
-            <a href="https://www.wavsocialscan.com" target="_blank" rel="noopener noreferrer">
-              <ExternalLink className="h-4 w-4" />
-              Aller sur WavSocialScan
-            </a>
+          <Button onClick={handleGo} className="flex-1 gap-2">
+            <Zap className="h-4 w-4" />
+            Lancer mon analyse
           </Button>
           <Button variant="outline" onClick={handleClose} className="flex-1">
             Continuer ma visite

@@ -137,6 +137,23 @@ export default function AnalyseExpress() {
             </div>
           ))}
         </div>
+
+        {/* Mention Wav Social Scan */}
+        <div className="max-w-2xl mx-auto mt-12 bg-card border border-border rounded-xl p-6 text-center">
+          <p className="text-muted-foreground">
+            Tu veux des analyses encore plus poussées et pouvoir analyser tes propres vidéos ?
+            Rendez-vous sur{" "}
+            <a
+              href="https://www.wavsocialscan.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary font-semibold underline underline-offset-2 hover:text-primary/80"
+            >
+              Wav Social Scan
+            </a>{" "}
+            pour accéder à l'outil complet.
+          </p>
+        </div>
       </Section>
 
       {/* Confirmation Modal */}

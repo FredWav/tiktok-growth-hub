@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { initPostHog } from "@/lib/posthog";
 
 const GA_ID = "G-E361JPZX7D";
 
@@ -37,6 +38,7 @@ export function CookieConsent() {
     const consent = localStorage.getItem("cookie_consent");
     if (consent === "accepted") {
       enableGA();
+      initPostHog();
     } else if (!consent) {
       setVisible(true);
     }
@@ -46,6 +48,7 @@ export function CookieConsent() {
   const accept = () => {
     localStorage.setItem("cookie_consent", "accepted");
     enableGA();
+    initPostHog();
     setVisible(false);
   };
 

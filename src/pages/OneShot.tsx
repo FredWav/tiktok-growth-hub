@@ -96,6 +96,7 @@ export default function OneShot() {
     }
 
     setLoading(true);
+    trackEvent("oneshot_checkout_start");
     try {
       const { data, error } = await supabase.functions.invoke("create-oneshot-checkout");
       if (error) throw error;

@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Zap, BarChart3, FileText, TrendingUp, Search } from "lucide-react";
+import { trackEvent } from "@/lib/tracking";
 import { SEOHead } from "@/components/SEOHead";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
@@ -41,6 +42,7 @@ export default function AnalyseExpress() {
   const proceedToPayment = async () => {
     setShowConfirmModal(false);
     setLoading(true);
+    trackEvent("express_checkout_start", { username: cleanUsername });
     try {
       const { data, error } = await supabase.functions.invoke("create-express-checkout", {
         body: { username: cleanUsername },

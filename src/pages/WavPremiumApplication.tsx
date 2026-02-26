@@ -4,6 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle2, AlertTriangle } from "lucide-react";
+import { trackEvent } from "@/lib/tracking";
+import { identifyUser } from "@/lib/posthog";
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -66,6 +68,8 @@ export default function WavPremiumApplication() {
 
   const onSubmit = async (data: ApplicationForm) => {
     setIsSubmitting(true);
+    trackEvent("wav_premium_apply", { level: data.current_level });
+    identifyUser(data.email, { first_name: data.first_name, last_name: data.last_name });
     try {
       const { error } = await supabase
         .from("wav_premium_applications" as any)

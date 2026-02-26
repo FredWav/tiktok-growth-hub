@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/tracking";
+import { identifyUser } from "@/lib/posthog";
 import { SEOHead } from "@/components/SEOHead";
 import { stripePrices } from "@/config/stripe-prices";
 
@@ -98,7 +99,8 @@ function VipCheckoutForm() {
     }
 
     setLoading(true);
-    trackEvent("cta_vip_click", { plan: plan.label });
+    trackEvent("vip_checkout_start", { plan: plan.label });
+    identifyUser(email);
 
     try {
       const { data, error } = await supabase.functions.invoke("create-vip-checkout", {
@@ -146,7 +148,7 @@ function VipCheckoutForm() {
             {VIP_PLANS.map((p, i) => {
               const isFeatured = (p as any).featured;
               return (
-                <button key={p.months} onClick={() => setSelectedPlan(i)} className={`relative rounded-xl p-4 text-center border-2 transition-all ${isFeatured ? "scale-105 z-10" : ""} ${selectedPlan === i ? "border-primary bg-primary/5 shadow-md ring-2 ring-primary/30" : isFeatured ? "border-primary/40 bg-primary/5 hover:border-primary" : "border-border bg-background hover:border-primary/50"}`}>
+                <button key={p.months} onClick={() => { setSelectedPlan(i); trackEvent("vip_plan_select", { plan: p.label }); }} className={`relative rounded-xl p-4 text-center border-2 transition-all ${isFeatured ? "scale-105 z-10" : ""} ${selectedPlan === i ? "border-primary bg-primary/5 shadow-md ring-2 ring-primary/30" : isFeatured ? "border-primary/40 bg-primary/5 hover:border-primary" : "border-border bg-background hover:border-primary/50"}`}>
                   {p.savings && <span className={`absolute -top-2.5 left-1/2 -translate-x-1/2 text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap ${isFeatured ? "bg-primary text-primary-foreground px-3 py-1 text-sm shadow-lg" : "bg-primary text-primary-foreground"}`}>{p.savings}</span>}
                   <div className="font-semibold text-lg">{p.label}</div>
                   <div className="text-2xl font-bold mt-1">{p.total}€</div>

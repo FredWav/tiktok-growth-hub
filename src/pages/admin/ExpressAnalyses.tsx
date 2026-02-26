@@ -1,6 +1,7 @@
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { useExpressAnalyses } from "@/hooks/useExpressAnalyses";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -11,7 +12,10 @@ import {
 } from "@/components/ui/table";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Loader2 } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { mapAccountDataForPDF } from "@/lib/pdf-data-mapper";
+import { generateCompletePDFHTML } from "@/lib/pdf-html-generator";
 
 const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
   pending: { label: "En attente", variant: "outline" },
@@ -19,6 +23,41 @@ const statusConfig: Record<string, { label: string; variant: "default" | "second
   complete: { label: "Terminée", variant: "default" },
   failed: { label: "Échouée", variant: "destructive" },
 };
+
+async function downloadPDF(analysis: any) {
+  try {
+    const result = analysis.result_data;
+    const account = result?.account || result;
+    const persona = result?.persona;
+    const pubPattern = result?.pubPattern;
+
+    const pdfData = mapAccountDataForPDF(account, persona, pubPattern);
+    const htmlContent = generateCompletePDFHTML(pdfData, account.ai_insights || '', account.recent_videos || []);
+
+    const container = document.createElement('div');
+    container.innerHTML = htmlContent;
+    container.style.position = 'absolute';
+    container.style.left = '-9999px';
+    container.style.top = '0';
+    document.body.appendChild(container);
+
+    const html2pdf = (await import('html2pdf.js')).default;
+    await (html2pdf().set as any)({
+      margin: 0,
+      filename: `analyse-express-${analysis.tiktok_username}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, logging: false },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+    }).from(container).save();
+
+    document.body.removeChild(container);
+    toast.success("PDF téléchargé !");
+  } catch (err) {
+    console.error("PDF generation error:", err);
+    toast.error("Erreur lors de la génération du PDF");
+  }
+}
 
 const ExpressAnalyses = () => {
   const { data: analyses, isLoading } = useExpressAnalyses();
@@ -74,11 +113,13 @@ const ExpressAnalyses = () => {
                   <TableHead className="text-cream/70">Statut</TableHead>
                   <TableHead className="text-cream/70">Health Score</TableHead>
                   <TableHead className="text-cream/70">Erreur</TableHead>
+                  <TableHead className="text-cream/70">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {analyses.map((analysis) => {
                   const config = statusConfig[analysis.status] || statusConfig.pending;
+                  const canDownload = analysis.status === "complete" && analysis.result_data;
                   return (
                     <TableRow key={analysis.id} className="border-primary/10">
                       <TableCell className="text-cream/80">
@@ -95,6 +136,20 @@ const ExpressAnalyses = () => {
                       </TableCell>
                       <TableCell className="text-red-400 text-sm max-w-[200px] truncate">
                         {analysis.error_message || "—"}
+                      </TableCell>
+                      <TableCell>
+                        {canDownload ? (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => downloadPDF(analysis)}
+                            title="Télécharger le PDF"
+                          >
+                            <Download className="h-4 w-4" />
+                          </Button>
+                        ) : (
+                          <span className="text-cream/30">—</span>
+                        )}
                       </TableCell>
                     </TableRow>
                   );

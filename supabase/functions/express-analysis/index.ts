@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -72,7 +73,22 @@ serve(async (req) => {
       });
     } catch (updateErr) {
       console.warn("Failed to update Stripe session metadata with job_id:", updateErr);
-      // Non-blocking: continue even if metadata update fails
+    }
+
+    // Insert record into express_analyses table
+    try {
+      const supabase = createClient(
+        Deno.env.get("SUPABASE_URL") || "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || ""
+      );
+      await supabase.from("express_analyses").insert({
+        stripe_session_id: session_id,
+        tiktok_username: username,
+        job_id: jobId,
+        status: "processing",
+      });
+    } catch (dbErr) {
+      console.warn("Failed to insert express_analyses record:", dbErr);
     }
 
     // Return job_id so client can poll status

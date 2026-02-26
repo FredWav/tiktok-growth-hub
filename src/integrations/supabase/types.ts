@@ -320,6 +320,42 @@ export type Database = {
         }
         Relationships: []
       }
+      express_analyses: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          health_score: number | null
+          id: string
+          job_id: string | null
+          status: string
+          stripe_session_id: string
+          tiktok_username: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          health_score?: number | null
+          id?: string
+          job_id?: string | null
+          status?: string
+          stripe_session_id: string
+          tiktok_username: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          health_score?: number | null
+          id?: string
+          job_id?: string | null
+          status?: string
+          stripe_session_id?: string
+          tiktok_username?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

@@ -5,11 +5,12 @@ interface SEOHeadProps {
   description: string;
   path: string;
   keywords?: string;
+  schema?: Record<string, unknown> | Record<string, unknown>[];
 }
 
 const BASE_URL = "https://fredwav.com";
 
-export function SEOHead({ title, description, path, keywords }: SEOHeadProps) {
+export function SEOHead({ title, description, path, keywords, schema }: SEOHeadProps) {
   useEffect(() => {
     document.title = title;
 
@@ -25,6 +26,7 @@ export function SEOHead({ title, description, path, keywords }: SEOHeadProps) {
 
     setMeta("description", description);
     if (keywords) setMeta("keywords", keywords);
+    setMeta("robots", "index, follow");
     setMeta("og:title", title, "property");
     setMeta("og:description", description, "property");
     setMeta("og:url", `${BASE_URL}${path}`, "property");
@@ -32,12 +34,14 @@ export function SEOHead({ title, description, path, keywords }: SEOHeadProps) {
     setMeta("og:locale", "fr_FR", "property");
     setMeta("og:site_name", "Fred Wav", "property");
     setMeta("og:image", "https://lovable.dev/opengraph-image-p98pqg.png", "property");
+    setMeta("og:image:alt", "Fred Wav - Expert Stratégie TikTok", "property");
     setMeta("twitter:card", "summary_large_image");
     setMeta("twitter:title", title);
     setMeta("twitter:description", description);
     setMeta("twitter:site", "@FredWav");
     setMeta("twitter:image", "https://lovable.dev/opengraph-image-p98pqg.png");
 
+    // Canonical
     let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
     if (!canonical) {
       canonical = document.createElement("link");
@@ -45,7 +49,36 @@ export function SEOHead({ title, description, path, keywords }: SEOHeadProps) {
       document.head.appendChild(canonical);
     }
     canonical.setAttribute("href", `${BASE_URL}${path}`);
-  }, [title, description, path]);
+
+    // Hreflang
+    let hreflang = document.querySelector('link[hreflang="fr-FR"]') as HTMLLinkElement | null;
+    if (!hreflang) {
+      hreflang = document.createElement("link");
+      hreflang.setAttribute("rel", "alternate");
+      hreflang.setAttribute("hreflang", "fr-FR");
+      document.head.appendChild(hreflang);
+    }
+    hreflang.setAttribute("href", `${BASE_URL}${path}`);
+
+    // JSON-LD schema injection
+    const schemaScripts: HTMLScriptElement[] = [];
+    if (schema) {
+      const schemas = Array.isArray(schema) ? schema : [schema];
+      schemas.forEach((s) => {
+        const script = document.createElement("script");
+        script.type = "application/ld+json";
+        script.text = JSON.stringify(s);
+        document.head.appendChild(script);
+        schemaScripts.push(script);
+      });
+    }
+
+    return () => {
+      schemaScripts.forEach((s) => {
+        if (s.parentNode) s.parentNode.removeChild(s);
+      });
+    };
+  }, [title, description, path, keywords, schema]);
 
   return null;
 }

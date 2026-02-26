@@ -132,7 +132,18 @@ export default function Home() {
   return (
     <Layout>
       <WavSocialScanPopup />
-      <SEOHead title="Fred Wav - Expert Stratégie TikTok | Coaching et Accompagnement" description="Transforme ton TikTok en machine à clients. Diagnostic, stratégie de contenu et plan d'action avec Fred Wav, expert TikTok." path="/" keywords="stratégie tiktok, coaching tiktok, expert tiktok, plan action tiktok, Fred Wav, audience tiktok, monétiser tiktok" />
+      <SEOHead title="Fred Wav - Expert Stratégie TikTok | Coaching et Accompagnement" description="Transforme ton TikTok en machine à clients. Diagnostic, stratégie de contenu et plan d'action avec Fred Wav, expert TikTok." path="/" keywords="stratégie tiktok, coaching tiktok, expert tiktok, plan action tiktok, Fred Wav, audience tiktok, monétiser tiktok" schema={{
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": faqItems.map((item) => ({
+          "@type": "Question",
+          "name": item.question,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": item.answer,
+          },
+        })),
+      }} />
       <Section variant="default" size="xl" className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-cream via-background to-primary/5 -z-10" />
 

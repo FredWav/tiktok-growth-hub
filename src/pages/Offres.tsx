@@ -126,7 +126,16 @@ const scrollTo = (id: string) => {
 export default function Offres() {
   return (
     <Layout>
-      <SEOHead title="Offres et Tarifs - Fred Wav | Coaching TikTok" description="Découvre les offres d'accompagnement TikTok : One Shot (179€), Wav Premium et VIP. Trouve la formule adaptée à tes besoins." path="/offres" keywords="tarifs coaching tiktok, offres tiktok, one shot, wav premium, vip, accompagnement créateur" />
+      <SEOHead title="Offres et Tarifs - Fred Wav | Coaching TikTok" description="Découvre les offres d'accompagnement TikTok : One Shot (179€), Wav Premium et VIP. Trouve la formule adaptée à tes besoins." path="/offres" keywords="tarifs coaching tiktok, offres tiktok, one shot, wav premium, vip, accompagnement créateur" schema={{
+        "@context": "https://schema.org",
+        "@type": "OfferCatalog",
+        "name": "Offres d'accompagnement TikTok - Fred Wav",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "One Shot", "description": "Session stratégique de 1h30 avec diagnostic complet et plan d'action personnalisé" }, "price": "179", "priceCurrency": "EUR" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Wav Premium", "description": "45 jours de transformation TikTok avec suivi hebdomadaire et feedback continu" }, "price": "987", "priceCurrency": "EUR" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "VIP", "description": "Accompagnement continu avec lives hebdo, feedback Discord 5/7 et ressources exclusives" }, "price": "99", "priceCurrency": "EUR", "priceSpecification": { "@type": "UnitPriceSpecification", "price": "99", "priceCurrency": "EUR", "unitText": "mois" } },
+        ],
+      }} />
       <Section variant="cream" size="lg">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">

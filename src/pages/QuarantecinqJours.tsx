@@ -112,7 +112,21 @@ const faqs = [
 export default function QuarantecinqJours() {
   return (
     <Layout>
-      <SEOHead title="Wav Premium - Transformation TikTok en 45 Jours | Fred Wav" description="Wav Premium : 45 jours d'accompagnement intensif pour transformer ta présence TikTok en levier business. Sur candidature." path="/45-jours" keywords="wav premium, accompagnement tiktok, transformation tiktok, suivi personnalisé, coaching tiktok intensif" />
+      <SEOHead title="Wav Premium - Transformation TikTok en 45 Jours | Fred Wav" description="Wav Premium : 45 jours d'accompagnement intensif pour transformer ta présence TikTok en levier business. Sur candidature." path="/45-jours" keywords="wav premium, accompagnement tiktok, transformation tiktok, suivi personnalisé, coaching tiktok intensif" schema={[
+        {
+          "@context": "https://schema.org",
+          "@type": "Service",
+          "name": "Wav Premium - Transformation TikTok 45 Jours",
+          "description": "45 jours d'accompagnement intensif pour transformer ta présence TikTok en levier business. Suivi hebdomadaire, feedback continu, résultats mesurables.",
+          "provider": { "@type": "Person", "name": "Fred Wav", "url": "https://fredwav.com" },
+          "offers": { "@type": "Offer", "price": "987", "priceCurrency": "EUR" },
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": faqs.map((faq) => ({ "@type": "Question", "name": faq.question, "acceptedAnswer": { "@type": "Answer", "text": faq.answer } })),
+        },
+      ]} />
       <Section variant="cream" size="lg">
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">

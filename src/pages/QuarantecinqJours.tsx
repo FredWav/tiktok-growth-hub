@@ -101,7 +101,7 @@ const faqs = [
   },
   {
     question: "Quel est le prix ?",
-    answer: "Le prix est communiqué lors de l'appel de qualification, car il dépend de ta situation. Paiement en plusieurs fois possible.",
+    answer: "Le Wav Premium est à 987€. Si tu as déjà effectué un One Shot, le prix passe à 799€. Paiement en plusieurs fois possible.",
   },
   {
     question: "Et si ça ne marche pas ?",
@@ -124,9 +124,13 @@ export default function QuarantecinqJours() {
             <span className="text-gold-gradient">Wav Premium</span> — 45 jours pour transformer ta présence TikTok
           </h1>
 
-          <p className="text-lg text-muted-foreground mb-8">
+          <p className="text-lg text-muted-foreground mb-4">
             Un accompagnement encadré pour passer de "je poste sans stratégie" à "chaque vidéo a un objectif business".
             Suivi hebdomadaire, feedback continu, résultats mesurables.
+          </p>
+
+          <p className="text-base font-semibold mb-8">
+            987€ — <span className="text-primary">799€ si tu as déjà fait un One Shot</span>
           </p>
 
           <Button

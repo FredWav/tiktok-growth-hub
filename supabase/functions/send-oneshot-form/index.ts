@@ -1,5 +1,6 @@
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import nodemailer from "npm:nodemailer@6.9.16";
+import { getStripeSecretKey } from "../_shared/stripe-config.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -24,7 +25,7 @@ Deno.serve(async (req) => {
     }
 
     // Verify payment with Stripe
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+    const stripe = new Stripe(getStripeSecretKey(), {
       apiVersion: "2025-08-27.basil",
     });
 

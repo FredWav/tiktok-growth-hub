@@ -8,7 +8,7 @@
 type StripeMode = "test" | "live";
 
 // Reads from VITE_STRIPE_MODE env var, defaults to "live"
-const STRIPE_MODE: StripeMode = (import.meta.env.VITE_STRIPE_MODE as StripeMode) || "live";
+const STRIPE_MODE: StripeMode = (import.meta.env.VITE_STRIPE_MODE as StripeMode) || "test";
 
 const PRICE_IDS = {
   test: {

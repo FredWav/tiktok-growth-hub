@@ -89,7 +89,7 @@ const App = () => (
             <Route path="/analyse-express/result" element={<AnalyseExpressResult />} />
             <Route path="/wav-premium/candidature" element={<WavPremiumApplication />} />
 
-            {/* Admin routes 
+            {/* Admin routes */}
             <Route
               path="/admin"
               element={
@@ -161,7 +161,7 @@ const App = () => (
                   <AdminSettings />
                 </ProtectedRoute>
               }
-            /> */}
+            />
 
             {/* Client routes */}
             <Route

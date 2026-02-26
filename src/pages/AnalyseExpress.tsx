@@ -33,7 +33,7 @@ export default function AnalyseExpress() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (cleanUsername.length < 2) {
-      toast.error("Entre un nom d'utilisateur TikTok valide");
+      toast.error("Entre un nom d'utilisateur valide");
       return;
     }
     setShowConfirmModal(true);
@@ -67,15 +67,15 @@ export default function AnalyseExpress() {
   return (
     <Layout>
       <SEOHead
-        title="Analyse Express TikTok – Diagnostic complet en 5 minutes | FredWav"
-        description="Obtiens un diagnostic complet de ton compte TikTok : health score, métriques, persona et recommandations. Rapport PDF téléchargeable pour 11,90€."
+        title="Analyse Express – Diagnostic complet en 5 minutes | FredWav"
+        description="Obtiens un diagnostic complet de ton compte : health score, métriques, persona et recommandations. Rapport PDF téléchargeable pour 11,90€."
         path="/analyse-express"
-        keywords="analyse tiktok, diagnostic tiktok, health score tiktok, rapport tiktok, audit compte tiktok, métriques tiktok"
+        keywords="analyse compte, diagnostic réseaux sociaux, health score, rapport compte, audit compte, métriques"
         schema={{
           "@context": "https://schema.org",
           "@type": "Product",
-          "name": "Analyse Express TikTok",
-          "description": "Diagnostic complet de ton compte TikTok avec health score, métriques clés, analyse de persona et rapport PDF téléchargeable.",
+          "name": "Analyse Express",
+          "description": "Diagnostic complet de ton compte avec health score, métriques clés, analyse de persona et rapport PDF téléchargeable.",
           "offers": {
             "@type": "Offer",
             "price": "11.90",
@@ -94,8 +94,7 @@ export default function AnalyseExpress() {
           </div>
 
           <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">
-            Analyse Express{" "}
-            <span className="text-gold-gradient">TikTok</span>
+            <span className="text-gold-gradient">Analyse Express</span>
           </h1>
 
           <p className="text-lg text-muted-foreground max-w-xl mx-auto mb-10">

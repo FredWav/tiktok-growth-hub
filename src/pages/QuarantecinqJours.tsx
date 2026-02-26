@@ -14,7 +14,7 @@ import { trackEvent } from "@/lib/tracking";
 import { SEOHead } from "@/components/SEOHead";
 
 const forYou = [
-  "Tu as déjà un business et tu veux que TikTok devienne un vrai levier",
+  "Tu as déjà un business et tu veux que les formats courts deviennent un vrai levier",
   "Tu es prêt à t'investir sérieusement pendant 45 jours",
   "Tu veux des résultats mesurables, pas juste des conseils",
 ];
@@ -112,12 +112,12 @@ const faqs = [
 export default function QuarantecinqJours() {
   return (
     <Layout>
-      <SEOHead title="Wav Premium - Transformation TikTok en 45 Jours | Fred Wav" description="Wav Premium : 45 jours d'accompagnement intensif pour transformer ta présence TikTok en levier business. Sur candidature." path="/45-jours" keywords="wav premium, accompagnement tiktok, transformation tiktok, suivi personnalisé, coaching tiktok intensif" schema={[
+      <SEOHead title="Wav Premium - Transformation en 45 Jours | Fred Wav" description="Wav Premium : 45 jours d'accompagnement intensif pour transformer ta présence en ligne en levier business. Sur candidature." path="/45-jours" keywords="wav premium, accompagnement formats courts, transformation contenu, suivi personnalisé, coaching intensif" schema={[
         {
           "@context": "https://schema.org",
           "@type": "Service",
-          "name": "Wav Premium - Transformation TikTok 45 Jours",
-          "description": "45 jours d'accompagnement intensif pour transformer ta présence TikTok en levier business. Suivi hebdomadaire, feedback continu, résultats mesurables.",
+          "name": "Wav Premium - Transformation 45 Jours",
+          "description": "45 jours d'accompagnement intensif pour transformer ta présence en ligne en levier business. Suivi hebdomadaire, feedback continu, résultats mesurables.",
           "provider": { "@type": "Person", "name": "Fred Wav", "url": "https://fredwav.com" },
           "offers": { "@type": "Offer", "price": "987", "priceCurrency": "EUR" },
         },
@@ -135,7 +135,7 @@ export default function QuarantecinqJours() {
           </div>
 
           <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">
-            <span className="text-gold-gradient">Wav Premium</span> — 45 jours pour transformer ta présence TikTok
+            <span className="text-gold-gradient">Wav Premium</span> — 45 jours pour transformer ta présence en ligne
           </h1>
 
           <p className="text-lg text-muted-foreground mb-4">
@@ -318,7 +318,7 @@ export default function QuarantecinqJours() {
             Prêt pour la transformation ?
           </h2>
           <p className="text-muted-foreground text-lg mb-8">
-            Le Wav Premium : 45 jours pour construire une présence TikTok qui génère des résultats pour ton business.
+            Le Wav Premium : 45 jours pour construire une présence en ligne qui génère des résultats pour ton business.
           </p>
           <Button
             variant="hero"

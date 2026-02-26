@@ -160,7 +160,7 @@ export default function AnalyseExpressResult() {
 
       await (html2pdf() as any).set({
         margin: [10, 0, 10, 0],
-        filename: `analyse-tiktok-${username}.pdf`,
+        filename: `analyse-${username}.pdf`,
         image: { type: "jpeg", quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true, allowTaint: true },
         jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
@@ -187,8 +187,8 @@ export default function AnalyseExpressResult() {
   return (
     <Layout>
       <SEOHead
-        title="Résultats Analyse Express TikTok | FredWav"
-        description="Consultez les résultats de votre analyse TikTok et téléchargez votre rapport PDF."
+        title="Résultats Analyse Express | FredWav"
+        description="Consultez les résultats de votre analyse et téléchargez votre rapport PDF."
         path="/analyse-express/result"
       />
 

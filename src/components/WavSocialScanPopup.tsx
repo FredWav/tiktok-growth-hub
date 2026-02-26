@@ -39,7 +39,7 @@ export function WavSocialScanPopup() {
       >
         <X className="h-4 w-4" />
       </button>
-      <p className="font-semibold text-sm mb-1">⚡ Analyse ton compte TikTok en 2 min</p>
+      <p className="font-semibold text-sm mb-1">⚡ Analyse ton compte en 2 min</p>
       <p className="text-xs text-muted-foreground mb-3">
         Health score, métriques clés et recommandations. Rapport PDF inclus — 11,90€.
       </p>

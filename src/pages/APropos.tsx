@@ -39,7 +39,7 @@ const stats = [
   { value: "10M+", label: "Vues générées via stratégies déployées" },
   { value: "18 ans", label: "D'expérience en création vidéo" },
   { value: "20 ans", label: "Dans la musique et la création artistique" },
-  { value: "280K", label: "Abonnés TikTok cumulés" },
+  { value: "280K", label: "Abonnés cumulés" },
   { value: "35K", label: "Abonnés Instagram" },
   { value: "30K", label: "Abonnés YouTube" },
   { value: "95%", label: "Taux de satisfaction" },
@@ -48,14 +48,14 @@ const stats = [
 export default function APropos() {
   return (
     <Layout>
-      <SEOHead title="À propos de Fred Wav | Expert Stratégie TikTok" description="18 ans d'expérience vidéo, 300+ créateurs accompagnés, 10M+ vues générées. Découvre le parcours et la méthode." path="/a-propos" keywords="Fred Wav, expert tiktok, parcours, méthode data-driven, accompagnement créateur" schema={{
+      <SEOHead title="À propos de Fred Wav | Expert Stratégie Formats Courts" description="18 ans d'expérience vidéo, 300+ créateurs accompagnés, 10M+ vues générées. Découvre le parcours et la méthode." path="/a-propos" keywords="Fred Wav, expert formats courts, parcours, méthode data-driven, accompagnement créateur" schema={{
         "@context": "https://schema.org",
         "@type": "Person",
         "name": "Fred Wav",
-        "jobTitle": "Expert Stratégie TikTok",
+        "jobTitle": "Expert Stratégie Formats Courts",
         "url": "https://fredwav.com/a-propos",
-        "description": "Stratégiste en contenu TikTok et formats courts. 18 ans d'expérience vidéo, 300+ créateurs accompagnés, 10M+ vues générées.",
-        "knowsAbout": ["Stratégie TikTok", "Marketing vidéo", "Hook engineering", "Formats courts", "Croissance organique"],
+        "description": "Stratégiste en contenu et formats courts. 18 ans d'expérience vidéo, 300+ créateurs accompagnés, 10M+ vues générées.",
+        "knowsAbout": ["Stratégie formats courts", "Marketing vidéo", "Hook engineering", "Réseaux sociaux", "Croissance organique"],
         "sameAs": ["https://www.tiktok.com/@fredwav", "https://www.instagram.com/levraifredwav/", "https://www.youtube.com/@Fredwavconseils"],
       }} />
       <Section variant="cream" size="lg">
@@ -65,7 +65,7 @@ export default function APropos() {
               Je suis là pour <span className="text-gold-gradient">tes résultats</span>, pas pour te vendre du rêve.
             </h1>
             <p className="text-lg text-muted-foreground mb-6">
-              Stratégiste en contenu TikTok et formats courts, j'accompagne entrepreneurs et créateurs 
+              Stratégiste en contenu et formats courts, j'accompagne entrepreneurs et créateurs 
               à construire une présence qui génère des clients — pas juste des likes.
             </p>
             <p className="text-muted-foreground">
@@ -106,7 +106,7 @@ export default function APropos() {
 
           <div className="prose prose-lg max-w-none text-muted-foreground space-y-4">
             <p>
-              Je n'ai pas commencé avec TikTok.<br />
+              Je n'ai pas commencé avec les formats courts.<br />
               Mes premières vidéos remontent à mes 16 ans. J'en ai 35 cette année.
             </p>
             <p>
@@ -115,7 +115,7 @@ export default function APropos() {
               13 ans que je travaille le son, l'enregistrement et la technique.
             </p>
             <p>
-              TikTok n'a été qu'un terrain d'application supplémentaire.
+              Les formats courts n'ont été qu'un terrain d'application supplémentaire.
             </p>
             <p>
               Comme tout le monde, j'ai posté sans stratégie au début.

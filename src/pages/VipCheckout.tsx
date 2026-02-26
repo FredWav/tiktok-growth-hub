@@ -117,10 +117,10 @@ function VipCheckoutForm() {
 
   return (
     <Layout>
-      <SEOHead title="VIP - Accompagnement Continu TikTok | Fred Wav" description="Rejoins le hub VIP : lives hebdo, feedback Discord 5/7, ressources exclusives. À partir de 99€/mois." path="/offres/vip" keywords="vip tiktok, accompagnement continu, discord tiktok, lives hebdo, feedback créateur" schema={{
+      <SEOHead title="VIP - Accompagnement Continu | Fred Wav" description="Rejoins le hub VIP : lives hebdo, feedback Discord 5/7, ressources exclusives. À partir de 99€/mois." path="/offres/vip" keywords="vip formats courts, accompagnement continu, discord créateurs, lives hebdo, feedback créateur" schema={{
         "@context": "https://schema.org",
         "@type": "Service",
-        "name": "VIP - Accompagnement Continu TikTok",
+        "name": "VIP - Accompagnement Continu",
         "description": "Accompagnement continu avec lives hebdomadaires, feedback Discord 5/7, ressources exclusives. Environnement structuré orienté performance.",
         "provider": { "@type": "Person", "name": "Fred Wav", "url": "https://fredwav.com" },
         "offers": { "@type": "AggregateOffer", "lowPrice": "74.25", "highPrice": "99", "priceCurrency": "EUR", "offerCount": "3" },

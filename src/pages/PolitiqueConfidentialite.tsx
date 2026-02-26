@@ -32,7 +32,7 @@ export default function PolitiqueConfidentialite() {
           <ul className="list-disc pl-6 text-muted-foreground mb-4 space-y-1">
             <li><strong>Identité :</strong> Nom, prénom.</li>
             <li><strong>Contact :</strong> Adresse email, numéro de téléphone (obligatoire pour le suivi WhatsApp Wav Premium).</li>
-            <li><strong>Données professionnelles :</strong> Nom d'utilisateur TikTok, URL de compte, statistiques publiques et données de profil nécessaires au diagnostic stratégique.</li>
+            <li><strong>Données professionnelles :</strong> Identifiant de compte, URL de compte, statistiques publiques et données de profil nécessaires au diagnostic stratégique.</li>
             <li><strong>Paiement :</strong> Les transactions sont gérées par Stripe. Fred Wav n'a jamais accès à vos coordonnées bancaires complètes.</li>
             <li><strong>Données techniques :</strong> Adresse IP, type de navigateur (via les logs du serveur pour la sécurité).</li>
           </ul>

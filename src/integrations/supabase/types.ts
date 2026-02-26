@@ -515,6 +515,45 @@ export type Database = {
           },
         ]
       }
+      wav_premium_applications: {
+        Row: {
+          blockers: string
+          budget_confirmed: boolean
+          created_at: string
+          current_level: string
+          email: string
+          first_name: string
+          goals: string
+          id: string
+          last_name: string
+          tiktok_username: string | null
+        }
+        Insert: {
+          blockers: string
+          budget_confirmed?: boolean
+          created_at?: string
+          current_level: string
+          email: string
+          first_name: string
+          goals: string
+          id?: string
+          last_name: string
+          tiktok_username?: string | null
+        }
+        Update: {
+          blockers?: string
+          budget_confirmed?: boolean
+          created_at?: string
+          current_level?: string
+          email?: string
+          first_name?: string
+          goals?: string
+          id?: string
+          last_name?: string
+          tiktok_username?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

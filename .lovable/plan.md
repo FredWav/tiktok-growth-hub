@@ -1,51 +1,63 @@
 
 
-## Intégration PostHog – Tracking stratégique sur tout le site
+## Suivi des Analyses Express dans le panneau admin
 
-### 1. Installer posthog-js et initialiser
+### Objectif
+Stocker chaque analyse express en base de données avec son statut (processing, complete, failed) pour que l'admin puisse voir l'historique et savoir si ça s'est bien passé.
 
-**Nouveau fichier `src/lib/posthog.ts`** :
-- Initialiser PostHog avec la clé `phc_PtioXOoY4oT3GYJsV7xTpI3a2fscFeJfX6mzFGMWGDj` et host `https://us.i.posthog.com`
-- Respecter le consentement GDPR : PostHog ne démarre le tracking qu'après acceptation des cookies (comme Google Analytics)
-- Exporter des fonctions utilitaires : `initPostHog()`, `trackPostHogEvent(event, properties)`
+### 1. Créer la table `express_analyses`
 
-### 2. Intégrer au consentement cookies
+```sql
+CREATE TABLE public.express_analyses (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  stripe_session_id text NOT NULL,
+  tiktok_username text NOT NULL,
+  job_id text,
+  status text NOT NULL DEFAULT 'pending', -- pending, processing, complete, failed
+  error_message text,
+  health_score integer,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  completed_at timestamptz
+);
 
-**Fichier `src/components/CookieConsent.tsx`** :
-- Appeler `initPostHog()` quand l'utilisateur accepte les cookies
-- Si déjà accepté au chargement, initialiser PostHog automatiquement
+ALTER TABLE public.express_analyses ENABLE ROW LEVEL SECURITY;
 
-### 3. Enrichir `src/lib/tracking.ts`
+CREATE POLICY "Admins can manage all express_analyses"
+  ON public.express_analyses FOR ALL
+  TO authenticated
+  USING (has_role(auth.uid(), 'admin'::app_role));
+```
 
-- Ajouter PostHog en parallèle de Google Analytics dans `trackEvent()` → chaque appel existant envoie aussi à PostHog sans modifier les pages
+### 2. Modifier les edge functions pour écrire en base
 
-### 4. Ajouter le tracking automatique de navigation
+**`express-analysis/index.ts`** : Après le paiement vérifié, insérer une ligne `status: 'processing'` avec le `tiktok_username`, `stripe_session_id` et `job_id`.
 
-**Fichier `src/App.tsx`** :
-- Ajouter un composant `PostHogPageTracker` qui capture un `$pageview` à chaque changement de route (via `useLocation`)
+**`express-analysis-status/index.ts`** : Quand le job est `completed` ou `failed`, mettre à jour la ligne correspondante avec le statut final, le `health_score` (si disponible), et `completed_at`.
 
-### 5. Événements stratégiques à tracker (en plus des existants)
+### 3. Créer la page admin `/admin/analyses`
 
-Les `trackEvent()` existants couvrent déjà les clics CTA. On ajoute des événements de conversion critiques :
+**Nouveau fichier `src/pages/admin/ExpressAnalyses.tsx`** :
+- Table listant toutes les analyses express (date, username, statut, health score)
+- Badge de couleur selon le statut : vert (complete), jaune (processing), rouge (failed)
+- Tri par date décroissante
 
-| Page | Événement | Déclencheur |
-|------|-----------|-------------|
-| `AnalyseExpress.tsx` | `express_checkout_start` | Clic "Lancer l'analyse" (validation username) |
-| `AnalyseExpressResult.tsx` | `express_pdf_download` | Clic téléchargement PDF |
-| `OneShot.tsx` | `oneshot_checkout_start` | Clic paiement |
-| `OneShotSuccess.tsx` | `oneshot_form_submit` | Soumission du formulaire post-paiement |
-| `VipCheckout.tsx` | `vip_plan_select` | Sélection d'un plan (3/6/12 mois) |
-| `VipCheckout.tsx` | `vip_checkout_start` | Clic paiement |
-| `WavPremiumApplication.tsx` | `wav_premium_apply` | Soumission candidature |
-| `Contact.tsx` | `contact_social_click` | Clic sur un réseau social |
-| `Home.tsx` | `faq_open` | Ouverture d'une question FAQ |
+### 4. Hook `useExpressAnalyses`
 
-### 6. Identifier les utilisateurs
+**Nouveau fichier `src/hooks/useExpressAnalyses.ts`** :
+- Query React Query pour récupérer les analyses depuis la table `express_analyses`
 
-- Sur les pages de paiement (`VipCheckout`, `OneShot`), appeler `posthog.identify(email)` quand un email est saisi pour lier les événements à un utilisateur
+### 5. Ajouter au menu admin et aux routes
 
-### Fichiers modifiés
+**`src/components/layout/AdminLayout.tsx`** : Ajouter un lien "Analyses Express" avec l'icône `Zap` dans la navigation.
 
-- **Nouveau** : `src/lib/posthog.ts`
-- **Modifiés** : `src/lib/tracking.ts`, `src/components/CookieConsent.tsx`, `src/App.tsx`, `src/pages/AnalyseExpress.tsx`, `src/pages/AnalyseExpressResult.tsx`, `src/pages/OneShot.tsx`, `src/pages/OneShotSuccess.tsx`, `src/pages/VipCheckout.tsx`, `src/pages/WavPremiumApplication.tsx`, `src/pages/Contact.tsx`, `src/pages/Home.tsx`
+**`src/App.tsx`** : Ajouter la route `/admin/analyses` (protégée admin).
+
+### 6. KPI sur le Dashboard admin
+
+**`src/pages/admin/Dashboard.tsx`** : Ajouter une carte avec le nombre d'analyses du mois et le taux de succès.
+
+### Fichiers modifiés/créés
+- **Migration SQL** : table `express_analyses`
+- **Modifiés** : `express-analysis/index.ts`, `express-analysis-status/index.ts`, `AdminLayout.tsx`, `App.tsx`, `Dashboard.tsx`
+- **Nouveaux** : `src/pages/admin/ExpressAnalyses.tsx`, `src/hooks/useExpressAnalyses.ts`
 

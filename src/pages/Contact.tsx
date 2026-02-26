@@ -36,7 +36,7 @@ const socials = [
 export default function Contact() {
   return (
     <Layout>
-      <SEOHead title="Contact - Fred Wav | Expert TikTok" description="Contacte Fred Wav par email ou réseaux sociaux. Réponse sous 24-48h en semaine." path="/contact" keywords="contact Fred Wav, question tiktok, réseaux sociaux, email" />
+      <SEOHead title="Contact - Fred Wav | Expert Formats Courts" description="Contacte Fred Wav par email ou réseaux sociaux. Réponse sous 24-48h en semaine." path="/contact" keywords="contact Fred Wav, question formats courts, réseaux sociaux, email" />
       <Section variant="cream" size="lg">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">

@@ -9,11 +9,11 @@ import { trackEvent } from "@/lib/tracking";
 import { SEOHead } from "@/components/SEOHead";
 
 const videoTestimonials = [
-  { id: "97xyXqwszrM", alt: "Témoignage client - Retour d'expérience sur l'accompagnement TikTok" },
-  { id: "cc1cRfCEJGE", alt: "Témoignage client - Résultats après coaching stratégie TikTok" },
-  { id: "hwTyjA6BORY", alt: "Témoignage client - Transformation de présence TikTok" },
+  { id: "97xyXqwszrM", alt: "Témoignage client - Retour d'expérience sur l'accompagnement" },
+  { id: "cc1cRfCEJGE", alt: "Témoignage client - Résultats après coaching stratégie de contenu" },
+  { id: "hwTyjA6BORY", alt: "Témoignage client - Transformation de présence en ligne" },
   { id: "FrMFqiAqAkU", alt: "Témoignage client - Impact du One Shot sur la stratégie de contenu" },
-  { id: "s-VaJvfFqbM", alt: "Témoignage client - Croissance TikTok après accompagnement" },
+  { id: "s-VaJvfFqbM", alt: "Témoignage client - Croissance après accompagnement" },
   { id: "wu2CPcqp-yU", alt: "Témoignage client - Avis sur le Wav Premium de Fred Wav" },
 ];
 
@@ -58,7 +58,7 @@ const testimonials = [
   {
     name: "Estelle",
     role: "Membre de la formation",
-    content: "Ce qui m'a le plus aidé, c'était l'analyse de compte. J'ai fait une autre formation social media, et ta valeur ajoutée est visible dès le début. La communauté qui se soutient, les feedbacks directs sur TikTok... Merci Fred pour tout ce boulot, c'est génial.",
+    content: "Ce qui m'a le plus aidé, c'était l'analyse de compte. J'ai fait une autre formation social media, et ta valeur ajoutée est visible dès le début. La communauté qui se soutient, les feedbacks directs... Merci Fred pour tout ce boulot, c'est génial.",
     result: "Analyse de compte",
   },
   {
@@ -150,10 +150,10 @@ const chooseOffers = [
 export default function Preuves() {
   return (
     <Layout>
-      <SEOHead title="Témoignages et Résultats Clients | Fred Wav" description="Découvre les résultats concrets de nos clients : témoignages vidéo, études de cas et retours d'expérience." path="/preuves" keywords="témoignages tiktok, résultats clients, études de cas, retours expérience, preuves" schema={{
+      <SEOHead title="Témoignages et Résultats Clients | Fred Wav" description="Découvre les résultats concrets de nos clients : témoignages vidéo, études de cas et retours d'expérience." path="/preuves" keywords="témoignages formats courts, résultats clients, études de cas, retours expérience, preuves" schema={{
         "@context": "https://schema.org",
         "@type": "Service",
-        "name": "Accompagnement TikTok - Fred Wav",
+        "name": "Accompagnement Formats Courts - Fred Wav",
         "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.8", "reviewCount": "300", "bestRating": "5" },
       }} />
       <Section variant="cream" size="lg">

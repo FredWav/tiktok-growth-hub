@@ -14,7 +14,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-sm text-muted-foreground max-w-md">
-              Expert stratégie TikTok. 
+              Expert stratégie formats courts. 
               Des résultats, pas des promesses.
             </p>
           </div>

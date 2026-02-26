@@ -63,7 +63,7 @@ const faqs = [
   },
   {
     question: "J'ai besoin de quoi avant la session ?",
-    answer: "Juste d'un compte TikTok (même vide) et de répondre au questionnaire que je t'envoie après ta réservation. C'est tout.",
+    answer: "Juste d'un compte sur les réseaux (même vide) et de répondre au questionnaire que je t'envoie après ta réservation. C'est tout.",
   },
   {
     question: "C'est adapté aux débutants ?",
@@ -113,12 +113,12 @@ export default function OneShot() {
 
   return (
     <Layout>
-      <SEOHead title="One Shot - Session Stratégie TikTok 179€ | Fred Wav" description="1h30 de diagnostic et plan d'action personnalisé pour ta stratégie TikTok. Réservation en ligne, paiement sécurisé." path="/one-shot" keywords="one shot tiktok, session stratégie, diagnostic tiktok, coaching individuel, plan action, 179 euros" schema={[
+      <SEOHead title="One Shot - Session Stratégie 179€ | Fred Wav" description="1h30 de diagnostic et plan d'action personnalisé pour ta stratégie de contenu. Réservation en ligne, paiement sécurisé." path="/one-shot" keywords="one shot stratégie, session stratégie, diagnostic contenu, coaching individuel, plan action, 179 euros" schema={[
         {
           "@context": "https://schema.org",
           "@type": "Service",
-          "name": "One Shot - Session Stratégie TikTok",
-          "description": "1h30 de diagnostic complet et plan d'action personnalisé pour ta stratégie TikTok.",
+          "name": "One Shot - Session Stratégie Formats Courts",
+          "description": "1h30 de diagnostic complet et plan d'action personnalisé pour ta stratégie de contenu.",
           "provider": { "@type": "Person", "name": "Fred Wav", "url": "https://fredwav.com" },
           "offers": { "@type": "Offer", "price": "179", "priceCurrency": "EUR", "availability": "https://schema.org/InStock" },
         },
@@ -136,12 +136,12 @@ export default function OneShot() {
           </div>
           
           <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">
-            1h30 pour clarifier <span className="text-gold-gradient">ta stratégie TikTok</span>
+            1h30 pour clarifier <span className="text-gold-gradient">ta stratégie</span>
           </h1>
           
           <p className="text-lg text-muted-foreground mb-8">
             Tu postes sans stratégie claire ? Tu ne sais pas par où commencer ?
-            En 1h30, on pose les bases d'une présence TikTok qui génère des résultats.
+            En 1h30, on pose les bases d'une présence en ligne qui génère des résultats.
           </p>
 
           <Button variant="hero" size="xl" onClick={() => { trackEvent("cta_one_shot_click", { location: "oneshot_hero" }); handleCheckout(); }} disabled={loading}>

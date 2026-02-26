@@ -5,7 +5,7 @@ import { SEOHead } from "@/components/SEOHead";
 export default function CGV() {
   return (
     <Layout>
-      <SEOHead title="Conditions Générales de Vente | Fred Wav" description="CGV applicables aux prestations de conseil en stratégie TikTok proposées par Fred Wav." path="/cgv" keywords="conditions générales, cgv, mentions légales" />
+      <SEOHead title="Conditions Générales de Vente | Fred Wav" description="CGV applicables aux prestations de conseil en stratégie de contenu proposées par Fred Wav." path="/cgv" keywords="conditions générales, cgv, mentions légales" />
       <Section variant="default" size="lg">
         <div className="max-w-3xl mx-auto prose prose-neutral">
           <h1 className="font-display text-3xl md:text-4xl font-semibold mb-2">Conditions Générales de Vente (CGV) — Fred Wav</h1>
@@ -25,7 +25,7 @@ export default function CGV() {
           {/* ARTICLE 2 */}
           <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 2 — Objet</h2>
           <p className="text-muted-foreground mb-4">
-            Les présentes CGV encadrent la vente à distance de prestations de conseil, d'accompagnement stratégique TikTok, l'accès à des ressources numériques et des abonnements VIP.
+            Les présentes CGV encadrent la vente à distance de prestations de conseil, d'accompagnement stratégique en formats courts, l'accès à des ressources numériques et des abonnements VIP.
           </p>
 
           {/* ARTICLE 3 */}
@@ -46,7 +46,7 @@ export default function CGV() {
           <ul className="text-muted-foreground mb-4 space-y-1">
             <li><strong>Prestations :</strong> One Shot (session unique), Wav Premium (45 jours), VIP (abonnement).</li>
             <li><strong>Contenus numériques :</strong> Cours, replays, checklists, méthodes, templates accessibles via Discord ou plateforme dédiée.</li>
-            <li><strong>Plateformes tierces :</strong> TikTok, Discord, WhatsApp, Stripe, PayPal, Klarna. Fred Wav n'est pas responsable de leurs pannes, interruptions, changements de conditions d'utilisation, ni des conséquences pouvant en découler.</li>
+            <li><strong>Plateformes tierces :</strong> TikTok, Instagram, YouTube, Discord, WhatsApp, Stripe, PayPal, Klarna. Fred Wav n'est pas responsable de leurs pannes, interruptions, changements de conditions d'utilisation, ni des conséquences pouvant en découler.</li>
           </ul>
 
           {/* ARTICLE 5 */}
@@ -152,7 +152,7 @@ export default function CGV() {
           <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 10 — Responsabilité et limitation</h2>
           <p className="text-muted-foreground mb-4">
             Fred Wav est tenu à une obligation de moyens, pas de résultat.
-            Il ne peut être tenu responsable des changements d'algorithme, des bannissements TikTok, des décisions de modération, des pannes de plateformes tierces, ni du manque de mise en application des conseils par le client.
+            Il ne peut être tenu responsable des changements d'algorithme, des bannissements de compte, des décisions de modération, des pannes de plateformes tierces, ni du manque de mise en application des conseils par le client.
           </p>
           <p className="text-muted-foreground mb-4">
             La responsabilité totale de Fred Wav, lorsque sa responsabilité serait retenue, est limitée au montant effectivement payé par le client pour la prestation litigieuse.

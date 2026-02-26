@@ -37,7 +37,7 @@ const profiles: { icon: LucideIcon; title: string; description: string }[] = [
   {
     icon: Target,
     title: "Tu veux structurer ton contenu pour vendre",
-    description: "Tu sais que TikTok peut rapporter, tu veux juste la bonne méthode pour y arriver.",
+    description: "Tu sais que les réseaux peuvent rapporter, tu veux juste la bonne méthode pour y arriver.",
   },
 ];
 
@@ -104,7 +104,7 @@ const offers = [
 const faqItems = [
   {
     question: "C'est quoi exactement un One Shot ?",
-    answer: "C'est une session de 1h30 en visio où je fais un diagnostic complet de ton compte TikTok, ta niche et ta stratégie. Tu repars avec un plan d'action concret et personnalisé.",
+    answer: "C'est une session de 1h30 en visio où je fais un diagnostic complet de ton compte, ta niche et ta stratégie. Tu repars avec un plan d'action concret et personnalisé.",
   },
   {
     question: "Est-ce que le One Shot suffit ou je dois prendre le Wav Premium ?",
@@ -115,7 +115,7 @@ const faqItems = [
     answer: "La méthode est basée sur les données et s'adapte à tous les secteurs : coaching, e-commerce, artisanat, services, formation. Si tu vends quelque chose, ça fonctionne.",
   },
   {
-    question: "Je débute sur TikTok, c'est trop tôt ?",
+    question: "Je débute sur les réseaux, c'est trop tôt ?",
     answer: "Non. Mieux vaut commencer avec une bonne stratégie que de poster 6 mois dans le vide. Le One Shot est justement fait pour poser les bases.",
   },
   {
@@ -132,7 +132,7 @@ export default function Home() {
   return (
     <Layout>
       <WavSocialScanPopup />
-      <SEOHead title="Fred Wav - Expert Stratégie TikTok | Coaching et Accompagnement" description="Transforme ton TikTok en machine à clients. Diagnostic, stratégie de contenu et plan d'action avec Fred Wav, expert TikTok." path="/" keywords="stratégie tiktok, coaching tiktok, expert tiktok, plan action tiktok, Fred Wav, audience tiktok, monétiser tiktok" schema={{
+      <SEOHead title="Fred Wav - Expert Stratégie Formats Courts | Coaching et Accompagnement" description="Transforme tes réseaux en machine à clients. Diagnostic, stratégie de contenu et plan d'action avec Fred Wav, expert formats courts." path="/" keywords="stratégie formats courts, coaching réseaux sociaux, expert formats courts, plan action contenu, Fred Wav, audience réseaux, monétiser contenu" schema={{
         "@context": "https://schema.org",
         "@type": "FAQPage",
         "mainEntity": faqItems.map((item) => ({
@@ -149,7 +149,7 @@ export default function Home() {
 
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 animate-fade-in">
-            Clarifie ta stratégie TikTok.{" "}
+            Clarifie ta stratégie.{" "}
             <span className="text-gold-gradient">Augmente ta visibilité.</span>
           </h1>
 

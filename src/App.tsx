@@ -50,6 +50,7 @@ import AdminDeliverables from "./pages/admin/Deliverables";
 import AdminTemplates from "./pages/admin/Templates";
 import AdminSettings from "./pages/admin/Settings";
 import AdminExpressAnalyses from "./pages/admin/ExpressAnalyses";
+import AdminApplications from "./pages/admin/Applications";
 
 // Client pages
 import ClientDashboard from "./pages/client/ClientDashboard";
@@ -168,6 +169,15 @@ const App = () => (
               element={
                 <ProtectedRoute requiredRole="admin">
                   <AdminExpressAnalyses />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin/applications"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AdminApplications />
                 </ProtectedRoute>
               }
             />

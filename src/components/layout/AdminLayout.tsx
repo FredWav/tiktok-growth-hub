@@ -14,6 +14,7 @@ import {
   Menu,
   X,
   Zap,
+  ClipboardList,
 } from "lucide-react";
 import { useState } from "react";
 import { AdminChatbot } from "@/components/admin/AdminChatbot";
@@ -30,6 +31,7 @@ const navItems = [
   { label: "Livrables", href: "/admin/deliverables", icon: FileText },
   { label: "Templates", href: "/admin/templates", icon: Mail },
   { label: "Analyses Express", href: "/admin/analyses", icon: Zap },
+  { label: "Candidatures", href: "/admin/applications", icon: ClipboardList },
   { label: "Paramètres", href: "/admin/settings", icon: Settings },
 ];
 

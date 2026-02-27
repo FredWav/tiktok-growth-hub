@@ -85,6 +85,21 @@ export default function WavPremiumApplication() {
         } as any);
 
       if (error) throw error;
+
+      // Send notification email (fire and forget)
+      supabase.functions.invoke("notify-application", {
+        body: {
+          first_name: data.first_name,
+          last_name: data.last_name,
+          email: data.email,
+          tiktok_username: data.tiktok_username || null,
+          current_level: levels.find((l) => l.value === data.current_level)?.label ?? data.current_level,
+          blockers: data.blockers,
+          goals: data.goals,
+          budget_confirmed: data.budget_confirmed,
+        },
+      }).catch((err) => console.error("Notification email error:", err));
+
       setSubmitted(true);
     } catch {
       toast.error("Une erreur est survenue. Réessaie ou contacte-nous directement.");

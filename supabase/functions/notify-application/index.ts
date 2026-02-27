@@ -4,7 +4,8 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1476936142149390498/PWhNWcdB4iqoFrfF7dFAdhpeMDwuLPNjvGiuZxp_0ubpjdxncA2UFTHcXMZzPiXtT6Bg";
+const DISCORD_WEBHOOK_URL =
+  "https://discord.com/api/webhooks/1476936142149390498/PWhNWcdB4iqoFrfF7dFAdhpeMDwuLPNjvGiuZxp_0ubpjdxncA2UFTHcXMZzPiXtT6Bg";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -12,7 +13,8 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { first_name, last_name, email, tiktok_username, current_level, blockers, goals, budget_confirmed } = await req.json();
+    const { first_name, last_name, email, tiktok_username, current_level, blockers, goals, budget_confirmed } =
+      await req.json();
 
     if (!first_name || !last_name || !email) {
       return new Response(JSON.stringify({ error: "Champs obligatoires manquants" }), {
@@ -22,7 +24,7 @@ Deno.serve(async (req) => {
     }
 
     const payload = {
-      content: "<@1409844507607957556> 📋 **Nouvelle candidature Wav Premium !**",
+      content: "<@&1409844507607957556> 📋 **Nouvelle candidature Wav Premium !**",
       embeds: [
         {
           title: `${first_name} ${last_name}`,

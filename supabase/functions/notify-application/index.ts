@@ -24,10 +24,7 @@ Deno.serve(async (req) => {
     }
 
     const payload = {
-      content: "<@&1409844507607957556> 📋 **Nouvelle candidature Wav Premium !**",
-      allowed_mentions: {
-        roles: ["1409844507607957556"], // ✅ autorise le ping du rôle
-      },
+      content: "<@967099537439227965> <@826133033069051954>📋 **Nouvelle candidature Wav Premium !**",
       embeds: [
         {
           title: `${first_name} ${last_name}`,

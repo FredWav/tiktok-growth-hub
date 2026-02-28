@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.notify-application]
 verify_jwt = false
+
+[functions.retry-express-analysis]
+verify_jwt = false

@@ -89,21 +89,31 @@ const ExpressAnalyses = () => {
     });
   }, []);
 
-  const startPolling = useCallback((analysisId: string) => {
+  const startPolling = useCallback((analysisId: string, jobId: string) => {
     const poll = setInterval(async () => {
       try {
-        const { data, error } = await supabase
-          .from("express_analyses")
-          .select("status")
-          .eq("id", analysisId)
-          .single();
+        const { data: sessionData } = await supabase.auth.getSession();
+        const token = sessionData?.session?.access_token;
 
-        if (error) return;
+        const res = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/check-express-job`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            },
+            body: JSON.stringify({ job_id: jobId, analysis_id: analysisId }),
+          }
+        );
 
-        if (data.status === "complete" || data.status === "failed") {
+        const result = await res.json();
+
+        if (result.status === "complete" || result.status === "failed") {
           stopPolling(analysisId);
           queryClient.invalidateQueries({ queryKey: ["express-analyses"] });
-          if (data.status === "complete") {
+          if (result.status === "complete") {
             toast.success("Analyse relancée avec succès !");
           } else {
             toast.error("L'analyse a échoué après relance");
@@ -145,7 +155,7 @@ const ExpressAnalyses = () => {
 
       toast.info("Analyse relancée, polling en cours...");
       queryClient.invalidateQueries({ queryKey: ["express-analyses"] });
-      startPolling(analysis.id);
+      startPolling(analysis.id, result.job_id);
     } catch (err: any) {
       console.error("Retry error:", err);
       toast.error(err.message || "Erreur lors de la relance");

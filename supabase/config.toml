@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.retry-express-analysis]
 verify_jwt = false
+
+[functions.check-express-job]
+verify_jwt = false

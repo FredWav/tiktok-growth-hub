@@ -1,14 +1,14 @@
 
 
-## Plan : Afficher l'analyse IA directement (sans collapsible) et corriger le mobile
+## Plan : Passer Stripe en mode test
 
-### Problème
-L'analyse IA (`ai_insights`) est dans un `Collapsible` fermé par défaut → invisible sur mobile car l'utilisateur ne pense pas à cliquer dessus.
+Le système supporte déjà le basculement test/live. Deux modifications :
 
-### Modification : `src/pages/AnalyseExpressResult.tsx` (lignes 307-322)
+### 1. Frontend : `VITE_STRIPE_MODE`
+Ajouter `VITE_STRIPE_MODE="test"` dans le fichier `.env` pour que le frontend utilise les Price IDs de test.
 
-Remplacer le `Collapsible` par une section toujours visible :
-- Supprimer `Collapsible`, `CollapsibleTrigger`, `CollapsibleContent` et le state `insightsOpen`
-- Afficher directement le contenu markdown dans une card avec titre `📊 Analyse détaillée (IA)` et le `MarkdownRenderer` toujours visible
-- Supprimer les imports `Collapsible`, `CollapsibleContent`, `CollapsibleTrigger`, `ChevronDown` et le state `insightsOpen`
+### 2. Backend : secret `STRIPE_MODE`
+Le secret `STRIPE_MODE` existe déjà. Il faut s'assurer qu'il est bien réglé sur `"test"` pour que les edge functions utilisent `STRIPE_SECRET_KEY_TEST` (qui existe déjà aussi).
+
+Aucun changement de code nécessaire — toute la logique de basculement est déjà en place dans `stripe-config.ts` (backend) et `stripe-prices.ts` (frontend).
 

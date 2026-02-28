@@ -9,6 +9,31 @@ const corsHeaders = {
 };
 
 const API_BASE = "https://hesozoobtehszosdlnrn.supabase.co/functions/v1/api-gateway";
+const DISCORD_WEBHOOK_URL =
+  "https://discord.com/api/webhooks/1476936142149390498/PWhNWcdB4iqoFrfF7dFAdhpeMDwuLPNjvGiuZxp_0ubpjdxncA2UFTHcXMZzPiXtT6Bg";
+
+async function notifyDiscordMissingAI(username: string, sessionId: string) {
+  try {
+    await fetch(DISCORD_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        embeds: [{
+          title: "⚠️ Analyse IA manquante",
+          color: 0xff9800,
+          fields: [
+            { name: "Username TikTok", value: `@${username}`, inline: true },
+            { name: "Session ID", value: sessionId, inline: false },
+          ],
+          description: "L'analyse express est terminée mais les insights IA (ai_insights) sont absents. Action requise.",
+          timestamp: new Date().toISOString(),
+        }],
+      }),
+    });
+  } catch (err) {
+    console.warn("Discord notification failed:", err);
+  }
+}
 
 function getSupabase() {
   return createClient(
@@ -60,6 +85,9 @@ serve(async (req) => {
     const supabase = getSupabase();
 
     if (job.status === "completed" && job.result) {
+      const aiInsights = job.result?.account?.ai_insights;
+      const missingAiInsights = !aiInsights || (typeof aiInsights === "string" && aiInsights.trim() === "");
+
       // Update DB record to complete
       try {
         const healthScore = job.result?.health_score ?? job.result?.score ?? null;
@@ -68,12 +96,23 @@ serve(async (req) => {
           health_score: typeof healthScore === "number" ? healthScore : null,
           result_data: job.result,
           completed_at: new Date().toISOString(),
+          ...(missingAiInsights ? { error_message: "Analyse IA (ai_insights) absente du résultat" } : {}),
         }).eq("job_id", job_id);
       } catch (dbErr) {
         console.warn("Failed to update express_analyses:", dbErr);
       }
 
-      return new Response(JSON.stringify({ status: "complete", data: job.result, username }), {
+      // Send Discord alert if AI insights missing
+      if (missingAiInsights) {
+        await notifyDiscordMissingAI(username, session_id);
+      }
+
+      return new Response(JSON.stringify({
+        status: "complete",
+        data: job.result,
+        username,
+        missing_ai_insights: missingAiInsights,
+      }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
       });

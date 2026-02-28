@@ -305,10 +305,20 @@ export default function AnalyseExpressResult() {
               )}
 
               {/* AI Insights */}
-              {account?.ai_insights && (
+              {account?.ai_insights ? (
                 <div className="bg-card border border-border rounded-xl p-6 space-y-4">
                   <h3 className="font-semibold">📊 Analyse détaillée (IA)</h3>
                   <MarkdownRenderer content={account.ai_insights} />
+                </div>
+              ) : (
+                <div className="bg-destructive/10 border border-destructive/30 rounded-xl p-6 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <AlertCircle className="h-6 w-6 text-destructive flex-shrink-0" />
+                    <h3 className="font-semibold text-destructive">Analyse IA temporairement indisponible</h3>
+                  </div>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    Nous sommes sincèrement désolés pour ce désagrément. Notre équipe a été automatiquement informée et travaille à corriger votre rapport. Nous vous recontacterons rapidement avec votre analyse complète et corrigée.
+                  </p>
                 </div>
               )}
 

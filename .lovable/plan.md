@@ -1,26 +1,35 @@
 
 
-## Plan : Sécurité quand l'analyse IA est absente + notification Discord
+## Plan : Bouton "Relancer l'analyse" dans l'admin
 
-### 1. Backend : Notification Discord dans `express-analysis-status`
+### 1. Nouvelle edge function `retry-express-analysis`
 
-Modifier `supabase/functions/express-analysis-status/index.ts` :
-- Quand le job est `completed` et que `job.result.account.ai_insights` est null/vide, envoyer une notification Discord via le webhook existant (`https://discord.com/api/webhooks/1476936142149390498/...`)
-- L'embed Discord contiendra : username TikTok, session_id, et le fait que l'analyse IA est manquante
-- Ajouter un flag `missing_ai_insights: true` dans la réponse renvoyée au client
-- Mettre à jour le record `express_analyses` avec un champ `error_message` indiquant l'absence d'insights IA
+Créer `supabase/functions/retry-express-analysis/index.ts` :
+- Reçoit `{ tiktok_username, analysis_id }` en POST
+- Vérifie que l'appelant est admin (via auth token + check `user_roles`)
+- Appelle l'API WavSocialScan (`POST /accounts/{username}/analyze`) pour obtenir un nouveau `job_id`
+- Met à jour le record `express_analyses` : status → `processing`, nouveau `job_id`, reset `error_message`, `result_data`, `health_score`
+- Retourne le nouveau `job_id`
 
-### 2. Frontend : Message d'excuse dans `AnalyseExpressResult.tsx`
+### 2. Frontend : bouton relancer + polling dans `ExpressAnalyses.tsx`
 
-Modifier `src/pages/AnalyseExpressResult.tsx` :
-- Détecter quand `account?.ai_insights` est null/vide après le chargement des résultats
-- Afficher à la place de la section IA un encart visible avec :
-  - Icône d'alerte
-  - Titre : "Analyse IA temporairement indisponible"
-  - Message : "Nous sommes sincèrement désolés pour ce désagrément. Notre équipe a été automatiquement informée et travaille à corriger votre rapport. Nous vous recontacterons rapidement avec votre analyse complète et corrigée."
-  - Les autres données (metrics, hashtags, persona, etc.) restent visibles normalement
+Modifier `src/pages/admin/ExpressAnalyses.tsx` :
+- Ajouter un bouton "Relancer" (icône `RefreshCw`) visible quand l'analyse est `failed` ou `complete` avec `ai_insights` manquant
+- Au clic, appeler la edge function `retry-express-analysis`
+- Mettre le statut local en "processing" et lancer un polling sur `express-analysis-status` avec le nouveau `job_id` jusqu'à completion
+- Une fois terminé, invalider le query cache (`queryClient.invalidateQueries`) pour rafraîchir la liste
+- Le bouton Download PDF existant fonctionnera ensuite normalement avec les nouvelles données
 
-### Fichiers modifiés
-- `supabase/functions/express-analysis-status/index.ts` — ajout envoi webhook Discord si `ai_insights` absent
-- `src/pages/AnalyseExpressResult.tsx` — affichage message fallback quand `ai_insights` est null
+### 3. Config TOML
+
+Ajouter dans `supabase/config.toml` :
+```toml
+[functions.retry-express-analysis]
+verify_jwt = false
+```
+
+### Fichiers modifiés/créés
+- `supabase/functions/retry-express-analysis/index.ts` (nouveau)
+- `src/pages/admin/ExpressAnalyses.tsx` (bouton relancer + logique polling)
+- `supabase/config.toml` (config JWT)
 

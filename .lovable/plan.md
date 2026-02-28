@@ -1,14 +1,14 @@
 
 
-## Plan : Notification candidature via Discord webhook
+## Plan : Afficher l'analyse IA directement (sans collapsible) et corriger le mobile
 
-### Modification unique : `supabase/functions/notify-application/index.ts`
+### Problème
+L'analyse IA (`ai_insights`) est dans un `Collapsible` fermé par défaut → invisible sur mobile car l'utilisateur ne pense pas à cliquer dessus.
 
-Remplacer l'envoi email SMTP par un POST vers le webhook Discord :
-- URL : `https://discord.com/api/webhooks/1476936142149390498/PWhNWcdB4iqoFrfF7dFAdhpeMDwuLPNjvGiuZxp_0ubpjdxncA2UFTHcXMZzPiXtT6Bg`
-- Mention : `<@1409844507607957556>`
-- Format : embed Discord avec les infos de la candidature (nom, email, TikTok, niveau, blockers, goals, budget)
-- Supprimer la dépendance nodemailer et le code SMTP
+### Modification : `src/pages/AnalyseExpressResult.tsx` (lignes 307-322)
 
-Aucun autre fichier ne change — le frontend appelle déjà `notify-application` correctement.
+Remplacer le `Collapsible` par une section toujours visible :
+- Supprimer `Collapsible`, `CollapsibleTrigger`, `CollapsibleContent` et le state `insightsOpen`
+- Afficher directement le contenu markdown dans une card avec titre `📊 Analyse détaillée (IA)` et le `MarkdownRenderer` toujours visible
+- Supprimer les imports `Collapsible`, `CollapsibleContent`, `CollapsibleTrigger`, `ChevronDown` et le state `insightsOpen`
 

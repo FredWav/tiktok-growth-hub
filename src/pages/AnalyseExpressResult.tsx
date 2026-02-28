@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { trackEvent } from "@/lib/tracking";
-import { Download, Loader2, AlertCircle, RefreshCw, ChevronDown, Target } from "lucide-react";
+import { Download, Loader2, AlertCircle, RefreshCw, Target } from "lucide-react";
 // @ts-ignore - html2pdf.js doesn't have proper types
 import html2pdf from "html2pdf.js";
 import { SEOHead } from "@/components/SEOHead";
@@ -9,7 +9,7 @@ import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -37,7 +37,7 @@ export default function AnalyseExpressResult() {
   const [pdfLoading, setPdfLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState<string | null>(null);
-  const [insightsOpen, setInsightsOpen] = useState(false);
+  
 
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const startTimeRef = useRef<number>(0);
@@ -304,21 +304,12 @@ export default function AnalyseExpressResult() {
                 </div>
               )}
 
-              {/* AI Insights — collapsible markdown */}
+              {/* AI Insights */}
               {account?.ai_insights && (
-                <Collapsible open={insightsOpen} onOpenChange={setInsightsOpen}>
-                  <div className="bg-card border border-border rounded-xl overflow-hidden">
-                    <CollapsibleTrigger className="w-full flex items-center justify-between p-6 hover:bg-muted/50 transition-colors">
-                      <h3 className="font-semibold text-left">📊 Analyse détaillée (IA)</h3>
-                      <ChevronDown className={`h-5 w-5 text-muted-foreground transition-transform ${insightsOpen ? "rotate-180" : ""}`} />
-                    </CollapsibleTrigger>
-                    <CollapsibleContent>
-                      <div className="px-6 pb-6 border-t border-border pt-4">
-                        <MarkdownRenderer content={account.ai_insights} />
-                      </div>
-                    </CollapsibleContent>
-                  </div>
-                </Collapsible>
+                <div className="bg-card border border-border rounded-xl p-6 space-y-4">
+                  <h3 className="font-semibold">📊 Analyse détaillée (IA)</h3>
+                  <MarkdownRenderer content={account.ai_insights} />
+                </div>
               )}
 
               {/* Download */}

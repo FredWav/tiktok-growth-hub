@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import { getStripeSecretKey } from "../_shared/stripe-config.ts";
+import { notifySuccess, notifyError } from "../_shared/itpush.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -13,10 +14,7 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const stripe = new Stripe(getStripeSecretKey(), {
-    apiVersion: "2025-08-27.basil",
-  });
-
+  const stripe = new Stripe(getStripeSecretKey(), { apiVersion: "2025-08-27.basil" });
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -26,8 +24,6 @@ serve(async (req) => {
   try {
     const body = await req.text();
     const sig = req.headers.get("stripe-signature");
-
-    // If STRIPE_WEBHOOK_SECRET is set, verify signature
     const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
     let event: Stripe.Event;
 
@@ -50,12 +46,10 @@ serve(async (req) => {
 
       const userId = metadata.user_id;
       const durationMonths = parseInt(metadata.duration_months);
-
       const startsAt = new Date();
       const expiresAt = new Date();
       expiresAt.setMonth(expiresAt.getMonth() + durationMonths);
 
-      // Create vip_subscription
       const { error: subError } = await supabase
         .from("vip_subscriptions")
         .insert({
@@ -69,9 +63,11 @@ serve(async (req) => {
 
       if (subError) {
         console.error("Error creating vip_subscription:", subError);
+        await notifyError("Stripe VIP", `Échec insert DB • user ${userId} • ${durationMonths} mois`);
         throw subError;
       }
 
+      await notifySuccess("Stripe VIP", `Abonnement créé • ${durationMonths} mois • user ${userId}`);
       console.log(`VIP subscription created for user ${userId}, ${durationMonths} months`);
     }
 
@@ -80,6 +76,7 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error("Webhook error:", error);
+    await notifyError("Stripe Webhook", `${error.message}`);
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 400,

@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 import { getStripeSecretKey } from "../_shared/stripe-config.ts";
+import { notifySuccess, notifyError } from "../_shared/itpush.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -52,14 +53,9 @@ serve(async (req) => {
     if (!session_id) throw new Error("session_id manquant");
     if (!job_id) throw new Error("job_id manquant");
 
-    const stripe = new Stripe(getStripeSecretKey(), {
-      apiVersion: "2025-08-27.basil",
-    });
-
+    const stripe = new Stripe(getStripeSecretKey(), { apiVersion: "2025-08-27.basil" });
     const session = await stripe.checkout.sessions.retrieve(session_id);
-    if (session.payment_status !== "paid") {
-      throw new Error("Paiement non confirmé");
-    }
+    if (session.payment_status !== "paid") throw new Error("Paiement non confirmé");
 
     const username = session.metadata?.tiktok_username;
     if (!username) throw new Error("Username TikTok introuvable dans la session");
@@ -67,7 +63,6 @@ serve(async (req) => {
     const apiKey = Deno.env.get("WAV_SOCIAL_SCAN_API_KEY");
     if (!apiKey) throw new Error("Clé API WavSocialScan non configurée");
 
-    // Poll job status
     const jobRes = await fetch(`${API_BASE}/jobs/${encodeURIComponent(job_id)}`, {
       headers: { "X-API-Key": apiKey },
     });
@@ -88,7 +83,6 @@ serve(async (req) => {
       const aiInsights = job.result?.account?.ai_insights;
       const missingAiInsights = !aiInsights || (typeof aiInsights === "string" && aiInsights.trim() === "");
 
-      // Update DB record to complete
       try {
         const healthScore = job.result?.health_score ?? job.result?.score ?? null;
         await supabase.from("express_analyses").update({
@@ -102,16 +96,15 @@ serve(async (req) => {
         console.warn("Failed to update express_analyses:", dbErr);
       }
 
-      // Send Discord alert if AI insights missing
       if (missingAiInsights) {
         await notifyDiscordMissingAI(username, session_id);
+        await notifyError("Analyse Status", `AI insights manquants • @${username}`);
+      } else {
+        await notifySuccess("Analyse Terminée", `@${username} • score ${job.result?.health_score ?? "N/A"}`);
       }
 
       return new Response(JSON.stringify({
-        status: "complete",
-        data: job.result,
-        username,
-        missing_ai_insights: missingAiInsights,
+        status: "complete", data: job.result, username, missing_ai_insights: missingAiInsights,
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -119,7 +112,6 @@ serve(async (req) => {
     }
 
     if (job.status === "failed") {
-      // Update DB record to failed
       try {
         await supabase.from("express_analyses").update({
           status: "failed",
@@ -130,27 +122,24 @@ serve(async (req) => {
         console.warn("Failed to update express_analyses:", dbErr);
       }
 
+      await notifyError("Analyse Échouée", `@${username} • ${job.error || "Erreur inconnue"}`);
+
       return new Response(JSON.stringify({
-        status: "failed",
-        error: job.error || "L'analyse a échoué",
-        username,
+        status: "failed", error: job.error || "L'analyse a échoué", username,
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
       });
     }
 
-    // Still processing
     return new Response(JSON.stringify({
-      status: "processing",
-      progress: job.progress || 0,
-      current_step: job.current_step || null,
-      username,
+      status: "processing", progress: job.progress || 0, current_step: job.current_step || null, username,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error) {
+    await notifyError("Analyse Status", `${error.message}`);
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,

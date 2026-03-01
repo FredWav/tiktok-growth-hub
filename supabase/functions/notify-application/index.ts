@@ -1,3 +1,5 @@
+import { notifySuccess, notifyError } from "../_shared/itpush.ts";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -17,6 +19,7 @@ Deno.serve(async (req) => {
       await req.json();
 
     if (!first_name || !last_name || !email) {
+      await notifyError("Candidature", "Champs obligatoires manquants");
       return new Response(JSON.stringify({ error: "Champs obligatoires manquants" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -25,21 +28,19 @@ Deno.serve(async (req) => {
 
     const payload = {
       content: "<@967099537439227965> <@826133033069051954>📋 **Nouvelle candidature Wav Premium !**",
-      embeds: [
-        {
-          title: `${first_name} ${last_name}`,
-          color: 0xc8a97e,
-          fields: [
-            { name: "📧 Email", value: email, inline: true },
-            { name: "🎵 TikTok", value: tiktok_username || "—", inline: true },
-            { name: "📊 Niveau", value: current_level || "—", inline: true },
-            { name: "💰 Budget confirmé", value: budget_confirmed ? "✅ Oui" : "❌ Non", inline: true },
-            { name: "🚧 Blockers", value: (blockers || "—").slice(0, 1024) },
-            { name: "🎯 Objectifs", value: (goals || "—").slice(0, 1024) },
-          ],
-          timestamp: new Date().toISOString(),
-        },
-      ],
+      embeds: [{
+        title: `${first_name} ${last_name}`,
+        color: 0xc8a97e,
+        fields: [
+          { name: "📧 Email", value: email, inline: true },
+          { name: "🎵 TikTok", value: tiktok_username || "—", inline: true },
+          { name: "📊 Niveau", value: current_level || "—", inline: true },
+          { name: "💰 Budget confirmé", value: budget_confirmed ? "✅ Oui" : "❌ Non", inline: true },
+          { name: "🚧 Blockers", value: (blockers || "—").slice(0, 1024) },
+          { name: "🎯 Objectifs", value: (goals || "—").slice(0, 1024) },
+        ],
+        timestamp: new Date().toISOString(),
+      }],
     };
 
     const res = await fetch(DISCORD_WEBHOOK_URL, {
@@ -51,16 +52,19 @@ Deno.serve(async (req) => {
     if (!res.ok) {
       const text = await res.text();
       console.error("Discord webhook error:", res.status, text);
+      await notifyError("Candidature Discord", `Webhook échoué (${res.status}) • ${first_name} ${last_name}`);
       throw new Error(`Discord webhook failed: ${res.status}`);
     }
 
     console.log(`Discord notification sent for ${first_name} ${last_name}`);
+    await notifySuccess("Candidature", `${first_name} ${last_name} • ${email}`);
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
     console.error("Error:", error);
+    await notifyError("Candidature", `Erreur: ${error.message}`);
     return new Response(JSON.stringify({ error: "Erreur interne du serveur" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

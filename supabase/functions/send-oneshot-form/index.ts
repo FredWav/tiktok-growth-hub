@@ -2,6 +2,7 @@ import Stripe from "https://esm.sh/stripe@18.5.0";
 import nodemailer from "npm:nodemailer@6.9.16";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import { getStripeSecretKey } from "../_shared/stripe-config.ts";
+import { notifySuccess, notifyError } from "../_shared/itpush.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -20,21 +21,18 @@ Deno.serve(async (req) => {
   try {
     const { name, email, whatsapp, tiktok, objectives, session_id } = await req.json();
 
-    // Validation
     if (!name || !email || !whatsapp || !tiktok || !objectives || !session_id) {
+      await notifyError("One Shot", "Champs obligatoires manquants");
       return new Response(JSON.stringify({ error: "Tous les champs sont obligatoires" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Verify payment with Stripe
-    const stripe = new Stripe(getStripeSecretKey(), {
-      apiVersion: "2025-08-27.basil",
-    });
-
+    const stripe = new Stripe(getStripeSecretKey(), { apiVersion: "2025-08-27.basil" });
     const session = await stripe.checkout.sessions.retrieve(session_id);
     if (session.payment_status !== "paid") {
+      await notifyError("One Shot", `Paiement non confirmé • ${email}`);
       return new Response(JSON.stringify({ error: "Paiement non confirmé" }), {
         status: 402,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -49,18 +47,11 @@ Deno.serve(async (req) => {
 
     const { error: dbError } = await supabaseAdmin
       .from("oneshot_submissions")
-      .insert({
-        stripe_session_id: session_id,
-        name,
-        email,
-        whatsapp,
-        tiktok,
-        objectives,
-      });
+      .insert({ stripe_session_id: session_id, name, email, whatsapp, tiktok, objectives });
 
     if (dbError) {
       console.error("DB insert error:", dbError);
-      // Don't block — continue with Discord + email
+      await notifyError("One Shot DB", `Échec insert • ${name} • ${email}`);
     } else {
       console.log("Oneshot submission saved to DB");
     }
@@ -69,19 +60,17 @@ Deno.serve(async (req) => {
     try {
       const discordPayload = {
         content: "<@967099537439227965> <@826133033069051954> 🎯 **Nouvelle réservation One Shot !**",
-        embeds: [
-          {
-            title: `${name}`,
-            color: 0xc8a97e,
-            fields: [
-              { name: "📧 Email", value: email, inline: true },
-              { name: "📱 WhatsApp", value: whatsapp, inline: true },
-              { name: "🎵 TikTok", value: tiktok, inline: true },
-              { name: "🎯 Objectifs", value: objectives.slice(0, 1024) },
-            ],
-            timestamp: new Date().toISOString(),
-          },
-        ],
+        embeds: [{
+          title: `${name}`,
+          color: 0xc8a97e,
+          fields: [
+            { name: "📧 Email", value: email, inline: true },
+            { name: "📱 WhatsApp", value: whatsapp, inline: true },
+            { name: "🎵 TikTok", value: tiktok, inline: true },
+            { name: "🎯 Objectifs", value: objectives.slice(0, 1024) },
+          ],
+          timestamp: new Date().toISOString(),
+        }],
       };
 
       const discordRes = await fetch(DISCORD_WEBHOOK_URL, {
@@ -92,12 +81,13 @@ Deno.serve(async (req) => {
 
       if (!discordRes.ok) {
         console.error("Discord webhook error:", discordRes.status, await discordRes.text());
+        await notifyError("One Shot Discord", `Webhook échoué (${discordRes.status}) • ${name}`);
       } else {
         console.log("Discord notification sent for", name);
       }
     } catch (discordErr) {
       console.error("Discord webhook failed:", discordErr);
-      // Don't block
+      await notifyError("One Shot Discord", `Exception • ${name}`);
     }
 
     // ── 3. SMTP email (backup) ──
@@ -110,40 +100,17 @@ Deno.serve(async (req) => {
               🎯 Nouvelle réservation One Shot
             </h1>
             <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-              <tr>
-                <td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; width: 140px;">Nom / Prénom</td>
-                <td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(name)}</td>
-              </tr>
-              <tr>
-                <td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Email</td>
-                <td style="padding: 12px; border-bottom: 1px solid #eee;">
-                  <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a>
-                </td>
-              </tr>
-              <tr>
-                <td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">WhatsApp</td>
-                <td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(whatsapp)}</td>
-              </tr>
-              <tr>
-                <td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Compte TikTok</td>
-                <td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(tiktok)}</td>
-              </tr>
-              <tr>
-                <td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; vertical-align: top;">Objectifs</td>
-                <td style="padding: 12px; border-bottom: 1px solid #eee; white-space: pre-wrap;">${escapeHtml(objectives)}</td>
-              </tr>
+              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; width: 140px;">Nom / Prénom</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(name)}</td></tr>
+              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Email</td><td style="padding: 12px; border-bottom: 1px solid #eee;"><a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></td></tr>
+              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">WhatsApp</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(whatsapp)}</td></tr>
+              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Compte TikTok</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(tiktok)}</td></tr>
+              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; vertical-align: top;">Objectifs</td><td style="padding: 12px; border-bottom: 1px solid #eee; white-space: pre-wrap;">${escapeHtml(objectives)}</td></tr>
             </table>
-          </div>
-        `;
+          </div>`;
 
         const transporter = nodemailer.createTransport({
-          host: "ssl0.ovh.net",
-          port: 465,
-          secure: true,
-          auth: {
-            user: "noreply@fredwav.com",
-            pass: SMTP_PASSWORD,
-          },
+          host: "ssl0.ovh.net", port: 465, secure: true,
+          auth: { user: "noreply@fredwav.com", pass: SMTP_PASSWORD },
         });
 
         await transporter.sendMail({
@@ -152,21 +119,22 @@ Deno.serve(async (req) => {
           subject: `🎯 Nouvelle réservation One Shot — ${name}`,
           html: htmlBody,
         });
-
         console.log("Email sent for", name);
       } else {
         console.warn("SMTP_PASSWORD not configured, skipping email");
       }
     } catch (emailErr) {
       console.error("Email send failed:", emailErr);
-      // Don't block — data is saved in DB + Discord
     }
+
+    await notifySuccess("One Shot", `${name} • ${email} • ${tiktok}`);
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
     console.error("Error:", error);
+    await notifyError("One Shot", `Erreur globale: ${error.message}`);
     return new Response(JSON.stringify({ error: "Erreur interne du serveur" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -175,10 +143,5 @@ Deno.serve(async (req) => {
 });
 
 function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }

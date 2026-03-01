@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 import { getStripeSecretKey } from "../_shared/stripe-config.ts";
+import { notifySuccess, notifyError } from "../_shared/itpush.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -19,19 +20,16 @@ serve(async (req) => {
     const { session_id } = await req.json();
     if (!session_id) throw new Error("session_id manquant");
 
-    const stripe = new Stripe(getStripeSecretKey(), {
-      apiVersion: "2025-08-27.basil",
-    });
-
+    const stripe = new Stripe(getStripeSecretKey(), { apiVersion: "2025-08-27.basil" });
     const session = await stripe.checkout.sessions.retrieve(session_id);
     if (session.payment_status !== "paid") {
+      await notifyError("Analyse Express", `Paiement non confirmé • session ${session_id}`);
       throw new Error("Paiement non confirmé");
     }
 
     const username = session.metadata?.tiktok_username;
     if (!username) throw new Error("Username TikTok introuvable dans la session");
 
-    // Server-side deduplication: check if job_id already exists in metadata
     const existingJobId = session.metadata?.job_id;
     if (existingJobId) {
       console.log(`Returning existing job_id ${existingJobId} for session ${session_id}`);
@@ -44,18 +42,15 @@ serve(async (req) => {
     const apiKey = Deno.env.get("WAV_SOCIAL_SCAN_API_KEY");
     if (!apiKey) throw new Error("Clé API WavSocialScan non configurée");
 
-    // Trigger analysis — returns 202 with job_id
     const analyzeRes = await fetch(`${API_BASE}/accounts/${encodeURIComponent(username)}/analyze`, {
       method: "POST",
-      headers: {
-        "X-API-Key": apiKey,
-        "Content-Type": "application/json",
-      },
+      headers: { "X-API-Key": apiKey, "Content-Type": "application/json" },
     });
 
     if (!analyzeRes.ok) {
       const errText = await analyzeRes.text();
       console.error("Analyze error:", errText);
+      await notifyError("Analyse Express", `API erreur ${analyzeRes.status} • @${username}`);
       throw new Error(`Erreur lors du lancement de l'analyse: ${analyzeRes.status}`);
     }
 
@@ -67,7 +62,6 @@ serve(async (req) => {
       throw new Error("job_id non retourné par l'API");
     }
 
-    // Store job_id in Stripe session metadata for deduplication
     try {
       await stripe.checkout.sessions.update(session_id, {
         metadata: { ...session.metadata, job_id: jobId },
@@ -76,7 +70,6 @@ serve(async (req) => {
       console.warn("Failed to update Stripe session metadata with job_id:", updateErr);
     }
 
-    // Insert record into express_analyses table
     try {
       const supabase = createClient(
         Deno.env.get("SUPABASE_URL") || "",
@@ -92,12 +85,14 @@ serve(async (req) => {
       console.warn("Failed to insert express_analyses record:", dbErr);
     }
 
-    // Return job_id so client can poll status
+    await notifySuccess("Analyse Express", `Lancée • @${username} • job ${jobId}`);
+
     return new Response(JSON.stringify({ username, job_id: jobId, status: "processing" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error) {
+    await notifyError("Analyse Express", `${error.message}`);
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,

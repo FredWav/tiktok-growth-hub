@@ -359,6 +359,39 @@ export type Database = {
         }
         Relationships: []
       }
+      oneshot_submissions: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string
+          objectives: string
+          stripe_session_id: string
+          tiktok: string
+          whatsapp: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          objectives: string
+          stripe_session_id: string
+          tiktok: string
+          whatsapp: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          objectives?: string
+          stripe_session_id?: string
+          tiktok?: string
+          whatsapp?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

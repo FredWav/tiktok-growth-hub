@@ -1,15 +1,35 @@
 
 
-## Plan : Afficher les soumissions One Shot dans le panel admin
+## Plan : Notifications Push itpush.dev
 
-### Changements
+### 1. Fichier utilitaire `supabase/functions/_shared/itpush.ts`
 
-1. **Nouveau fichier `src/pages/admin/Bookings.tsx`** — Réécrire la page placeholder pour qu'elle query `oneshot_submissions` via Supabase et affiche un tableau avec colonnes : Date, Nom, Email, WhatsApp, TikTok, Objectifs. Click sur une ligne ouvre un Dialog avec le détail (même pattern que `Applications.tsx`). Compteurs en haut (total, cette semaine).
+Creer une fonction helper reutilisable :
+- Verifie `ITPUSH_ENABLED` (env var) — si absent ou `"false"`, skip silencieusement
+- API key et project ID en dur (valeurs publiques fournies par l'utilisateur)
+- Fonction `notifySuccess(title, message)` et `notifyError(title, message)`
+- Catch les erreurs sans bloquer le flow principal
 
-2. **Aucun changement DB** — La table `oneshot_submissions` existe déjà avec la bonne RLS policy admin.
+### 2. Integration dans les edge functions
 
-3. **Aucun nouveau hook nécessaire** — Query directe avec `useQuery` + `supabase.from('oneshot_submissions')` dans le composant (ou un petit hook dédié si préféré).
+Ajouter des appels `notifySuccess` / `notifyError` dans :
 
-### Pattern suivi
-Même structure que `Applications.tsx` : AdminLayout > stats cards > Table > Dialog détail.
+- **`send-oneshot-form`** : succes apres insert DB + Discord, erreur si paiement invalide ou echec global
+- **`stripe-webhook`** : succes apres creation VIP subscription, erreur si insertion echoue
+- **`express-analysis`** : succes au lancement d'analyse, erreur si paiement invalide ou API echoue
+- **`express-analysis-status`** : succes quand analyse complete, erreur si analyse echouee ou AI manquante
+- **`notify-application`** : succes apres envoi Discord candidature, erreur si webhook echoue
+
+### 3. Variable d'environnement
+
+- `ITPUSH_ENABLED` : mettre a `"true"` pour activer, toute autre valeur ou absence = desactive
+- A configurer comme secret dans le backend
+
+### Fichiers modifies
+- `supabase/functions/_shared/itpush.ts` (nouveau)
+- `supabase/functions/send-oneshot-form/index.ts`
+- `supabase/functions/stripe-webhook/index.ts`
+- `supabase/functions/express-analysis/index.ts`
+- `supabase/functions/express-analysis-status/index.ts`
+- `supabase/functions/notify-application/index.ts`
 

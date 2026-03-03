@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, Check, Clock, Video, FileText, HelpCircle, Zap, BarChart3, Lightbulb, Target, Play } from "lucide-react";
+import { ArrowRight, Check, Clock, Video, FileText, HelpCircle, Zap, BarChart3, PenTool, Route, Play } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
 import { SEOHead } from "@/components/SEOHead";
 import { Layout } from "@/components/layout/Layout";
@@ -32,19 +32,19 @@ const steps = [
 const deliverables = [
   {
     icon: BarChart3,
-    title: "Diagnostic complet de ton compte et de ta niche",
+    title: "Diagnostic stratégique et algorithmique de ton compte",
   },
   {
     icon: FileText,
-    title: "Ressources personnalisées adaptées à ta situation",
+    title: "Ressources d'exécution personnalisées adaptées à ta situation",
   },
   {
-    icon: Lightbulb,
-    title: "Stratégie de hooks et scripts adaptés à ton secteur",
+    icon: PenTool,
+    title: "Ingénierie de tes scripts : création de hooks implacables pour ton secteur",
   },
   {
-    icon: Target,
-    title: "Optimisation de ton positionnement et de ta bio",
+    icon: Route,
+    title: "Optimisation de ton tunnel : de la lecture de ta bio jusqu'au Call-to-Action",
   },
   {
     icon: Play,
@@ -52,7 +52,7 @@ const deliverables = [
   },
   {
     icon: FileText,
-    title: "Analyse de tes stats et recommandations concrètes",
+    title: "Analyse de tes métriques et plan de correction immédiat",
   },
 ];
 
@@ -113,7 +113,7 @@ export default function OneShot() {
 
   return (
     <Layout>
-      <SEOHead title="One Shot - Session Stratégie 179€ | Fred Wav" description="1h30 de diagnostic et plan d'action personnalisé pour ta stratégie de contenu. Réservation en ligne, paiement sécurisé." path="/one-shot" keywords="one shot stratégie, session stratégie, diagnostic contenu, coaching individuel, plan action, 179 euros" schema={[
+      <SEOHead title="One Shot - Session Stratégie 179€ | Fred Wav" description="1h30 pour débloquer ton acquisition et arrêter de poster dans le vide. Diagnostic complet, stratégie millimétrée et plan d'action concret." path="/one-shot" keywords="one shot stratégie, session stratégie, diagnostic contenu, coaching individuel, plan action, 179 euros" schema={[
         {
           "@context": "https://schema.org",
           "@type": "Service",
@@ -136,12 +136,11 @@ export default function OneShot() {
           </div>
           
           <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">
-            1h30 pour clarifier <span className="text-gold-gradient">ta stratégie</span>
+            1h30 pour débloquer <span className="text-gold-gradient">ton acquisition</span> et arrêter de poster dans le vide.
           </h1>
           
           <p className="text-lg text-muted-foreground mb-8">
-            Tu postes sans stratégie claire ? Tu ne sais pas par où commencer ?
-            En 1h30, on pose les bases d'une présence en ligne qui génère des résultats.
+            Tu postes au feeling sans comprendre la mécanique de l'algorithme ? Tes vues stagnent et ton audience ne convertit pas ? En 1h30, on coupe le bruit. On pose une stratégie de contenu millimétrée pour générer des résultats concrets.
           </p>
 
           <Button variant="hero" size="xl" onClick={() => { trackEvent("cta_one_shot_click", { location: "oneshot_hero" }); handleCheckout(); }} disabled={loading}>
@@ -151,10 +150,7 @@ export default function OneShot() {
 
           <p className="text-sm text-muted-foreground mt-4">
             <Clock className="inline h-4 w-4 mr-1" />
-            Créneaux disponibles cette semaine
-          </p>
-          <p className="text-xs text-muted-foreground mt-2">
-            Paiement en 3x avec Klarna et 4x avec PayPal disponible, sous réserve d'acceptation.
+            Créneaux disponibles cette semaine. Paiement en 3x avec Klarna et 4x avec PayPal disponible.
           </p>
         </div>
       </Section>
@@ -170,15 +166,15 @@ export default function OneShot() {
               <ul className="space-y-3 text-red-800">
                 <li className="flex items-start gap-2">
                   <span className="mt-1">→</span>
-                  <span>Tu postes au hasard, sans vraie direction</span>
+                  <span>Tu publies au hasard en espérant qu'une vidéo perce par magie</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-1">→</span>
-                  <span>Tu copies ce que tu vois sans comprendre pourquoi ça marche</span>
+                  <span>Tu copies des formats sans comprendre l'ingénierie de la rétention derrière</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-1">→</span>
-                  <span>Tu passes du temps sans voir de résultats concrets</span>
+                  <span>Tu passes des heures sur ta création pour un retour sur investissement nul</span>
                 </li>
               </ul>
             </div>
@@ -190,15 +186,15 @@ export default function OneShot() {
               <ul className="space-y-3 text-green-800">
                 <li className="flex items-start gap-2">
                   <Check className="h-5 w-5 mt-0.5 shrink-0" />
-                  <span>Une stratégie claire adaptée à TON business</span>
+                  <span>Un plan d'action chirurgical et scalable pour les 30 prochains jours</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="h-5 w-5 mt-0.5 shrink-0" />
-                  <span>Un plan d'action pour les 30 prochains jours</span>
+                  <span>L'architecture exacte pour créer des contenus qui retiennent l'attention et convertissent</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="h-5 w-5 mt-0.5 shrink-0" />
-                  <span>Les clés pour créer du contenu qui convertit</span>
+                  <span>Une stratégie de positionnement pour dominer ta niche</span>
                 </li>
               </ul>
             </div>
@@ -265,7 +261,7 @@ export default function OneShot() {
               <ul className="space-y-4">
                 <li className="flex items-start gap-3">
                   <Check className="h-5 w-5 text-green-600 mt-0.5 shrink-0" />
-                  <span>Tu veux une stratégie claire et actionnable</span>
+                  <span>Tu veux un plan d'attaque basé sur l'analyse, pas sur la motivation</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Check className="h-5 w-5 text-green-600 mt-0.5 shrink-0" />
@@ -298,7 +294,7 @@ export default function OneShot() {
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-red-600 mt-0.5 shrink-0">✕</span>
-                  <span>Tu n'es pas prêt à remettre en question ta façon de faire</span>
+                  <span>Tu cherches une formule magique sans être prêt à itérer sur tes contenus</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-red-600 mt-0.5 shrink-0">✕</span>

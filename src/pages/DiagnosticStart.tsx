@@ -24,6 +24,8 @@ import {
   AlertTriangle,
   ExternalLink,
 } from "lucide-react";
+import { trackEvent } from "@/lib/tracking";
+import { identifyUser } from "@/lib/posthog";
 
 const identitySchema = z.object({
   firstName: z.string().min(1, "Prénom requis"),
@@ -105,6 +107,8 @@ const DiagnosticStart = () => {
       return;
     }
     setErrors({});
+    trackEvent("diagnostic_step_identity", { email: data.email, tiktok: data.tiktok });
+    identifyUser(data.email);
     saveLead({
       first_name: data.firstName,
       last_name: data.lastName,
@@ -120,12 +124,14 @@ const DiagnosticStart = () => {
       return;
     }
     setErrors({});
+    trackEvent("diagnostic_step_blocker");
     saveLead({ blocker: data.blocker }, 4);
     setStep(5);
   };
 
   const handleBudgetSelect = (budget: string) => {
     setData((prev) => ({ ...prev, budget }));
+    trackEvent("diagnostic_completed", { budget, recommended_offer: getRecommendedOffer(budget), level: data.level, objective: data.objective });
     saveLead({ budget, recommended_offer: getRecommendedOffer(budget) }, 5, true);
     // Fire-and-forget notification
     supabase.functions.invoke("notify-diagnostic", {
@@ -203,7 +209,7 @@ const DiagnosticStart = () => {
           </div>
         )}
         <Button variant="hero" size="xl" asChild className="w-full sm:w-auto">
-          <a href={config.url} target="_blank" rel="noopener noreferrer">
+          <a href={config.url} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent("diagnostic_cta_click", { recommended_offer: getRecommendedOffer(data.budget), url: config.url })}>
             {config.cta}
             <ExternalLink className="w-4 h-4 ml-2" />
           </a>
@@ -254,7 +260,7 @@ const DiagnosticStart = () => {
       <div className="flex-1 flex items-center justify-center px-4 py-12 md:py-20">
         <div className="w-full max-w-2xl">
           {step >= 1 && step <= 5 && (
-            <Button variant="ghost" size="sm" onClick={() => setStep(step - 1)} className="mb-4 -ml-2 text-muted-foreground hover:text-foreground">
+            <Button variant="ghost" size="sm" onClick={() => { trackEvent("diagnostic_back", { from_step: String(step) }); setStep(step - 1); }} className="mb-4 -ml-2 text-muted-foreground hover:text-foreground">
               <ArrowLeft className="w-4 h-4 mr-1" />
               Retour
             </Button>
@@ -270,7 +276,7 @@ const DiagnosticStart = () => {
                   L'objectif de ce diagnostic est d'identifier ton point de blocage exact pour t'orienter vers l'écosystème le plus rentable pour toi. Sois 100% transparent.
                 </p>
               </div>
-              <Button variant="hero" size="xl" onClick={() => setStep(1)} className="w-full sm:w-auto">
+              <Button variant="hero" size="xl" onClick={() => { trackEvent("diagnostic_started"); setStep(1); }} className="w-full sm:w-auto">
                 Démarrer le diagnostic
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
@@ -354,6 +360,7 @@ const DiagnosticStart = () => {
                   selected={data.level === "beginner"}
                   onClick={() => {
                     setData((prev) => ({ ...prev, level: "beginner" }));
+                    trackEvent("diagnostic_step_level", { level: "beginner" });
                     saveLead({ level: "beginner" }, 2);
                     setTimeout(() => setStep(3), 300);
                   }}
@@ -364,6 +371,7 @@ const DiagnosticStart = () => {
                   selected={data.level === "intermediate"}
                   onClick={() => {
                     setData((prev) => ({ ...prev, level: "intermediate" }));
+                    trackEvent("diagnostic_step_level", { level: "intermediate" });
                     saveLead({ level: "intermediate" }, 2);
                     setTimeout(() => setStep(3), 300);
                   }}
@@ -374,6 +382,7 @@ const DiagnosticStart = () => {
                   selected={data.level === "advanced"}
                   onClick={() => {
                     setData((prev) => ({ ...prev, level: "advanced" }));
+                    trackEvent("diagnostic_step_level", { level: "advanced" });
                     saveLead({ level: "advanced" }, 2);
                     setTimeout(() => setStep(3), 300);
                   }}
@@ -398,6 +407,7 @@ const DiagnosticStart = () => {
                   selected={data.objective === "visibility"}
                   onClick={() => {
                     setData((prev) => ({ ...prev, objective: "visibility" }));
+                    trackEvent("diagnostic_step_objective", { objective: "visibility" });
                     saveLead({ objective: "visibility" }, 3);
                     setTimeout(() => setStep(4), 300);
                   }}
@@ -408,6 +418,7 @@ const DiagnosticStart = () => {
                   selected={data.objective === "strategy"}
                   onClick={() => {
                     setData((prev) => ({ ...prev, objective: "strategy" }));
+                    trackEvent("diagnostic_step_objective", { objective: "strategy" });
                     saveLead({ objective: "strategy" }, 3);
                     setTimeout(() => setStep(4), 300);
                   }}
@@ -418,6 +429,7 @@ const DiagnosticStart = () => {
                   selected={data.objective === "monetize"}
                   onClick={() => {
                     setData((prev) => ({ ...prev, objective: "monetize" }));
+                    trackEvent("diagnostic_step_objective", { objective: "monetize" });
                     saveLead({ objective: "monetize" }, 3);
                     setTimeout(() => setStep(4), 300);
                   }}

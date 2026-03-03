@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Check, Target, Users, Calendar, MessageSquare, BarChart3 } from "lucide-react";
+import { ArrowRight, Check, X, BarChart3, RefreshCw, MessageSquare, Target, Play, Image } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -14,97 +14,82 @@ import { trackEvent } from "@/lib/tracking";
 import { SEOHead } from "@/components/SEOHead";
 
 const forYou = [
-  "Tu as déjà un business et tu veux que les formats courts deviennent un vrai levier",
-  "Tu es prêt à t'investir sérieusement pendant 45 jours",
-  "Tu veux des résultats mesurables, pas juste des conseils",
+  "Tu as une offre validée et tu veux faire des formats courts un vrai levier d'acquisition",
+  "Tu es prêt à itérer rapidement sur la structure de tes vidéos pendant 45 jours",
+  "Tu exiges des résultats mesurables, pas des conseils génériques",
 ];
 
 const notForYou = [
-  "Tu n'as pas le temps de créer du contenu régulièrement",
-  "Tu cherches une solution miracle sans effort",
-  "Tu veux juste plus de likes sans objectif business",
+  "Tu cherches une agence pour déléguer ta production à ta place",
+  "Tu espères percer avec du contenu pauvre et sans effort",
+  "Tu vises la vanité des vues au lieu de la conversion business",
 ];
 
 const method = [
   {
     icon: BarChart3,
-    title: "Diagnostic approfondi",
-    description: "On analyse ton compte, ton marché et tes concurrents pour définir une stratégie sur mesure.",
+    title: "Audit algorithmique",
+    description: "Analyse de ton compte, de ton SEO et des failles de ton marché pour définir un positionnement d'autorité.",
   },
   {
-    icon: Calendar,
-    title: "Suivi hebdomadaire",
-    description: "Des sessions régulières pour ajuster, corriger et accélérer ta progression.",
+    icon: RefreshCw,
+    title: "Sprints hebdomadaires",
+    description: "Sessions régulières pour analyser tes métriques de rétention et corriger le tir immédiatement.",
   },
   {
     icon: MessageSquare,
-    title: "Accès direct",
-    description: "Messagerie prioritaire pour poser tes questions et obtenir du feedback rapide.",
+    title: "Accès asynchrone direct",
+    description: "Messagerie prioritaire pour valider tes scripts et tes hooks avant même de tourner.",
   },
   {
     icon: Target,
-    title: "Objectifs concrets",
-    description: "Chaque semaine a un objectif clair. Pas de flou, pas de blabla.",
+    title: "KPI structurés",
+    description: "Chaque semaine a un objectif mesurable. Aucun flou toléré.",
   },
 ];
 
 const deliverables = [
-  "Stratégie de contenu complète adaptée à ton business",
-  "Review de tous tes contenus avec feedback actionnable",
-  "Templates et ressources personnalisées",
-  "Optimisation de ton profil et positionnement",
-  "Plan de contenu pour continuer après les 45 jours",
-  "Replay de toutes les sessions",
+  "Architecture éditoriale complète et plan de conversion",
+  "Script Doctoring : corrections ligne par ligne de tes contenus",
+  "Frameworks de production (structures de rétention, bibliothèques de hooks)",
+  "Optimisation SEO du compte et tunnel de la bio",
+  "Plan de scale pour maintenir la croissance post-45 jours",
+  "Replays de toutes les sessions d'analyse",
 ];
 
 const process = [
   {
     step: "1",
-    title: "Candidature",
-    description: "Tu remplis un court formulaire pour que je comprenne ta situation.",
+    title: "Filtrage",
+    description: "Tu remplis un court formulaire de qualification technique.",
   },
   {
     step: "2",
-    title: "Appel de qualification",
-    description: "On échange 15 minutes pour voir si l'accompagnement est adapté à ton cas.",
+    title: "Audit de viabilité",
+    description: "Call de 15 min pour valider que la méthode s'applique à ton modèle.",
   },
   {
     step: "3",
-    title: "Démarrage",
-    description: "Si c'est un match, on commence avec un onboarding complet et ta stratégie sur mesure.",
-  },
-];
-
-const proofs = [
-  {
-    title: "Des créateurs qui passent à l'action",
-    excerpt: "Le Wav Premium est conçu pour des résultats concrets et mesurables, pas des promesses vagues.",
-  },
-  {
-    title: "Une méthode testée sur le terrain",
-    excerpt: "Chaque recommandation est basée sur des données réelles, pas sur des tendances génériques.",
+    title: "Kickoff stratégique",
+    description: "Onboarding immédiat et lancement du premier sprint.",
   },
 ];
 
 const faqs = [
   {
-    question: "Comment se passe la candidature ?",
+    question: "Comment se passe la sélection des candidatures ?",
     answer: "Tu remplis un court formulaire, puis on fait un appel de 15 minutes. Si ton profil correspond, on démarre. Sinon, je te redirige vers l'offre la plus adaptée.",
   },
   {
-    question: "Combien de temps par semaine ça demande ?",
+    question: "Quelle est la charge de travail hebdomadaire requise ?",
     answer: "Compte environ 3 à 5 heures par semaine pour créer du contenu et appliquer les recommandations. Les sessions de suivi durent 30 à 45 minutes.",
   },
   {
-    question: "Je peux faire un One Shot avant de candidater ?",
-    answer: "Oui, et c'est même recommandé. Le One Shot permet de poser les bases et de voir si tu es prêt pour un accompagnement plus intensif.",
+    question: "Est-il obligatoire de faire un One Shot avant ?",
+    answer: "Non, mais c'est recommandé. Le One Shot permet de poser les bases et de voir si tu es prêt pour un accompagnement plus intensif.",
   },
   {
-    question: "Quel est le prix ?",
-    answer: "Le Wav Premium est à 987€. Si tu as déjà effectué un One Shot, le prix passe à 799€. Paiement en plusieurs fois possible.",
-  },
-  {
-    question: "Et si ça ne marche pas ?",
+    question: "Comment fonctionne la garantie d'exécution ?",
     answer: "L'accompagnement est basé sur l'exécution. Si tu appliques la méthode, les résultats suivent. C'est pour ça qu'il y a un process de sélection.",
   },
 ];
@@ -112,39 +97,41 @@ const faqs = [
 export default function QuarantecinqJours() {
   return (
     <Layout>
-      <SEOHead title="Wav Premium - Transformation en 45 Jours | Fred Wav" description="Wav Premium : 45 jours d'accompagnement intensif pour transformer ta présence en ligne en levier business. Sur candidature." path="/45-jours" keywords="wav premium, accompagnement formats courts, transformation contenu, suivi personnalisé, coaching intensif" schema={[
-        {
-          "@context": "https://schema.org",
-          "@type": "Service",
-          "name": "Wav Premium - Transformation 45 Jours",
-          "description": "45 jours d'accompagnement intensif pour transformer ta présence en ligne en levier business. Suivi hebdomadaire, feedback continu, résultats mesurables.",
-          "provider": { "@type": "Person", "name": "Fred Wav", "url": "https://fredwav.com" },
-          "offers": { "@type": "Offer", "price": "987", "priceCurrency": "EUR" },
-        },
-        {
-          "@context": "https://schema.org",
-          "@type": "FAQPage",
-          "mainEntity": faqs.map((faq) => ({ "@type": "Question", "name": faq.question, "acceptedAnswer": { "@type": "Answer", "text": faq.answer } })),
-        },
-      ]} />
-      <Section variant="cream" size="lg">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
-            <Target className="h-4 w-4" />
-            Wav Premium — Accompagnement intensif
-          </div>
+      <SEOHead
+        title="Wav Premium - 45 jours pour craquer ton acquisition | Fred Wav"
+        description="Wav Premium : 45 jours d'itération intensive pour transformer ton compte en actif business. Feedback chirurgical, data, rétention et conversion. Sur candidature."
+        path="/45-jours"
+        keywords="wav premium, accompagnement formats courts, acquisition TikTok, coaching intensif, stratégie contenu"
+        schema={[
+          {
+            "@context": "https://schema.org",
+            "@type": "Service",
+            "name": "Wav Premium - Transformation 45 Jours",
+            "description": "45 jours d'itération intensive pour transformer ton compte en actif business.",
+            "provider": { "@type": "Person", "name": "Fred Wav", "url": "https://fredwav.com" },
+            "offers": { "@type": "Offer", "price": "987", "priceCurrency": "EUR" },
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": faqs.map((faq) => ({ "@type": "Question", "name": faq.question, "acceptedAnswer": { "@type": "Answer", "text": faq.answer } })),
+          },
+        ]}
+      />
 
-          <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">
-            <span className="text-gold-gradient">Wav Premium</span> — 45 jours pour transformer ta présence en ligne
+      {/* Hero */}
+      <Section variant="dark" size="lg">
+        <div className="max-w-3xl mx-auto text-center">
+          <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 text-cream">
+            Wav Premium : 45 jours d'itération pour craquer ton acquisition TikTok.
           </h1>
 
-          <p className="text-lg text-muted-foreground mb-4">
-            Un accompagnement encadré pour passer de "je poste sans stratégie" à "chaque vidéo a un objectif business".
-            Suivi hebdomadaire, feedback continu, résultats mesurables.
+          <p className="text-lg md:text-xl text-cream/70 mb-6 max-w-2xl mx-auto">
+            Fini de publier à l'aveugle. On structure ton système de contenu autour de la data, de la rétention et de la conversion. Un accompagnement intensif avec feedback chirurgical pour transformer ton compte en actif business.
           </p>
 
-          <p className="text-base font-semibold mb-8">
-            987€ — <span className="text-primary">799€ si tu as déjà fait un One Shot</span>
+          <p className="text-lg font-semibold mb-8 text-gold-gradient">
+            987 € — Tarif préférentiel de 799 € pour les alumni One Shot.
           </p>
 
           <Button
@@ -159,13 +146,13 @@ export default function QuarantecinqJours() {
             </Link>
           </Button>
 
-          <p className="text-xs text-muted-foreground mt-4">
-            Paiement en 3x avec Klarna et 4x avec PayPal disponible, sous réserve d'acceptation.
+          <p className="text-xs text-cream/50 mt-4">
+            Paiement en 3x avec Klarna et 4x avec PayPal disponible.
           </p>
         </div>
       </Section>
 
-      {/* Pour qui / Pas pour qui */}
+      {/* Filtre */}
       <Section variant="default" size="lg">
         <div className="max-w-3xl mx-auto">
           <div className="grid md:grid-cols-2 gap-8">
@@ -186,13 +173,13 @@ export default function QuarantecinqJours() {
 
             <div className="bg-destructive/5 rounded-xl p-8">
               <h3 className="font-display text-xl font-semibold mb-4 flex items-center gap-2">
-                <span className="text-destructive">✕</span>
+                <X className="h-5 w-5 text-destructive" />
                 Ce n'est PAS pour toi si...
               </h3>
               <ul className="space-y-3">
                 {notForYou.map((item, i) => (
                   <li key={i} className="flex items-start gap-3 text-sm">
-                    <span className="text-destructive mt-0.5 shrink-0">✕</span>
+                    <X className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -203,61 +190,61 @@ export default function QuarantecinqJours() {
       </Section>
 
       {/* Méthode */}
-      <Section variant="cream" size="lg">
+      <Section variant="dark" size="lg">
         <SectionHeader
-          title="La méthode"
-          subtitle="Un cadre structuré pour des résultats concrets."
+          title="L'infrastructure de l'accompagnement"
+          subtitle="Un cadre de travail implacable pour des résultats concrets."
         />
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
           {method.map((item) => (
-            <div key={item.title} className="bg-background border border-border rounded-xl p-6 text-center">
+            <div
+              key={item.title}
+              className="bg-cream/5 border border-cream/10 rounded-xl p-6 text-center hover:border-primary/40 transition-colors"
+            >
               <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <item.icon className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="font-semibold mb-2">{item.title}</h3>
-              <p className="text-sm text-muted-foreground">{item.description}</p>
+              <h3 className="font-semibold mb-2 text-cream">{item.title}</h3>
+              <p className="text-sm text-cream/60">{item.description}</p>
             </div>
           ))}
         </div>
       </Section>
 
-      {/* Ce que tu auras à la fin */}
+      {/* Livrables */}
       <Section variant="default" size="lg">
         <SectionHeader
-          title="Ce que tu auras à la fin"
-          subtitle="Pas juste des conseils. Des livrables concrets."
+          title="Ce que tu intègres dans ton business"
+          subtitle="Des livrables exploitables, zéro théorie."
         />
 
-        <div className="max-w-2xl mx-auto">
-          <div className="bg-muted/50 rounded-xl p-8">
-            <ul className="space-y-4">
-              {deliverables.map((item, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <Check className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+          {deliverables.map((item, i) => (
+            <div key={i} className="bg-muted/50 border border-border rounded-xl p-6 hover:border-primary/30 transition-colors">
+              <Check className="h-5 w-5 text-primary mb-3" />
+              <p className="text-sm font-medium">{item}</p>
+            </div>
+          ))}
         </div>
       </Section>
 
-      {/* Preuves courtes */}
-      <Section variant="cream" size="lg">
+      {/* Preuve Sociale */}
+      <Section variant="dark" size="lg">
         <SectionHeader
-          title="Ce qu'ils en disent"
-          subtitle="Des résultats concrets, pas des promesses."
+          title="Basé sur la data, validé par le marché."
+          subtitle="Chaque recommandation est issue de l'analyse de centaines de vidéos, pas de tendances éphémères."
         />
 
-        <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto mb-8">
-          {proofs.map((proof) => (
-            <Card key={proof.title} className="border-border">
-              <CardContent className="pt-6">
-                <h3 className="font-semibold mb-2">{proof.title}</h3>
-                <p className="text-sm text-muted-foreground">{proof.excerpt}</p>
-              </CardContent>
-            </Card>
+        <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-8">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="bg-cream/5 border border-cream/10 rounded-xl aspect-video flex items-center justify-center hover:border-primary/30 transition-colors">
+              {i <= 2 ? (
+                <Play className="h-10 w-10 text-cream/30" />
+              ) : (
+                <Image className="h-10 w-10 text-cream/30" />
+              )}
+            </div>
           ))}
         </div>
 
@@ -271,10 +258,10 @@ export default function QuarantecinqJours() {
         </div>
       </Section>
 
-      {/* Process candidature */}
-      <Section variant="dark" size="lg">
+      {/* Process */}
+      <Section variant="cream" size="lg">
         <SectionHeader
-          title="Le process"
+          title="Le process d'intégration"
           subtitle="3 étapes simples pour démarrer."
         />
 
@@ -284,7 +271,7 @@ export default function QuarantecinqJours() {
               <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center mx-auto mb-4 font-semibold text-lg">
                 {item.step}
               </div>
-              <h3 className="font-semibold text-cream mb-2">{item.title}</h3>
+              <h3 className="font-semibold mb-2">{item.title}</h3>
               <p className="text-sm text-muted-foreground">{item.description}</p>
             </div>
           ))}
@@ -312,12 +299,12 @@ export default function QuarantecinqJours() {
       </Section>
 
       {/* CTA final */}
-      <Section variant="cream" size="lg">
+      <Section variant="dark" size="lg">
         <div className="max-w-2xl mx-auto text-center">
-          <h2 className="font-display text-3xl md:text-4xl font-semibold mb-4">
-            Prêt pour la transformation ?
+          <h2 className="font-display text-3xl md:text-4xl font-semibold mb-4 text-cream">
+            Prêt à installer un système d'acquisition rentable ?
           </h2>
-          <p className="text-muted-foreground text-lg mb-8">
+          <p className="text-cream/60 text-lg mb-8">
             Le Wav Premium : 45 jours pour construire une présence en ligne qui génère des résultats pour ton business.
           </p>
           <Button
@@ -331,8 +318,8 @@ export default function QuarantecinqJours() {
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
-          <p className="text-sm text-muted-foreground mt-6">
-            Tu hésites ? <Link to="/one-shot" className="text-primary underline hover:no-underline">Commence par un One Shot (179€)</Link> pour poser les bases.
+          <p className="text-sm text-cream/50 mt-6">
+            Tu hésites ? <Link to="/one-shot" className="text-primary underline hover:no-underline">Commence par un One Shot (179 €)</Link> pour valider les bases stratégiques.
           </p>
         </div>
       </Section>

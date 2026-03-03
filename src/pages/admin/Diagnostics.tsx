@@ -10,7 +10,8 @@ import {
 } from "@/components/ui/dialog";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Loader2 } from "lucide-react";
+import { Loader2, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const stepLabels: Record<number, string> = {
   0: "Accueil",
@@ -35,14 +36,52 @@ const offerLabels: Record<string, string> = {
   wav_premium: "Wav Premium",
 };
 
+const escapeCsv = (val: string | null | undefined) => {
+  if (!val) return "";
+  const s = String(val);
+  return s.includes(",") || s.includes('"') || s.includes("\n") ? `"${s.replace(/"/g, '""')}"` : s;
+};
+
 const Diagnostics = () => {
   const { data: leads, isLoading } = useDiagnosticLeads();
   const [selected, setSelected] = useState<DiagnosticLead | null>(null);
 
+  const handleExportCsv = () => {
+    if (!leads?.length) return;
+    const headers = ["Date", "Prénom", "Nom", "Email", "TikTok", "Niveau", "Objectif", "Blocage", "Budget", "Offre recommandée", "Étape", "Statut"];
+    const rows = leads.map((l) => [
+      format(new Date(l.created_at), "yyyy-MM-dd HH:mm"),
+      escapeCsv(l.first_name),
+      escapeCsv(l.last_name),
+      escapeCsv(l.email),
+      escapeCsv(l.tiktok),
+      escapeCsv(l.level),
+      escapeCsv(l.objective),
+      escapeCsv(l.blocker),
+      l.budget ? budgetLabels[l.budget] || l.budget : "",
+      l.recommended_offer ? offerLabels[l.recommended_offer] || l.recommended_offer : "",
+      stepLabels[l.current_step] || String(l.current_step),
+      l.completed ? "Complet" : "Incomplet",
+    ].join(","));
+    const csv = "\uFEFF" + [headers.join(","), ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `diagnostics-leads-${format(new Date(), "yyyy-MM-dd")}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <h1 className="font-display text-3xl text-primary">Diagnostics</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="font-display text-3xl text-primary">Diagnostics</h1>
+          <Button variant="outline" size="sm" onClick={handleExportCsv} disabled={!leads?.length}>
+            <Download className="h-4 w-4 mr-2" /> Exporter CSV
+          </Button>
+        </div>
 
         {leads && (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">

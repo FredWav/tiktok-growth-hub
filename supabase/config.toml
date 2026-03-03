@@ -47,3 +47,6 @@ verify_jwt = false
 
 [functions.check-express-job]
 verify_jwt = false
+
+[functions.notify-diagnostic]
+verify_jwt = false

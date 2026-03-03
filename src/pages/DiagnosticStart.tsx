@@ -127,6 +127,20 @@ const DiagnosticStart = () => {
   const handleBudgetSelect = (budget: string) => {
     setData((prev) => ({ ...prev, budget }));
     saveLead({ budget, recommended_offer: getRecommendedOffer(budget) }, 5, true);
+    // Fire-and-forget notification
+    supabase.functions.invoke("notify-diagnostic", {
+      body: {
+        first_name: data.firstName,
+        last_name: data.lastName,
+        email: data.email,
+        tiktok: data.tiktok,
+        level: data.level,
+        objective: data.objective,
+        blocker: data.blocker,
+        budget,
+        recommended_offer: getRecommendedOffer(budget),
+      },
+    });
     setStep(6);
     setLoading(true);
   };

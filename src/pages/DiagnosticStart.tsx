@@ -14,6 +14,7 @@ import {
   LayoutList,
   Coins,
   ArrowRight,
+  ArrowLeft,
   Loader2,
   Zap,
   Users,
@@ -203,6 +204,12 @@ const DiagnosticStart = () => {
 
       <div className="flex-1 flex items-center justify-center px-4 py-12 md:py-20">
         <div className="w-full max-w-2xl">
+          {step >= 1 && step <= 5 && (
+            <Button variant="ghost" size="sm" onClick={() => setStep(step - 1)} className="mb-4 -ml-2 text-muted-foreground hover:text-foreground">
+              <ArrowLeft className="w-4 h-4 mr-1" />
+              Retour
+            </Button>
+          )}
           {/* Screen 0: Welcome */}
           {step === 0 && (
             <div className="animate-fade-in text-center space-y-8">

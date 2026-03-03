@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Check, X, BarChart3, RefreshCw, MessageSquare, Target, Play, Image } from "lucide-react";
+import { ArrowRight, Check, X, BarChart3, RefreshCw, MessageSquare, Target, Play } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -93,6 +94,49 @@ const faqs = [
     answer: "L'accompagnement est basé sur l'exécution. Si tu appliques la méthode, les résultats suivent. C'est pour ça qu'il y a un process de sélection.",
   },
 ];
+
+const featuredVideos = [
+  { id: "97xyXqwszrM", alt: "Témoignage client - Retour d'expérience sur l'accompagnement" },
+  { id: "cc1cRfCEJGE", alt: "Témoignage client - Résultats après coaching stratégie de contenu" },
+  { id: "wu2CPcqp-yU", alt: "Témoignage client - Avis sur le Wav Premium" },
+];
+
+function VideoCard({ id, alt }: { id: string; alt: string }) {
+  const [playing, setPlaying] = useState(false);
+
+  if (playing) {
+    return (
+      <div className="aspect-video rounded-xl overflow-hidden shadow-lg">
+        <iframe
+          src={`https://www.youtube.com/embed/${id}?autoplay=1`}
+          title={alt}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="w-full h-full"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <button
+      onClick={() => setPlaying(true)}
+      className="group relative aspect-video rounded-xl overflow-hidden shadow-lg cursor-pointer w-full"
+    >
+      <img
+        src={`https://img.youtube.com/vi/${id}/hqdefault.jpg`}
+        alt={alt}
+        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+        loading="lazy"
+      />
+      <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+        <div className="w-14 h-14 rounded-full bg-primary/90 flex items-center justify-center group-hover:scale-110 transition-transform shadow-xl">
+          <Play className="h-6 w-6 text-primary-foreground ml-0.5" fill="currentColor" />
+        </div>
+      </div>
+    </button>
+  );
+}
 
 export default function QuarantecinqJours() {
   return (
@@ -237,14 +281,8 @@ export default function QuarantecinqJours() {
         />
 
         <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-8">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-cream/5 border border-cream/10 rounded-xl aspect-video flex items-center justify-center hover:border-primary/30 transition-colors">
-              {i <= 2 ? (
-                <Play className="h-10 w-10 text-cream/30" />
-              ) : (
-                <Image className="h-10 w-10 text-cream/30" />
-              )}
-            </div>
+          {featuredVideos.map((video) => (
+            <VideoCard key={video.id} id={video.id} alt={video.alt} />
           ))}
         </div>
 

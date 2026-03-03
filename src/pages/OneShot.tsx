@@ -186,7 +186,7 @@ export default function OneShot() {
               <ul className="space-y-3 text-green-800">
                 <li className="flex items-start gap-2">
                   <Check className="h-5 w-5 mt-0.5 shrink-0" />
-                  <span>Un plan d'action chirurgical et scalable pour les 30 prochains jours</span>
+                  <span>Des ressources actionnables immédiatement</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="h-5 w-5 mt-0.5 shrink-0" />

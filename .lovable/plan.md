@@ -1,71 +1,39 @@
 
 
-## Plan : Persistance progressive du diagnostic /start + page admin
+## Plan : Notification Discord + Email SMTP à la fin du diagnostic /start
 
-### 1. Nouvelle table `diagnostic_leads`
+### 1. Nouvelle edge function `supabase/functions/notify-diagnostic/index.ts`
 
-Migration SQL pour créer une table qui stocke chaque lead du diagnostic avec sauvegarde progressive :
+Suivre exactement le pattern de `notify-application` + `send-oneshot-form` :
 
-```sql
-CREATE TABLE public.diagnostic_leads (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now(),
-  first_name text,
-  last_name text,
-  email text,
-  tiktok text,
-  level text,
-  objective text,
-  blocker text,
-  budget text,
-  recommended_offer text,
-  current_step integer NOT NULL DEFAULT 0,
-  completed boolean NOT NULL DEFAULT false
-);
-
-ALTER TABLE public.diagnostic_leads ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Admins can manage diagnostic_leads"
-  ON public.diagnostic_leads FOR ALL
-  USING (has_role(auth.uid(), 'admin'));
-
-CREATE POLICY "Anyone can insert diagnostic_leads"
-  ON public.diagnostic_leads FOR INSERT
-  WITH CHECK (true);
-
-CREATE POLICY "Anyone can update their own diagnostic lead by id"
-  ON public.diagnostic_leads FOR UPDATE
-  USING (true)
-  WITH CHECK (true);
-
-CREATE TRIGGER update_diagnostic_leads_updated_at
-  BEFORE UPDATE ON public.diagnostic_leads
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-```
+- **Discord webhook** : Envoyer un embed avec tous les champs du lead (Nom, Email, TikTok, Niveau, Objectif, Blocker, Budget, Offre recommandée) vers le même webhook Discord existant, avec mention des admins
+- **Email SMTP OVH** : Envoyer un email HTML récapitulatif via nodemailer (même config que `send-oneshot-form` : `ssl0.ovh.net:465`, `noreply@fredwav.com` → `fredwavcm@gmail.com`) avec le secret `SMTP_PASSWORD`
+- **itpush** : Notifications succès/erreur via `notifySuccess`/`notifyError`
+- CORS headers standard, `verify_jwt = false` dans config.toml
 
 ### 2. Modifier `src/pages/DiagnosticStart.tsx`
 
-- Importer le client Supabase
-- A l'etape 1 (apres validation identite) : `INSERT` une nouvelle ligne dans `diagnostic_leads` avec first_name, last_name, email, tiktok, current_step=1. Stocker le `id` retourne dans un state `leadId`
-- A chaque etape suivante (level, objective, blocker, budget) : `UPDATE` la ligne existante avec la nouvelle donnee et current_step incremente
-- A la fin (budget selectionne) : `UPDATE` avec budget, recommended_offer (calcule depuis budget), completed=true
+Dans `handleBudgetSelect`, après le `saveLead` (qui marque `completed: true`), appeler la edge function :
 
-### 3. Nouvelle page admin `/admin/diagnostics`
+```typescript
+supabase.functions.invoke("notify-diagnostic", {
+  body: {
+    first_name: data.firstName,
+    last_name: data.lastName,
+    email: data.email,
+    tiktok: data.tiktok,
+    level: data.level,
+    objective: data.objective,
+    blocker: data.blocker,
+    budget,
+    recommended_offer: getRecommendedOffer(budget),
+  },
+});
+```
 
-Creer `src/pages/admin/Diagnostics.tsx` :
-- Meme structure que `Applications.tsx` (AdminLayout, Table, Dialog detail)
-- Stats en haut : total leads, completes, cette semaine
-- Tableau avec colonnes : Date, Nom, Email, TikTok, Etape, Budget, Offre recommandee, Complet
-- Dialog avec detail complet au clic
-- Badge couleur pour l'etape courante et le statut complete/incomplet
+Appel fire-and-forget (pas de `await`) pour ne pas bloquer l'affichage du résultat.
 
-### 4. Hook `src/hooks/useDiagnosticLeads.ts`
+### 3. Config
 
-Query hook pour fetcher les leads depuis `diagnostic_leads`, ordonne par created_at desc.
-
-### 5. Ajouter la route et le lien nav
-
-- `src/App.tsx` : ajouter route `/admin/diagnostics` protegee admin
-- `src/components/layout/AdminLayout.tsx` : ajouter item nav "Diagnostics" avec icone `Stethoscope`
+Ajouter `[functions.notify-diagnostic]` avec `verify_jwt = false` dans `supabase/config.toml`.
 

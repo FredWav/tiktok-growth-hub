@@ -233,6 +233,57 @@ export type Database = {
           },
         ]
       }
+      diagnostic_leads: {
+        Row: {
+          blocker: string | null
+          budget: string | null
+          completed: boolean
+          created_at: string
+          current_step: number
+          email: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          level: string | null
+          objective: string | null
+          recommended_offer: string | null
+          tiktok: string | null
+          updated_at: string
+        }
+        Insert: {
+          blocker?: string | null
+          budget?: string | null
+          completed?: boolean
+          created_at?: string
+          current_step?: number
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          level?: string | null
+          objective?: string | null
+          recommended_offer?: string | null
+          tiktok?: string | null
+          updated_at?: string
+        }
+        Update: {
+          blocker?: string | null
+          budget?: string | null
+          completed?: boolean
+          created_at?: string
+          current_step?: number
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          level?: string | null
+          objective?: string | null
+          recommended_offer?: string | null
+          tiktok?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       email_logs: {
         Row: {
           client_id: string | null

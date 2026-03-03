@@ -1,39 +1,28 @@
 
 
-## Plan : Notification Discord + Email SMTP à la fin du diagnostic /start
+## Plan : Ajouter le tracking PostHog au diagnostic /start
 
-### 1. Nouvelle edge function `supabase/functions/notify-diagnostic/index.ts`
+### Fichier modifié : `src/pages/DiagnosticStart.tsx`
 
-Suivre exactement le pattern de `notify-application` + `send-oneshot-form` :
+Importer `trackEvent` depuis `@/lib/tracking` et ajouter des événements à chaque interaction clé :
 
-- **Discord webhook** : Envoyer un embed avec tous les champs du lead (Nom, Email, TikTok, Niveau, Objectif, Blocker, Budget, Offre recommandée) vers le même webhook Discord existant, avec mention des admins
-- **Email SMTP OVH** : Envoyer un email HTML récapitulatif via nodemailer (même config que `send-oneshot-form` : `ssl0.ovh.net:465`, `noreply@fredwav.com` → `fredwavcm@gmail.com`) avec le secret `SMTP_PASSWORD`
-- **itpush** : Notifications succès/erreur via `notifySuccess`/`notifyError`
-- CORS headers standard, `verify_jwt = false` dans config.toml
+| Moment | Événement | Propriétés |
+|--------|-----------|------------|
+| Clic "Démarrer" (step 0→1) | `diagnostic_started` | — |
+| Validation identité (step 1→2) | `diagnostic_step_identity` | `email`, `tiktok` |
+| Sélection niveau (step 2→3) | `diagnostic_step_level` | `level` |
+| Sélection objectif (step 3→4) | `diagnostic_step_objective` | `objective` |
+| Validation blocker (step 4→5) | `diagnostic_step_blocker` | — |
+| Sélection budget (step 5→résultat) | `diagnostic_completed` | `budget`, `recommended_offer`, `level`, `objective` |
+| Clic CTA résultat | `diagnostic_cta_click` | `recommended_offer`, `url` |
+| Clic "Retour" | `diagnostic_back` | `from_step` |
 
-### 2. Modifier `src/pages/DiagnosticStart.tsx`
+Aussi appeler `identifyUser(data.email)` à l'étape identité pour rattacher le lead à son email dans PostHog.
 
-Dans `handleBudgetSelect`, après le `saveLead` (qui marque `completed: true`), appeler la edge function :
+### Modifications concrètes
 
-```typescript
-supabase.functions.invoke("notify-diagnostic", {
-  body: {
-    first_name: data.firstName,
-    last_name: data.lastName,
-    email: data.email,
-    tiktok: data.tiktok,
-    level: data.level,
-    objective: data.objective,
-    blocker: data.blocker,
-    budget,
-    recommended_offer: getRecommendedOffer(budget),
-  },
-});
-```
+- Ajouter `import { trackEvent } from "@/lib/tracking"` et `import { identifyUser } from "@/lib/posthog"`
+- Insérer `trackEvent(...)` dans : le bouton "Démarrer", `handleIdentityNext`, chaque `onClick` des OptionCard (steps 2 et 3), `handleBlockerNext`, `handleBudgetSelect`, le lien CTA du résultat, et le bouton retour
 
-Appel fire-and-forget (pas de `await`) pour ne pas bloquer l'affichage du résultat.
-
-### 3. Config
-
-Ajouter `[functions.notify-diagnostic]` avec `verify_jwt = false` dans `supabase/config.toml`.
+Aucune nouvelle dépendance, aucun changement de structure.
 

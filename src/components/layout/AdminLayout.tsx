@@ -15,6 +15,7 @@ import {
   X,
   Zap,
   ClipboardList,
+  Stethoscope,
 } from "lucide-react";
 import { useState } from "react";
 import { AdminChatbot } from "@/components/admin/AdminChatbot";
@@ -32,6 +33,7 @@ const navItems = [
   { label: "Templates", href: "/admin/templates", icon: Mail },
   { label: "Analyses Express", href: "/admin/analyses", icon: Zap },
   { label: "Candidatures", href: "/admin/applications", icon: ClipboardList },
+  { label: "Diagnostics", href: "/admin/diagnostics", icon: Stethoscope },
   { label: "Paramètres", href: "/admin/settings", icon: Settings },
 ];
 

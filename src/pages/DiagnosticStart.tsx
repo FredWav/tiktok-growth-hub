@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { z } from "zod";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -49,6 +50,7 @@ const DiagnosticStart = () => {
   const [loading, setLoading] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const leadIdRef = useRef<string | null>(null);
   const [data, setData] = useState<FormData>({
     firstName: "",
     lastName: "",
@@ -61,6 +63,31 @@ const DiagnosticStart = () => {
   });
 
   const progress = step === 0 ? 0 : Math.round((Math.min(step, TOTAL_STEPS) / TOTAL_STEPS) * 100);
+
+  const saveLead = async (fields: Record<string, any>, currentStep: number, completed = false) => {
+    try {
+      if (!leadIdRef.current) {
+        const { data: row, error } = await supabase
+          .from("diagnostic_leads" as any)
+          .insert({ ...fields, current_step: currentStep, completed } as any)
+          .select("id")
+          .single();
+        if (!error && row) leadIdRef.current = (row as any).id;
+      } else {
+        await supabase
+          .from("diagnostic_leads" as any)
+          .update({ ...fields, current_step: currentStep, completed } as any)
+          .eq("id", leadIdRef.current);
+      }
+    } catch (e) {
+      console.error("Error saving diagnostic lead:", e);
+    }
+  };
+
+  const getRecommendedOffer = (budget: string) => {
+    const map: Record<string, string> = { none: "discord", low: "one_shot", mid: "vip", high: "wav_premium" };
+    return map[budget] || "discord";
+  };
 
   const handleIdentityNext = () => {
     const result = identitySchema.safeParse({
@@ -78,6 +105,12 @@ const DiagnosticStart = () => {
       return;
     }
     setErrors({});
+    saveLead({
+      first_name: data.firstName,
+      last_name: data.lastName,
+      email: data.email,
+      tiktok: data.tiktok,
+    }, 1);
     setStep(2);
   };
 
@@ -87,11 +120,13 @@ const DiagnosticStart = () => {
       return;
     }
     setErrors({});
+    saveLead({ blocker: data.blocker }, 4);
     setStep(5);
   };
 
   const handleBudgetSelect = (budget: string) => {
     setData((prev) => ({ ...prev, budget }));
+    saveLead({ budget, recommended_offer: getRecommendedOffer(budget) }, 5, true);
     setStep(6);
     setLoading(true);
   };
@@ -305,6 +340,7 @@ const DiagnosticStart = () => {
                   selected={data.level === "beginner"}
                   onClick={() => {
                     setData((prev) => ({ ...prev, level: "beginner" }));
+                    saveLead({ level: "beginner" }, 2);
                     setTimeout(() => setStep(3), 300);
                   }}
                 />
@@ -314,6 +350,7 @@ const DiagnosticStart = () => {
                   selected={data.level === "intermediate"}
                   onClick={() => {
                     setData((prev) => ({ ...prev, level: "intermediate" }));
+                    saveLead({ level: "intermediate" }, 2);
                     setTimeout(() => setStep(3), 300);
                   }}
                 />
@@ -323,6 +360,7 @@ const DiagnosticStart = () => {
                   selected={data.level === "advanced"}
                   onClick={() => {
                     setData((prev) => ({ ...prev, level: "advanced" }));
+                    saveLead({ level: "advanced" }, 2);
                     setTimeout(() => setStep(3), 300);
                   }}
                 />
@@ -346,6 +384,7 @@ const DiagnosticStart = () => {
                   selected={data.objective === "visibility"}
                   onClick={() => {
                     setData((prev) => ({ ...prev, objective: "visibility" }));
+                    saveLead({ objective: "visibility" }, 3);
                     setTimeout(() => setStep(4), 300);
                   }}
                 />
@@ -355,6 +394,7 @@ const DiagnosticStart = () => {
                   selected={data.objective === "strategy"}
                   onClick={() => {
                     setData((prev) => ({ ...prev, objective: "strategy" }));
+                    saveLead({ objective: "strategy" }, 3);
                     setTimeout(() => setStep(4), 300);
                   }}
                 />
@@ -364,6 +404,7 @@ const DiagnosticStart = () => {
                   selected={data.objective === "monetize"}
                   onClick={() => {
                     setData((prev) => ({ ...prev, objective: "monetize" }));
+                    saveLead({ objective: "monetize" }, 3);
                     setTimeout(() => setStep(4), 300);
                   }}
                 />

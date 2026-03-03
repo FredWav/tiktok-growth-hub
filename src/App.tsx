@@ -52,6 +52,7 @@ import AdminTemplates from "./pages/admin/Templates";
 import AdminSettings from "./pages/admin/Settings";
 import AdminExpressAnalyses from "./pages/admin/ExpressAnalyses";
 import AdminApplications from "./pages/admin/Applications";
+import AdminDiagnostics from "./pages/admin/Diagnostics";
 
 // Client pages
 import ClientDashboard from "./pages/client/ClientDashboard";
@@ -180,6 +181,14 @@ const App = () => (
               element={
                 <ProtectedRoute requiredRole="admin">
                   <AdminApplications />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/diagnostics"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AdminDiagnostics />
                 </ProtectedRoute>
               }
             />

@@ -1,35 +1,46 @@
 
 
-## Plan : Notifications Push itpush.dev
+## Plan : Tunnel de Qualification "Diagnostic Strategique TikTok" sur /start
 
-### 1. Fichier utilitaire `supabase/functions/_shared/itpush.ts`
+### Resume
+Creer une page single-page type Typeform avec un tunnel multi-etapes (6 ecrans) qui qualifie les leads par budget et les redirige vers l'offre adaptee. Pas de backend, etat local React uniquement.
 
-Creer une fonction helper reutilisable :
-- Verifie `ITPUSH_ENABLED` (env var) — si absent ou `"false"`, skip silencieusement
-- API key et project ID en dur (valeurs publiques fournies par l'utilisateur)
-- Fonction `notifySuccess(title, message)` et `notifyError(title, message)`
-- Catch les erreurs sans bloquer le flow principal
+### Fichiers a creer/modifier
 
-### 2. Integration dans les edge functions
+#### 1. Nouveau fichier : `src/pages/DiagnosticStart.tsx`
+Page autonome contenant tout le tunnel. Composant unique avec `useState` pour gerer l'etape courante (0-6) et les donnees du formulaire.
 
-Ajouter des appels `notifySuccess` / `notifyError` dans :
+**Structure des ecrans :**
+- **Ecran 0 (Accueil)** : Titre "Diagnostic Strategique TikTok", sous-titre explicatif, bouton "Demarrer le diagnostic"
+- **Etape 1 (Identite)** : 4 inputs (prenom, nom, email, TikTok). Validation Zod. Bouton "Suivant"
+- **Etape 2 (Niveau)** : 3 cartes cliquables avec icones Lucide (Sprout, TrendingUp, DollarSign). Selection auto-avance
+- **Etape 3 (Objectif)** : 3 cartes cliquables (Eye, LayoutList, Coins). Selection auto-avance
+- **Etape 4 (Blocage)** : Textarea obligatoire (min 10 chars). Bouton "Derniere etape"
+- **Etape 5 (Budget)** : 4 cartes cliquables (budget filter)
+- **Ecran 6 (Resultat)** : Spinner 2s puis affichage du resultat selon le budget choisi
 
-- **`send-oneshot-form`** : succes apres insert DB + Discord, erreur si paiement invalide ou echec global
-- **`stripe-webhook`** : succes apres creation VIP subscription, erreur si insertion echoue
-- **`express-analysis`** : succes au lancement d'analyse, erreur si paiement invalide ou API echoue
-- **`express-analysis-status`** : succes quand analyse complete, erreur si analyse echouee ou AI manquante
-- **`notify-application`** : succes apres envoi Discord candidature, erreur si webhook echoue
+**Logique de routage (ecran resultat) :**
+- Pas de budget → Discord (https://discord.gg/6ctGNjqUXr)
+- Moins de 200€ → One-Shot (https://fredwav.com/one-shot)
+- 200-500€ → VIP (https://fredwav.com/offres/vip) + badge urgence "7 places sur 10"
+- 500-1000€+ → Wav Premium Calendly + badge urgence "3 places sur 5"
 
-### 3. Variable d'environnement
+**Design :**
+- Fond cream (bg-cream), texte noir (text-noir), accents gold (primary)
+- Barre de progression en haut (Progress component existant)
+- Cartes cliquables : bordure, hover avec bordure gold, etat selectionne avec bg-primary/10 et bordure primary
+- Transitions avec opacity/transform (animate-fade-in existant)
+- Mobile-first, max-w-2xl centre
+- Sans Header/Footer (pas de Layout wrapper) pour experience full-screen tunnel
 
-- `ITPUSH_ENABLED` : mettre a `"true"` pour activer, toute autre valeur ou absence = desactive
-- A configurer comme secret dans le backend
+#### 2. Modifier : `src/App.tsx`
+- Ajouter import `DiagnosticStart`
+- Ajouter route `<Route path="/start" element={<DiagnosticStart />} />`
 
-### Fichiers modifies
-- `supabase/functions/_shared/itpush.ts` (nouveau)
-- `supabase/functions/send-oneshot-form/index.ts`
-- `supabase/functions/stripe-webhook/index.ts`
-- `supabase/functions/express-analysis/index.ts`
-- `supabase/functions/express-analysis-status/index.ts`
-- `supabase/functions/notify-application/index.ts`
+### Contraintes respectees
+- Pas de base de donnees, etat local useState uniquement
+- Icones Lucide uniquement (pas d'emojis)
+- 100% responsive mobile-first
+- Composants UI existants reutilises (Button, Input, Textarea, Progress)
+- Charte graphique noir/or/cream du projet
 

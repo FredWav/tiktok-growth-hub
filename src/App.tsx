@@ -38,6 +38,7 @@ import NotFound from "./pages/NotFound";
 import AnalyseExpress from "./pages/AnalyseExpress";
 import AnalyseExpressResult from "./pages/AnalyseExpressResult";
 import WavPremiumApplication from "./pages/WavPremiumApplication";
+import DiagnosticStart from "./pages/DiagnosticStart";
 
 // Admin pages
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -90,6 +91,7 @@ const App = () => (
             <Route path="/analyse-express" element={<AnalyseExpress />} />
             <Route path="/analyse-express/result" element={<AnalyseExpressResult />} />
             <Route path="/wav-premium/candidature" element={<WavPremiumApplication />} />
+            <Route path="/start" element={<DiagnosticStart />} />
 
             {/* Admin routes */}
             <Route

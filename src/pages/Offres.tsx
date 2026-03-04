@@ -9,7 +9,6 @@ import { SEOHead } from "@/components/SEOHead";
 const profileSelector = [
   { label: "Un diagnostic clair", target: "one-shot", icon: Zap },
   { label: "Une transformation encadrée", target: "wav-premium", icon: Target },
-  { label: "Un cadre continu", target: "vip", icon: Crown },
 ];
 
 const offers = [
@@ -76,38 +75,13 @@ const offers = [
     variant: "premium" as const,
     recommended: false,
   },
-  {
-    id: "vip",
-    icon: Crown,
-    title: "VIP",
-    subtitle: "Progresser dans la durée",
-    description: "L'environnement structuré et exigeant qui transforme un créateur motivé en créateur stratège. Pas un groupe motivation - un hub performance.",
-    price: "99€/mois",
-    priceNote: "3 mois minimum",
-    duration: "3, 6 ou 12 mois",
-    forWho: [
-      "Tu es bloqué en croissance et tu ne comprends pas pourquoi",
-      "Tu es débutant ambitieux et tu veux partir avec les bonnes bases",
-      "Tu es intermédiaire et tu veux scaler proprement",
-    ],
-    notForWho: [
-      "Tu cherches de la motivation sans passer à l'action",
-      "Tu n'es pas prêt à remettre en question ta méthode",
-    ],
-    includes: [
-      "1 live par semaine en petit comité avec les membres VIP",
-      "Feedback sur tes hooks, scripts et positionnement",
-      "Éducation avancée : hook engineering, CTA stratégique, lecture analytique des stats",
-      "Ressources nombreuses et régulièrement mises à jour",
-      "Réponses et feedback 5/7 sur le serveur Discord",
-      "Environnement exigeant orienté performance",
-    ],
-    cta: "Rejoindre le VIP",
-    href: "/offres/vip",
-    trackEvent: "cta_vip_click",
-    variant: "premium" as const,
-    recommended: false,
-  },
+  // VIP offer hidden from storefront — backend routes preserved
+  // {
+  //   id: "vip",
+  //   icon: Crown,
+  //   title: "VIP",
+  //   ...
+  // },
 ];
 
 const stats = [
@@ -133,7 +107,6 @@ export default function Offres() {
         "itemListElement": [
           { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "One Shot", "description": "Session stratégique de 1h30 avec diagnostic complet et plan d'action personnalisé" }, "price": "179", "priceCurrency": "EUR" },
           { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Wav Premium", "description": "45 jours de transformation avec suivi hebdomadaire et feedback continu" }, "price": "987", "priceCurrency": "EUR" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "VIP", "description": "Accompagnement continu avec lives hebdo, feedback Discord 5/7 et ressources exclusives" }, "price": "99", "priceCurrency": "EUR", "priceSpecification": { "@type": "UnitPriceSpecification", "price": "99", "priceCurrency": "EUR", "unitText": "mois" } },
         ],
       }} />
       <Section variant="cream" size="lg">
@@ -142,7 +115,7 @@ export default function Offres() {
             Trouve l'accompagnement <span className="text-gold-gradient">adapté à tes besoins</span>
           </h1>
           <p className="text-lg text-muted-foreground mb-8">
-            Trois niveaux d'engagement pour trois types de profils.
+            Deux accompagnements pour deux types de profils.
             Pas de formule standard : chaque accompagnement est personnalisé.
           </p>
 

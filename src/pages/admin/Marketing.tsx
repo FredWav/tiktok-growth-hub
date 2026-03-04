@@ -68,10 +68,11 @@ export default function AdminMarketing() {
   const { data: leads = [], isLoading } = useQuery({
     queryKey: ["marketing-leads"],
     queryFn: async () => {
-      const [appsRes, diagRes, oneshotRes] = await Promise.all([
+      const [appsRes, diagRes, oneshotRes, expressRes] = await Promise.all([
         supabase.from("wav_premium_applications" as any).select("created_at, first_name, last_name, origin_source, follower_since, current_revenue, posthog_id").order("created_at", { ascending: false }).limit(200),
         supabase.from("diagnostic_leads" as any).select("created_at, first_name, last_name, origin_source, follower_since, posthog_id").eq("completed", true).order("created_at", { ascending: false }).limit(200),
         supabase.from("oneshot_submissions" as any).select("created_at, name, origin_source, posthog_id").order("created_at", { ascending: false }).limit(200),
+        supabase.from("express_analyses").select("created_at, tiktok_username, email, status").order("created_at", { ascending: false }).limit(200),
       ]);
 
       const apps: Lead[] = ((appsRes.data as any[]) || []).map((a: any) => ({
@@ -104,7 +105,17 @@ export default function AdminMarketing() {
         posthog_id: o.posthog_id,
       }));
 
-      return [...apps, ...diags, ...oneshots].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      const express: Lead[] = ((expressRes.data as any[]) || []).map((e: any) => ({
+        date: e.created_at,
+        name: e.tiktok_username || e.email || "—",
+        offer: "Analyse Express",
+        source: null,
+        follower_since: null,
+        current_revenue: null,
+        posthog_id: null,
+      }));
+
+      return [...apps, ...diags, ...oneshots, ...express].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     },
   });
 
@@ -403,7 +414,18 @@ export default function AdminMarketing() {
                         </TableCell>
                         <TableCell className="text-cream font-medium">{lead.name}</TableCell>
                         <TableCell>
-                          <Badge variant={lead.offer === "Wav Premium" ? "default" : "secondary"}>
+                          <Badge
+                            variant="outline"
+                            className={
+                              lead.offer === "Wav Premium"
+                                ? "bg-primary/20 text-primary border-primary/30"
+                                : lead.offer === "One Shot"
+                                ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
+                                : lead.offer === "Analyse Express"
+                                ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+                                : "bg-violet-500/20 text-violet-400 border-violet-500/30"
+                            }
+                          >
                             {lead.offer}
                           </Badge>
                         </TableCell>

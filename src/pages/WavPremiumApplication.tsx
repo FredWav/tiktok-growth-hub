@@ -56,8 +56,8 @@ const applicationSchema = z.object({
   current_level: z.string().min(1, "Sélectionne ton niveau actuel"),
   blockers: z.string().trim().min(10, "Décris tes points de blocage (10 caractères min.)").max(2000),
   goals: z.string().trim().min(10, "Décris tes objectifs (10 caractères min.)").max(2000),
-  current_revenue: z.string().trim().max(200).optional().or(z.literal("")),
-  revenue_goal: z.string().trim().max(200).optional().or(z.literal("")),
+  current_revenue: z.string().trim().min(1, "Ce champ est obligatoire").max(200),
+  revenue_goal: z.string().trim().min(1, "Ce champ est obligatoire").max(200),
   origin_source: z.string().trim().max(500).optional().or(z.literal("")),
   follower_since: z.string().optional().or(z.literal("")),
   conversion_trigger: z.string().trim().max(500).optional().or(z.literal("")),
@@ -316,7 +316,7 @@ export default function WavPremiumApplication() {
                   name="current_revenue"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Ton CA actuel ?</FormLabel>
+                      <FormLabel>Quel est ton CA mensuel actuel ? *</FormLabel>
                       <FormControl>
                         <Input placeholder="Ex : 2000€/mois, 0€, etc." {...field} />
                       </FormControl>
@@ -329,7 +329,7 @@ export default function WavPremiumApplication() {
                   name="revenue_goal"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Ton objectif de CA à 6 mois ?</FormLabel>
+                      <FormLabel>Quel est ton objectif de CA mensuel d'ici 6 mois ? *</FormLabel>
                       <FormControl>
                         <Input placeholder="Ex : 5000€/mois" {...field} />
                       </FormControl>

@@ -1,49 +1,63 @@
 
 
-## Plan : Compléter le système de tracking Zero-Party Data + Dashboard Marketing
+## Plan : CRM auto-prospect + livraison Analyse Express par email
 
-### État actuel
+### 1. Migration DB — Ajouter `email` à `express_analyses`
 
-La majorité du travail a été faite dans les itérations précédentes. Voici ce qui **reste à faire** :
+Ajouter une colonne `email text` nullable à la table `express_analyses`.
 
-### 1. Migration DB — Ajouter `posthog_id`
+### 2. Frontend — Champ email dans `AnalyseExpress.tsx`
 
-Ajouter une colonne `posthog_id text` nullable aux 3 tables : `wav_premium_applications`, `diagnostic_leads`, `oneshot_submissions`.
+- Ajouter un state `email` et un champ Input "Adresse email" obligatoire sous le champ username
+- Passer `email` dans le body de `create-express-checkout`
+- Afficher l'email dans le modal de confirmation
 
-### 2. `src/lib/posthog.ts` — Exporter `getPostHogId()`
+### 3. Edge Function `create-express-checkout` — `customer_email`
 
-Ajouter une fonction qui retourne `posthog.get_distinct_id()` si PostHog est initialisé, sinon `null`.
+- Extraire `email` du body
+- Ajouter `customer_email: email` dans `stripe.checkout.sessions.create()`
+- Stocker l'email dans `metadata` pour le récupérer plus tard
 
-### 3. `src/lib/tracking.ts` — Ajouter `utm_medium`
+### 4. Edge Function `express-analysis` — Sauvegarder l'email
 
-`captureUtmParams()` capture déjà `utm_source` et `utm_campaign`. Ajouter `utm_medium` dans le même pattern localStorage.
+- Lors de l'insert dans `express_analyses`, récupérer l'email depuis `session.metadata.email` ou `session.customer_email` et le persister
 
-### 4. `src/pages/WavPremiumApplication.tsx` — Ajouter `conversion_trigger` + `posthog_id`
+### 5. Frontend — UX asynchrone dans `AnalyseExpressResult.tsx`
 
-- Ajouter un champ "Quel contenu t'a décidé aujourd'hui ?" dans le bloc attribution
-- Envoyer `posthog_id` via `getPostHogId()` dans le payload insert + notify-application
+- Modifier la section loading : remplacer le spinner d'attente active par un message "Ton analyse est en cours (~2 min). Tu peux fermer cette page, ton rapport te sera envoyé par email."
+- Conserver le polling en arrière-plan pour ceux qui restent sur la page (résultats s'affichent si prêts)
 
-### 5. `src/pages/OneShotSuccess.tsx` — Envoyer `posthog_id`
+### 6. Edge Function `express-analysis-status` — Envoi email à la complétion
 
-Ajouter `posthog_id` dans le body envoyé à `send-oneshot-form`.
+- Quand `job.status === "completed"` et les données sont sauvées :
+  - Récupérer l'email depuis `express_analyses` (colonne `email`)
+  - Construire un email HTML avec lien vers `https://fredwav.lovable.app/analyse-express/result?session_id={session_id}`
+  - Envoyer via nodemailer (SMTP OVH, même config que `send-oneshot-form`)
 
-### 6. Admin Marketing — Nouvelle page
+### 7. CRM auto-prospect — Logique d'upsert dans les Edge Functions
 
-**`src/pages/admin/Marketing.tsx`** : page divisée en deux colonnes.
+Créer une fonction utilitaire `upsertProspect(supabase, { email, name?, tiktok?, source? })` utilisable dans les 3 fonctions :
 
-- **Gauche — Générateur UTM** : formulaire local (URL, Source, Medium, Campagne) → affiche l'URL générée + bouton Copier. Aucun appel Supabase.
-- **Droite — Derniers leads** : tableau fusionnant `wav_premium_applications` (offre "Wav Premium") et `diagnostic_leads` complétés (offre "Diagnostic"), triés par date. Colonnes : Date, Nom, Offre, Source, Follower Since, CA Actuel, PostHog ID (lien cliquable vers `https://us.posthog.com/project/…/person/{id}`).
+- **`express-analysis-status`** (à la complétion) : upsert avec email + tiktok du client
+- **`send-oneshot-form`** : upsert avec email + nom + tiktok
+- **`notify-application`** : pas de changement (les candidatures Wav Premium ne passent pas par `clients` car ce sont des prospects à qualification manuelle)
 
-**`src/components/layout/AdminLayout.tsx`** : ajouter un lien "Marketing" avec icône `BarChart3` pointant vers `/admin/marketing`.
+**Logique d'upsert** : Chercher dans `profiles` par email (via `auth.users`). Si pas trouvé, on ne crée PAS de user auth (pas de sens pour un achat ponctuel). A la place, on insère/met à jour directement dans `clients` en utilisant un user_id "system" ou on crée une table dédiée `prospects` — MAIS la table `clients` requiert un `user_id` (FK vers auth). 
 
-**`src/App.tsx`** : ajouter la route `/admin/marketing` protégée admin.
+**Problème identifié** : La table `clients` a un champ `user_id uuid NOT NULL` qui référence un user authentifié. On ne peut pas y insérer un prospect sans compte. Deux options :
 
-### 7. Edge Functions — Ajouter `posthog_id`
+- **Option A** : Rendre `user_id` nullable dans `clients` pour permettre les prospects sans compte
+- **Option B** : Créer une table `prospects` séparée (email, name, tiktok, source, offer, created_at) et adapter l'admin
 
-- `notify-application/index.ts` : extraire `posthog_id` du body, l'ajouter comme champ dans l'embed Discord.
-- `send-oneshot-form/index.ts` : idem, extraire et ajouter dans Discord + email HTML.
+Je recommande **Option A** (rendre `user_id` nullable) car c'est le plus simple et le champ `status = 'prospect'` distingue déjà les prospects des clients actifs. Il faudra mettre à jour la RLS pour autoriser les inserts admin-only sans user_id.
+
+### 8. Admin — Renommer "Clients" en "Prospects & Clients"
+
+Dans `AdminLayout.tsx`, changer le label du navItem de "Clients" à "Prospects & Clients".
 
 ---
 
-**Fichiers modifiés** : 8 fichiers + 1 nouveau + 1 migration SQL. Aucune dépendance ajoutée.
+**Fichiers modifiés** : `AnalyseExpress.tsx`, `AnalyseExpressResult.tsx`, `create-express-checkout/index.ts`, `express-analysis/index.ts`, `express-analysis-status/index.ts`, `send-oneshot-form/index.ts`, `AdminLayout.tsx` + 1 migration SQL
+
+**Clarification nécessaire** : l'upsert CRM dépend de la contrainte `user_id NOT NULL` sur `clients`.
 

@@ -27,7 +27,15 @@ interface Lead {
   follower_since: string | null;
   current_revenue: string | null;
   posthog_id: string | null;
+  email: string | null;
 }
+
+const OFFER_PRIORITY: Record<string, number> = {
+  "Wav Premium": 1,
+  "One Shot": 2,
+  "Analyse Express": 3,
+  "Diagnostic": 4,
+};
 
 const CHART_COLORS = [
   "hsl(43, 74%, 49%)",   // primary / gold
@@ -69,9 +77,9 @@ export default function AdminMarketing() {
     queryKey: ["marketing-leads"],
     queryFn: async () => {
       const [appsRes, diagRes, oneshotRes, expressRes] = await Promise.all([
-        supabase.from("wav_premium_applications" as any).select("created_at, first_name, last_name, origin_source, follower_since, current_revenue, posthog_id").order("created_at", { ascending: false }).limit(200),
-        supabase.from("diagnostic_leads" as any).select("created_at, first_name, last_name, origin_source, follower_since, posthog_id").eq("completed", true).order("created_at", { ascending: false }).limit(200),
-        supabase.from("oneshot_submissions" as any).select("created_at, name, origin_source, posthog_id").order("created_at", { ascending: false }).limit(200),
+        supabase.from("wav_premium_applications" as any).select("created_at, first_name, last_name, email, origin_source, follower_since, current_revenue, posthog_id").order("created_at", { ascending: false }).limit(200),
+        supabase.from("diagnostic_leads" as any).select("created_at, first_name, last_name, email, origin_source, follower_since, posthog_id").eq("completed", true).order("created_at", { ascending: false }).limit(200),
+        supabase.from("oneshot_submissions" as any).select("created_at, name, email, origin_source, posthog_id").order("created_at", { ascending: false }).limit(200),
         supabase.from("express_analyses").select("created_at, tiktok_username, email, status").order("created_at", { ascending: false }).limit(200),
       ]);
 
@@ -83,6 +91,7 @@ export default function AdminMarketing() {
         follower_since: a.follower_since,
         current_revenue: a.current_revenue,
         posthog_id: a.posthog_id,
+        email: a.email || null,
       }));
 
       const diags: Lead[] = ((diagRes.data as any[]) || []).map((d: any) => ({
@@ -93,6 +102,7 @@ export default function AdminMarketing() {
         follower_since: d.follower_since,
         current_revenue: null,
         posthog_id: d.posthog_id,
+        email: d.email || null,
       }));
 
       const oneshots: Lead[] = ((oneshotRes.data as any[]) || []).map((o: any) => ({
@@ -103,6 +113,7 @@ export default function AdminMarketing() {
         follower_since: null,
         current_revenue: null,
         posthog_id: o.posthog_id,
+        email: o.email || null,
       }));
 
       const express: Lead[] = ((expressRes.data as any[]) || []).map((e: any) => ({
@@ -113,9 +124,29 @@ export default function AdminMarketing() {
         follower_since: null,
         current_revenue: null,
         posthog_id: null,
+        email: e.email || null,
       }));
 
-      return [...apps, ...diags, ...oneshots, ...express].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      // Merge all leads
+      const allLeads = [...apps, ...diags, ...oneshots, ...express];
+
+      // Deduplicate by email: keep highest priority offer per email
+      const byEmail = new Map<string, Lead>();
+      const noEmail: Lead[] = [];
+
+      for (const lead of allLeads) {
+        if (!lead.email) {
+          noEmail.push(lead);
+          continue;
+        }
+        const key = lead.email.toLowerCase().trim();
+        const existing = byEmail.get(key);
+        if (!existing || (OFFER_PRIORITY[lead.offer] ?? 99) < (OFFER_PRIORITY[existing.offer] ?? 99)) {
+          byEmail.set(key, lead);
+        }
+      }
+
+      return [...byEmail.values(), ...noEmail].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     },
   });
 

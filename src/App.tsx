@@ -57,6 +57,7 @@ import AdminSettings from "./pages/admin/Settings";
 import AdminExpressAnalyses from "./pages/admin/ExpressAnalyses";
 import AdminApplications from "./pages/admin/Applications";
 import AdminDiagnostics from "./pages/admin/Diagnostics";
+import AdminMarketing from "./pages/admin/Marketing";
 
 // Client pages
 import ClientDashboard from "./pages/client/ClientDashboard";
@@ -193,6 +194,14 @@ const App = () => (
               element={
                 <ProtectedRoute requiredRole="admin">
                   <AdminDiagnostics />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/marketing"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AdminMarketing />
                 </ProtectedRoute>
               }
             />

@@ -16,6 +16,7 @@ import {
   Zap,
   ClipboardList,
   Stethoscope,
+  BarChart3,
 } from "lucide-react";
 import { useState } from "react";
 import { AdminChatbot } from "@/components/admin/AdminChatbot";
@@ -34,6 +35,7 @@ const navItems = [
   { label: "Analyses Express", href: "/admin/analyses", icon: Zap },
   { label: "Candidatures", href: "/admin/applications", icon: ClipboardList },
   { label: "Diagnostics", href: "/admin/diagnostics", icon: Stethoscope },
+  { label: "Marketing", href: "/admin/marketing", icon: BarChart3 },
   { label: "Paramètres", href: "/admin/settings", icon: Settings },
 ];
 

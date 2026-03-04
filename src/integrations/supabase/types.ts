@@ -249,6 +249,7 @@ export type Database = {
           level: string | null
           objective: string | null
           origin_source: string | null
+          posthog_id: string | null
           recommended_offer: string | null
           tiktok: string | null
           updated_at: string
@@ -268,6 +269,7 @@ export type Database = {
           level?: string | null
           objective?: string | null
           origin_source?: string | null
+          posthog_id?: string | null
           recommended_offer?: string | null
           tiktok?: string | null
           updated_at?: string
@@ -287,6 +289,7 @@ export type Database = {
           level?: string | null
           objective?: string | null
           origin_source?: string | null
+          posthog_id?: string | null
           recommended_offer?: string | null
           tiktok?: string | null
           updated_at?: string
@@ -428,6 +431,7 @@ export type Database = {
           name: string
           objectives: string
           origin_source: string | null
+          posthog_id: string | null
           stripe_session_id: string
           tiktok: string
           whatsapp: string
@@ -440,6 +444,7 @@ export type Database = {
           name: string
           objectives: string
           origin_source?: string | null
+          posthog_id?: string | null
           stripe_session_id: string
           tiktok: string
           whatsapp: string
@@ -452,6 +457,7 @@ export type Database = {
           name?: string
           objectives?: string
           origin_source?: string | null
+          posthog_id?: string | null
           stripe_session_id?: string
           tiktok?: string
           whatsapp?: string
@@ -667,6 +673,7 @@ export type Database = {
           id: string
           last_name: string
           origin_source: string | null
+          posthog_id: string | null
           revenue_goal: string | null
           tiktok_username: string | null
         }
@@ -683,6 +690,7 @@ export type Database = {
           id?: string
           last_name: string
           origin_source?: string | null
+          posthog_id?: string | null
           revenue_goal?: string | null
           tiktok_username?: string | null
         }
@@ -699,6 +707,7 @@ export type Database = {
           id?: string
           last_name?: string
           origin_source?: string | null
+          posthog_id?: string | null
           revenue_goal?: string | null
           tiktok_username?: string | null
         }

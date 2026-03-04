@@ -21,8 +21,10 @@ export function captureUtmParams() {
   if (typeof window === "undefined") return;
   const params = new URLSearchParams(window.location.search);
   const source = params.get("utm_source");
+  const medium = params.get("utm_medium");
   const campaign = params.get("utm_campaign");
   if (source) localStorage.setItem("utm_source", source);
+  if (medium) localStorage.setItem("utm_medium", medium);
   if (campaign) localStorage.setItem("utm_campaign", campaign);
 }
 

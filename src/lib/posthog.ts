@@ -36,3 +36,14 @@ export function capturePageview() {
     posthog.capture("$pageview");
   }
 }
+
+export function getPostHogId(): string | null {
+  if (initialized) {
+    try {
+      return posthog.get_distinct_id() || null;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}

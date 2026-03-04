@@ -15,7 +15,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { first_name, last_name, email, tiktok_username, current_level, blockers, goals, current_revenue, revenue_goal, origin_source, follower_since } =
+    const { first_name, last_name, email, tiktok_username, current_level, blockers, goals, current_revenue, revenue_goal, origin_source, follower_since, conversion_trigger, posthog_id } =
       await req.json();
 
     if (!first_name || !last_name || !email) {
@@ -39,6 +39,8 @@ Deno.serve(async (req) => {
           { name: "🎯 Objectif CA", value: revenue_goal || "—", inline: true },
           { name: "📍 Source", value: origin_source || "—", inline: true },
           { name: "⏳ Follower depuis", value: follower_since || "—", inline: true },
+          { name: "🔥 Déclencheur", value: conversion_trigger || "—", inline: true },
+          { name: "📊 PostHog", value: posthog_id ? `[Voir](https://us.posthog.com/person/${posthog_id})` : "—", inline: true },
           { name: "🚧 Blockers", value: (blockers || "—").slice(0, 1024) },
           { name: "🎯 Objectifs", value: (goals || "—").slice(0, 1024) },
         ],

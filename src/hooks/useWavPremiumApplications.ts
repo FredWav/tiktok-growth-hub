@@ -10,7 +10,11 @@ export interface WavPremiumApplication {
   current_level: string;
   blockers: string;
   goals: string;
-  budget_confirmed: boolean;
+  origin_source: string | null;
+  follower_since: string | null;
+  conversion_trigger: string | null;
+  current_revenue: string | null;
+  revenue_goal: string | null;
   created_at: string;
 }
 

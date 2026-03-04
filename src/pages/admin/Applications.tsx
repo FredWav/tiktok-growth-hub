@@ -28,9 +28,9 @@ const Applications = () => {
               <p className="text-2xl font-bold text-cream">{applications.length}</p>
             </div>
             <div className="bg-noir-light border border-green-500/20 rounded-lg p-4">
-              <p className="text-cream/60 text-sm">Budget confirmé</p>
+              <p className="text-cream/60 text-sm">Avec source</p>
               <p className="text-2xl font-bold text-green-400">
-                {applications.filter((a) => a.budget_confirmed).length}
+                {applications.filter((a) => a.origin_source).length}
               </p>
             </div>
             <div className="bg-noir-light border border-yellow-500/20 rounded-lg p-4">
@@ -63,7 +63,7 @@ const Applications = () => {
                   <TableHead className="text-cream/70">Email</TableHead>
                   <TableHead className="text-cream/70">TikTok</TableHead>
                   <TableHead className="text-cream/70">Niveau</TableHead>
-                  <TableHead className="text-cream/70">Budget</TableHead>
+                  <TableHead className="text-cream/70">Source</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -86,10 +86,8 @@ const Applications = () => {
                     <TableCell className="text-cream/80 max-w-[200px] truncate">
                       {app.current_level}
                     </TableCell>
-                    <TableCell>
-                      <Badge variant={app.budget_confirmed ? "default" : "destructive"}>
-                        {app.budget_confirmed ? "Oui" : "Non"}
-                      </Badge>
+                    <TableCell className="text-cream/80">
+                      {app.origin_source || "—"}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -126,10 +124,20 @@ const Applications = () => {
                     <p>{selected.current_level}</p>
                   </div>
                   <div>
-                    <p className="text-cream/50 text-sm">Budget confirmé</p>
-                    <Badge variant={selected.budget_confirmed ? "default" : "destructive"}>
-                      {selected.budget_confirmed ? "Oui" : "Non"}
-                    </Badge>
+                    <p className="text-cream/50 text-sm">CA actuel</p>
+                    <p>{selected.current_revenue || "—"}</p>
+                  </div>
+                  <div>
+                    <p className="text-cream/50 text-sm">Objectif CA</p>
+                    <p>{selected.revenue_goal || "—"}</p>
+                  </div>
+                  <div>
+                    <p className="text-cream/50 text-sm">Source</p>
+                    <p>{selected.origin_source || "—"}</p>
+                  </div>
+                  <div>
+                    <p className="text-cream/50 text-sm">Follower depuis</p>
+                    <p>{selected.follower_since || "—"}</p>
                   </div>
                 </div>
                 <div>

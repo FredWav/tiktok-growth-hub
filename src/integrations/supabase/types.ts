@@ -238,14 +238,17 @@ export type Database = {
           blocker: string | null
           budget: string | null
           completed: boolean
+          conversion_trigger: string | null
           created_at: string
           current_step: number
           email: string | null
           first_name: string | null
+          follower_since: string | null
           id: string
           last_name: string | null
           level: string | null
           objective: string | null
+          origin_source: string | null
           recommended_offer: string | null
           tiktok: string | null
           updated_at: string
@@ -254,14 +257,17 @@ export type Database = {
           blocker?: string | null
           budget?: string | null
           completed?: boolean
+          conversion_trigger?: string | null
           created_at?: string
           current_step?: number
           email?: string | null
           first_name?: string | null
+          follower_since?: string | null
           id?: string
           last_name?: string | null
           level?: string | null
           objective?: string | null
+          origin_source?: string | null
           recommended_offer?: string | null
           tiktok?: string | null
           updated_at?: string
@@ -270,14 +276,17 @@ export type Database = {
           blocker?: string | null
           budget?: string | null
           completed?: boolean
+          conversion_trigger?: string | null
           created_at?: string
           current_step?: number
           email?: string | null
           first_name?: string | null
+          follower_since?: string | null
           id?: string
           last_name?: string | null
           level?: string | null
           objective?: string | null
+          origin_source?: string | null
           recommended_offer?: string | null
           tiktok?: string | null
           updated_at?: string
@@ -412,31 +421,37 @@ export type Database = {
       }
       oneshot_submissions: {
         Row: {
+          conversion_trigger: string | null
           created_at: string
           email: string
           id: string
           name: string
           objectives: string
+          origin_source: string | null
           stripe_session_id: string
           tiktok: string
           whatsapp: string
         }
         Insert: {
+          conversion_trigger?: string | null
           created_at?: string
           email: string
           id?: string
           name: string
           objectives: string
+          origin_source?: string | null
           stripe_session_id: string
           tiktok: string
           whatsapp: string
         }
         Update: {
+          conversion_trigger?: string | null
           created_at?: string
           email?: string
           id?: string
           name?: string
           objectives?: string
+          origin_source?: string | null
           stripe_session_id?: string
           tiktok?: string
           whatsapp?: string
@@ -641,38 +656,50 @@ export type Database = {
       wav_premium_applications: {
         Row: {
           blockers: string
-          budget_confirmed: boolean
+          conversion_trigger: string | null
           created_at: string
           current_level: string
+          current_revenue: string | null
           email: string
           first_name: string
+          follower_since: string | null
           goals: string
           id: string
           last_name: string
+          origin_source: string | null
+          revenue_goal: string | null
           tiktok_username: string | null
         }
         Insert: {
           blockers: string
-          budget_confirmed?: boolean
+          conversion_trigger?: string | null
           created_at?: string
           current_level: string
+          current_revenue?: string | null
           email: string
           first_name: string
+          follower_since?: string | null
           goals: string
           id?: string
           last_name: string
+          origin_source?: string | null
+          revenue_goal?: string | null
           tiktok_username?: string | null
         }
         Update: {
           blockers?: string
-          budget_confirmed?: boolean
+          conversion_trigger?: string | null
           created_at?: string
           current_level?: string
+          current_revenue?: string | null
           email?: string
           first_name?: string
+          follower_since?: string | null
           goals?: string
           id?: string
           last_name?: string
+          origin_source?: string | null
+          revenue_goal?: string | null
           tiktok_username?: string | null
         }
         Relationships: []

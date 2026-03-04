@@ -1,8 +1,8 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
+import { format, subDays, startOfDay, eachDayOfInterval } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Copy, Check, ExternalLink } from "lucide-react";
+import { Copy, Check, ExternalLink, TrendingUp, PieChart, BarChart3, Percent, DollarSign } from "lucide-react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,8 +10,14 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid,
+  PieChart as RechartsPie, Pie, Cell,
+  BarChart, Bar, ResponsiveContainer,
+} from "recharts";
 
 interface Lead {
   date: string;
@@ -22,6 +28,14 @@ interface Lead {
   current_revenue: string | null;
   posthog_id: string | null;
 }
+
+const CHART_COLORS = [
+  "hsl(43, 74%, 49%)",   // primary / gold
+  "hsl(43, 74%, 65%)",   // lighter gold
+  "hsl(43, 50%, 35%)",   // darker gold
+  "hsl(30, 50%, 50%)",   // warm amber
+  "hsl(43, 30%, 55%)",   // muted gold
+];
 
 export default function AdminMarketing() {
   // UTM Generator state
@@ -50,13 +64,14 @@ export default function AdminMarketing() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Leads data
+  // Leads data — fetch all three sources
   const { data: leads = [], isLoading } = useQuery({
     queryKey: ["marketing-leads"],
     queryFn: async () => {
-      const [appsRes, diagRes] = await Promise.all([
-        supabase.from("wav_premium_applications" as any).select("created_at, first_name, last_name, origin_source, follower_since, current_revenue, posthog_id").order("created_at", { ascending: false }).limit(50),
-        supabase.from("diagnostic_leads" as any).select("created_at, first_name, last_name, origin_source, follower_since, posthog_id").eq("completed", true).order("created_at", { ascending: false }).limit(50),
+      const [appsRes, diagRes, oneshotRes] = await Promise.all([
+        supabase.from("wav_premium_applications" as any).select("created_at, first_name, last_name, origin_source, follower_since, current_revenue, posthog_id").order("created_at", { ascending: false }).limit(200),
+        supabase.from("diagnostic_leads" as any).select("created_at, first_name, last_name, origin_source, follower_since, posthog_id").eq("completed", true).order("created_at", { ascending: false }).limit(200),
+        supabase.from("oneshot_submissions" as any).select("created_at, name, origin_source, posthog_id").order("created_at", { ascending: false }).limit(200),
       ]);
 
       const apps: Lead[] = ((appsRes.data as any[]) || []).map((a: any) => ({
@@ -79,9 +94,81 @@ export default function AdminMarketing() {
         posthog_id: d.posthog_id,
       }));
 
-      return [...apps, ...diags].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      const oneshots: Lead[] = ((oneshotRes.data as any[]) || []).map((o: any) => ({
+        date: o.created_at,
+        name: o.name || "—",
+        offer: "One Shot",
+        source: o.origin_source,
+        follower_since: null,
+        current_revenue: null,
+        posthog_id: o.posthog_id,
+      }));
+
+      return [...apps, ...diags, ...oneshots].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     },
   });
+
+  // ---- Computed analytics ----
+
+  // 1. Line chart: leads over last 30 days
+  const lineData = useMemo(() => {
+    const now = new Date();
+    const thirtyDaysAgo = subDays(now, 29);
+    const days = eachDayOfInterval({ start: thirtyDaysAgo, end: now });
+    const counts: Record<string, number> = {};
+    days.forEach((d) => { counts[format(d, "yyyy-MM-dd")] = 0; });
+    leads.forEach((l) => {
+      const key = format(new Date(l.date), "yyyy-MM-dd");
+      if (counts[key] !== undefined) counts[key]++;
+    });
+    return days.map((d) => ({
+      date: format(d, "dd/MM", { locale: fr }),
+      leads: counts[format(d, "yyyy-MM-dd")] || 0,
+    }));
+  }, [leads]);
+
+  // 2. Donut chart: source distribution
+  const donutData = useMemo(() => {
+    const sourceCounts: Record<string, number> = {};
+    leads.forEach((l) => {
+      const s = l.source || "Non tracké";
+      sourceCounts[s] = (sourceCounts[s] || 0) + 1;
+    });
+    return Object.entries(sourceCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, value]) => ({ name, value }));
+  }, [leads]);
+
+  // 3. Bar chart: by offer
+  const barData = useMemo(() => {
+    const offerCounts: Record<string, number> = {};
+    leads.forEach((l) => {
+      offerCounts[l.offer] = (offerCounts[l.offer] || 0) + 1;
+    });
+    return Object.entries(offerCounts).map(([name, value]) => ({ name, value }));
+  }, [leads]);
+
+  // KPIs
+  const trackingRate = useMemo(() => {
+    if (!leads.length) return 0;
+    return Math.round((leads.filter((l) => l.source).length / leads.length) * 100);
+  }, [leads]);
+
+  const pipelineValue = useMemo(() => {
+    let total = 0;
+    leads.forEach((l) => {
+      if (l.current_revenue) {
+        const num = parseInt(l.current_revenue.replace(/[^0-9]/g, ""), 10);
+        if (!isNaN(num)) total += num;
+      }
+    });
+    return total;
+  }, [leads]);
+
+  const lineChartConfig = { leads: { label: "Leads", color: "hsl(43, 74%, 49%)" } };
+  const barChartConfig = {
+    value: { label: "Leads", color: "hsl(43, 74%, 49%)" },
+  };
 
   return (
     <AdminLayout>
@@ -129,7 +216,7 @@ export default function AdminMarketing() {
             <CardHeader>
               <CardTitle className="text-cream">Résumé</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent>
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-noir rounded-lg p-4 border border-primary/10 text-center">
                   <p className="text-2xl font-bold text-primary">{leads.length}</p>
@@ -139,32 +226,153 @@ export default function AdminMarketing() {
                   <p className="text-2xl font-bold text-primary">{leads.filter((l) => l.source).length}</p>
                   <p className="text-xs text-cream/60">Avec source</p>
                 </div>
-              </div>
-              {(() => {
-                const sources = leads.filter((l) => l.source).reduce((acc, l) => {
-                  const s = l.source!;
-                  acc[s] = (acc[s] || 0) + 1;
-                  return acc;
-                }, {} as Record<string, number>);
-                const top = Object.entries(sources).sort((a, b) => b[1] - a[1]).slice(0, 5);
-                if (!top.length) return null;
-                return (
-                  <div>
-                    <p className="text-sm font-medium text-cream/70 mb-2">Top sources</p>
-                    <div className="space-y-1">
-                      {top.map(([s, c]) => (
-                        <div key={s} className="flex justify-between text-sm">
-                          <span className="text-cream/80">{s}</span>
-                          <Badge variant="secondary">{c}</Badge>
-                        </div>
-                      ))}
-                    </div>
+                <div className="bg-noir rounded-lg p-4 border border-primary/10 text-center">
+                  <div className="flex items-center justify-center gap-1.5 mb-1">
+                    <Percent className="h-4 w-4 text-primary" />
+                    <p className="text-2xl font-bold text-primary">{trackingRate}%</p>
                   </div>
-                );
-              })()}
+                  <p className="text-xs text-cream/60">Taux de tracking</p>
+                </div>
+                <div className="bg-noir rounded-lg p-4 border border-primary/10 text-center">
+                  <div className="flex items-center justify-center gap-1.5 mb-1">
+                    <DollarSign className="h-4 w-4 text-primary" />
+                    <p className="text-2xl font-bold text-primary">{pipelineValue > 0 ? `${pipelineValue.toLocaleString("fr-FR")} €` : "—"}</p>
+                  </div>
+                  <p className="text-xs text-cream/60">Pipeline estimé (CA déclaré)</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
+
+        {/* Charts */}
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Line Chart — Acquisition over time */}
+          <Card className="bg-noir-light border-primary/20 lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="text-cream flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-primary" />
+                Évolution de l'acquisition (30j)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer config={lineChartConfig} className="h-[280px] w-full">
+                <LineChart data={lineData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 74%, 49% / 0.1)" />
+                  <XAxis
+                    dataKey="date"
+                    tick={{ fill: "hsl(45, 30%, 80% / 0.6)", fontSize: 11 }}
+                    tickLine={false}
+                    axisLine={false}
+                    interval="preserveStartEnd"
+                  />
+                  <YAxis
+                    tick={{ fill: "hsl(45, 30%, 80% / 0.6)", fontSize: 11 }}
+                    tickLine={false}
+                    axisLine={false}
+                    allowDecimals={false}
+                  />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Line
+                    type="monotone"
+                    dataKey="leads"
+                    stroke="hsl(43, 74%, 49%)"
+                    strokeWidth={2}
+                    dot={false}
+                    activeDot={{ r: 5, fill: "hsl(43, 74%, 49%)" }}
+                  />
+                </LineChart>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+
+          {/* Donut Chart — Source distribution */}
+          <Card className="bg-noir-light border-primary/20">
+            <CardHeader>
+              <CardTitle className="text-cream flex items-center gap-2">
+                <PieChart className="h-5 w-5 text-primary" />
+                Sources
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[280px] flex items-center justify-center">
+                {donutData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RechartsPie>
+                      <Pie
+                        data={donutData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={50}
+                        outerRadius={90}
+                        paddingAngle={3}
+                        dataKey="value"
+                        nameKey="name"
+                        stroke="none"
+                      >
+                        {donutData.map((_, index) => (
+                          <Cell key={index} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
+                    </RechartsPie>
+                  </ResponsiveContainer>
+                ) : (
+                  <p className="text-cream/40 text-sm">Aucune donnée</p>
+                )}
+              </div>
+              {donutData.length > 0 && (
+                <div className="space-y-1.5 mt-2">
+                  {donutData.slice(0, 5).map((d, i) => (
+                    <div key={d.name} className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <div className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }} />
+                        <span className="text-cream/70 truncate max-w-[120px]">{d.name}</span>
+                      </div>
+                      <span className="text-cream font-medium">{d.value}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Bar Chart — By offer */}
+        <Card className="bg-noir-light border-primary/20">
+          <CardHeader>
+            <CardTitle className="text-cream flex items-center gap-2">
+              <BarChart3 className="h-5 w-5 text-primary" />
+              Répartition par offre
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={barChartConfig} className="h-[250px] w-full">
+              <BarChart data={barData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 74%, 49% / 0.1)" />
+                <XAxis
+                  dataKey="name"
+                  tick={{ fill: "hsl(45, 30%, 80% / 0.6)", fontSize: 12 }}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  tick={{ fill: "hsl(45, 30%, 80% / 0.6)", fontSize: 11 }}
+                  tickLine={false}
+                  axisLine={false}
+                  allowDecimals={false}
+                />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar
+                  dataKey="value"
+                  fill="hsl(43, 74%, 49%)"
+                  radius={[6, 6, 0, 0]}
+                  maxBarSize={80}
+                />
+              </BarChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
 
         {/* Leads table */}
         <Card className="bg-noir-light border-primary/20">

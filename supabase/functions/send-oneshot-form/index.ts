@@ -19,7 +19,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { name, email, whatsapp, tiktok, objectives, session_id, origin_source, conversion_trigger } = await req.json();
+    const { name, email, whatsapp, tiktok, objectives, session_id, origin_source, conversion_trigger, posthog_id } = await req.json();
 
     if (!name || !email || !whatsapp || !tiktok || !objectives || !session_id) {
       await notifyError("One Shot", "Champs obligatoires manquants");
@@ -56,6 +56,7 @@ Deno.serve(async (req) => {
         objectives,
         origin_source: origin_source || null,
         conversion_trigger: conversion_trigger || null,
+        posthog_id: posthog_id || null,
       });
 
     if (dbError) {
@@ -79,6 +80,7 @@ Deno.serve(async (req) => {
             { name: "🎯 Objectifs", value: objectives.slice(0, 1024) },
             { name: "📍 Source", value: origin_source || "—", inline: true },
             { name: "🔥 Déclencheur", value: conversion_trigger || "—", inline: true },
+            { name: "📊 PostHog", value: posthog_id ? `[Voir](https://us.posthog.com/person/${posthog_id})` : "—", inline: true },
           ],
           timestamp: new Date().toISOString(),
         }],
@@ -118,6 +120,7 @@ Deno.serve(async (req) => {
               <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; vertical-align: top;">Objectifs</td><td style="padding: 12px; border-bottom: 1px solid #eee; white-space: pre-wrap;">${escapeHtml(objectives)}</td></tr>
               <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Source</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(origin_source || "—")}</td></tr>
               <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Déclencheur</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(conversion_trigger || "—")}</td></tr>
+              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">PostHog ID</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(posthog_id || "—")}</td></tr>
             </table>
           </div>`;
 

@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
 import { getStoredUtmSource } from "@/lib/tracking";
-import { identifyUser } from "@/lib/posthog";
+import { identifyUser, getPostHogId } from "@/lib/posthog";
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -60,6 +60,7 @@ const applicationSchema = z.object({
   revenue_goal: z.string().trim().max(200).optional().or(z.literal("")),
   origin_source: z.string().trim().max(500).optional().or(z.literal("")),
   follower_since: z.string().optional().or(z.literal("")),
+  conversion_trigger: z.string().trim().max(500).optional().or(z.literal("")),
 });
 
 type ApplicationForm = z.infer<typeof applicationSchema>;
@@ -82,6 +83,7 @@ export default function WavPremiumApplication() {
       revenue_goal: "",
       origin_source: getStoredUtmSource(),
       follower_since: "",
+      conversion_trigger: "",
     },
   });
 
@@ -102,6 +104,8 @@ export default function WavPremiumApplication() {
         revenue_goal: data.revenue_goal || null,
         origin_source: data.origin_source || null,
         follower_since: data.follower_since || null,
+        conversion_trigger: data.conversion_trigger || null,
+        posthog_id: getPostHogId(),
       };
 
       const { error } = await supabase
@@ -369,6 +373,19 @@ export default function WavPremiumApplication() {
                           ))}
                         </SelectContent>
                       </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="conversion_trigger"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Quel contenu t'a décidé aujourd'hui ?</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ex : une vidéo, un témoignage, l'analyse express..." {...field} />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { trackEvent, getStoredUtmSource } from "@/lib/tracking";
+import { getPostHogId } from "@/lib/posthog";
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -81,7 +82,7 @@ export default function OneShotSuccess() {
     trackEvent("oneshot_form_submit");
     try {
       const { error } = await supabase.functions.invoke("send-oneshot-form", {
-        body: { ...values, session_id: sessionId },
+        body: { ...values, session_id: sessionId, posthog_id: getPostHogId() },
       });
       if (error) throw error;
       // Payment process complete, clear stored session

@@ -42,6 +42,8 @@ function VideoCard({ id, alt }: { id: string; alt: string }) {
       <img
         src={`https://img.youtube.com/vi/${id}/hqdefault.jpg`}
         alt={alt}
+        width={480}
+        height={360}
         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         loading="lazy"
       />

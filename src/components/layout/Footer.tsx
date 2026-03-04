@@ -7,7 +7,7 @@ export function Footer() {
       <div className="container mx-auto px-4 py-12 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
-          <div className="md:col-span-2">
+          <div className="md:col-span-1">
             <Link to="/" className="inline-block mb-4">
               <span className="font-display text-2xl font-semibold tracking-tight text-cream">
                 Fred<span className="text-primary">Wav</span>
@@ -20,34 +20,22 @@ export function Footer() {
           </div>
 
           {/* Navigation */}
-          <div>
+          <nav aria-label="Navigation footer - Pages principales">
             <h4 className="font-semibold text-cream mb-4">Navigation</h4>
             <ul className="space-y-2 text-sm">
-              <li>
-                <Link to="/" className="hover:text-primary transition-colors">
-                  Accueil
-                </Link>
-              </li>
-              <li>
-                <Link to="/offres" className="hover:text-primary transition-colors">
-                  Offres
-                </Link>
-              </li>
-              <li>
-                <Link to="/one-shot" className="hover:text-primary transition-colors">
-                  One Shot
-                </Link>
-              </li>
-              <li>
-                <Link to="/a-propos" className="hover:text-primary transition-colors">
-                  À propos
-                </Link>
-              </li>
+              <li><Link to="/" className="hover:text-primary transition-colors">Accueil</Link></li>
+              <li><Link to="/offres" className="hover:text-primary transition-colors">Offres</Link></li>
+              <li><Link to="/one-shot" className="hover:text-primary transition-colors">One Shot</Link></li>
+              <li><Link to="/45-jours" className="hover:text-primary transition-colors">Wav Premium</Link></li>
+              <li><Link to="/analyse-express" className="hover:text-primary transition-colors">Analyse Express</Link></li>
+              <li><Link to="/preuves" className="hover:text-primary transition-colors">Témoignages</Link></li>
+              <li><Link to="/a-propos" className="hover:text-primary transition-colors">À propos</Link></li>
+              <li><Link to="/start" className="hover:text-primary transition-colors">Diagnostic gratuit</Link></li>
             </ul>
-          </div>
+          </nav>
 
           {/* Réseaux sociaux */}
-          <div>
+          <nav aria-label="Réseaux sociaux">
             <h4 className="font-semibold text-cream mb-4">Réseaux</h4>
             <ul className="space-y-2 text-sm">
               <li>
@@ -75,6 +63,15 @@ export function Footer() {
                 </a>
               </li>
             </ul>
+          </nav>
+
+          {/* Contact */}
+          <div>
+            <h4 className="font-semibold text-cream mb-4">Contact</h4>
+            <ul className="space-y-2 text-sm">
+              <li><Link to="/contact" className="hover:text-primary transition-colors">Nous contacter</Link></li>
+              <li><a href="mailto:contact@fredwav.com" className="hover:text-primary transition-colors">contact@fredwav.com</a></li>
+            </ul>
           </div>
         </div>
 
@@ -82,20 +79,11 @@ export function Footer() {
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} Fred Wav. Tous droits réservés.
           </p>
-          <div className="flex gap-6 text-xs">
-            <Link to="/mentions-legales" className="hover:text-primary transition-colors">
-              Mentions légales
-            </Link>
-            <Link to="/politique-de-confidentialite" className="hover:text-primary transition-colors">
-              Confidentialité
-            </Link>
-            <Link to="/cgv" className="hover:text-primary transition-colors">
-              CGV
-            </Link>
-            <Link to="/contact" className="hover:text-primary transition-colors">
-              Contact
-            </Link>
-          </div>
+          <nav aria-label="Mentions légales" className="flex gap-6 text-xs">
+            <Link to="/mentions-legales" className="hover:text-primary transition-colors">Mentions légales</Link>
+            <Link to="/politique-de-confidentialite" className="hover:text-primary transition-colors">Confidentialité</Link>
+            <Link to="/cgv" className="hover:text-primary transition-colors">CGV</Link>
+          </nav>
         </div>
       </div>
     </footer>

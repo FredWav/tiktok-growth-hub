@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { SEOHead } from "@/components/SEOHead";
 import { z } from "zod";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -250,6 +251,12 @@ const DiagnosticStart = () => {
 
   return (
     <div className="min-h-screen bg-[hsl(var(--cream))] flex flex-col">
+      <SEOHead
+        title="Diagnostic Stratégique TikTok Gratuit | Fred Wav"
+        description="Identifie ton point de blocage exact sur TikTok en 2 minutes. Diagnostic gratuit pour t'orienter vers la bonne stratégie."
+        path="/start"
+        keywords="diagnostic TikTok gratuit, audit TikTok, stratégie TikTok, blocage TikTok, Fred Wav"
+      />
       {/* Progress bar */}
       {step > 0 && step <= TOTAL_STEPS && (
         <div className="fixed top-0 left-0 right-0 z-50">

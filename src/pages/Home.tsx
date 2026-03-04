@@ -132,18 +132,31 @@ export default function Home() {
   return (
     <Layout>
       <WavSocialScanPopup />
-      <SEOHead title="Fred Wav - Expert Stratégie Formats Courts | Coaching et Accompagnement" description="Transforme tes réseaux en machine à clients. Diagnostic, stratégie de contenu et plan d'action avec Fred Wav, expert formats courts." path="/" keywords="stratégie formats courts, coaching réseaux sociaux, expert formats courts, plan action contenu, Fred Wav, audience réseaux, monétiser contenu" schema={{
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": faqItems.map((item) => ({
-          "@type": "Question",
-          "name": item.question,
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": item.answer,
-          },
-        })),
-      }} />
+      <SEOHead title="Fred Wav - Expert Stratégie Formats Courts | Coaching et Accompagnement" description="Transforme tes réseaux en machine à clients. Diagnostic, stratégie de contenu et plan d'action avec Fred Wav, expert formats courts." path="/" keywords="stratégie formats courts, coaching réseaux sociaux, expert formats courts, plan action contenu, Fred Wav, audience réseaux, monétiser contenu" schema={[
+        {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": faqItems.map((item) => ({
+            "@type": "Question",
+            "name": item.question,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": item.answer,
+            },
+          })),
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://fredwav.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Offres", "item": "https://fredwav.com/offres" },
+            { "@type": "ListItem", "position": 3, "name": "One Shot", "item": "https://fredwav.com/one-shot" },
+            { "@type": "ListItem", "position": 4, "name": "Wav Premium", "item": "https://fredwav.com/45-jours" },
+            { "@type": "ListItem", "position": 5, "name": "Témoignages", "item": "https://fredwav.com/preuves" },
+          ],
+        },
+      ]} />
       <Section variant="default" size="xl" className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-cream via-background to-primary/5 -z-10" />
 

@@ -5,12 +5,13 @@ interface SEOHeadProps {
   description: string;
   path: string;
   keywords?: string;
+  noindex?: boolean;
   schema?: Record<string, unknown> | Record<string, unknown>[];
 }
 
 const BASE_URL = "https://fredwav.com";
 
-export function SEOHead({ title, description, path, keywords, schema }: SEOHeadProps) {
+export function SEOHead({ title, description, path, keywords, noindex, schema }: SEOHeadProps) {
   useEffect(() => {
     document.title = title;
 
@@ -26,7 +27,7 @@ export function SEOHead({ title, description, path, keywords, schema }: SEOHeadP
 
     setMeta("description", description);
     if (keywords) setMeta("keywords", keywords);
-    setMeta("robots", "index, follow");
+    setMeta("robots", noindex ? "noindex, nofollow" : "index, follow");
     setMeta("og:title", title, "property");
     setMeta("og:description", description, "property");
     setMeta("og:url", `${BASE_URL}${path}`, "property");

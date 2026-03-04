@@ -1,58 +1,49 @@
 
 
-## Plan : Tracking d'attribution Zero-Party Data
+## Plan : Compléter le système de tracking Zero-Party Data + Dashboard Marketing
 
-### 1. Migration DB — Nouvelles colonnes
+### État actuel
 
-**Table `wav_premium_applications`** : ajouter `origin_source text`, `follower_since text`, `conversion_trigger text`, `current_revenue text`, `revenue_goal text`. Supprimer `budget_confirmed boolean`.
+La majorité du travail a été faite dans les itérations précédentes. Voici ce qui **reste à faire** :
 
-**Table `diagnostic_leads`** : ajouter `origin_source text`, `follower_since text`, `conversion_trigger text`.
+### 1. Migration DB — Ajouter `posthog_id`
 
-**Table `oneshot_submissions`** : ajouter `origin_source text`, `conversion_trigger text`.
+Ajouter une colonne `posthog_id text` nullable aux 3 tables : `wav_premium_applications`, `diagnostic_leads`, `oneshot_submissions`.
 
-### 2. `src/lib/tracking.ts` — Capture UTM
+### 2. `src/lib/posthog.ts` — Exporter `getPostHogId()`
 
-Ajouter une fonction `captureUtmParams()` qui lit `utm_source` et `utm_campaign` depuis `window.location.search` et les stocke dans `localStorage` sous les clés `utm_source` et `utm_campaign`. Ajouter `getStoredUtmSource()` qui retourne une string formatée (ex: "TikTok (campagne X)") ou `""`.
+Ajouter une fonction qui retourne `posthog.get_distinct_id()` si PostHog est initialisé, sinon `null`.
 
-Appeler `captureUtmParams()` dans `App.tsx` au montage.
+### 3. `src/lib/tracking.ts` — Ajouter `utm_medium`
 
-### 3. `src/pages/WavPremiumApplication.tsx` — Formulaire enrichi
+`captureUtmParams()` capture déjà `utm_source` et `utm_campaign`. Ajouter `utm_medium` dans le même pattern localStorage.
 
-- Remplacer le champ `budget_confirmed` (checkbox) par deux champs texte : `current_revenue` ("Ton CA actuel ?") et `revenue_goal` ("Ton objectif de CA à 6 mois ?")
-- Ajouter `origin_source` (input texte, pré-rempli via `getStoredUtmSource()`) : "Comment m'as-tu découvert ?"
-- Ajouter `follower_since` (select : "Moins d'1 mois", "1-3 mois", "3-6 mois", "6+ mois", "Je ne te suivais pas") : "Depuis combien de temps me suis-tu ?"
-- Supprimer le bloc budget notice + checkbox
-- Mettre à jour le schéma zod, les defaultValues, et le payload `insert` + `notify-application`
+### 4. `src/pages/WavPremiumApplication.tsx` — Ajouter `conversion_trigger` + `posthog_id`
 
-### 4. `src/pages/OneShotSuccess.tsx` — Mini-formulaire attribution
+- Ajouter un champ "Quel contenu t'a décidé aujourd'hui ?" dans le bloc attribution
+- Envoyer `posthog_id` via `getPostHogId()` dans le payload insert + notify-application
 
-- Ajouter deux champs au schéma zod : `origin_source` (optionnel) et `conversion_trigger` (optionnel)
-- Les afficher juste avant le bouton submit, dans un bloc séparé visuellement ("Pour mieux te servir")
-- `origin_source` pré-rempli via `getStoredUtmSource()`
-- Passer ces champs dans le body de `send-oneshot-form`
+### 5. `src/pages/OneShotSuccess.tsx` — Envoyer `posthog_id`
 
-### 5. `src/pages/AnalyseExpressResult.tsx` — Alerte régularité
+Ajouter `posthog_id` dans le body envoyé à `send-oneshot-form`.
 
-- Après la section `RegularityBreakdown`, si `pubPattern?.consistency_score < 60`, afficher un bloc d'alerte stylisé (bg orange/ambre) avec le message "⚠️ Ta régularité freine ton acquisition. On règle ça en 1h30 ?" et un bouton CTA vers `/one-shot`
+### 6. Admin Marketing — Nouvelle page
 
-### 6. Edge Functions — Notifications enrichies
+**`src/pages/admin/Marketing.tsx`** : page divisée en deux colonnes.
 
-**`supabase/functions/notify-application/index.ts`** :
-- Extraire `current_revenue`, `revenue_goal`, `origin_source`, `follower_since` du body
-- Ajouter 4 champs dans l'embed Discord : "💰 CA actuel", "🎯 Objectif CA", "📍 Source", "⏳ Follower depuis"
-- Supprimer le champ "💰 Budget confirmé"
+- **Gauche — Générateur UTM** : formulaire local (URL, Source, Medium, Campagne) → affiche l'URL générée + bouton Copier. Aucun appel Supabase.
+- **Droite — Derniers leads** : tableau fusionnant `wav_premium_applications` (offre "Wav Premium") et `diagnostic_leads` complétés (offre "Diagnostic"), triés par date. Colonnes : Date, Nom, Offre, Source, Follower Since, CA Actuel, PostHog ID (lien cliquable vers `https://us.posthog.com/project/…/person/{id}`).
 
-**`supabase/functions/send-oneshot-form/index.ts`** :
-- Extraire `origin_source` et `conversion_trigger` du body
-- Ajouter 2 champs dans l'embed Discord : "📍 Source" et "🔥 Déclencheur"
-- Ajouter 2 lignes dans le tableau HTML email
+**`src/components/layout/AdminLayout.tsx`** : ajouter un lien "Marketing" avec icône `BarChart3` pointant vers `/admin/marketing`.
 
-### 7. `src/integrations/supabase/types.ts`
+**`src/App.tsx`** : ajouter la route `/admin/marketing` protégée admin.
 
-Ce fichier est auto-généré et ne doit pas être modifié manuellement. Après la migration, les types seront régénérés automatiquement. En attendant, les `as any` casts existants sur les inserts seront maintenus.
+### 7. Edge Functions — Ajouter `posthog_id`
+
+- `notify-application/index.ts` : extraire `posthog_id` du body, l'ajouter comme champ dans l'embed Discord.
+- `send-oneshot-form/index.ts` : idem, extraire et ajouter dans Discord + email HTML.
 
 ---
 
-**Fichiers modifiés** : 7 fichiers + 1 migration SQL
-**Nouvelles dépendances** : aucune
+**Fichiers modifiés** : 8 fichiers + 1 nouveau + 1 migration SQL. Aucune dépendance ajoutée.
 

@@ -15,8 +15,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid,
-  PieChart as RechartsPie, Pie, Cell,
-  BarChart, Bar, ResponsiveContainer,
+  PieChart as RechartsPie, Pie, Cell, Tooltip as RechartsTooltip,
+  BarChart, Bar,
 } from "recharts";
 
 interface Lead {
@@ -166,9 +166,8 @@ export default function AdminMarketing() {
   }, [leads]);
 
   const lineChartConfig = { leads: { label: "Leads", color: "hsl(43, 74%, 49%)" } };
-  const barChartConfig = {
-    value: { label: "Leads", color: "hsl(43, 74%, 49%)" },
-  };
+  const barChartConfig = { value: { label: "Leads", color: "hsl(43, 74%, 49%)" } };
+  const donutChartConfig = { value: { label: "Leads", color: "hsl(43, 74%, 49%)" } };
 
   return (
     <AdminLayout>
@@ -297,7 +296,7 @@ export default function AdminMarketing() {
             <CardContent>
               <div className="h-[280px] flex items-center justify-center">
                 {donutData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ChartContainer config={donutChartConfig} className="h-[280px] w-full">
                     <RechartsPie>
                       <Pie
                         data={donutData}
@@ -316,7 +315,7 @@ export default function AdminMarketing() {
                       </Pie>
                       <ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
                     </RechartsPie>
-                  </ResponsiveContainer>
+                  </ChartContainer>
                 ) : (
                   <p className="text-cream/40 text-sm">Aucune donnée</p>
                 )}

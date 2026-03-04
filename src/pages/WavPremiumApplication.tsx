@@ -3,20 +3,27 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle2, AlertTriangle } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
+import { getStoredUtmSource } from "@/lib/tracking";
 import { identifyUser } from "@/lib/posthog";
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { SEOHead } from "@/components/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Form,
   FormControl,
@@ -33,6 +40,14 @@ const levels = [
   { value: "scale", label: "J'ai déjà des résultats mais je veux scaler" },
 ] as const;
 
+const followerSinceOptions = [
+  "Moins d'1 mois",
+  "1-3 mois",
+  "3-6 mois",
+  "6+ mois",
+  "Je ne te suivais pas",
+] as const;
+
 const applicationSchema = z.object({
   first_name: z.string().trim().min(1, "Prénom requis").max(100),
   last_name: z.string().trim().min(1, "Nom requis").max(100),
@@ -41,9 +56,10 @@ const applicationSchema = z.object({
   current_level: z.string().min(1, "Sélectionne ton niveau actuel"),
   blockers: z.string().trim().min(10, "Décris tes points de blocage (10 caractères min.)").max(2000),
   goals: z.string().trim().min(10, "Décris tes objectifs (10 caractères min.)").max(2000),
-  budget_confirmed: z.boolean().refine((v) => v === true, {
-    message: "Tu dois confirmer que ton budget est d'au moins 987€",
-  }),
+  current_revenue: z.string().trim().max(200).optional().or(z.literal("")),
+  revenue_goal: z.string().trim().max(200).optional().or(z.literal("")),
+  origin_source: z.string().trim().max(500).optional().or(z.literal("")),
+  follower_since: z.string().optional().or(z.literal("")),
 });
 
 type ApplicationForm = z.infer<typeof applicationSchema>;
@@ -62,7 +78,10 @@ export default function WavPremiumApplication() {
       current_level: "",
       blockers: "",
       goals: "",
-      budget_confirmed: false,
+      current_revenue: "",
+      revenue_goal: "",
+      origin_source: getStoredUtmSource(),
+      follower_since: "",
     },
   });
 
@@ -71,34 +90,29 @@ export default function WavPremiumApplication() {
     trackEvent("wav_premium_apply", { level: data.current_level });
     identifyUser(data.email, { first_name: data.first_name, last_name: data.last_name });
     try {
+      const payload = {
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+        tiktok_username: data.tiktok_username || null,
+        current_level: levels.find((l) => l.value === data.current_level)?.label ?? data.current_level,
+        blockers: data.blockers,
+        goals: data.goals,
+        current_revenue: data.current_revenue || null,
+        revenue_goal: data.revenue_goal || null,
+        origin_source: data.origin_source || null,
+        follower_since: data.follower_since || null,
+      };
+
       const { error } = await supabase
         .from("wav_premium_applications" as any)
-        .insert({
-          first_name: data.first_name,
-          last_name: data.last_name,
-          email: data.email,
-          tiktok_username: data.tiktok_username || null,
-          current_level: levels.find((l) => l.value === data.current_level)?.label ?? data.current_level,
-          blockers: data.blockers,
-          goals: data.goals,
-          budget_confirmed: data.budget_confirmed,
-        } as any);
+        .insert(payload as any);
 
       if (error) throw error;
 
-      // Send notification email (fire and forget)
       supabase.functions.invoke("notify-application", {
-        body: {
-          first_name: data.first_name,
-          last_name: data.last_name,
-          email: data.email,
-          tiktok_username: data.tiktok_username || null,
-          current_level: levels.find((l) => l.value === data.current_level)?.label ?? data.current_level,
-          blockers: data.blockers,
-          goals: data.goals,
-          budget_confirmed: data.budget_confirmed,
-        },
-      }).catch((err) => console.error("Notification email error:", err));
+        body: payload,
+      }).catch((err) => console.error("Notification error:", err));
 
       setSubmitted(true);
     } catch {
@@ -291,40 +305,71 @@ export default function WavPremiumApplication() {
                 )}
               />
 
-              {/* Budget notice */}
-              <div className="bg-accent/50 border border-border rounded-xl p-6">
-                <div className="flex items-start gap-3 mb-4">
-                  <AlertTriangle className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                  <div>
-                    <p className="font-semibold mb-1">Information budget</p>
-                    <p className="text-sm text-muted-foreground">
-                      Le Wav Premium est un accompagnement intensif qui demande un investissement minimum de 987€.
-                      Si ton budget est inférieur, je te recommande de commencer par un{" "}
-                      <Link to="/one-shot" className="text-primary underline hover:no-underline">
-                        One Shot (179€)
-                      </Link>{" "}
-                      pour poser les bases.
-                    </p>
-                  </div>
-                </div>
-
+              {/* Revenue fields */}
+              <div className="grid sm:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="budget_confirmed"
+                  name="current_revenue"
                   render={({ field }) => (
-                    <FormItem className="flex items-start space-x-3 space-y-0">
+                    <FormItem>
+                      <FormLabel>Ton CA actuel ?</FormLabel>
                       <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <Input placeholder="Ex : 2000€/mois, 0€, etc." {...field} />
                       </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel className="font-normal cursor-pointer">
-                          Je confirme que mon budget est d'au moins 987€ pour cet accompagnement *
-                        </FormLabel>
-                        <FormMessage />
-                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="revenue_goal"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Ton objectif de CA à 6 mois ?</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ex : 5000€/mois" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Attribution fields */}
+              <div className="bg-accent/50 border border-border rounded-xl p-6 space-y-5">
+                <p className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Pour mieux te connaître</p>
+                <FormField
+                  control={form.control}
+                  name="origin_source"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Comment m'as-tu découvert ?</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ex : TikTok, bouche-à-oreille, Google..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="follower_since"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Depuis combien de temps me suis-tu ?</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sélectionne une durée" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {followerSinceOptions.map((opt) => (
+                            <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />

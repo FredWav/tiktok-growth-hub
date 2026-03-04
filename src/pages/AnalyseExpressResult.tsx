@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { trackEvent } from "@/lib/tracking";
-import { Download, Loader2, AlertCircle, RefreshCw, Target } from "lucide-react";
+import { Download, Loader2, AlertCircle, RefreshCw, Target, ArrowRight } from "lucide-react";
 // @ts-ignore - html2pdf.js doesn't have proper types
 import html2pdf from "html2pdf.js";
 import { SEOHead } from "@/components/SEOHead";
@@ -263,6 +263,26 @@ export default function AnalyseExpressResult() {
               {/* Regularity breakdown */}
               {pubPattern?.regularity_details?.tiktok_breakdown && (
                 <RegularityBreakdown breakdown={pubPattern.regularity_details.tiktok_breakdown} />
+              )}
+
+              {/* Regularity alert CTA */}
+              {pubPattern?.consistency_score != null && pubPattern.consistency_score < 60 && (
+                <div className="bg-amber-50 border border-amber-300 rounded-xl p-6 flex flex-col sm:flex-row items-center gap-4">
+                  <div className="flex-1">
+                    <p className="font-semibold text-amber-900">
+                      ⚠️ Ta régularité freine ton acquisition. On règle ça en 1h30 ?
+                    </p>
+                    <p className="text-sm text-amber-800 mt-1">
+                      Une session One Shot pour débloquer ta stratégie de publication et booster ta visibilité.
+                    </p>
+                  </div>
+                  <Button asChild variant="hero" size="lg" className="shrink-0">
+                    <Link to="/one-shot">
+                      Réserver un One Shot
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
               )}
 
               {/* Persona */}

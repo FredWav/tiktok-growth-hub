@@ -10,12 +10,16 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import ScrollToTop from "@/components/ScrollToTop";
 import { CookieConsent } from "@/components/CookieConsent";
 import { capturePageview } from "@/lib/posthog";
+import { captureUtmParams } from "@/lib/tracking";
 
 function PostHogPageTracker() {
   const location = useLocation();
   useEffect(() => {
     capturePageview();
   }, [location.pathname]);
+  useEffect(() => {
+    captureUtmParams();
+  }, []);
   return null;
 }
 

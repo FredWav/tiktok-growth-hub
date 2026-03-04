@@ -4,7 +4,7 @@ import { ArrowRight, Calendar, CheckCircle, Loader2, Mail, XCircle } from "lucid
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { trackEvent } from "@/lib/tracking";
+import { trackEvent, getStoredUtmSource } from "@/lib/tracking";
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,8 @@ const formSchema = z.object({
   whatsapp: z.string().trim().min(1, "Le numéro WhatsApp est obligatoire").max(30),
   tiktok: z.string().trim().min(1, "Le compte TikTok est obligatoire").max(100),
   objectives: z.string().trim().min(1, "Merci de décrire tes objectifs").max(2000),
+  origin_source: z.string().trim().max(500).optional().or(z.literal("")),
+  conversion_trigger: z.string().trim().max(500).optional().or(z.literal("")),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -39,7 +41,7 @@ export default function OneShotSuccess() {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: { name: "", email: "", whatsapp: "", tiktok: "", objectives: "" },
+    defaultValues: { name: "", email: "", whatsapp: "", tiktok: "", objectives: "", origin_source: getStoredUtmSource(), conversion_trigger: "" },
   });
 
   useEffect(() => {
@@ -191,6 +193,26 @@ export default function OneShotSuccess() {
                         <FormMessage />
                       </FormItem>
                     )} />
+
+                    {/* Attribution mini-form */}
+                    <div className="border-t border-border pt-5 mt-5 space-y-4">
+                      <p className="text-sm font-medium text-muted-foreground">Pour mieux te servir</p>
+                      <FormField control={form.control} name="origin_source" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Comment m'as-tu découvert ?</FormLabel>
+                          <FormControl><Input placeholder="Ex : TikTok, bouche-à-oreille, Google..." {...field} /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={form.control} name="conversion_trigger" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Qu'est-ce qui t'a convaincu de passer à l'action ?</FormLabel>
+                          <FormControl><Input placeholder="Ex : une vidéo, un témoignage, l'analyse express..." {...field} /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                    </div>
+
                     <Button type="submit" variant="hero" size="lg" className="w-full" disabled={isSubmitting}>
                       {isSubmitting ? (
                         <><Loader2 className="mr-2 h-5 w-5 animate-spin" />Envoi en cours...</>

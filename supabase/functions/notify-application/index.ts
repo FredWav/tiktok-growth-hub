@@ -15,7 +15,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { first_name, last_name, email, tiktok_username, current_level, blockers, goals, budget_confirmed } =
+    const { first_name, last_name, email, tiktok_username, current_level, blockers, goals, current_revenue, revenue_goal, origin_source, follower_since } =
       await req.json();
 
     if (!first_name || !last_name || !email) {
@@ -35,7 +35,10 @@ Deno.serve(async (req) => {
           { name: "📧 Email", value: email, inline: true },
           { name: "🎵 TikTok", value: tiktok_username || "—", inline: true },
           { name: "📊 Niveau", value: current_level || "—", inline: true },
-          { name: "💰 Budget confirmé", value: budget_confirmed ? "✅ Oui" : "❌ Non", inline: true },
+          { name: "💰 CA actuel", value: current_revenue || "—", inline: true },
+          { name: "🎯 Objectif CA", value: revenue_goal || "—", inline: true },
+          { name: "📍 Source", value: origin_source || "—", inline: true },
+          { name: "⏳ Follower depuis", value: follower_since || "—", inline: true },
           { name: "🚧 Blockers", value: (blockers || "—").slice(0, 1024) },
           { name: "🎯 Objectifs", value: (goals || "—").slice(0, 1024) },
         ],

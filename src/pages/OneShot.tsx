@@ -113,7 +113,7 @@ export default function OneShot() {
 
   return (
     <Layout>
-      <SEOHead title="One Shot - Session Stratégie 179€ | Fred Wav" description="1h30 pour débloquer ton acquisition et arrêter de poster dans le vide. Diagnostic complet, stratégie millimétrée et plan d'action concret." path="/one-shot" keywords="one shot stratégie, session stratégie, diagnostic contenu, coaching individuel, plan action, 179 euros" schema={[
+      <SEOHead title="One Shot - Session Stratégie 179€ | Fred Wav" description="1h30 pour débloquer ta stratégie de monétisation et arrêter de poster dans le vide. Diagnostic complet, stratégie millimétrée et plan d'action concret." path="/one-shot" keywords="one shot stratégie, session stratégie, diagnostic contenu, coaching individuel, plan action, 179 euros" schema={[
         {
           "@context": "https://schema.org",
           "@type": "Service",
@@ -136,11 +136,11 @@ export default function OneShot() {
           </div>
           
           <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">
-            1h30 pour débloquer <span className="text-gold-gradient">ton acquisition</span> et arrêter de poster dans le vide.
+            1h30 pour <span className="text-gold-gradient">transformer tes vues en clients</span> et arrêter de poster dans le vide.
           </h1>
           
           <p className="text-lg text-muted-foreground mb-8">
-            Tu postes au feeling sans comprendre la mécanique de l'algorithme ? Tes vues stagnent et ton audience ne convertit pas ? En 1h30, on coupe le bruit. On pose une stratégie de contenu millimétrée pour générer des résultats concrets.
+            Tu postes au feeling sans comprendre la mécanique de l'algorithme ? Tes vues stagnent et ton audience ne t'achète rien ? En 1h30, on coupe le bruit. On pose une stratégie de contenu millimétrée pour transformer tes abonnés en clients.
           </p>
 
           <Button variant="hero" size="xl" onClick={() => { trackEvent("cta_one_shot_click", { location: "oneshot_hero" }); handleCheckout(); }} disabled={loading}>
@@ -190,7 +190,7 @@ export default function OneShot() {
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="h-5 w-5 mt-0.5 shrink-0" />
-                  <span>L'architecture exacte pour créer des contenus qui retiennent l'attention et convertissent</span>
+                  <span>L'architecture exacte pour créer des contenus qui retiennent l'attention et donnent envie d'acheter</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="h-5 w-5 mt-0.5 shrink-0" />

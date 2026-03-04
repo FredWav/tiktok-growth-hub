@@ -10,7 +10,7 @@ const values = [
   {
     icon: Lightbulb,
     title: "Stratégie avant création",
-    description: "On définit l'objectif business, le positionnement, l'angle différenciant, puis seulement le contenu. Chaque vidéo a une fonction claire : autorité, acquisition, conversion ou préparation d'offre. Pas de contenu \"au hasard\".",
+    description: "On définit l'objectif business, le positionnement, l'angle différenciant, puis seulement le contenu. Chaque vidéo a une fonction claire : autorité, visibilité, monétisation ou préparation d'offre. Pas de contenu \"au hasard\".",
   },
   {
     icon: BarChart3,

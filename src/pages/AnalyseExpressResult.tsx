@@ -277,7 +277,7 @@ export default function AnalyseExpressResult() {
                 <div className="bg-amber-50 border border-amber-300 rounded-xl p-6 flex flex-col sm:flex-row items-center gap-4">
                   <div className="flex-1">
                     <p className="font-semibold text-amber-900">
-                      ⚠️ Ta régularité freine ton acquisition. On règle ça en 1h30 ?
+                      ⚠️ Ta régularité freine ta visibilité. Tes abonnés ne te voient pas assez pour acheter. On règle ça en 1h30 ?
                     </p>
                     <p className="text-sm text-amber-800 mt-1">
                       Une session One Shot pour débloquer ta stratégie de publication et booster ta visibilité.

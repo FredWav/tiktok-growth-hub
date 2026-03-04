@@ -15,7 +15,7 @@ import { trackEvent } from "@/lib/tracking";
 import { SEOHead } from "@/components/SEOHead";
 
 const forYou = [
-  "Tu as une offre validée et tu veux faire des formats courts un vrai levier d'acquisition",
+  "Tu as une offre validée et tu veux faire des formats courts un vrai levier pour transformer tes abonnés en clients",
   "Tu es prêt à itérer rapidement sur la structure de tes vidéos pendant 45 jours",
   "Tu exiges des résultats mesurables, pas des conseils génériques",
 ];
@@ -23,7 +23,7 @@ const forYou = [
 const notForYou = [
   "Tu cherches une agence pour déléguer ta production à ta place",
   "Tu espères percer avec du contenu pauvre et sans effort",
-  "Tu vises la vanité des vues au lieu de la conversion business",
+  "Tu vises la vanité des vues au lieu de la monétisation de ton audience",
 ];
 
 const method = [
@@ -50,11 +50,11 @@ const method = [
 ];
 
 const deliverables = [
-  "Architecture éditoriale complète et plan de conversion",
+  "Architecture éditoriale complète et plan de monétisation",
   "Script Doctoring : corrections ligne par ligne de tes contenus",
   "Frameworks de production (structures de rétention, bibliothèques de hooks)",
-  "Optimisation SEO du compte et tunnel de la bio",
-  "Plan de scale pour maintenir la croissance post-45 jours",
+  "Optimisation de ta bio et de ton parcours abonné",
+  "Plan d'action pour maintenir ta croissance post-45 jours",
   "Replays de toutes les sessions d'analyse",
 ];
 
@@ -142,10 +142,10 @@ export default function QuarantecinqJours() {
   return (
     <Layout>
       <SEOHead
-        title="Wav Premium - 45 jours pour craquer ton acquisition | Fred Wav"
-        description="Wav Premium : 45 jours d'itération intensive pour transformer ton compte en actif business. Feedback chirurgical, data, rétention et conversion. Sur candidature."
+        title="Wav Premium - 45 jours pour transformer ton audience en revenus | Fred Wav"
+        description="Wav Premium : 45 jours d'itération intensive pour structurer ta stratégie de monétisation. Feedback chirurgical, data, rétention. Sur candidature."
         path="/45-jours"
-        keywords="wav premium, accompagnement formats courts, acquisition TikTok, coaching intensif, stratégie contenu"
+        keywords="wav premium, accompagnement formats courts, monétisation audience, coaching intensif, stratégie contenu"
         schema={[
           {
             "@context": "https://schema.org",
@@ -167,11 +167,11 @@ export default function QuarantecinqJours() {
       <Section variant="dark" size="lg">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 text-cream">
-            Wav Premium : 45 jours d'itération pour craquer ton acquisition TikTok.
+            45 jours pour arrêter de faire des vues dans le vide et transformer ton audience en revenus.
           </h1>
 
           <p className="text-lg md:text-xl text-cream/70 mb-6 max-w-2xl mx-auto">
-            Fini de publier à l'aveugle. On structure ton système de contenu autour de la data, de la rétention et de la conversion. Un accompagnement intensif avec feedback chirurgical pour transformer ton compte en actif business.
+            On structure ta stratégie de monétisation : chaque vidéo a un objectif clair, chaque semaine produit un résultat mesurable. Un accompagnement intensif avec feedback chirurgical pour que ton contenu génère des clients.
           </p>
 
           <p className="text-lg font-semibold mb-8 text-gold-gradient">
@@ -340,10 +340,10 @@ export default function QuarantecinqJours() {
       <Section variant="dark" size="lg">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="font-display text-3xl md:text-4xl font-semibold mb-4 text-cream">
-            Prêt à installer un système d'acquisition rentable ?
+            Prêt à vivre de ton contenu ?
           </h2>
           <p className="text-cream/60 text-lg mb-8">
-            Le Wav Premium : 45 jours pour construire une présence en ligne qui génère des résultats pour ton business.
+            Le Wav Premium : 45 jours pour structurer une stratégie qui transforme tes abonnés en clients.
           </p>
           <Button
             variant="hero"

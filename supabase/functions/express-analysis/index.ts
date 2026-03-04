@@ -75,11 +75,13 @@ serve(async (req) => {
         Deno.env.get("SUPABASE_URL") || "",
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || ""
       );
+      const customerEmail = session.metadata?.email || session.customer_email || null;
       await supabase.from("express_analyses").insert({
         stripe_session_id: session_id,
         tiktok_username: username,
         job_id: jobId,
         status: "processing",
+        email: customerEmail,
       });
     } catch (dbErr) {
       console.warn("Failed to insert express_analyses record:", dbErr);

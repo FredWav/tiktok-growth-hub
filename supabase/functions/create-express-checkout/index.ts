@@ -13,12 +13,13 @@ serve(async (req) => {
   }
 
   try {
-    const { username } = await req.json();
+    const { username, email } = await req.json();
     if (!username || typeof username !== "string" || username.trim().length < 2) {
       throw new Error("Nom d'utilisateur TikTok invalide");
     }
 
     const cleanUsername = username.trim().replace(/^@/, "");
+    const cleanEmail = email?.trim() || "";
 
     const stripe = new Stripe(getStripeSecretKey(), {
       apiVersion: "2025-08-27.basil",
@@ -34,9 +35,11 @@ serve(async (req) => {
         },
       ],
       mode: "payment",
+      ...(cleanEmail ? { customer_email: cleanEmail } : {}),
       metadata: {
         tiktok_username: cleanUsername,
         type: "analyse_express",
+        ...(cleanEmail ? { email: cleanEmail } : {}),
       },
       success_url: `${origin}/analyse-express/result?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/analyse-express`,

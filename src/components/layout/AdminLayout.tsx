@@ -27,7 +27,7 @@ interface AdminLayoutProps {
 
 const navItems = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { label: "Clients", href: "/admin/clients", icon: Users },
+  { label: "Prospects & Clients", href: "/admin/clients", icon: Users },
   { label: "Sessions", href: "/admin/sessions", icon: Calendar },
   { label: "Réservations", href: "/admin/bookings", icon: CreditCard },
   { label: "Livrables", href: "/admin/deliverables", icon: FileText },

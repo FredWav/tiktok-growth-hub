@@ -1,8 +1,10 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import nodemailer from "npm:nodemailer@6.9.16";
 import { getStripeSecretKey } from "../_shared/stripe-config.ts";
 import { notifySuccess, notifyError } from "../_shared/itpush.ts";
+import { upsertProspect } from "../_shared/upsert-prospect.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -41,6 +43,56 @@ function getSupabase() {
     Deno.env.get("SUPABASE_URL") || "",
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || ""
   );
+}
+
+async function sendResultEmail(email: string, username: string, sessionId: string) {
+  const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD") || "";
+  if (!SMTP_PASSWORD || !email) return;
+
+  try {
+    const reportUrl = `https://fredwav.lovable.app/analyse-express/result?session_id=${sessionId}`;
+    const htmlBody = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #0a0a0a; color: #f5f0e8;">
+        <div style="text-align: center; padding: 30px 0; border-bottom: 2px solid #c8a97e;">
+          <h1 style="color: #c8a97e; margin: 0; font-size: 24px;">Ton Analyse Express est prête 🎉</h1>
+        </div>
+        <div style="padding: 30px 0;">
+          <p style="color: #f5f0e8; font-size: 16px; line-height: 1.6;">
+            Salut ! L'analyse de ton compte <strong style="color: #c8a97e;">@${username}</strong> est terminée.
+          </p>
+          <p style="color: #f5f0e8; font-size: 16px; line-height: 1.6;">
+            Clique sur le bouton ci-dessous pour consulter ton rapport complet et télécharger ton PDF.
+          </p>
+          <div style="text-align: center; padding: 30px 0;">
+            <a href="${reportUrl}" style="background: #c8a97e; color: #0a0a0a; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px; display: inline-block;">
+              Voir mon rapport
+            </a>
+          </div>
+          <p style="color: #999; font-size: 13px; text-align: center;">
+            Si le bouton ne fonctionne pas, copie ce lien : <a href="${reportUrl}" style="color: #c8a97e;">${reportUrl}</a>
+          </p>
+        </div>
+        <div style="border-top: 1px solid #333; padding-top: 20px; text-align: center;">
+          <p style="color: #666; font-size: 12px;">FredWav — Coaching TikTok</p>
+        </div>
+      </div>`;
+
+    const transporter = nodemailer.createTransport({
+      host: "ssl0.ovh.net", port: 465, secure: true,
+      auth: { user: "noreply@fredwav.com", pass: SMTP_PASSWORD },
+    });
+
+    await transporter.sendMail({
+      from: "FredWav <noreply@fredwav.com>",
+      to: email,
+      subject: `📊 Ton Analyse Express @${username} est prête !`,
+      html: htmlBody,
+    });
+
+    console.log(`Result email sent to ${email} for @${username}`);
+  } catch (err) {
+    console.error("Failed to send result email:", err);
+  }
 }
 
 serve(async (req) => {
@@ -83,6 +135,19 @@ serve(async (req) => {
       const aiInsights = job.result?.account?.ai_insights;
       const missingAiInsights = !aiInsights || (typeof aiInsights === "string" && aiInsights.trim() === "");
 
+      // Get email from express_analyses record
+      let customerEmail: string | null = null;
+      try {
+        const { data: analysisRow } = await supabase
+          .from("express_analyses")
+          .select("email")
+          .eq("job_id", job_id)
+          .maybeSingle();
+        customerEmail = analysisRow?.email || null;
+      } catch (e) {
+        console.warn("Failed to fetch email from express_analyses:", e);
+      }
+
       try {
         const healthScore = job.result?.health_score ?? job.result?.score ?? null;
         await supabase.from("express_analyses").update({
@@ -101,6 +166,25 @@ serve(async (req) => {
         await notifyError("Analyse Status", `AI insights manquants • @${username}`);
       } else {
         await notifySuccess("Analyse Terminée", `@${username} • score ${job.result?.health_score ?? "N/A"}`);
+      }
+
+      // Send result email
+      if (customerEmail) {
+        await sendResultEmail(customerEmail, username, session_id);
+      }
+
+      // Upsert prospect in CRM
+      if (customerEmail) {
+        try {
+          await upsertProspect({
+            email: customerEmail,
+            tiktok: username,
+            offer: "one_shot",
+            origin_source: "analyse_express",
+          });
+        } catch (e) {
+          console.warn("Failed to upsert prospect:", e);
+        }
       }
 
       return new Response(JSON.stringify({

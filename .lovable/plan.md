@@ -1,77 +1,58 @@
 
 
-## Plan : Amélioration SEO drastique basée sur l'audit
+## Plan : Tracking d'attribution Zero-Party Data
 
-### Diagnostic de l'audit
+### 1. Migration DB — Nouvelles colonnes
 
-L'audit confirme le problème critique : **le crawler ne voit que le HTML statique de `index.html`** (4699 octets). Résultat :
-- **0 H1**, 0 headings, 0 liens internes, 0 images détectés
-- **Score links : 85** (aucun lien visible pour le crawler)
-- **Score GEO : 70** (structured data insuffisante pour les moteurs IA)
-- **1 seule page crawlée** (SPA = les autres pages sont invisibles)
+**Table `wav_premium_applications`** : ajouter `origin_source text`, `follower_since text`, `conversion_trigger text`, `current_revenue text`, `revenue_goal text`. Supprimer `budget_confirmed boolean`.
 
-### Corrections par fichier
+**Table `diagnostic_leads`** : ajouter `origin_source text`, `follower_since text`, `conversion_trigger text`.
 
----
+**Table `oneshot_submissions`** : ajouter `origin_source text`, `conversion_trigger text`.
 
-#### 1. `index.html` — Rendre le contenu visible aux crawlers (impact critique)
+### 2. `src/lib/tracking.ts` — Capture UTM
 
-Le crawler ne voit que `<div id="root"></div>`. On injecte du contenu statique visible par les bots :
+Ajouter une fonction `captureUtmParams()` qui lit `utm_source` et `utm_campaign` depuis `window.location.search` et les stocke dans `localStorage` sous les clés `utm_source` et `utm_campaign`. Ajouter `getStoredUtmSource()` qui retourne une string formatée (ex: "TikTok (campagne X)") ou `""`.
 
-- Ajouter un bloc `<noscript>` avec le H1, la description, les liens internes principaux et les offres (texte statique reprenant le contenu de la homepage)
-- Ajouter `<meta name="robots" content="index, follow" />`
-- Ajouter `<link rel="preconnect" href="https://img.youtube.com" />` et `<link rel="dns-prefetch" ...>`
-- Ajouter une FAQ schema `FAQPage` en JSON-LD statique (en plus du ProfessionalService existant)
+Appeler `captureUtmParams()` dans `App.tsx` au montage.
 
-#### 2. `src/components/SEOHead.tsx` — Prop `noindex`
+### 3. `src/pages/WavPremiumApplication.tsx` — Formulaire enrichi
 
-- Ajouter une prop optionnelle `noindex?: boolean`
-- Quand `noindex` est true, mettre `robots` à `"noindex, nofollow"`
+- Remplacer le champ `budget_confirmed` (checkbox) par deux champs texte : `current_revenue` ("Ton CA actuel ?") et `revenue_goal` ("Ton objectif de CA à 6 mois ?")
+- Ajouter `origin_source` (input texte, pré-rempli via `getStoredUtmSource()`) : "Comment m'as-tu découvert ?"
+- Ajouter `follower_since` (select : "Moins d'1 mois", "1-3 mois", "3-6 mois", "6+ mois", "Je ne te suivais pas") : "Depuis combien de temps me suis-tu ?"
+- Supprimer le bloc budget notice + checkbox
+- Mettre à jour le schéma zod, les defaultValues, et le payload `insert` + `notify-application`
 
-#### 3. `src/pages/NotFound.tsx` — Refonte complète
+### 4. `src/pages/OneShotSuccess.tsx` — Mini-formulaire attribution
 
-- Ajouter `Layout` (Header + Footer)
-- Traduire en français
-- Ajouter `SEOHead` avec `noindex: true`
-- Ajouter des liens vers les pages principales (maillage interne)
+- Ajouter deux champs au schéma zod : `origin_source` (optionnel) et `conversion_trigger` (optionnel)
+- Les afficher juste avant le bouton submit, dans un bloc séparé visuellement ("Pour mieux te servir")
+- `origin_source` pré-rempli via `getStoredUtmSource()`
+- Passer ces champs dans le body de `send-oneshot-form`
 
-#### 4. `src/pages/DiagnosticStart.tsx` — Ajouter SEOHead
+### 5. `src/pages/AnalyseExpressResult.tsx` — Alerte régularité
 
-- Ajouter `SEOHead` avec title, description, keywords appropriés
+- Après la section `RegularityBreakdown`, si `pubPattern?.consistency_score < 60`, afficher un bloc d'alerte stylisé (bg orange/ambre) avec le message "⚠️ Ta régularité freine ton acquisition. On règle ça en 1h30 ?" et un bouton CTA vers `/one-shot`
 
-#### 5. `src/components/layout/Footer.tsx` — Enrichir le maillage interne
+### 6. Edge Functions — Notifications enrichies
 
-- Ajouter les liens manquants : Analyse Express, Preuves/Témoignages, Wav Premium, Diagnostic gratuit (/start)
-- Wrapper dans `<nav aria-label="Footer navigation">`
+**`supabase/functions/notify-application/index.ts`** :
+- Extraire `current_revenue`, `revenue_goal`, `origin_source`, `follower_since` du body
+- Ajouter 4 champs dans l'embed Discord : "💰 CA actuel", "🎯 Objectif CA", "📍 Source", "⏳ Follower depuis"
+- Supprimer le champ "💰 Budget confirmé"
 
-#### 6. `src/components/layout/Header.tsx` — Sémantique
+**`supabase/functions/send-oneshot-form/index.ts`** :
+- Extraire `origin_source` et `conversion_trigger` du body
+- Ajouter 2 champs dans l'embed Discord : "📍 Source" et "🔥 Déclencheur"
+- Ajouter 2 lignes dans le tableau HTML email
 
-- Ajouter `aria-label="Navigation principale"` sur le `<nav>`
+### 7. `src/integrations/supabase/types.ts`
 
-#### 7. `public/sitemap.xml` — Compléter
-
-- Ajouter `/start` (priority 0.7)
-- Ajouter `<lastmod>2026-03-04</lastmod>` sur chaque URL
-
-#### 8. `src/pages/Home.tsx` — Schema BreadcrumbList
-
-- Ajouter un schema `BreadcrumbList` dans le `SEOHead` (en plus du FAQPage existant) via un tableau de schemas
-
-#### 9. `src/pages/Preuves.tsx` — Images YouTube
-
-- Ajouter `width={480} height={360}` sur les `<img>` YouTube pour éviter le CLS
-- Ajouter `loading="lazy"` sur les images
+Ce fichier est auto-généré et ne doit pas être modifié manuellement. Après la migration, les types seront régénérés automatiquement. En attendant, les `as any` casts existants sur les inserts seront maintenus.
 
 ---
 
-### Résumé de l'impact attendu
-
-| Problème audit | Correction | Score visé |
-|---|---|---|
-| 0 H1 détecté | `<noscript>` avec H1 statique | headings → 100 |
-| 0 liens internes | `<noscript>` + footer enrichi | links → 95+ |
-| GEO 70 | FAQ + BreadcrumbList schemas | GEO → 85+ |
-| 1 page crawlée | sitemap + `<noscript>` liens | pages crawlées ↑ |
-
-9 fichiers modifiés, aucune nouvelle dépendance.
+**Fichiers modifiés** : 7 fichiers + 1 migration SQL
+**Nouvelles dépendances** : aucune
 

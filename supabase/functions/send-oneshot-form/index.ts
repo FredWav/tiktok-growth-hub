@@ -3,6 +3,7 @@ import nodemailer from "npm:nodemailer@6.9.16";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import { getStripeSecretKey } from "../_shared/stripe-config.ts";
 import { notifySuccess, notifyError } from "../_shared/itpush.ts";
+import { upsertProspect } from "../_shared/upsert-prospect.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -141,6 +142,19 @@ Deno.serve(async (req) => {
       }
     } catch (emailErr) {
       console.error("Email send failed:", emailErr);
+    }
+
+    // ── 4. Upsert prospect in CRM ──
+    try {
+      await upsertProspect({
+        email,
+        full_name: name,
+        tiktok,
+        origin_source: origin_source || "one_shot",
+        offer: "one_shot",
+      });
+    } catch (upsertErr) {
+      console.warn("Failed to upsert prospect:", upsertErr);
     }
 
     await notifySuccess("One Shot", `${name} • ${email} • ${tiktok}`);

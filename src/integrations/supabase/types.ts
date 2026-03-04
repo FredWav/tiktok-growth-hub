@@ -139,49 +139,61 @@ export type Database = {
         Row: {
           company: string | null
           created_at: string
+          email: string | null
           end_date: string | null
+          full_name: string | null
           id: string
           instagram: string | null
           internal_notes: string | null
           offer: Database["public"]["Enums"]["offer_type"]
+          origin_source: string | null
           phone: string | null
           start_date: string | null
           status: Database["public"]["Enums"]["client_status"]
           tags: string[] | null
+          tiktok: string | null
           updated_at: string
-          user_id: string
+          user_id: string | null
           website: string | null
         }
         Insert: {
           company?: string | null
           created_at?: string
+          email?: string | null
           end_date?: string | null
+          full_name?: string | null
           id?: string
           instagram?: string | null
           internal_notes?: string | null
           offer: Database["public"]["Enums"]["offer_type"]
+          origin_source?: string | null
           phone?: string | null
           start_date?: string | null
           status?: Database["public"]["Enums"]["client_status"]
           tags?: string[] | null
+          tiktok?: string | null
           updated_at?: string
-          user_id: string
+          user_id?: string | null
           website?: string | null
         }
         Update: {
           company?: string | null
           created_at?: string
+          email?: string | null
           end_date?: string | null
+          full_name?: string | null
           id?: string
           instagram?: string | null
           internal_notes?: string | null
           offer?: Database["public"]["Enums"]["offer_type"]
+          origin_source?: string | null
           phone?: string | null
           start_date?: string | null
           status?: Database["public"]["Enums"]["client_status"]
           tags?: string[] | null
+          tiktok?: string | null
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
           website?: string | null
         }
         Relationships: []
@@ -387,6 +399,7 @@ export type Database = {
         Row: {
           completed_at: string | null
           created_at: string
+          email: string | null
           error_message: string | null
           health_score: number | null
           id: string
@@ -399,6 +412,7 @@ export type Database = {
         Insert: {
           completed_at?: string | null
           created_at?: string
+          email?: string | null
           error_message?: string | null
           health_score?: number | null
           id?: string
@@ -411,6 +425,7 @@ export type Database = {
         Update: {
           completed_at?: string | null
           created_at?: string
+          email?: string | null
           error_message?: string | null
           health_score?: number | null
           id?: string

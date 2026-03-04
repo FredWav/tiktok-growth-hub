@@ -21,6 +21,7 @@ const features = [
 
 export default function AnalyseExpress() {
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -36,6 +37,11 @@ export default function AnalyseExpress() {
       toast.error("Entre un nom d'utilisateur valide");
       return;
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      toast.error("Entre une adresse email valide");
+      return;
+    }
     setShowConfirmModal(true);
   };
 
@@ -45,7 +51,7 @@ export default function AnalyseExpress() {
     trackEvent("express_checkout_start", { username: cleanUsername });
     try {
       const { data, error } = await supabase.functions.invoke("create-express-checkout", {
-        body: { username: cleanUsername },
+        body: { username: cleanUsername, email: email.trim() },
       });
 
       if (error || !data?.url) {
@@ -118,6 +124,15 @@ export default function AnalyseExpress() {
                 disabled={loading}
               />
             </div>
+            <Input
+              type="email"
+              placeholder="ton@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="h-12 text-base"
+              disabled={loading}
+              required
+            />
             <Button type="submit" variant="hero" size="lg" className="w-full" disabled={loading}>
               {loading ? "Redirection..." : "Lancer l'analyse (11,90€)"}
             </Button>
@@ -192,6 +207,9 @@ export default function AnalyseExpress() {
 
             <p className="text-center text-base">
               Tu as saisi : <span className="font-bold text-primary text-lg">@{cleanUsername}</span>
+            </p>
+            <p className="text-center text-sm text-muted-foreground">
+              Email : <span className="font-medium text-foreground">{email.trim()}</span>
             </p>
 
             <div className="flex flex-col sm:flex-row gap-2">

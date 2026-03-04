@@ -197,15 +197,22 @@ export default function AnalyseExpressResult() {
           {/* Loading */}
           {loading && (
             <div className="text-center space-y-6">
-              <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-2">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
               <h2 className="font-display text-2xl font-semibold">Analyse en cours...</h2>
               <p className="text-muted-foreground">
-                Nous analysons le compte @{username || "..."} – cela peut prendre jusqu'à 2 minutes.
+                Nous analysons le compte @{username || "..."} – cela prend environ 2 minutes.
               </p>
-              <div className="max-w-xs mx-auto space-y-3">
+              <div className="bg-card border border-border rounded-xl p-5 max-w-sm mx-auto space-y-3">
                 <Progress value={progress} className="h-3" />
                 <p className="text-sm font-medium text-primary">{progress}%</p>
                 {currentStep && <p className="text-sm text-muted-foreground">{currentStep}</p>}
+              </div>
+              <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 max-w-md mx-auto">
+                <p className="text-sm text-muted-foreground">
+                  📧 Tu peux fermer cette page en toute tranquillité. Ton rapport complet te sera envoyé directement par email dès qu'il sera prêt.
+                </p>
               </div>
             </div>
           )}

@@ -454,8 +454,22 @@ export default function AdminMarketing() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label className="text-cream/70">URL de destination</Label>
-                <Input value={url} onChange={(e) => setUrl(e.target.value)} className="bg-noir border-primary/20 text-cream" />
+                <Label className="text-cream/70">Page de destination</Label>
+                <select
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  className="flex h-10 w-full rounded-md border bg-noir border-primary/20 text-cream px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                >
+                  <option value="https://fredwav.com">Accueil</option>
+                  <option value="https://fredwav.com/start">Diagnostic (/start)</option>
+                  <option value="https://fredwav.com/analyse-express">Analyse Express</option>
+                  <option value="https://fredwav.com/one-shot">One Shot</option>
+                  <option value="https://fredwav.com/offres">Offres</option>
+                  <option value="https://fredwav.com/wav-premium/candidature">Wav Premium</option>
+                  <option value="https://fredwav.com/preuves">Témoignages</option>
+                  <option value="https://fredwav.com/a-propos">À Propos</option>
+                  <option value="https://fredwav.com/contact">Contact</option>
+                </select>
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div>

@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { format, subDays, startOfDay, eachDayOfInterval } from "date-fns";
+import { format, subDays, startOfDay, startOfMonth, eachDayOfInterval } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Copy, Check, ExternalLink, TrendingUp, PieChart, BarChart3, Percent, DollarSign, Eye, Clock, Filter, Globe } from "lucide-react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
@@ -181,6 +181,57 @@ export default function AdminMarketing() {
     });
   }, [diagnosticLeads]);
 
+  // ---- UTM breakdown: source / medium / campaign ----
+  const utmBreakdown = useMemo(() => {
+    const aggregate = (key: "utm_source" | "utm_medium" | "utm_campaign") => {
+      const grouped: Record<string, { views: number; visitors: Set<string>; totalDuration: number }> = {};
+      pageViews.forEach((pv: any) => {
+        const val = pv[key];
+        if (!val) return;
+        if (!grouped[val]) grouped[val] = { views: 0, visitors: new Set(), totalDuration: 0 };
+        grouped[val].views++;
+        if (pv.visitor_id) grouped[val].visitors.add(pv.visitor_id);
+        grouped[val].totalDuration += pv.duration_seconds || 0;
+      });
+      return Object.entries(grouped)
+        .map(([name, { views, visitors, totalDuration }]) => ({
+          name,
+          views,
+          uniqueVisitors: visitors.size,
+          avgDuration: views > 0 ? Math.round(totalDuration / views) : 0,
+        }))
+        .sort((a, b) => b.views - a.views);
+    };
+    return {
+      sources: aggregate("utm_source"),
+      mediums: aggregate("utm_medium"),
+      campaigns: aggregate("utm_campaign"),
+    };
+  }, [pageViews]);
+
+  // ---- Real revenue (bookings + oneshot) ----
+  const { data: monthlyRevenue = 0 } = useQuery({
+    queryKey: ["marketing-real-revenue"],
+    queryFn: async () => {
+      const monthStart = startOfMonth(new Date()).toISOString();
+      const [bookingsRes, oneshotCountRes] = await Promise.all([
+        supabase
+          .from("bookings")
+          .select("amount_cents")
+          .eq("payment_status", "paid")
+          .gte("paid_at", monthStart),
+        supabase
+          .from("oneshot_submissions")
+          .select("id", { count: "exact", head: true })
+          .gte("created_at", monthStart),
+      ]);
+      const bookingsTotal = (bookingsRes.data || []).reduce((sum: number, b: any) => sum + (b.amount_cents || 0), 0);
+      const oneshotCount = oneshotCountRes.count || 0;
+      const ONE_SHOT_PRICE_CENTS = 9700; // 97€
+      return (bookingsTotal + oneshotCount * ONE_SHOT_PRICE_CENTS) / 100;
+    },
+  });
+
   // ---- Existing leads query ----
   const { data: leads = [], isLoading } = useQuery({
     queryKey: ["marketing-leads"],
@@ -263,16 +314,7 @@ export default function AdminMarketing() {
     return Math.round((leads.filter((l) => l.source).length / leads.length) * 100);
   }, [leads]);
 
-  const pipelineValue = useMemo(() => {
-    let total = 0;
-    leads.forEach((l) => {
-      if (l.current_revenue) {
-        const num = parseInt(l.current_revenue.replace(/[^0-9]/g, ""), 10);
-        if (!isNaN(num)) total += num;
-      }
-    });
-    return total;
-  }, [leads]);
+  // pipelineValue removed — now using monthlyRevenue from bookings query
 
   const lineChartConfig = { leads: { label: "Leads", color: "hsl(43, 74%, 49%)" } };
   const barChartConfig = { value: { label: "Leads", color: "hsl(43, 74%, 49%)" } };
@@ -446,6 +488,52 @@ export default function AdminMarketing() {
           </CardContent>
         </Card>
 
+        {/* ===== NEW: UTM Breakdown (Sources / Médias / Campagnes) ===== */}
+        {(utmBreakdown.sources.length > 0 || utmBreakdown.mediums.length > 0 || utmBreakdown.campaigns.length > 0) && (
+          <div className="grid lg:grid-cols-3 gap-6">
+            {[
+              { title: "Sources UTM", data: utmBreakdown.sources },
+              { title: "Médias UTM", data: utmBreakdown.mediums },
+              { title: "Campagnes UTM", data: utmBreakdown.campaigns },
+            ].map(({ title, data }) => (
+              <Card key={title} className="bg-noir-light border-primary/20">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-cream text-base flex items-center gap-2">
+                    <BarChart3 className="h-4 w-4 text-primary" />
+                    {title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {data.length > 0 ? (
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-primary/20">
+                          <TableHead className="text-cream/70 text-xs">Nom</TableHead>
+                          <TableHead className="text-cream/70 text-xs text-right">Vues</TableHead>
+                          <TableHead className="text-cream/70 text-xs text-right">Uniques</TableHead>
+                          <TableHead className="text-cream/70 text-xs text-right">Durée</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {data.slice(0, 8).map((row) => (
+                          <TableRow key={row.name} className="border-primary/10">
+                            <TableCell className="text-cream text-sm font-medium truncate max-w-[120px]">{row.name}</TableCell>
+                            <TableCell className="text-cream/80 text-sm text-right">{row.views}</TableCell>
+                            <TableCell className="text-cream/80 text-sm text-right">{row.uniqueVisitors}</TableCell>
+                            <TableCell className="text-cream/80 text-sm text-right">{formatDuration(row.avgDuration)}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  ) : (
+                    <p className="text-cream/40 text-sm text-center py-4">Aucune donnée</p>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
         {/* ===== EXISTING: UTM + Summary ===== */}
         <div className="grid lg:grid-cols-2 gap-6">
           <Card className="bg-noir-light border-primary/20">
@@ -520,9 +608,9 @@ export default function AdminMarketing() {
                 <div className="bg-noir rounded-lg p-4 border border-primary/10 text-center">
                   <div className="flex items-center justify-center gap-1.5 mb-1">
                     <DollarSign className="h-4 w-4 text-primary" />
-                    <p className="text-2xl font-bold text-primary">{pipelineValue > 0 ? `${pipelineValue.toLocaleString("fr-FR")} €` : "—"}</p>
+                    <p className="text-2xl font-bold text-primary">{monthlyRevenue > 0 ? `${monthlyRevenue.toLocaleString("fr-FR")} €` : "—"}</p>
                   </div>
-                  <p className="text-xs text-cream/60">Pipeline estimé</p>
+                  <p className="text-xs text-cream/60">CA du mois</p>
                 </div>
               </div>
             </CardContent>

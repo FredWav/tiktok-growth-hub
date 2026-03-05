@@ -131,9 +131,10 @@ const DiagnosticStart = () => {
   };
 
   const handleBudgetSelect = (budget: string) => {
-    setData((prev) => ({ ...prev, budget }));
-    trackEvent("diagnostic_completed", { budget, recommended_offer: getRecommendedOffer(budget), level: data.level, objective: data.objective });
-    saveLead({ budget, recommended_offer: getRecommendedOffer(budget) }, 5, true);
+    const effectiveBudget = (budget === "high" && data.level === "beginner") ? "low" : budget;
+    setData((prev) => ({ ...prev, budget: effectiveBudget }));
+    trackEvent("diagnostic_completed", { budget, effective_budget: effectiveBudget, recommended_offer: getRecommendedOffer(effectiveBudget), level: data.level, objective: data.objective });
+    saveLead({ budget, recommended_offer: getRecommendedOffer(effectiveBudget) }, 5, true);
     // Fire-and-forget notification
     supabase.functions.invoke("notify-diagnostic", {
       body: {
@@ -145,7 +146,7 @@ const DiagnosticStart = () => {
         objective: data.objective,
         blocker: data.blocker,
         budget,
-        recommended_offer: getRecommendedOffer(budget),
+        recommended_offer: getRecommendedOffer(effectiveBudget),
       },
     });
     setStep(6);
@@ -172,8 +173,10 @@ const DiagnosticStart = () => {
         urgency: "Limité : 3 places disponibles ce mois-ci",
       },
       low: {
-        title: "Débloque ta situation maintenant.",
-        text: "T'as pas encore le budget pour un accompagnement complet, mais pour débloquer ta situation maintenant, le One Shot est fait pour ça : 1h30 d'audit stratégique pour identifier le problème et corriger le tir.",
+        title: data.level === "beginner" ? "Le Wav Premium est réservé aux créateurs confirmés." : "Débloque ta situation maintenant.",
+        text: data.level === "beginner"
+          ? "Le Wav Premium est conçu pour des créateurs qui publient déjà. Pour ton niveau actuel, le One Shot est le meilleur point de départ : 1h30 d'audit stratégique pour poser les fondations de ta stratégie et partir dans la bonne direction."
+          : "T'as pas encore le budget pour un accompagnement complet, mais pour débloquer ta situation maintenant, le One Shot est fait pour ça : 1h30 d'audit stratégique pour identifier le problème et corriger le tir.",
         url: "https://fredwav.com/one-shot",
         cta: "Voir les détails du One-Shot",
       },

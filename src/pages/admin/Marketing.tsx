@@ -227,7 +227,7 @@ export default function AdminMarketing() {
       ]);
       const bookingsTotal = (bookingsRes.data || []).reduce((sum: number, b: any) => sum + (b.amount_cents || 0), 0);
       const oneshotCount = oneshotCountRes.count || 0;
-      const ONE_SHOT_PRICE_CENTS = 9700; // 97€
+      const ONE_SHOT_PRICE_CENTS = 17900; // 179€
       return (bookingsTotal + oneshotCount * ONE_SHOT_PRICE_CENTS) / 100;
     },
   });

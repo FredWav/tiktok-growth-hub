@@ -1,30 +1,62 @@
 
 
-## Plan : Persistance du step 2 + sécurité anti-contournement
+## Parcours actuel `/start`
 
-### Analyse de la sécurité actuelle
+Le tunnel actuel fonctionne ainsi :
 
-La page `/one-shot/success` vérifie **déjà** le paiement côté serveur via `verify-oneshot-payment` (qui appelle Stripe pour confirmer `payment_status === "paid"`). Sans `session_id` valide et payé, la page affiche une erreur. Le lien Calendly n'est **jamais** accessible sans paiement vérifié.
+1. **Écran d'accueil** → "Démarrer le diagnostic"
+2. **Identité** (prénom, nom, email, TikTok)
+3. **Niveau** (débutant / intermédiaire / avancé)
+4. **Objectif** (visibilité / stratégie / monétisation)
+5. **Blocage** (texte libre)
+6. **Budget** → 4 choix qui redirigent vers 4 destinations différentes :
+   - Pas de budget → Discord
+   - < 200€ → One Shot
+   - 200–500€ → VIP
+   - 500€+ → Wav Premium
 
-Le vrai problème : quand le formulaire est soumis (step 1 → step 2), le `localStorage` est vidé (ligne 89). Si le client perd le réseau ou ferme l'onglet avant de cliquer sur Calendly, il ne peut plus revenir sur la page.
+**Le problème** : le tunnel "dispatche" vers toutes les offres à plat. Il ne filtre pas d'abord pour le Premium.
 
-### Modifications sur `src/pages/OneShotSuccess.tsx`
+---
 
-1. **Ne plus supprimer `oneshot_session_id` du localStorage à l'envoi du formulaire** (ligne 89) -- le garder pour permettre le retour.
+## Nouveau parcours : entonnoir descendant
 
-2. **Persister l'état "formulaire soumis"** : après envoi réussi, stocker `oneshot_form_submitted = "true"` dans localStorage.
+L'idée est de présenter le **Wav Premium comme la recommandation principale**, puis de descendre en cascade pour ceux qui n'ont pas le budget.
 
-3. **Au chargement** : après vérification du paiement réussie, vérifier si `oneshot_form_submitted === "true"`. Si oui, sauter directement au step 2.
+### Changement 1 — Reformuler l'étape Budget (step 5)
 
-4. **Remplacer le lien "Retour à l'accueil"** par un bouton **"J'ai réservé mon créneau"** qui :
-   - Nettoie `oneshot_session_id` et `oneshot_form_submitted` du localStorage
-   - Redirige vers `/`
+Remplacer les 4 options actuelles par 3 options orientées "exclusion Premium" :
 
-### Résultat
+| Option | Label | Valeur interne |
+|--------|-------|----------------|
+| 🚀 | "Oui, je suis prêt à investir 500€+ pour un accompagnement sur-mesure" | `high` |
+| ⚡ | "Pas encore, mais je peux investir moins de 200€ pour un déblocage immédiat" | `low` |
+| 🔍 | "Je veux d'abord un état des lieux de mon compte avant de m'engager" | `express` |
 
-- La vérification Stripe côté serveur reste la barrière d'accès -- pas de contournement possible.
-- Un client qui a payé + soumis le formulaire peut revenir sur `/one-shot/success` et retrouver le lien Calendly.
-- Le localStorage n'est nettoyé que quand le client confirme explicitement avoir réservé.
+On supprime l'option "mid" (VIP masqué) et "none" (Discord).
 
-Un seul fichier modifié.
+### Changement 2 — Réécrire les résultats (step 6)
+
+3 résultats au lieu de 4, avec un ton descendant :
+
+- **`high`** → Wav Premium. Redirige vers Calendly (`calendly.com/fredwavcm/wav-premium`). Badge urgence "3 places disponibles".
+- **`low`** → One Shot. Ton : "T'as pas encore le budget pour un accompagnement complet, mais pour débloquer ta situation maintenant, le One Shot est fait pour ça." Redirige vers `/one-shot`.
+- **`express`** → Analyse Express. Ton : "Avant de t'engager, fais analyser ton compte. En 2 minutes tu sauras exactement où tu en es." Redirige vers `/analyse-express`.
+
+### Changement 3 — Mettre à jour le mapping `getRecommendedOffer`
+
+```text
+high   → wav_premium
+low    → one_shot
+express → analyse_express
+```
+
+### Fichier modifié
+
+Un seul fichier : `src/pages/DiagnosticStart.tsx`
+- Options du step 5 (icônes, labels, valeurs)
+- `getRecommendedOffer()` (3 valeurs au lieu de 4)
+- `renderResult()` configs (3 résultats au lieu de 4)
+
+Aucune migration DB nécessaire — la colonne `budget` et `recommended_offer` dans `diagnostic_leads` acceptent déjà n'importe quelle string.
 

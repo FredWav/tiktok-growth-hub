@@ -11,14 +11,17 @@ import ScrollToTop from "@/components/ScrollToTop";
 import { CookieConsent } from "@/components/CookieConsent";
 import { capturePageview } from "@/lib/posthog";
 import { captureUtmParams } from "@/lib/tracking";
+import { trackPageView, setupBeforeUnloadTracking } from "@/lib/page-tracker";
 
 function PostHogPageTracker() {
   const location = useLocation();
   useEffect(() => {
     capturePageview();
+    trackPageView(location.pathname);
   }, [location.pathname]);
   useEffect(() => {
     captureUtmParams();
+    setupBeforeUnloadTracking();
   }, []);
   return null;
 }

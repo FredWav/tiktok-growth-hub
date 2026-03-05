@@ -1,27 +1,30 @@
 
 
-## Plan : Mapping strict par table + déduplication par email
+## Plan : Persistance du step 2 + sécurité anti-contournement
 
-### Constat
-Le mapping actuel est déjà correct — chaque table source assigne explicitement son type d'offre. Le vrai problème est l'absence de **déduplication** : un prospect qui fait le diagnostic puis achète un One Shot apparaît deux fois.
+### Analyse de la sécurité actuelle
 
-### Modifications sur `src/pages/admin/Marketing.tsx`
+La page `/one-shot/success` vérifie **déjà** le paiement côté serveur via `verify-oneshot-payment` (qui appelle Stripe pour confirmer `payment_status === "paid"`). Sans `session_id` valide et payé, la page affiche une erreur. Le lien Calendly n'est **jamais** accessible sans paiement vérifié.
 
-**1. Ajouter `email` au fetch de chaque table** pour permettre la déduplication :
-- `wav_premium_applications` : déjà a `email` implicitement via first/last name, ajouter `email` au select
-- `diagnostic_leads` : ajouter `email` au select
-- `oneshot_submissions` : a déjà `email` implicitement via `name`, ajouter `email` au select
-- `express_analyses` : a déjà `email`
+Le vrai problème : quand le formulaire est soumis (step 1 → step 2), le `localStorage` est vidé (ligne 89). Si le client perd le réseau ou ferme l'onglet avant de cliquer sur Calendly, il ne peut plus revenir sur la page.
 
-**2. Enrichir l'interface `Lead`** avec un champ `email` optionnel.
+### Modifications sur `src/pages/OneShotSuccess.tsx`
 
-**3. Déduplication par email** après la fusion :
-- Définir un ordre de priorité : `Wav Premium (1) > One Shot (2) > Analyse Express (3) > Diagnostic (4)`
-- Grouper les leads par email (les leads sans email restent tels quels)
-- Pour chaque groupe, garder uniquement l'entrée avec la priorité la plus forte
-- Cela élimine les doublons diagnostic/oneshot pour un même prospect
+1. **Ne plus supprimer `oneshot_session_id` du localStorage à l'envoi du formulaire** (ligne 89) -- le garder pour permettre le retour.
 
-**4. Aucun changement de badge/style** — le mapping par table est déjà strict et correct.
+2. **Persister l'état "formulaire soumis"** : après envoi réussi, stocker `oneshot_form_submitted = "true"` dans localStorage.
 
-Un seul fichier modifié : `src/pages/admin/Marketing.tsx`.
+3. **Au chargement** : après vérification du paiement réussie, vérifier si `oneshot_form_submitted === "true"`. Si oui, sauter directement au step 2.
+
+4. **Remplacer le lien "Retour à l'accueil"** par un bouton **"J'ai réservé mon créneau"** qui :
+   - Nettoie `oneshot_session_id` et `oneshot_form_submitted` du localStorage
+   - Redirige vers `/`
+
+### Résultat
+
+- La vérification Stripe côté serveur reste la barrière d'accès -- pas de contournement possible.
+- Un client qui a payé + soumis le formulaire peut revenir sur `/one-shot/success` et retrouver le lien Calendly.
+- Le localStorage n'est nettoyé que quand le client confirme explicitement avoir réservé.
+
+Un seul fichier modifié.
 

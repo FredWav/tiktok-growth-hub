@@ -1,63 +1,41 @@
 
 
-## Plan : Analytics avancés dans l'onglet Marketing
+## Diagnostic
 
-### Problème
-Tu veux voir dans le dashboard Marketing : sources de visites, durée des visites, pages les plus visitées, et le drop-off du parcours diagnostic. Aujourd'hui, ces données n'existent pas en base -- le tracking est sur PostHog/GA mais pas exploitable dans le dashboard admin.
+### 1. Suivi campagnes/médias/sources
+Le dashboard Marketing a bien les **sources de visites** (depuis `page_views`) et les **sources de leads** (depuis les formulaires). Mais il manque un **suivi par campagne** et **par medium** -- les données `utm_medium` et `utm_campaign` sont collectées dans `page_views` mais jamais affichées. Il n'y a pas de tableau qui regroupe par campagne ou par medium.
 
-### Approche
+### 2. Pipeline estimé cassé
+Le "Pipeline estimé" (ligne 266-275) somme le champ `current_revenue` des leads Wav Premium -- c'est le **CA auto-déclaré par le candidat**, pas le revenu généré. La vente One Shot de ce matin n'y apparaît pas car One Shot n'a pas de champ `current_revenue`. Le pipeline devrait refléter les **ventes réelles** (montants payés) plutôt que le CA déclaré des prospects.
 
-**1. Tracking des pages visitées** -- nouvelle table `page_views` + tracking côté client
+---
 
-Créer une table `page_views` légère qui enregistre chaque visite de page :
-- `path` (URL)
-- `referrer` (d'où vient le visiteur)
-- `utm_source`, `utm_medium`, `utm_campaign`
-- `session_id` (UUID généré côté client par session, stocké en sessionStorage)
-- `entered_at` (timestamp d'arrivée)
-- `duration_seconds` (mis à jour via `beforeunload` ou heartbeat)
-- `visitor_id` (hash anonyme ou PostHog distinct_id, pour compter les visiteurs uniques)
+## Plan de correction
 
-RLS : INSERT pour tout le monde (anon), SELECT pour admins uniquement.
+### A. Ajouter un tableau de suivi Campagnes / Médias / Sources
 
-Condition GDPR : ne tracker que si `localStorage.getItem("cookie_consent") === "accepted"` (cohérent avec le consentement cookies existant).
+Dans `Marketing.tsx`, ajouter une nouvelle section avec 3 sous-tableaux (ou un tableau combiné) qui agrège `page_views` par :
+- **utm_source** (source) -- ex: tiktok, instagram, google
+- **utm_medium** (medium) -- ex: social, cpc, email  
+- **utm_campaign** (campagne) -- ex: launch-q1, promo-mars
 
-**2. Composant de tracking** -- `src/lib/page-tracker.ts`
+Chaque ligne montre : nom, nombre de visites, nombre de visiteurs uniques, durée moyenne. Utiliser un `useMemo` qui groupe les `pageViews` par ces 3 dimensions.
 
-Un module appelé dans `PostHogPageTracker` (App.tsx) qui :
-- Génère un `session_id` en sessionStorage s'il n'existe pas
-- INSERT dans `page_views` à chaque changement de route (path, referrer, UTMs, timestamp)
-- Met à jour `duration_seconds` via `beforeunload` (UPDATE sur la dernière ligne du session_id)
+### B. Corriger le Pipeline estimé
 
-**3. Funnel du diagnostic** -- depuis `diagnostic_leads.current_step`
+Remplacer le calcul basé sur `current_revenue` (CA auto-déclaré) par un calcul basé sur les **ventes réelles** :
+- Requêter la table `bookings` (filtre `payment_status = 'paid'`) pour les montants réels
+- Ajouter aussi les `oneshot_submissions` avec un prix fixe (le prix One Shot) puisqu'elles sont validées par Stripe
+- Afficher le **revenu réel** du mois en cours au lieu du "pipeline estimé"
 
-Requête sur `diagnostic_leads` groupée par `current_step` pour afficher un funnel chart :
-```text
-Étape 0 (démarré) → Étape 1 (identité) → Étape 2 (niveau) → ... → Étape 5 (complété)
-```
-Affiche le nombre de leads à chaque étape et le taux de drop-off entre chaque étape. Utilise un BarChart horizontal ou un FunnelChart.
-
-**4. Nouveaux widgets dans Marketing.tsx**
-
-Ajouter 3 sections au dashboard existant (au-dessus du tableau de leads) :
-
-| Widget | Source de données | Visualisation |
-|--------|------------------|---------------|
-| **Pages les plus visitées** | `page_views` groupé par `path` | Table avec nb de vues + durée moyenne |
-| **Sources de visites** | `page_views` groupé par `referrer` / `utm_source` | Donut chart (comme l'existant) |
-| **Funnel diagnostic** | `diagnostic_leads` groupé par `current_step` | Bar chart horizontal avec taux de conversion |
-| **Durée moyenne** | `page_views` avg `duration_seconds` | KPI card |
+Concrètement :
+1. Ajouter une query `bookings` + compter les `oneshot_submissions` du mois
+2. Remplacer `pipelineValue` par le total réel (bookings.amount_cents + oneshot count * prix One Shot)
+3. Renommer le KPI en "Revenu du mois" ou "CA généré"
 
 ### Fichiers modifiés
 
 | Fichier | Action |
 |---------|--------|
-| Migration SQL | Créer table `page_views` + RLS |
-| `src/lib/page-tracker.ts` | Nouveau -- tracking des pages |
-| `src/App.tsx` | Appeler le page tracker dans `PostHogPageTracker` |
-| `src/pages/admin/Marketing.tsx` | Ajouter les 3 widgets + requêtes |
-
-### Limites
-- Les données commenceront à s'accumuler à partir du déploiement (pas de rétro-historique)
-- La durée via `beforeunload` n'est pas 100% fiable sur mobile mais suffisant pour une estimation
+| `src/pages/admin/Marketing.tsx` | Ajouter tableau campagnes/médias/sources + corriger pipeline |
 

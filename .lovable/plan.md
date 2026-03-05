@@ -1,41 +1,44 @@
 
 
-## Diagnostic
+## Diagnostic : liens de tracking depuis TikTok
 
-### 1. Suivi campagnes/médias/sources
-Le dashboard Marketing a bien les **sources de visites** (depuis `page_views`) et les **sources de leads** (depuis les formulaires). Mais il manque un **suivi par campagne** et **par medium** -- les données `utm_medium` et `utm_campaign` sont collectées dans `page_views` mais jamais affichées. Il n'y a pas de tableau qui regroupe par campagne ou par medium.
+J'ai analysé le flux complet. Voici les problèmes identifiés :
 
-### 2. Pipeline estimé cassé
-Le "Pipeline estimé" (ligne 266-275) somme le champ `current_revenue` des leads Wav Premium -- c'est le **CA auto-déclaré par le candidat**, pas le revenu généré. La vente One Shot de ce matin n'y apparaît pas car One Shot n'a pas de champ `current_revenue`. Le pipeline devrait refléter les **ventes réelles** (montants payés) plutôt que le CA déclaré des prospects.
+### Problème 1 : Le bouton "Ouvrir dans mon navigateur" ne fonctionne pas sur iOS
+Sur iOS, le `TikTokBrowserBanner` utilise `navigator.clipboard.writeText()` qui est **souvent bloqué dans le webview TikTok** (pas de permission clipboard). Le prospect voit soit rien, soit un message qu'il ignore. Il n'y a **aucun moyen automatique d'ouvrir Safari** depuis le webview TikTok sur iOS -- c'est une limitation système.
+
+### Problème 2 : Le tracking `page_views` ne capture rien sans consentement cookies
+Un visiteur TikTok arrive pour la première fois → pas de `cookie_consent` en localStorage → `trackPageView()` return immédiatement sans rien enregistrer. Le visiteur ne verra jamais la bannière cookies s'il est bloqué avant. C'est le comportement GDPR attendu, mais ça signifie que le trafic TikTok est largement invisible dans les analytics custom.
+
+### Problème 3 : Les UTMs sont perdus si le prospect copie/colle l'URL manuellement
+Si le prospect suit l'instruction "copie dans Safari", il copie l'URL complète (avec UTMs), donc ça devrait fonctionner -- à condition que le clipboard fonctionne.
 
 ---
 
 ## Plan de correction
 
-### A. Ajouter un tableau de suivi Campagnes / Médias / Sources
+### A. Améliorer le banner TikTok (iOS)
 
-Dans `Marketing.tsx`, ajouter une nouvelle section avec 3 sous-tableaux (ou un tableau combiné) qui agrège `page_views` par :
-- **utm_source** (source) -- ex: tiktok, instagram, google
-- **utm_medium** (medium) -- ex: social, cpc, email  
-- **utm_campaign** (campagne) -- ex: launch-q1, promo-mars
+Remplacer la logique iOS actuelle par une approche plus robuste :
+1. Essayer `navigator.clipboard.writeText()` en premier
+2. Si ça échoue (ce qui arrive souvent dans TikTok), afficher l'URL en texte sélectionnable dans le banner pour que l'utilisateur puisse la copier manuellement (long press)
+3. Ajouter des instructions plus claires : "Appuie sur les 3 points en haut → Ouvrir dans Safari"
 
-Chaque ligne montre : nom, nombre de visites, nombre de visiteurs uniques, durée moyenne. Utiliser un `useMemo` qui groupe les `pageViews` par ces 3 dimensions.
+### B. Rendre le tracking UTM indépendant du consentement cookies
 
-### B. Corriger le Pipeline estimé
+Les UTMs ne sont pas des cookies/données personnelles -- ce sont des paramètres marketing de l'URL. On peut les capturer en localStorage **avant** le consentement cookies (c'est déjà le cas dans `captureUtmParams()`). Le problème est que `page_views` ne s'insère pas sans consentement.
 
-Remplacer le calcul basé sur `current_revenue` (CA auto-déclaré) par un calcul basé sur les **ventes réelles** :
-- Requêter la table `bookings` (filtre `payment_status = 'paid'`) pour les montants réels
-- Ajouter aussi les `oneshot_submissions` avec un prix fixe (le prix One Shot) puisqu'elles sont validées par Stripe
-- Afficher le **revenu réel** du mois en cours au lieu du "pipeline estimé"
+Solution : séparer la capture UTM du tracking page_views. `captureUtmParams()` fonctionne déjà sans condition de consentement -- c'est correct. Les UTMs seront ensuite rattachés aux leads (diagnostic, one-shot, etc.) indépendamment du tracking de pages.
 
-Concrètement :
-1. Ajouter une query `bookings` + compter les `oneshot_submissions` du mois
-2. Remplacer `pipelineValue` par le total réel (bookings.amount_cents + oneshot count * prix One Shot)
-3. Renommer le KPI en "Revenu du mois" ou "CA généré"
+Pas de changement nécessaire ici -- le flow est déjà correct pour les leads.
+
+### C. Ajouter un fallback pour la copie d'URL sur iOS TikTok
+
+Dans `TikTokBrowserBanner`, si le clipboard échoue, afficher un champ texte en lecture seule avec l'URL complète + instruction pour appuyer longuement et copier.
 
 ### Fichiers modifiés
 
 | Fichier | Action |
 |---------|--------|
-| `src/pages/admin/Marketing.tsx` | Ajouter tableau campagnes/médias/sources + corriger pipeline |
+| `src/components/TikTokBrowserBanner.tsx` | Améliorer le fallback iOS avec URL affichée + instructions "3 points → Ouvrir dans Safari" |
 

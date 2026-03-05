@@ -149,6 +149,7 @@ const DiagnosticStart = () => {
         recommended_offer: getRecommendedOffer(effectiveBudget),
       },
     });
+    sessionStorage.setItem("from_diagnostic", "true");
     setStep(6);
     setLoading(true);
   };

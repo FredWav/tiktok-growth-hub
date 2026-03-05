@@ -8,6 +8,8 @@ export function WavSocialScanPopup() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (sessionStorage.getItem("from_diagnostic")) return;
+
     const lastShown = localStorage.getItem("wavsocialscan_last_shown");
     if (lastShown) {
       const elapsed = Date.now() - parseInt(lastShown, 10);

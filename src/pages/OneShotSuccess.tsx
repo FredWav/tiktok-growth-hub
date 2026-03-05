@@ -68,6 +68,10 @@ export default function OneShotSuccess() {
         if (data.customer_email) {
           form.setValue("email", data.customer_email);
         }
+        // If form was already submitted, skip to step 2
+        if (localStorage.getItem("oneshot_form_submitted") === "true") {
+          setStep(2);
+        }
         setVerifyState("verified");
       } catch {
         setVerifyState("error");
@@ -85,8 +89,7 @@ export default function OneShotSuccess() {
         body: { ...values, session_id: sessionId, posthog_id: getPostHogId() },
       });
       if (error) throw error;
-      // Payment process complete, clear stored session
-      localStorage.removeItem("oneshot_session_id");
+      localStorage.setItem("oneshot_form_submitted", "true");
       setStep(2);
     } catch (err) {
       console.error("Error submitting form:", err);
@@ -246,8 +249,12 @@ export default function OneShotSuccess() {
                 </div>
               </div>
               <div className="mt-8">
-                <Button variant="ghost" asChild>
-                  <Link to="/">Retour à l'accueil<ArrowRight className="ml-2 h-4 w-4" /></Link>
+                <Button variant="ghost" onClick={() => {
+                  localStorage.removeItem("oneshot_session_id");
+                  localStorage.removeItem("oneshot_form_submitted");
+                  navigate("/");
+                }}>
+                  J'ai réservé mon créneau<ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
             </>

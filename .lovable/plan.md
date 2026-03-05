@@ -1,33 +1,63 @@
 
 
-## Deux modifications demandées
+## Plan : Analytics avancés dans l'onglet Marketing
 
-### 1. Détection du navigateur TikTok — banner "Ouvrir dans le navigateur"
+### Problème
+Tu veux voir dans le dashboard Marketing : sources de visites, durée des visites, pages les plus visitées, et le drop-off du parcours diagnostic. Aujourd'hui, ces données n'existent pas en base -- le tracking est sur PostHog/GA mais pas exploitable dans le dashboard admin.
 
-TikTok ouvre les liens dans son navigateur intégré (in-app browser), qui est limité (pas de paiement Stripe, pas de redirection propre). On détecte le user-agent TikTok et on affiche un bandeau fixe en haut de page avec un lien pour ouvrir dans le navigateur natif.
+### Approche
 
-**Fichier : `src/components/TikTokBrowserBanner.tsx`** (nouveau)
-- Détecte `navigator.userAgent` contenant `TikTok` ou `BytedanceWebview`
-- Si détecté, affiche un bandeau sticky en haut : "Tu es sur le navigateur TikTok. Pour une meilleure expérience, ouvre cette page dans ton navigateur."
-- Bouton "Ouvrir dans mon navigateur" qui utilise l'astuce `intent://` sur Android ou copie l'URL dans le clipboard avec un message d'instruction sur iOS
-- Le bandeau peut être fermé
+**1. Tracking des pages visitées** -- nouvelle table `page_views` + tracking côté client
 
-**Fichier : `src/components/layout/Layout.tsx`** — importer et afficher le `TikTokBrowserBanner` en haut du layout global pour que ça fonctionne sur toutes les pages.
+Créer une table `page_views` légère qui enregistre chaque visite de page :
+- `path` (URL)
+- `referrer` (d'où vient le visiteur)
+- `utm_source`, `utm_medium`, `utm_campaign`
+- `session_id` (UUID généré côté client par session, stocké en sessionStorage)
+- `entered_at` (timestamp d'arrivée)
+- `duration_seconds` (mis à jour via `beforeunload` ou heartbeat)
+- `visitor_id` (hash anonyme ou PostHog distinct_id, pour compter les visiteurs uniques)
 
-### 2. Supprimer le popup Analyse Express pour les visiteurs venant de `/start`
+RLS : INSERT pour tout le monde (anon), SELECT pour admins uniquement.
 
-Les utilisateurs qui arrivent de `/start` ont déjà été qualifiés par le tunnel. Le popup Analyse Express est redondant pour eux.
+Condition GDPR : ne tracker que si `localStorage.getItem("cookie_consent") === "accepted"` (cohérent avec le consentement cookies existant).
 
-**Fichier : `src/pages/DiagnosticStart.tsx`** — à la complétion du diagnostic (dans `handleBudgetSelect`), écrire un flag en sessionStorage : `sessionStorage.setItem("from_diagnostic", "true")`.
+**2. Composant de tracking** -- `src/lib/page-tracker.ts`
 
-**Fichier : `src/components/WavSocialScanPopup.tsx`** — au début du `useEffect`, vérifier `sessionStorage.getItem("from_diagnostic")`. Si présent, ne pas afficher le popup (return early).
+Un module appelé dans `PostHogPageTracker` (App.tsx) qui :
+- Génère un `session_id` en sessionStorage s'il n'existe pas
+- INSERT dans `page_views` à chaque changement de route (path, referrer, UTMs, timestamp)
+- Met à jour `duration_seconds` via `beforeunload` (UPDATE sur la dernière ligne du session_id)
 
-### Résumé des fichiers
+**3. Funnel du diagnostic** -- depuis `diagnostic_leads.current_step`
+
+Requête sur `diagnostic_leads` groupée par `current_step` pour afficher un funnel chart :
+```text
+Étape 0 (démarré) → Étape 1 (identité) → Étape 2 (niveau) → ... → Étape 5 (complété)
+```
+Affiche le nombre de leads à chaque étape et le taux de drop-off entre chaque étape. Utilise un BarChart horizontal ou un FunnelChart.
+
+**4. Nouveaux widgets dans Marketing.tsx**
+
+Ajouter 3 sections au dashboard existant (au-dessus du tableau de leads) :
+
+| Widget | Source de données | Visualisation |
+|--------|------------------|---------------|
+| **Pages les plus visitées** | `page_views` groupé par `path` | Table avec nb de vues + durée moyenne |
+| **Sources de visites** | `page_views` groupé par `referrer` / `utm_source` | Donut chart (comme l'existant) |
+| **Funnel diagnostic** | `diagnostic_leads` groupé par `current_step` | Bar chart horizontal avec taux de conversion |
+| **Durée moyenne** | `page_views` avg `duration_seconds` | KPI card |
+
+### Fichiers modifiés
 
 | Fichier | Action |
 |---------|--------|
-| `src/components/TikTokBrowserBanner.tsx` | Créer |
-| `src/components/layout/Layout.tsx` | Ajouter le banner |
-| `src/pages/DiagnosticStart.tsx` | Ajouter `sessionStorage.setItem("from_diagnostic", "true")` |
-| `src/components/WavSocialScanPopup.tsx` | Vérifier le flag et skip si présent |
+| Migration SQL | Créer table `page_views` + RLS |
+| `src/lib/page-tracker.ts` | Nouveau -- tracking des pages |
+| `src/App.tsx` | Appeler le page tracker dans `PostHogPageTracker` |
+| `src/pages/admin/Marketing.tsx` | Ajouter les 3 widgets + requêtes |
+
+### Limites
+- Les données commenceront à s'accumuler à partir du déploiement (pas de rétro-historique)
+- La durée via `beforeunload` n'est pas 100% fiable sur mobile mais suffisant pour une estimation
 

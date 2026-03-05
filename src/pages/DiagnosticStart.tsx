@@ -88,8 +88,8 @@ const DiagnosticStart = () => {
   };
 
   const getRecommendedOffer = (budget: string) => {
-    const map: Record<string, string> = { none: "discord", low: "one_shot", mid: "vip", high: "wav_premium" };
-    return map[budget] || "discord";
+    const map: Record<string, string> = { high: "wav_premium", low: "one_shot", express: "analyse_express" };
+    return map[budget] || "analyse_express";
   };
 
   const handleIdentityNext = () => {
@@ -164,31 +164,24 @@ const DiagnosticStart = () => {
 
   const renderResult = () => {
     const configs: Record<string, { title: string; text: string; url: string; cta: string; urgency?: string }> = {
-      none: {
-        title: "L'accompagnement individuel demande un investissement.",
-        text: "En attendant d'avoir les fonds, rejoins la communauté pour commencer à te former gratuitement avec les autres créateurs.",
-        url: "https://discord.gg/6ctGNjqUXr",
-        cta: "Rejoindre le Discord",
-      },
-      low: {
-        title: "Intervention chirurgicale.",
-        text: "Pour ton budget, la meilleure option pour un déblocage immédiat est l'audit stratégique d'1h30. On identifie le problème, on corrige le tir.",
-        url: "https://fredwav.com/one-shot",
-        cta: "Voir les détails du One-Shot",
-      },
-      mid: {
-        title: "L'écosystème VIP.",
-        text: "Ton profil correspond à l'offre VIP. Accès aux ressources froides (cours PDF, replays) et analyse en direct chaque semaine pour structurer ta stratégie.",
-        url: "https://fredwav.com/offres/vip",
-        cta: "Découvrir le programme VIP",
-        urgency: "Seulement 7 places sur 10 disponibles",
-      },
       high: {
         title: "Accompagnement Sur-Mesure.",
         text: "Ton profil nécessite un travail en profondeur. Le Wav Premium est conçu pour ça : 6 semaines de suivi 5/7, 1 appel hebdo et toutes les ressources pour exploser tes blocages. On prend un premier contact pour valider qu'on peut bosser ensemble.",
         url: "https://calendly.com/fredwavcm/wav-premium",
         cta: "Réserver mon premier contact",
-        urgency: "Limité : 3 places sur 5 disponibles ce mois-ci",
+        urgency: "Limité : 3 places disponibles ce mois-ci",
+      },
+      low: {
+        title: "Débloque ta situation maintenant.",
+        text: "T'as pas encore le budget pour un accompagnement complet, mais pour débloquer ta situation maintenant, le One Shot est fait pour ça : 1h30 d'audit stratégique pour identifier le problème et corriger le tir.",
+        url: "https://fredwav.com/one-shot",
+        cta: "Voir les détails du One-Shot",
+      },
+      express: {
+        title: "Fais le point avant de t'engager.",
+        text: "Avant de t'engager, fais analyser ton compte par notre IA. En 2 minutes tu sauras exactement où tu en es et quels leviers activer en priorité.",
+        url: "https://fredwav.com/analyse-express",
+        cta: "Lancer mon Analyse Express",
       },
     };
 
@@ -482,28 +475,22 @@ const DiagnosticStart = () => {
               </div>
               <div className="space-y-3 max-w-lg mx-auto">
                 <OptionCard
-                  icon={Users}
-                  label="Je n'ai pas de budget pour le moment."
-                  selected={data.budget === "none"}
-                  onClick={() => handleBudgetSelect("none")}
+                  icon={Rocket}
+                  label="Oui, je suis prêt à investir 500€+ pour un accompagnement sur-mesure"
+                  selected={data.budget === "high"}
+                  onClick={() => handleBudgetSelect("high")}
                 />
                 <OptionCard
                   icon={Zap}
-                  label="Moins de 200 €"
+                  label="Pas encore, mais je peux investir moins de 200€ pour un déblocage immédiat"
                   selected={data.budget === "low"}
                   onClick={() => handleBudgetSelect("low")}
                 />
                 <OptionCard
-                  icon={Crown}
-                  label="Entre 200 € et 500 €"
-                  selected={data.budget === "mid"}
-                  onClick={() => handleBudgetSelect("mid")}
-                />
-                <OptionCard
-                  icon={Rocket}
-                  label="Entre 500 € et 1000 € ou plus"
-                  selected={data.budget === "high"}
-                  onClick={() => handleBudgetSelect("high")}
+                  icon={Eye}
+                  label="Je veux d'abord un état des lieux de mon compte avant de m'engager"
+                  selected={data.budget === "express"}
+                  onClick={() => handleBudgetSelect("express")}
                 />
               </div>
             </div>

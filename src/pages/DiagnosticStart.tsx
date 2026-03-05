@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
 import { identifyUser } from "@/lib/posthog";
+import { TikTokBrowserBanner } from "@/components/TikTokBrowserBanner";
 
 const identitySchema = z.object({
   firstName: z.string().min(1, "Prénom requis"),
@@ -248,6 +249,7 @@ const DiagnosticStart = () => {
 
   return (
     <div className="min-h-screen bg-[hsl(var(--cream))] flex flex-col">
+      <TikTokBrowserBanner />
       <SEOHead
         title="Diagnostic Stratégique TikTok Gratuit | Fred Wav"
         description="Identifie ton point de blocage exact sur TikTok en 2 minutes. Diagnostic gratuit pour t'orienter vers la bonne stratégie."

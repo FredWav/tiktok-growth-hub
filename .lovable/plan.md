@@ -1,24 +1,33 @@
 
 
-## Plan : Exclure les débutants du Wav Premium
+## Deux modifications demandées
 
-### Logique actuelle
-Le `level` (beginner/intermediate/advanced) est collecté à l'étape 2 mais n'influence **pas** le résultat. Seul le `budget` détermine l'offre recommandée. Un débutant qui sélectionne "500€+" est envoyé vers le Wav Premium.
+### 1. Détection du navigateur TikTok — banner "Ouvrir dans le navigateur"
 
-### Modification sur `src/pages/DiagnosticStart.tsx`
+TikTok ouvre les liens dans son navigateur intégré (in-app browser), qui est limité (pas de paiement Stripe, pas de redirection propre). On détecte le user-agent TikTok et on affiche un bandeau fixe en haut de page avec un lien pour ouvrir dans le navigateur natif.
 
-**Changer `handleBudgetSelect`** pour croiser `level` et `budget` :
-- Si `budget === "high"` **ET** `level === "beginner"` → forcer le résultat vers `low` (One Shot) avec un message adapté
-- Sinon, comportement actuel inchangé
+**Fichier : `src/components/TikTokBrowserBanner.tsx`** (nouveau)
+- Détecte `navigator.userAgent` contenant `TikTok` ou `BytedanceWebview`
+- Si détecté, affiche un bandeau sticky en haut : "Tu es sur le navigateur TikTok. Pour une meilleure expérience, ouvre cette page dans ton navigateur."
+- Bouton "Ouvrir dans mon navigateur" qui utilise l'astuce `intent://` sur Android ou copie l'URL dans le clipboard avec un message d'instruction sur iOS
+- Le bandeau peut être fermé
 
-Concrètement, dans `handleBudgetSelect`, avant d'appeler `saveLead` :
-```text
-effectiveBudget = (budget === "high" && data.level === "beginner") ? "low" : budget
-```
+**Fichier : `src/components/layout/Layout.tsx`** — importer et afficher le `TikTokBrowserBanner` en haut du layout global pour que ça fonctionne sur toutes les pages.
 
-On utilise `effectiveBudget` pour `getRecommendedOffer()` et pour `setData`, mais on sauvegarde le `budget` original en base pour l'analytics.
+### 2. Supprimer le popup Analyse Express pour les visiteurs venant de `/start`
 
-**Optionnel** : adapter le texte du résultat One Shot pour les débutants redirigés, par exemple : "Le Wav Premium est réservé aux créateurs qui publient déjà. Pour ton niveau actuel, le One Shot est le meilleur point de départ : 1h30 pour poser les fondations de ta stratégie."
+Les utilisateurs qui arrivent de `/start` ont déjà été qualifiés par le tunnel. Le popup Analyse Express est redondant pour eux.
 
-Un seul fichier modifié.
+**Fichier : `src/pages/DiagnosticStart.tsx`** — à la complétion du diagnostic (dans `handleBudgetSelect`), écrire un flag en sessionStorage : `sessionStorage.setItem("from_diagnostic", "true")`.
+
+**Fichier : `src/components/WavSocialScanPopup.tsx`** — au début du `useEffect`, vérifier `sessionStorage.getItem("from_diagnostic")`. Si présent, ne pas afficher le popup (return early).
+
+### Résumé des fichiers
+
+| Fichier | Action |
+|---------|--------|
+| `src/components/TikTokBrowserBanner.tsx` | Créer |
+| `src/components/layout/Layout.tsx` | Ajouter le banner |
+| `src/pages/DiagnosticStart.tsx` | Ajouter `sessionStorage.setItem("from_diagnostic", "true")` |
+| `src/components/WavSocialScanPopup.tsx` | Vérifier le flag et skip si présent |
 

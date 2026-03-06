@@ -1,25 +1,45 @@
 
 
-## Diagnostic
+## Diagnostic : compatibilite avec le callback API
 
-Après recherche, voici l'état des lieux technique pour forcer l'ouverture dans un navigateur externe depuis le webview TikTok :
+En comparant la structure API que tu viens de partager avec le code des Edge Functions, voici ce qui fonctionne et ce qui ne fonctionne pas :
 
-- **Android** : l'`intent://` scheme fonctionne déjà dans le code actuel -- ça ouvre Chrome automatiquement. C'est une vraie solution technique.
-- **iOS** : **il n'existe aucun moyen fiable de forcer l'ouverture dans Safari** depuis un webview in-app. Les schemes comme `x-safari-https://` ou `googlechrome://` sont bloqués par TikTok. C'est une limitation système iOS que tous les développeurs web subissent.
+### Ce qui marche
 
-La meilleure solution technique possible sur iOS est de **rediriger automatiquement** dès la détection du webview TikTok, sans attendre que l'utilisateur clique. Sur Android, on peut déclencher l'intent immédiatement. Sur iOS, on peut au moins tenter le `googlechrome://` scheme (si Chrome est installé) et sinon afficher l'URL de manière très visible et impossible à ignorer.
+| Champ | Code actuel | Verdict |
+|-------|------------|---------|
+| `ai_insights` (objet) | `job.result?.account?.ai_insights` puis `!aiInsights` | OK — un objet truthy passe le check |
+| `status`, `progress`, `current_step` | Lecture directe | OK |
+| `error` (cas failed) | `job.error` | OK |
 
-## Plan
+### Ce qui ne marche PAS
 
-### Redirection automatique au lieu d'un banner passif
+| Champ | Code actuel | Probleme |
+|-------|------------|----------|
+| `health_score` | `job.result?.health_score ?? job.result?.score` puis `typeof healthScore === "number"` | **L'API retourne un objet `{ total: 74, components: {...} }`, pas un nombre.** Le check `typeof === "number"` echoue → stocke `null` |
 
-Transformer le `TikTokBrowserBanner` en une **page de redirection bloquante** plutôt qu'un simple banner informatif :
+C'est le seul bug. Le `health_score` est present dans la reponse mais ignore a cause du type check.
 
-1. **Android** : déclencher automatiquement l'intent Chrome dès le chargement (pas besoin de cliquer)
-2. **iOS** : tenter `googlechrome://` en auto, et afficher immédiatement un **overlay plein écran** (pas un petit banner) avec l'URL copiable + instructions visuelles claires pour ouvrir dans Safari via le menu natif TikTok
-3. Le contenu de la page est masqué derrière l'overlay tant que l'utilisateur est dans le webview TikTok -- ça force l'action
+### Correction
 
-| Fichier | Action |
-|---------|--------|
-| `src/components/TikTokBrowserBanner.tsx` | Remplacer le banner par un overlay plein écran bloquant avec redirection auto sur Android, tentative Chrome + instructions visuelles sur iOS |
+**2 fichiers a modifier, meme changement dans chacun :**
+
+**`supabase/functions/express-analysis-status/index.ts`** (~ligne 135) et **`supabase/functions/check-express-job/index.ts`** (~ligne 90) :
+
+Remplacer :
+```javascript
+const healthScore = job.result?.health_score ?? job.result?.score ?? null;
+// ...
+health_score: typeof healthScore === "number" ? healthScore : null,
+```
+
+Par :
+```javascript
+const hs = job.result?.health_score ?? job.result?.account?.health_score;
+const healthScore = typeof hs === "object" && hs !== null ? hs.total : (typeof hs === "number" ? hs : null);
+// ...
+health_score: typeof healthScore === "number" ? healthScore : null,
+```
+
+Aucun autre changement necessaire. Le reste du code gere correctement la structure de callback.
 

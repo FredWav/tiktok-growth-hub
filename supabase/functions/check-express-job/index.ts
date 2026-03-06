@@ -85,7 +85,8 @@ serve(async (req) => {
     if (job.status === "completed" && job.result) {
       const aiInsights = job.result?.account?.ai_insights;
       const missingAi = !aiInsights || (typeof aiInsights === "string" && aiInsights.trim() === "");
-      const healthScore = job.result?.health_score ?? job.result?.score ?? null;
+      const hs = job.result?.health_score ?? job.result?.account?.health_score;
+      const healthScore = typeof hs === "object" && hs !== null ? hs.total : (typeof hs === "number" ? hs : null);
 
       await supabaseAdmin.from("express_analyses").update({
         status: "complete",

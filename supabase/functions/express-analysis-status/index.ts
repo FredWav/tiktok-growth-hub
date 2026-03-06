@@ -154,7 +154,8 @@ serve(async (req) => {
       }
 
       try {
-        const healthScore = job.result?.health_score ?? job.result?.score ?? null;
+        const hs = job.result?.health_score ?? job.result?.account?.health_score;
+        const healthScore = typeof hs === "object" && hs !== null ? hs.total : (typeof hs === "number" ? hs : null);
         await supabase
           .from("express_analyses")
           .update({

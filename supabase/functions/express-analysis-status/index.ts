@@ -8,7 +8,8 @@ import { upsertProspect } from "../_shared/upsert-prospect.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 const API_BASE = "https://hesozoobtehszosdlnrn.supabase.co/functions/v1/api-gateway";
@@ -21,16 +22,19 @@ async function notifyDiscordMissingAI(username: string, sessionId: string) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        embeds: [{
-          title: "⚠️ Analyse IA manquante",
-          color: 0xff9800,
-          fields: [
-            { name: "Username TikTok", value: `@${username}`, inline: true },
-            { name: "Session ID", value: sessionId, inline: false },
-          ],
-          description: "L'analyse express est terminée mais les insights IA (ai_insights) sont absents. Action requise.",
-          timestamp: new Date().toISOString(),
-        }],
+        embeds: [
+          {
+            title: "⚠️ Analyse IA manquante",
+            color: 0xff9800,
+            fields: [
+              { name: "Username TikTok", value: `@${username}`, inline: true },
+              { name: "Session ID", value: sessionId, inline: false },
+            ],
+            description:
+              "L'analyse express est terminée mais les insights IA (ai_insights) sont absents. Action requise.",
+            timestamp: new Date().toISOString(),
+          },
+        ],
       }),
     });
   } catch (err) {
@@ -39,10 +43,7 @@ async function notifyDiscordMissingAI(username: string, sessionId: string) {
 }
 
 function getSupabase() {
-  return createClient(
-    Deno.env.get("SUPABASE_URL") || "",
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || ""
-  );
+  return createClient(Deno.env.get("SUPABASE_URL") || "", Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "");
 }
 
 async function sendResultEmail(email: string, username: string, sessionId: string) {
@@ -78,7 +79,9 @@ async function sendResultEmail(email: string, username: string, sessionId: strin
       </div>`;
 
     const transporter = nodemailer.createTransport({
-      host: "ssl0.ovh.net", port: 465, secure: true,
+      host: "ssl0.ovh.net",
+      port: 465,
+      secure: true,
       auth: { user: "noreply@fredwav.com", pass: SMTP_PASSWORD },
     });
 
@@ -131,6 +134,8 @@ serve(async (req) => {
     const job = await jobRes.json();
     const supabase = getSupabase();
 
+    console.log(job);
+
     if (job.status === "completed" && job.result) {
       const aiInsights = job.result?.account?.ai_insights;
       const missingAiInsights = !aiInsights || (typeof aiInsights === "string" && aiInsights.trim() === "");
@@ -150,13 +155,16 @@ serve(async (req) => {
 
       try {
         const healthScore = job.result?.health_score ?? job.result?.score ?? null;
-        await supabase.from("express_analyses").update({
-          status: "complete",
-          health_score: typeof healthScore === "number" ? healthScore : null,
-          result_data: job.result,
-          completed_at: new Date().toISOString(),
-          ...(missingAiInsights ? { error_message: "Analyse IA (ai_insights) absente du résultat" } : {}),
-        }).eq("job_id", job_id);
+        await supabase
+          .from("express_analyses")
+          .update({
+            status: "complete",
+            health_score: typeof healthScore === "number" ? healthScore : null,
+            result_data: job.result,
+            completed_at: new Date().toISOString(),
+            ...(missingAiInsights ? { error_message: "Analyse IA (ai_insights) absente du résultat" } : {}),
+          })
+          .eq("job_id", job_id);
       } catch (dbErr) {
         console.warn("Failed to update express_analyses:", dbErr);
       }
@@ -187,41 +195,61 @@ serve(async (req) => {
         }
       }
 
-      return new Response(JSON.stringify({
-        status: "complete", data: job.result, username, missing_ai_insights: missingAiInsights,
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      });
+      return new Response(
+        JSON.stringify({
+          status: "complete",
+          data: job.result,
+          username,
+          missing_ai_insights: missingAiInsights,
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        },
+      );
     }
 
     if (job.status === "failed") {
       try {
-        await supabase.from("express_analyses").update({
-          status: "failed",
-          error_message: job.error || "L'analyse a échoué",
-          completed_at: new Date().toISOString(),
-        }).eq("job_id", job_id);
+        await supabase
+          .from("express_analyses")
+          .update({
+            status: "failed",
+            error_message: job.error || "L'analyse a échoué",
+            completed_at: new Date().toISOString(),
+          })
+          .eq("job_id", job_id);
       } catch (dbErr) {
         console.warn("Failed to update express_analyses:", dbErr);
       }
 
       await notifyError("Analyse Échouée", `@${username} • ${job.error || "Erreur inconnue"}`);
 
-      return new Response(JSON.stringify({
-        status: "failed", error: job.error || "L'analyse a échoué", username,
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      });
+      return new Response(
+        JSON.stringify({
+          status: "failed",
+          error: job.error || "L'analyse a échoué",
+          username,
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        },
+      );
     }
 
-    return new Response(JSON.stringify({
-      status: "processing", progress: job.progress || 0, current_step: job.current_step || null, username,
-    }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 200,
-    });
+    return new Response(
+      JSON.stringify({
+        status: "processing",
+        progress: job.progress || 0,
+        current_step: job.current_step || null,
+        username,
+      }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      },
+    );
   } catch (error) {
     await notifyError("Analyse Status", `${error.message}`);
     return new Response(JSON.stringify({ error: error.message }), {

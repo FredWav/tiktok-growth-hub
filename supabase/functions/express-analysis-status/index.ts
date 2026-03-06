@@ -51,7 +51,7 @@ async function sendResultEmail(email: string, username: string, sessionId: strin
   if (!SMTP_PASSWORD || !email) return;
 
   try {
-    const reportUrl = `https://fredwav.lovable.app/analyse-express/result?session_id=${sessionId}`;
+    const reportUrl = `https://fredwav.com/analyse-express/result?session_id=${sessionId}`;
     const htmlBody = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #0a0a0a; color: #f5f0e8;">
         <div style="text-align: center; padding: 30px 0; border-bottom: 2px solid #c8a97e;">
@@ -155,7 +155,7 @@ serve(async (req) => {
 
       try {
         const hs = job.result?.health_score ?? job.result?.account?.health_score;
-        const healthScore = typeof hs === "object" && hs !== null ? hs.total : (typeof hs === "number" ? hs : null);
+        const healthScore = typeof hs === "object" && hs !== null ? hs.total : typeof hs === "number" ? hs : null;
         await supabase
           .from("express_analyses")
           .update({

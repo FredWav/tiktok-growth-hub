@@ -13,7 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useDiagnostic } from "@/contexts/DiagnosticContext";
 import { ArrowRight, ArrowLeft, Users, TrendingUp, Crown, Eye, LayoutList, Coins, ShoppingBag, Clock, Zap, Rocket, DollarSign } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
-import { TikTokBrowserBanner } from "@/components/TikTokBrowserBanner";
+
 
 const TOTAL_STEPS = 7;
 

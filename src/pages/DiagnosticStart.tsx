@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { Layout } from "@/components/layout/Layout";
 import { SEOHead } from "@/components/SEOHead";
 import { z } from "zod";
 import { Mail } from "lucide-react";
@@ -12,7 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useDiagnostic } from "@/contexts/DiagnosticContext";
 import { ArrowRight, ArrowLeft, Users, TrendingUp, Crown, Eye, LayoutList, Coins, ShoppingBag, Clock, Zap, Rocket, DollarSign } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
-import { TikTokBrowserBanner } from "@/components/TikTokBrowserBanner";
+
 
 const TOTAL_STEPS = 7;
 
@@ -172,8 +173,7 @@ const DiagnosticStart = () => {
   };
 
   return (
-    <div className="min-h-screen bg-cream flex flex-col">
-      <TikTokBrowserBanner />
+    <Layout>
       <SEOHead
         title="Diagnostic Stratégique TikTok Gratuit | Fred Wav"
         description="Identifie ton point de blocage exact sur TikTok en 2 minutes. Diagnostic gratuit pour t'orienter vers la bonne stratégie."
@@ -182,7 +182,7 @@ const DiagnosticStart = () => {
       />
 
       {step > 0 && step <= TOTAL_STEPS && (
-        <div className="fixed top-0 left-0 right-0 z-50">
+        <div className="fixed top-16 md:top-20 left-0 right-0 z-40">
           <Progress value={progress} className="h-1.5 rounded-none" />
         </div>
       )}
@@ -355,7 +355,7 @@ const DiagnosticStart = () => {
           )}
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 

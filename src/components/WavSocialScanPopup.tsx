@@ -21,7 +21,8 @@ export function WavSocialScanPopup() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleClose = () => {
+  const handleClose = (dismissed = false) => {
+    if (dismissed) trackPostHogEvent("popup_dismissed", { popup: "wavsocialscan" });
     setOpen(false);
     localStorage.setItem("wavsocialscan_last_shown", Date.now().toString());
   };

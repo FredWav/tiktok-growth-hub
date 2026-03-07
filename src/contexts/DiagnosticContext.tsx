@@ -7,6 +7,7 @@ export type DiagnosticData = {
   objectif: string;
   budget: string;
   temps: string;
+  email: string;
   blocage: string;
 };
 

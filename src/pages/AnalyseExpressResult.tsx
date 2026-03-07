@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { trackEvent } from "@/lib/tracking";
+import { trackPostHogEvent } from "@/lib/posthog";
 import { Download, Loader2, AlertCircle, RefreshCw, Target, ArrowRight } from "lucide-react";
 // @ts-ignore - html2pdf.js doesn't have proper types
 import html2pdf from "html2pdf.js";

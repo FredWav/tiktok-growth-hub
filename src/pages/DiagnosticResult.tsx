@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ExternalLink, Mail } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
+import { trackPostHogEvent } from "@/lib/posthog";
 
 const CALENDLY_URL = "https://calendly.com/fredwavcm/wav-premium";
 

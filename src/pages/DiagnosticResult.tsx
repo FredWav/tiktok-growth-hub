@@ -38,6 +38,26 @@ const ScoreCircle = ({ score }: { score: number }) => {
 const DiagnosticResult = () => {
   const { data, isComplete } = useDiagnostic();
   const navigate = useNavigate();
+  const [tracked, setTracked] = useState(false);
+
+  // ── Score calculation (must be before hooks) ──
+  const audiencePoints: Record<string, number> = { "0-5k": 10, "5k-50k": 25, "50k+": 40 };
+  const objectifPoints: Record<string, number> = { "Visibilité": 10, "Audience": 15, "Vendre": 25, "Monétiser": 30 };
+  const budgetPoints: Record<string, number> = { "0": 0, "1-200": 10, "200-500": 20, "500+": 30 };
+  const score = (audiencePoints[data.audience] || 0) + (objectifPoints[data.objectif] || 0) + (budgetPoints[data.budget] || 0);
+  const scoreLabel = score < 40 ? "Compte instable" : score <= 70 ? "Potentiel non exploité" : "Compte structuré";
+
+  // ── Offer routing ──
+  const getOffer = () => {
+    const { audience, budget } = data;
+    if (budget === "0") return "EXPRESS";
+    if (budget === "1-200" || audience === "0-5k") return "ONE_SHOT";
+    if (audience === "5k-50k" && budget === "200-500") return "ONE_SHOT_PLUS_PREMIUM";
+    if (audience === "50k+" && budget === "200-500") return "PREMIUM";
+    if ((audience === "5k-50k" || audience === "50k+") && budget === "500+") return "PREMIUM";
+    return "ONE_SHOT";
+  };
+  const offer = getOffer();
 
   useEffect(() => {
     console.log("[DiagnosticResult] isComplete:", isComplete, "data:", data);
@@ -48,18 +68,17 @@ const DiagnosticResult = () => {
     sessionStorage.setItem("from_diagnostic", "true");
   }, [isComplete, navigate]);
 
-  // Track result viewed — needs score & offer, computed below via a second effect
-  const [tracked, setTracked] = useState(false);
+  // Fire result_page_viewed once
+  useEffect(() => {
+    if (isComplete && !tracked) {
+      trackPostHogEvent("result_page_viewed", { maturity_score: score, recommended_offer: offer });
+      setTracked(true);
+    }
+  }, [isComplete, tracked, score, offer]);
 
   if (!isComplete) return null;
 
-  // ── Score calculation ──
-  const audiencePoints: Record<string, number> = { "0-5k": 10, "5k-50k": 25, "50k+": 40 };
-  const objectifPoints: Record<string, number> = { "Visibilité": 10, "Audience": 15, "Vendre": 25, "Monétiser": 30 };
-  const budgetPoints: Record<string, number> = { "0": 0, "1-200": 10, "200-500": 20, "500+": 30 };
-
-  const score = (audiencePoints[data.audience] || 0) + (objectifPoints[data.objectif] || 0) + (budgetPoints[data.budget] || 0);
-  const scoreLabel = score < 40 ? "Compte instable" : score <= 70 ? "Potentiel non exploité" : "Compte structuré";
+  console.log("[DiagnosticResult] score:", score, "scoreLabel:", scoreLabel, "offer:", offer, "audience:", data.audience, "budget:", data.budget);
 
   // ── Strategic analysis ──
   const constat: Record<string, string> = {
@@ -79,28 +98,6 @@ const DiagnosticResult = () => {
     }
     return "";
   };
-
-  // ── Offer routing ──
-  const getOffer = () => {
-    const { audience, budget } = data;
-    if (budget === "0") return "EXPRESS";
-    if (budget === "1-200" || audience === "0-5k") return "ONE_SHOT";
-    if (audience === "5k-50k" && budget === "200-500") return "ONE_SHOT_PLUS_PREMIUM";
-    if (audience === "50k+" && budget === "200-500") return "PREMIUM";
-    if ((audience === "5k-50k" || audience === "50k+") && budget === "500+") return "PREMIUM";
-    return "ONE_SHOT";
-  };
-
-  const offer = getOffer();
-  console.log("[DiagnosticResult] score:", score, "scoreLabel:", scoreLabel, "offer:", offer, "audience:", data.audience, "budget:", data.budget);
-
-  // Fire result_page_viewed once
-  useEffect(() => {
-    if (!tracked) {
-      trackPostHogEvent("result_page_viewed", { maturity_score: score, recommended_offer: offer });
-      setTracked(true);
-    }
-  }, [tracked, score, offer]);
 
   const MailFooter = () => (
     <p className="text-sm text-muted-foreground mt-4">

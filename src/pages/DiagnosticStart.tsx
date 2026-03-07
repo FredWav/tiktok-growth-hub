@@ -279,8 +279,12 @@ const DiagnosticStart = () => {
                   {errors.firstName && <p className="text-destructive text-xs mt-1">{errors.firstName}</p>}
                 </div>
                 <div>
-                  <Label htmlFor="tiktokUrl">Lien de ton compte TikTok</Label>
-                  <Input id="tiktokUrl" value={data.tiktokUrl} onChange={(e) => updateField("tiktokUrl", e.target.value)} placeholder="https://tiktok.com/@toncompte" className="mt-1.5" />
+                  <Label htmlFor="tiktokHandle">Ton pseudo TikTok</Label>
+                  <div className="relative mt-1.5">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">@</span>
+                    <Input id="tiktokHandle" value={data.tiktokUrl} onChange={(e) => updateField("tiktokUrl", e.target.value.replace(/^@/, ""))} placeholder="ton_username" className="pl-8" />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">Ton pseudo TikTok, sans le @ (ex : fredwav)</p>
                   {errors.tiktokUrl && <p className="text-destructive text-xs mt-1">{errors.tiktokUrl}</p>}
                 </div>
                 <Button variant="hero" size="lg" onClick={handleIdentityNext} className="w-full mt-4">

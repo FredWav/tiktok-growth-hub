@@ -642,6 +642,39 @@ export type Database = {
           },
         ]
       }
+      trusted_clients: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_order: number
+          id: string
+          is_active: boolean
+          name: string
+          offers: string[]
+          tiktok_url: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          name: string
+          offers?: string[]
+          tiktok_url?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          offers?: string[]
+          tiktok_url?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { TrustedBy } from "@/components/TrustedBy";
 
 const steps = [
   {
@@ -304,6 +305,11 @@ export default function OneShot() {
             </div>
           </div>
         </div>
+      </Section>
+
+      {/* Social proof */}
+      <Section variant="cream" size="md">
+        <TrustedBy filter="one_shot" />
       </Section>
 
       {/* FAQ */}

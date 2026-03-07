@@ -14,6 +14,7 @@ import { useDiagnostic } from "@/contexts/DiagnosticContext";
 import { ArrowRight, ArrowLeft, Users, TrendingUp, Crown, Eye, LayoutList, Coins, ShoppingBag, Clock, Zap, Rocket, DollarSign } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
 import { trackPostHogEvent } from "@/lib/posthog";
+import { TrustedBy } from "@/components/TrustedBy";
 
 
 const TOTAL_STEPS = 7;
@@ -261,6 +262,7 @@ const DiagnosticStart = () => {
               <Button variant="hero" size="xl" onClick={() => { trackEvent("diagnostic_started"); trackPostHogEvent("diagnostic_started"); setStep(1); }} className="w-full sm:w-auto">
                 Démarrer le diagnostic <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
+              <TrustedBy filter="diagnostic" className="mt-6" />
             </div>
           )}
 

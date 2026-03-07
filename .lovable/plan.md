@@ -1,60 +1,30 @@
 
 
-## Plan : Page admin "Témoignages" avec gestion des clients accompagnés
+## Analyse de compatibilite avec la doc API complete
 
-### 1. Base de données
+### Ce qui fonctionne deja correctement
 
-Nouvelle table `trusted_clients` :
+| Aspect | Code actuel | Verdict |
+|--------|------------|---------|
+| `health_score` (nombre ou objet) | Fix applique : extrait `.total` si objet | OK |
+| Status `processing_insights` | Tombe dans le `else` → retourne `processing` au front | OK |
+| Status `completed` / `failed` | Gere explicitement | OK |
+| `ai_insights` detection | Check truthy/string vide | OK |
 
-| Colonne | Type | Notes |
-|---------|------|-------|
-| id | uuid | PK, auto |
-| name | text | Prénom/nom affiché |
-| avatar_url | text | URL de la photo de profil |
-| tiktok_url | text | Lien profil TikTok |
-| offers | text[] | Ex: `{"one_shot", "premium", "diagnostic"}` |
-| display_order | integer | Ordre d'affichage, default 0 |
-| is_active | boolean | default true |
-| created_at | timestamptz | auto |
+### Probleme identifie : `processing_insights` traite comme simple `processing`
 
-RLS : admin ALL, anon/public SELECT (les données sont affichées publiquement sur le site).
+La doc revele un statut **`processing_insights`** (progress ~97%) ou le scraping est fini mais l'IA genere encore (~2 min). Le code actuel le traite comme `processing` generique, ce qui fonctionne mais :
 
-Bucket storage public `trusted-avatars` pour uploader les photos de profil.
+1. **Le front ne sait pas** que le scraping est fini et que seule l'IA reste — l'UX pourrait afficher un message plus precis
+2. **Le `current_step`** est deja transmis au front (`job.current_step`), donc le message "Generating AI strategic insights..." devrait arriver naturellement
 
-### 2. Page admin `/admin/testimonials`
+**Verdict : pas de bug, ca fonctionne.** Le polling continue jusqu'a `completed`.
 
-Nouvelle page `src/pages/admin/Testimonials.tsx` accessible depuis la sidebar admin (icône Users/Star, label "Témoignages").
+### Seul point d'attention restant
 
-Fonctionnalités :
-- **Liste** des clients ajoutés (photo, nom, lien TikTok, offres associées, actif/inactif)
-- **Formulaire d'ajout** (dialog) : nom, upload photo, URL TikTok, sélection multiple des offres (One Shot, Premium, Diagnostic, Express), ordre d'affichage
-- **Modification** et **suppression** inline
-- **Toggle actif/inactif** pour masquer temporairement sans supprimer
+La doc montre que `health_score` a la racine du `result` est un **nombre simple** (74), pas un objet. Mais dans les donnees reelles qu'on a observees en base, c'etait un objet `{ total: 74, components: {...} }`. Le fix qu'on a applique gere les deux cas, donc c'est couvert.
 
-### 3. Composant public `TrustedBy`
+### Conclusion
 
-Nouveau composant `src/components/TrustedBy.tsx` :
-- Fetch les `trusted_clients` actifs depuis la base
-- Prop `filter?: string` pour filtrer par offre
-- Affiche avatars ronds cliquables (lien TikTok) + prénoms
-- Titre "Ils m'ont fait confiance"
-
-### 4. Intégration sur les pages publiques
-
-- **`/start` (DiagnosticStart.tsx)** : step 0, sous le CTA
-- **`/one-shot` (OneShot.tsx)** : section social proof
-- **`/45-jours` (QuarantecinqJours.tsx)** : section social proof
-- **`/offres` (Offres.tsx)** : sous les cartes d'offres
-
-### 5. Fichiers impactés
-
-| Action | Fichier |
-|--------|---------|
-| Migration | Nouvelle table + bucket storage |
-| Nouveau | `src/pages/admin/Testimonials.tsx` |
-| Nouveau | `src/hooks/useTrustedClients.ts` |
-| Nouveau | `src/components/TrustedBy.tsx` |
-| Modifié | `src/components/layout/AdminLayout.tsx` (nav item) |
-| Modifié | `src/App.tsx` (route admin) |
-| Modifié | `DiagnosticStart.tsx`, `OneShot.tsx`, `QuarantecinqJours.tsx`, `Offres.tsx` |
+**Aucune modification supplementaire necessaire.** Le code est compatible avec la doc API v1.1. Le fix `health_score` deja applique couvre les deux formats possibles (nombre ou objet avec `.total`).
 

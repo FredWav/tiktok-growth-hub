@@ -5,6 +5,7 @@ import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/tracking";
 import { SEOHead } from "@/components/SEOHead";
+import { TrustedBy } from "@/components/TrustedBy";
 
 const profileSelector = [
   { label: "Un diagnostic clair", target: "one-shot", icon: Zap },
@@ -260,6 +261,11 @@ export default function Offres() {
             </div>
           ))}
         </div>
+      </Section>
+
+      {/* Social proof */}
+      <Section variant="default" size="md">
+        <TrustedBy />
       </Section>
 
       {/* CTA */}

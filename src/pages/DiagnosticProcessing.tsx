@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useDiagnostic } from "@/contexts/DiagnosticContext";
 import { Button } from "@/components/ui/button";
 import { Loader2, ArrowRight } from "lucide-react";
+import { trackPostHogEvent } from "@/lib/posthog";
 
 const MESSAGES = [
   "Analyse du profil...",

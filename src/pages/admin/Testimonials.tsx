@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -181,32 +181,33 @@ const Testimonials = () => {
         <DialogContent className="bg-noir-light border-primary/20 text-cream">
           <DialogHeader>
             <DialogTitle>{editingId ? "Modifier" : "Ajouter"} un client</DialogTitle>
+            <DialogDescription className="text-cream/50">Remplissez les informations du client à afficher.</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div>
-              <Label>Nom</Label>
-              <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="Prénom Nom" className="mt-1" />
+              <Label className="text-cream">Nom</Label>
+              <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="Prénom Nom" className="mt-1 text-cream bg-noir border-primary/20 placeholder:text-cream/30" />
             </div>
 
             <div>
-              <Label>Photo de profil</Label>
+              <Label className="text-cream">Photo de profil</Label>
               <div className="flex items-center gap-3 mt-1">
                 <Avatar className="h-14 w-14">
                   {form.avatar_url ? <AvatarImage src={form.avatar_url} /> : null}
                   <AvatarFallback className="bg-primary/10 text-primary">?</AvatarFallback>
                 </Avatar>
-                <Input type="file" accept="image/*" onChange={handleUpload} disabled={uploading} />
+                <Input type="file" accept="image/*" onChange={handleUpload} disabled={uploading} className="text-cream bg-noir border-primary/20 file:text-cream/60" />
               </div>
             </div>
 
             <div>
-              <Label>Lien TikTok</Label>
-              <Input value={form.tiktok_url} onChange={(e) => setForm((f) => ({ ...f, tiktok_url: e.target.value }))} placeholder="https://tiktok.com/@..." className="mt-1" />
+              <Label className="text-cream">Lien TikTok</Label>
+              <Input value={form.tiktok_url} onChange={(e) => setForm((f) => ({ ...f, tiktok_url: e.target.value }))} placeholder="https://tiktok.com/@..." className="mt-1 text-cream bg-noir border-primary/20 placeholder:text-cream/30" />
             </div>
 
             <div>
-              <Label>Offres associées</Label>
+              <Label className="text-cream">Offres associées</Label>
               <div className="grid grid-cols-2 gap-2 mt-2">
                 {OFFER_OPTIONS.map((opt) => (
                   <label key={opt.value} className="flex items-center gap-2 text-sm cursor-pointer">
@@ -218,8 +219,8 @@ const Testimonials = () => {
             </div>
 
             <div>
-              <Label>Ordre d'affichage</Label>
-              <Input type="number" value={form.display_order} onChange={(e) => setForm((f) => ({ ...f, display_order: parseInt(e.target.value) || 0 }))} className="mt-1 w-24" />
+              <Label className="text-cream">Ordre d'affichage</Label>
+              <Input type="number" value={form.display_order} onChange={(e) => setForm((f) => ({ ...f, display_order: parseInt(e.target.value) || 0 }))} className="mt-1 w-24 text-cream bg-noir border-primary/20" />
             </div>
           </div>
 

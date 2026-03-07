@@ -1,30 +1,32 @@
 
 
-## Analyse de compatibilite avec la doc API complete
+## Plan : Harmoniser les events PostHog du funnel diagnostic
 
-### Ce qui fonctionne deja correctement
+Email mailto reste `fredwavcm@gmail.com`, durée d'appel reste 45 min. Seuls les events PostHog changent.
 
-| Aspect | Code actuel | Verdict |
-|--------|------------|---------|
-| `health_score` (nombre ou objet) | Fix applique : extrait `.total` si objet | OK |
-| Status `processing_insights` | Tombe dans le `else` → retourne `processing` au front | OK |
-| Status `completed` / `failed` | Gere explicitement | OK |
-| `ai_insights` detection | Check truthy/string vide | OK |
+### 1. `DiagnosticStart.tsx`
 
-### Probleme identifie : `processing_insights` traite comme simple `processing`
+- **Step 0 "Démarrer"** : ajouter `trackPostHogEvent("diagnostic_started")` dans le onClick (en plus du `trackEvent` existant)
+- **`selectOption`** : ajouter `trackPostHogEvent("step_completed", { step_name, value_selected })` — mapper field vers step_name : audience→"Audience", objectif→"Objectif", budget→"Budget", temps→"Temps"
+- **`handleIdentityNext`** (après validation) : ajouter `trackPostHogEvent("step_completed", { step_name: "Identity", value_selected: "completed" })`
+- **`handleEmailNext`** (après validation) : ajouter `trackPostHogEvent("step_completed", { step_name: "Email", value_selected: "completed" })`
+- **`handleBlockerNext`** validation échouée (150 chars) : ajouter `trackPostHogEvent("validation_error_triggered", { error_type: "min_length_150", audience_level: data.audience })`
+- **`handleBlockerNext`** submit réussi : ajouter `trackPostHogEvent("diagnostic_form_submitted", { audience: data.audience, objectif: data.objectif, budget: data.budget, time_available: data.temps })`
 
-La doc revele un statut **`processing_insights`** (progress ~97%) ou le scraping est fini mais l'IA genere encore (~2 min). Le code actuel le traite comme `processing` generique, ce qui fonctionne mais :
+### 2. `DiagnosticProcessing.tsx`
 
-1. **Le front ne sait pas** que le scraping est fini et que seule l'IA reste — l'UX pourrait afficher un message plus precis
-2. **Le `current_step`** est deja transmis au front (`job.current_step`), donc le message "Generating AI strategic insights..." devrait arriver naturellement
+- Ajouter import `trackPostHogEvent`
+- Dans le `useEffect` quand `isComplete` est true : `trackPostHogEvent("processing_screen_viewed")`
 
-**Verdict : pas de bug, ca fonctionne.** Le polling continue jusqu'a `completed`.
+### 3. `DiagnosticResult.tsx`
 
-### Seul point d'attention restant
+- **Mount useEffect** : remplacer `diagnostic_result_viewed` par `result_page_viewed` avec `{ maturity_score: score, recommended_offer: offer }`
+- **CTA Express** : ajouter `trackPostHogEvent("cta_clicked", { offer_type: "EXPRESS", destination: "/analyse-express" })`
+- **CTA One Shot** : ajouter `trackPostHogEvent("cta_clicked", { offer_type: "ONE_SHOT", destination: "/one-shot" })`
+- **CTA Premium** : ajouter `trackPostHogEvent("cta_clicked", { offer_type: "PREMIUM", destination: "calendly" })`
+- **CTA combo One Shot** : ajouter `trackPostHogEvent("cta_clicked", { offer_type: "ONE_SHOT", destination: "/one-shot" })`
+- **CTA combo Premium (secondaire)** : ajouter `trackPostHogEvent("secondary_cta_clicked", { offer_type: "PREMIUM_UPSELL" })`
+- **MailFooter** : remplacer event par `trackPostHogEvent("contact_mail_clicked", { source_offer: offer })`
 
-La doc montre que `health_score` a la racine du `result` est un **nombre simple** (74), pas un objet. Mais dans les donnees reelles qu'on a observees en base, c'etait un objet `{ total: 74, components: {...} }`. Le fix qu'on a applique gere les deux cas, donc c'est couvert.
-
-### Conclusion
-
-**Aucune modification supplementaire necessaire.** Le code est compatible avec la doc API v1.1. Le fix `health_score` deja applique couvre les deux formats possibles (nombre ou objet avec `.total`).
+Aucun changement de contenu, email ou durée d'appel.
 

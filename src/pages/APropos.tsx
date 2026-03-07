@@ -104,7 +104,7 @@ export default function APropos() {
             align="center"
           />
 
-          <div className="text-center space-y-6 text-muted-foreground text-lg">
+          <blockquote className="border-l-4 border-primary/30 pl-6 space-y-6 text-muted-foreground text-lg">
             <p>
               Je n'ai pas commencé avec les formats courts.<br />
               Mes premières vidéos remontent à mes 16 ans. J'en ai 35 cette année.
@@ -118,7 +118,7 @@ export default function APropos() {
               Les formats courts n'ont été qu'un terrain d'application supplémentaire.
             </p>
 
-            <div className="w-16 h-px bg-primary/40 mx-auto" />
+            <div className="w-16 h-px bg-primary/40" />
 
             <p>
               Comme tout le monde, j'ai posté sans stratégie au début.<br />
@@ -139,7 +139,7 @@ export default function APropos() {
               Aujourd'hui, j'accompagne plus de 300 créateurs — entrepreneurs, experts, marques —
               qui veulent transformer leur contenu en levier business.
             </p>
-          </div>
+          </blockquote>
         </div>
       </Section>
 

@@ -77,7 +77,7 @@ export default function Contact() {
               </div>
               <div>
                 <h3 className="font-semibold mb-1">Email</h3>
-                <p className="text-muted-foreground text-sm">contact@fredwav.com</p>
+                <a href="mailto:contact@fredwav.com" className="text-muted-foreground text-sm hover:text-primary transition-colors" onClick={() => trackEvent("click_email_link", { location: "contact" })}>contact@fredwav.com</a>
               </div>
             </div>
             <div className="flex items-start gap-4 flex-1">

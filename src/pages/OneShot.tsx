@@ -314,7 +314,7 @@ export default function OneShot() {
           <Accordion type="single" collapsible className="w-full">
             {faqs.map((faq, index) => (
               <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger className="text-left font-medium">
+                <AccordionTrigger className="text-left font-medium" onClick={() => trackEvent("click_faq_oneshot", { question: faq.question })}>
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">

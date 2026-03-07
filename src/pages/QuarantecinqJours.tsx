@@ -324,7 +324,7 @@ export default function QuarantecinqJours() {
           <Accordion type="single" collapsible className="w-full">
             {faqs.map((faq, index) => (
               <AccordionItem key={index} value={`faq-${index}`}>
-                <AccordionTrigger className="text-left font-medium">
+                <AccordionTrigger className="text-left font-medium" onClick={() => trackEvent("click_faq_45j", { question: faq.question })}>
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">

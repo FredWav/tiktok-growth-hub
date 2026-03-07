@@ -194,7 +194,7 @@ export default function WavPremiumApplication() {
       <Section variant="default" size="lg">
         <div className="max-w-2xl mx-auto">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(onSubmit, (errors) => trackPostHogEvent("wav_premium_form_error", { fields: Object.keys(errors).join(",") }))} onFocus={handleFormFocus} className="space-y-8">
               {/* Identity */}
               <div className="grid sm:grid-cols-2 gap-4">
                 <FormField

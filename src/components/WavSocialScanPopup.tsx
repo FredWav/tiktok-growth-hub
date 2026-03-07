@@ -53,7 +53,7 @@ export function WavSocialScanPopup() {
           <Zap className="h-3.5 w-3.5" />
           Lancer mon analyse
         </Button>
-        <Button variant="ghost" size="sm" onClick={handleClose} className="text-xs px-2">
+        <Button variant="ghost" size="sm" onClick={() => handleClose(true)} className="text-xs px-2">
           Non merci
         </Button>
       </div>

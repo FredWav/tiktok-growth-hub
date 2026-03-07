@@ -125,7 +125,7 @@ export default function Offres() {
             {profileSelector.map((item) => (
               <button
                 key={item.target}
-                onClick={() => scrollTo(item.target)}
+                onClick={() => { trackEvent("click_profile_selector", { target: item.target }); scrollTo(item.target); }}
                 className="inline-flex items-center gap-2 px-5 py-3 rounded-full border border-border bg-background text-sm font-medium hover:border-primary hover:text-primary transition-all"
               >
                 <item.icon className="h-4 w-4" />

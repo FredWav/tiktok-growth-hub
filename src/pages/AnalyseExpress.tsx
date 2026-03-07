@@ -185,6 +185,7 @@ export default function AnalyseExpress() {
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary font-semibold underline underline-offset-2 hover:text-primary/80"
+              onClick={() => trackPostHogEvent("click_wavsocialscan_link")}
             >
               Wav Social Scan
             </a>{" "}

@@ -252,6 +252,7 @@ export default function OneShotSuccess() {
               </div>
               <div className="mt-8">
                 <Button variant="ghost" onClick={() => {
+                  trackPostHogEvent("oneshot_flow_complete");
                   localStorage.removeItem("oneshot_session_id");
                   localStorage.removeItem("oneshot_form_submitted");
                   navigate("/");

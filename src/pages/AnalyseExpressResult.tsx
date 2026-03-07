@@ -147,6 +147,7 @@ export default function AnalyseExpressResult() {
     if (!username || !data?.account) return;
     setPdfLoading(true);
     trackEvent("express_pdf_download", { username });
+    trackPostHogEvent("click_pdf_download", { username });
     try {
       const pdfData = mapAccountDataForPDF(data.account, persona, pubPattern);
       const htmlContent = generateCompletePDFHTML(

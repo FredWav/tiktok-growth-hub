@@ -217,7 +217,7 @@ const DiagnosticResult = () => {
                 <Button variant="hero" size="lg" asChild className="w-full" onClick={() => trackEvent("diagnostic_cta_click", { offer: "ONE_SHOT" })}>
                   <Link to="/one-shot">Réserver mon Audit stratégique <ExternalLink className="w-4 h-4 ml-2" /></Link>
                 </Button>
-                <Button variant="outline" size="lg" asChild className="w-full" onClick={() => trackEvent("diagnostic_cta_click", { offer: "PREMIUM" })}>
+                <Button variant="outline" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer: "PREMIUM" }); trackPostHogEvent("click_calendly", { offer: "PREMIUM" }); }}>
                   <a href={CALENDLY_URL} target="_blank" rel="noopener noreferrer">
                     Découvrir Wav Premium (45 min) <ExternalLink className="w-4 h-4 ml-2" />
                   </a>

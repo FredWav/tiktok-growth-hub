@@ -1,30 +1,26 @@
 
 
-## Analyse de compatibilite avec la doc API complete
+## Diagnostic
 
-### Ce qui fonctionne deja correctement
+D'après la session replay, le dialog s'ouvre bien et tu peux cliquer dans les champs, mais **le texte saisi est invisible** car les inputs utilisent une couleur de texte sombre (`text-foreground`) sur le fond sombre du dialog (`bg-noir-light`). Le `text-cream` sur le DialogContent ne cascade pas dans les inputs qui ont leur propre style.
 
-| Aspect | Code actuel | Verdict |
-|--------|------------|---------|
-| `health_score` (nombre ou objet) | Fix applique : extrait `.total` si objet | OK |
-| Status `processing_insights` | Tombe dans le `else` → retourne `processing` au front | OK |
-| Status `completed` / `failed` | Gere explicitement | OK |
-| `ai_insights` detection | Check truthy/string vide | OK |
+Il y a aussi un warning console "Missing Description" pour le DialogContent.
 
-### Probleme identifie : `processing_insights` traite comme simple `processing`
+## Plan de correction
 
-La doc revele un statut **`processing_insights`** (progress ~97%) ou le scraping est fini mais l'IA genere encore (~2 min). Le code actuel le traite comme `processing` generique, ce qui fonctionne mais :
+### 1. Corriger la visibilité des inputs dans le dialog
 
-1. **Le front ne sait pas** que le scraping est fini et que seule l'IA reste — l'UX pourrait afficher un message plus precis
-2. **Le `current_step`** est deja transmis au front (`job.current_step`), donc le message "Generating AI strategic insights..." devrait arriver naturellement
+**Fichier : `src/pages/admin/Testimonials.tsx`**
 
-**Verdict : pas de bug, ca fonctionne.** Le polling continue jusqu'a `completed`.
+- Ajouter des classes `text-cream bg-noir border-primary/20` sur chaque `<Input>` du formulaire pour que le texte soit visible sur fond sombre
+- Ajouter les mêmes classes sur les `<Label>` si nécessaire
+- Ajouter un `<DialogDescription>` pour corriger le warning d'accessibilité
 
-### Seul point d'attention restant
+### 2. Fichiers impactés
 
-La doc montre que `health_score` a la racine du `result` est un **nombre simple** (74), pas un objet. Mais dans les donnees reelles qu'on a observees en base, c'etait un objet `{ total: 74, components: {...} }`. Le fix qu'on a applique gere les deux cas, donc c'est couvert.
+| Fichier | Modification |
+|---------|-------------|
+| `src/pages/admin/Testimonials.tsx` | Ajouter classes de style sur les inputs + DialogDescription |
 
-### Conclusion
-
-**Aucune modification supplementaire necessaire.** Le code est compatible avec la doc API v1.1. Le fix `health_score` deja applique couvre les deux formats possibles (nombre ou objet avec `.total`).
+Correction simple et ciblée, aucun changement de logique.
 

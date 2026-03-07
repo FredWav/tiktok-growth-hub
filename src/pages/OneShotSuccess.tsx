@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { trackEvent, getStoredUtmSource } from "@/lib/tracking";
-import { getPostHogId } from "@/lib/posthog";
+import { trackPostHogEvent, getPostHogId } from "@/lib/posthog";
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -65,6 +65,7 @@ export default function OneShotSuccess() {
         // Persist session_id so user can return after closing the tab
         localStorage.setItem("oneshot_session_id", sessionId);
 
+        trackPostHogEvent("oneshot_payment_verified", { session_id: sessionId });
         if (data.customer_email) {
           form.setValue("email", data.customer_email);
         }
@@ -74,6 +75,7 @@ export default function OneShotSuccess() {
         }
         setVerifyState("verified");
       } catch {
+        trackPostHogEvent("oneshot_payment_error", { session_id: sessionId || "" });
         setVerifyState("error");
       }
     };
@@ -234,7 +236,7 @@ export default function OneShotSuccess() {
                 Merci pour ces infos ! Il ne te reste plus qu'à réserver ton créneau pour notre session.
               </p>
               <Button variant="hero" size="xl" asChild>
-                <a href="https://calendly.com/fredwavcm/accompagnement-one-shot" target="_blank" rel="noopener noreferrer">
+                <a href="https://calendly.com/fredwavcm/accompagnement-one-shot" target="_blank" rel="noopener noreferrer" onClick={() => trackPostHogEvent("click_calendly_oneshot")}>
                   <Calendar className="mr-2 h-5 w-5" />
                   Réserver mon créneau
                 </a>
@@ -250,6 +252,7 @@ export default function OneShotSuccess() {
               </div>
               <div className="mt-8">
                 <Button variant="ghost" onClick={() => {
+                  trackPostHogEvent("oneshot_flow_complete");
                   localStorage.removeItem("oneshot_session_id");
                   localStorage.removeItem("oneshot_form_submitted");
                   navigate("/");

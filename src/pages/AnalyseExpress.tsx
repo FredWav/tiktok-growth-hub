@@ -185,6 +185,7 @@ export default function AnalyseExpress() {
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary font-semibold underline underline-offset-2 hover:text-primary/80"
+              onClick={() => trackPostHogEvent("click_wavsocialscan_link")}
             >
               Wav Social Scan
             </a>{" "}
@@ -221,7 +222,7 @@ export default function AnalyseExpress() {
               <Button variant="outline" className="flex-1" onClick={handleGoBack}>
                 Ha je me suis trompé !
               </Button>
-              <Button variant="hero" className="flex-1" onClick={proceedToPayment}>
+              <Button variant="hero" className="flex-1" onClick={() => { trackPostHogEvent("click_analyse_express_confirm", { username: cleanUsername }); proceedToPayment(); }}>
                 Je valide ✅
               </Button>
             </div>

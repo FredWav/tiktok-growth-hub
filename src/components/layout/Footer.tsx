@@ -2,6 +2,36 @@ import { Link } from "react-router-dom";
 import { Instagram, Youtube, Facebook } from "lucide-react";
 import { trackPostHogEvent } from "@/lib/posthog";
 
+const navLinks = [
+  { label: "Accueil", href: "/", section: "navigation" },
+  { label: "Offres", href: "/offres", section: "navigation" },
+  { label: "One Shot", href: "/one-shot", section: "navigation" },
+  { label: "Wav Premium", href: "/45-jours", section: "navigation" },
+  { label: "Analyse Express", href: "/analyse-express", section: "navigation" },
+  { label: "Témoignages", href: "/preuves", section: "navigation" },
+  { label: "À propos", href: "/a-propos", section: "navigation" },
+  { label: "Diagnostic gratuit", href: "/start", section: "navigation" },
+];
+
+const socialLinks = [
+  {
+    name: "TikTok",
+    href: "https://www.tiktok.com/@fredwav",
+    icon: (
+      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.75a8.18 8.18 0 004.77 1.52V6.84a4.84 4.84 0 01-1-.15z"/></svg>
+    ),
+  },
+  { name: "Instagram", href: "https://www.instagram.com/levraifredwav/", icon: <Instagram className="h-4 w-4" /> },
+  { name: "YouTube", href: "https://www.youtube.com/@Fredwavconseils", icon: <Youtube className="h-4 w-4" /> },
+  { name: "Facebook", href: "https://www.facebook.com/frederic.olalde", icon: <Facebook className="h-4 w-4" /> },
+];
+
+const legalLinks = [
+  { label: "Mentions légales", href: "/mentions-legales" },
+  { label: "Confidentialité", href: "/politique-de-confidentialite" },
+  { label: "CGV", href: "/cgv" },
+];
+
 export function Footer() {
   return (
     <footer className="bg-noir text-muted-foreground">
@@ -9,7 +39,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="md:col-span-1">
-            <Link to="/" className="inline-block mb-4">
+            <Link to="/" className="inline-block mb-4" onClick={() => trackPostHogEvent("click_footer_link", { item: "logo", section: "brand" })}>
               <span className="font-display text-2xl font-semibold tracking-tight text-cream">
                 Fred<span className="text-primary">Wav</span>
               </span>
@@ -24,14 +54,17 @@ export function Footer() {
           <nav aria-label="Navigation footer - Pages principales">
             <h4 className="font-semibold text-cream mb-4">Navigation</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/" className="hover:text-primary transition-colors">Accueil</Link></li>
-              <li><Link to="/offres" className="hover:text-primary transition-colors">Offres</Link></li>
-              <li><Link to="/one-shot" className="hover:text-primary transition-colors">One Shot</Link></li>
-              <li><Link to="/45-jours" className="hover:text-primary transition-colors">Wav Premium</Link></li>
-              <li><Link to="/analyse-express" className="hover:text-primary transition-colors" onClick={() => trackPostHogEvent("click_analyse_express_nav", { location: "footer" })}>Analyse Express</Link></li>
-              <li><Link to="/preuves" className="hover:text-primary transition-colors">Témoignages</Link></li>
-              <li><Link to="/a-propos" className="hover:text-primary transition-colors">À propos</Link></li>
-              <li><Link to="/start" className="hover:text-primary transition-colors">Diagnostic gratuit</Link></li>
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    to={link.href}
+                    className="hover:text-primary transition-colors"
+                    onClick={() => trackPostHogEvent("click_footer_link", { item: link.label, section: "navigation" })}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </nav>
 
@@ -39,30 +72,20 @@ export function Footer() {
           <nav aria-label="Réseaux sociaux">
             <h4 className="font-semibold text-cream mb-4">Réseaux</h4>
             <ul className="space-y-2 text-sm">
-              <li>
-                <a href="https://www.tiktok.com/@fredwav" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors flex items-center gap-2">
-                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.75a8.18 8.18 0 004.77 1.52V6.84a4.84 4.84 0 01-1-.15z"/></svg>
-                  TikTok
-                </a>
-              </li>
-              <li>
-                <a href="https://www.instagram.com/levraifredwav/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors flex items-center gap-2">
-                  <Instagram className="h-4 w-4" />
-                  Instagram
-                </a>
-              </li>
-              <li>
-                <a href="https://www.youtube.com/@Fredwavconseils" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors flex items-center gap-2">
-                  <Youtube className="h-4 w-4" />
-                  YouTube
-                </a>
-              </li>
-              <li>
-                <a href="https://www.facebook.com/frederic.olalde" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors flex items-center gap-2">
-                  <Facebook className="h-4 w-4" />
-                  Facebook
-                </a>
-              </li>
+              {socialLinks.map((s) => (
+                <li key={s.name}>
+                  <a
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-primary transition-colors flex items-center gap-2"
+                    onClick={() => trackPostHogEvent("click_social", { platform: s.name, location: "footer" })}
+                  >
+                    {s.icon}
+                    {s.name}
+                  </a>
+                </li>
+              ))}
             </ul>
           </nav>
 
@@ -70,8 +93,16 @@ export function Footer() {
           <div>
             <h4 className="font-semibold text-cream mb-4">Contact</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/contact" className="hover:text-primary transition-colors">Nous contacter</Link></li>
-              <li><a href="mailto:contact@fredwav.com" className="hover:text-primary transition-colors">contact@fredwav.com</a></li>
+              <li>
+                <Link to="/contact" className="hover:text-primary transition-colors" onClick={() => trackPostHogEvent("click_footer_link", { item: "Contact", section: "contact" })}>
+                  Nous contacter
+                </Link>
+              </li>
+              <li>
+                <a href="mailto:contact@fredwav.com" className="hover:text-primary transition-colors" onClick={() => trackPostHogEvent("click_email_link", { location: "footer" })}>
+                  contact@fredwav.com
+                </a>
+              </li>
             </ul>
           </div>
         </div>
@@ -81,9 +112,16 @@ export function Footer() {
             © {new Date().getFullYear()} Fred Wav. Tous droits réservés.
           </p>
           <nav aria-label="Mentions légales" className="flex gap-6 text-xs">
-            <Link to="/mentions-legales" className="hover:text-primary transition-colors">Mentions légales</Link>
-            <Link to="/politique-de-confidentialite" className="hover:text-primary transition-colors">Confidentialité</Link>
-            <Link to="/cgv" className="hover:text-primary transition-colors">CGV</Link>
+            {legalLinks.map((link) => (
+              <Link
+                key={link.href}
+                to={link.href}
+                className="hover:text-primary transition-colors"
+                onClick={() => trackPostHogEvent("click_footer_link", { item: link.label, section: "legal" })}
+              >
+                {link.label}
+              </Link>
+            ))}
           </nav>
         </div>
       </div>

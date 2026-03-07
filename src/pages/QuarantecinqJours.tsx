@@ -120,7 +120,7 @@ function VideoCard({ id, alt }: { id: string; alt: string }) {
 
   return (
     <button
-      onClick={() => setPlaying(true)}
+      onClick={() => { trackEvent("click_video_play", { video_id: id, location: "45j" }); setPlaying(true); }}
       className="group relative aspect-video rounded-xl overflow-hidden shadow-lg cursor-pointer w-full"
     >
       <img
@@ -287,7 +287,7 @@ export default function QuarantecinqJours() {
         </div>
 
         <div className="text-center">
-          <Button variant="premium" size="lg" asChild>
+          <Button variant="premium" size="lg" asChild onClick={() => trackEvent("click_preuves_link", { location: "45j" })}>
             <Link to="/preuves">
               Voir toutes les preuves
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -324,7 +324,7 @@ export default function QuarantecinqJours() {
           <Accordion type="single" collapsible className="w-full">
             {faqs.map((faq, index) => (
               <AccordionItem key={index} value={`faq-${index}`}>
-                <AccordionTrigger className="text-left font-medium">
+                <AccordionTrigger className="text-left font-medium" onClick={() => trackEvent("click_faq_45j", { question: faq.question })}>
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">

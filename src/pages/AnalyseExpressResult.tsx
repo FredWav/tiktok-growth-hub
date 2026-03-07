@@ -72,6 +72,7 @@ export default function AnalyseExpressResult() {
         stopPolling();
         setData(result.data);
         setLoading(false);
+        trackPostHogEvent("analyse_express_result_viewed", { username: result.username || "" });
       } else if (result.status === "failed") {
         stopPolling();
         setError(result.error || "L'analyse a échoué. Réessayez.");
@@ -147,6 +148,7 @@ export default function AnalyseExpressResult() {
     if (!username || !data?.account) return;
     setPdfLoading(true);
     trackEvent("express_pdf_download", { username });
+    trackPostHogEvent("click_pdf_download", { username });
     try {
       const pdfData = mapAccountDataForPDF(data.account, persona, pubPattern);
       const htmlContent = generateCompletePDFHTML(

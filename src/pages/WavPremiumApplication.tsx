@@ -4,9 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
-import { trackEvent } from "@/lib/tracking";
-import { getStoredUtmSource } from "@/lib/tracking";
-import { identifyUser, getPostHogId } from "@/lib/posthog";
+import { trackEvent, getStoredUtmSource } from "@/lib/tracking";
+import { trackPostHogEvent, identifyUser, getPostHogId } from "@/lib/posthog";
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -68,6 +67,7 @@ type ApplicationForm = z.infer<typeof applicationSchema>;
 export default function WavPremiumApplication() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formStarted, setFormStarted] = useState(false);
 
   const form = useForm<ApplicationForm>({
     resolver: zodResolver(applicationSchema),
@@ -86,6 +86,13 @@ export default function WavPremiumApplication() {
       conversion_trigger: "",
     },
   });
+
+  const handleFormFocus = () => {
+    if (!formStarted) {
+      setFormStarted(true);
+      trackPostHogEvent("wav_premium_form_start");
+    }
+  };
 
   const onSubmit = async (data: ApplicationForm) => {
     setIsSubmitting(true);
@@ -148,6 +155,7 @@ export default function WavPremiumApplication() {
                 href="https://calendly.com/fredwavcm/wav-premium"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackPostHogEvent("click_calendly_post_apply")}
               >
                 Réserver mon appel de qualification
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -186,7 +194,7 @@ export default function WavPremiumApplication() {
       <Section variant="default" size="lg">
         <div className="max-w-2xl mx-auto">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(onSubmit, (errors) => trackPostHogEvent("wav_premium_form_error", { fields: Object.keys(errors).join(",") }))} onFocus={handleFormFocus} className="space-y-8">
               {/* Identity */}
               <div className="grid sm:grid-cols-2 gap-4">
                 <FormField

@@ -48,6 +48,17 @@ const DiagnosticResult = () => {
     sessionStorage.setItem("from_diagnostic", "true");
   }, [isComplete, navigate]);
 
+  // Track result viewed
+  useEffect(() => {
+    if (isComplete && data) {
+      const audiencePoints: Record<string, number> = { "0-5k": 10, "5k-50k": 25, "50k+": 40 };
+      const objectifPoints: Record<string, number> = { "Visibilité": 10, "Audience": 15, "Vendre": 25, "Monétiser": 30 };
+      const budgetPoints: Record<string, number> = { "0": 0, "1-200": 10, "200-500": 20, "500+": 30 };
+      const s = (audiencePoints[data.audience] || 0) + (objectifPoints[data.objectif] || 0) + (budgetPoints[data.budget] || 0);
+      trackPostHogEvent("diagnostic_result_viewed", { score: s, audience: data.audience, budget: data.budget, objectif: data.objectif });
+    }
+  }, [isComplete, data]);
+
   if (!isComplete) return null;
 
   // ── Score calculation ──
@@ -94,7 +105,7 @@ const DiagnosticResult = () => {
   const MailFooter = () => (
     <p className="text-sm text-muted-foreground mt-4">
       Besoin d'en discuter par écrit ?{" "}
-      <a href="mailto:fredwavcm@gmail.com" className="text-primary underline underline-offset-4 hover:text-primary/80">
+      <a href="mailto:fredwavcm@gmail.com" className="text-primary underline underline-offset-4 hover:text-primary/80" onClick={() => trackPostHogEvent("click_email_contact", { location: "diagnostic_result" })}>
         Contacte-moi par mail.
       </a>
     </p>
@@ -184,7 +195,7 @@ const DiagnosticResult = () => {
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Structuration business</li>
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Scale de l'audience</li>
                 </ul>
-                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => trackEvent("diagnostic_cta_click", { offer })}>
+                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer }); trackPostHogEvent("click_calendly", { offer }); }}>
                   <a href={CALENDLY_URL} target="_blank" rel="noopener noreferrer">
                     Réserver une discussion stratégique (45 min) <ExternalLink className="w-4 h-4 ml-2" />
                   </a>
@@ -206,7 +217,7 @@ const DiagnosticResult = () => {
                 <Button variant="hero" size="lg" asChild className="w-full" onClick={() => trackEvent("diagnostic_cta_click", { offer: "ONE_SHOT" })}>
                   <Link to="/one-shot">Réserver mon Audit stratégique <ExternalLink className="w-4 h-4 ml-2" /></Link>
                 </Button>
-                <Button variant="outline" size="lg" asChild className="w-full" onClick={() => trackEvent("diagnostic_cta_click", { offer: "PREMIUM" })}>
+                <Button variant="outline" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer: "PREMIUM" }); trackPostHogEvent("click_calendly", { offer: "PREMIUM" }); }}>
                   <a href={CALENDLY_URL} target="_blank" rel="noopener noreferrer">
                     Découvrir Wav Premium (45 min) <ExternalLink className="w-4 h-4 ml-2" />
                   </a>

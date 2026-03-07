@@ -21,7 +21,8 @@ export function WavSocialScanPopup() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleClose = () => {
+  const handleClose = (dismissed = false) => {
+    if (dismissed) trackPostHogEvent("popup_dismissed", { popup: "wavsocialscan" });
     setOpen(false);
     localStorage.setItem("wavsocialscan_last_shown", Date.now().toString());
   };
@@ -37,7 +38,7 @@ export function WavSocialScanPopup() {
   return (
     <div className="fixed bottom-4 right-4 z-50 w-[340px] animate-fade-in rounded-xl border border-primary/30 bg-background shadow-lg p-4">
       <button
-        onClick={handleClose}
+        onClick={() => handleClose(true)}
         className="absolute top-2 right-2 text-muted-foreground hover:text-foreground transition-colors"
         aria-label="Fermer"
       >
@@ -52,7 +53,7 @@ export function WavSocialScanPopup() {
           <Zap className="h-3.5 w-3.5" />
           Lancer mon analyse
         </Button>
-        <Button variant="ghost" size="sm" onClick={handleClose} className="text-xs px-2">
+        <Button variant="ghost" size="sm" onClick={() => handleClose(true)} className="text-xs px-2">
           Non merci
         </Button>
       </div>

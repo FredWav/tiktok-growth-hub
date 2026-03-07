@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { initPostHog } from "@/lib/posthog";
+import { initPostHog, trackPostHogEvent } from "@/lib/posthog";
 
 const GA_ID = "G-E361JPZX7D";
 
@@ -49,6 +49,8 @@ export function CookieConsent() {
     localStorage.setItem("cookie_consent", "accepted");
     enableGA();
     initPostHog();
+    // Track after init so PostHog is ready
+    setTimeout(() => trackPostHogEvent("cookie_consent_accepted"), 100);
     setVisible(false);
   };
 

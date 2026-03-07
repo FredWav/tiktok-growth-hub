@@ -41,9 +41,7 @@ export function Header() {
                     : "text-muted-foreground"
                 }`}
                 onClick={() => {
-                  if (item.href === "/analyse-express") {
-                    trackPostHogEvent("click_analyse_express_nav", { location: "header" });
-                  }
+                  trackPostHogEvent("click_nav", { item: item.label, location: "header" });
                 }}
               >
                 {item.label}
@@ -54,14 +52,14 @@ export function Header() {
           {/* CTA Button */}
           <div className="hidden lg:block">
             <Button asChild>
-              <Link to="/one-shot">Réserver mon One Shot (179€)</Link>
+              <Link to="/one-shot" onClick={() => trackPostHogEvent("click_nav_cta", { location: "header" })}>Réserver mon One Shot (179€)</Link>
             </Button>
           </div>
 
           {/* Mobile Menu Button */}
           <button
             className="lg:hidden p-2"
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={() => { const next = !isOpen; setIsOpen(next); trackPostHogEvent("toggle_mobile_menu", { open: next }); }}
             aria-label="Toggle menu"
           >
             {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -82,9 +80,7 @@ export function Header() {
                       : "text-muted-foreground"
                   }`}
                   onClick={() => {
-                    if (item.href === "/analyse-express") {
-                      trackPostHogEvent("click_analyse_express_nav", { location: "header_mobile" });
-                    }
+                    trackPostHogEvent("click_nav", { item: item.label, location: "header_mobile" });
                     setIsOpen(false);
                   }}
                 >
@@ -92,7 +88,7 @@ export function Header() {
                 </Link>
               ))}
               <Button asChild className="mt-2">
-                <Link to="/one-shot" onClick={() => setIsOpen(false)}>
+                <Link to="/one-shot" onClick={() => { trackPostHogEvent("click_nav_cta", { location: "header_mobile" }); setIsOpen(false); }}>
                   Réserver mon One Shot (179€)
                 </Link>
               </Button>

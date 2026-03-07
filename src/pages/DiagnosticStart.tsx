@@ -140,6 +140,7 @@ const DiagnosticStart = () => {
     setErrors({});
     console.log("[Diagnostic] Email validated → step 7");
     trackEvent("diagnostic_step_email", { email: data.email });
+    trackPostHogEvent("step_completed", { step_name: "Email", value_selected: "completed" });
     saveLead({ email: data.email }, 6);
     setStep(7);
   };

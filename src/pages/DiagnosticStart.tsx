@@ -67,6 +67,8 @@ const DiagnosticStart = () => {
   const progress = step === 0 ? 0 : Math.round((Math.min(step, TOTAL_STEPS) / TOTAL_STEPS) * 100);
 
   const saveLead = async (fields: Record<string, any>, currentStep: number, completed = false) => {
+    const mode = leadIdRef.current ? "UPDATE" : "INSERT";
+    console.log(`[Diagnostic] saveLead — mode=${mode}, step=${currentStep}, completed=${completed}, fields=`, fields);
     try {
       if (!leadIdRef.current) {
         const { data: row, error } = await supabase
@@ -74,15 +76,25 @@ const DiagnosticStart = () => {
           .insert({ ...fields, current_step: currentStep, completed } as any)
           .select("id")
           .single();
-        if (!error && row) leadIdRef.current = (row as any).id;
+        if (error) {
+          console.error("[Diagnostic] INSERT error:", error);
+        } else if (row) {
+          leadIdRef.current = (row as any).id;
+          console.log("[Diagnostic] INSERT success, leadId=", leadIdRef.current);
+        }
       } else {
-        await supabase
+        const { error } = await supabase
           .from("diagnostic_leads" as any)
           .update({ ...fields, current_step: currentStep, completed } as any)
           .eq("id", leadIdRef.current);
+        if (error) {
+          console.error("[Diagnostic] UPDATE error:", error);
+        } else {
+          console.log("[Diagnostic] UPDATE success, leadId=", leadIdRef.current);
+        }
       }
     } catch (e) {
-      console.error("Error saving diagnostic lead:", e);
+      console.error("[Diagnostic] saveLead exception:", e);
     }
   };
 

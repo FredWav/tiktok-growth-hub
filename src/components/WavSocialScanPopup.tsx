@@ -38,7 +38,7 @@ export function WavSocialScanPopup() {
   return (
     <div className="fixed bottom-4 right-4 z-50 w-[340px] animate-fade-in rounded-xl border border-primary/30 bg-background shadow-lg p-4">
       <button
-        onClick={handleClose}
+        onClick={() => handleClose(true)}
         className="absolute top-2 right-2 text-muted-foreground hover:text-foreground transition-colors"
         aria-label="Fermer"
       >

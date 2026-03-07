@@ -1,30 +1,52 @@
 
 
-## Analyse de compatibilite avec la doc API complete
+## Plan : 3 changements UX (Diagnostic TikTok handle, Blocage choix multiples, OneShot formulaire pré-paiement)
 
-### Ce qui fonctionne deja correctement
+### Changement 1 — DiagnosticStart.tsx : Champ @handle TikTok (Step 1)
 
-| Aspect | Code actuel | Verdict |
-|--------|------------|---------|
-| `health_score` (nombre ou objet) | Fix applique : extrait `.total` si objet | OK |
-| Status `processing_insights` | Tombe dans le `else` → retourne `processing` au front | OK |
-| Status `completed` / `failed` | Gere explicitement | OK |
-| `ai_insights` detection | Check truthy/string vide | OK |
+**Fichier** : `src/pages/DiagnosticStart.tsx`
 
-### Probleme identifie : `processing_insights` traite comme simple `processing`
+- Remplacer `identitySchema.tiktokUrl` : validation `.url()` → `.regex(/^[a-zA-Z0-9_.]+$/, "Pseudo invalide")` avec `.min(2)`.max(50)
+- Step 1 JSX : label "Ton pseudo TikTok", input avec `@` préfixé (span absolute + `pl-8`), placeholder "ton_username", texte d'aide sous le champ
+- `handleIdentityNext` : valider avec `tiktokHandle` au lieu de `tiktokUrl` dans le schema, mais stocker dans `data.tiktokUrl` (pas de modif du context)
+- `handleBlockerNext` : `notifyPayload.tiktok` utilise `data.tiktokUrl` (inchangé, c'est le handle maintenant)
 
-La doc revele un statut **`processing_insights`** (progress ~97%) ou le scraping est fini mais l'IA genere encore (~2 min). Le code actuel le traite comme `processing` generique, ce qui fonctionne mais :
+Note : Le DiagnosticContext garde le champ `tiktokUrl` comme nom de clé — on y stocke simplement le handle au lieu de l'URL. Aucune modif du context.
 
-1. **Le front ne sait pas** que le scraping est fini et que seule l'IA reste — l'UX pourrait afficher un message plus precis
-2. **Le `current_step`** est deja transmis au front (`job.current_step`), donc le message "Generating AI strategic insights..." devrait arriver naturellement
+### Changement 2 — DiagnosticStart.tsx : Blocage en choix multiples (Step 7)
 
-**Verdict : pas de bug, ca fonctionne.** Le polling continue jusqu'a `completed`.
+**Fichier** : `src/pages/DiagnosticStart.tsx`
 
-### Seul point d'attention restant
+- Remplacer le contenu du Step 7 par 8 `OptionCard` + option "Autre" qui révèle un Textarea court
+- Ajouter les icônes manquantes dans les imports lucide : `HelpCircle` est déjà importé via OneShot mais pas dans DiagnosticStart → à ajouter
+- `handleBlockerNext` : supprimer la logique `minChars` / validation 150 caractères. Garder juste `if (!data.blocage.trim())` → erreur
+- Icônes utilisées : `HelpCircle`, `Eye`, `Users`, `ShoppingBag`, `Clock`, `TrendingUp`, `DollarSign`, `Zap` (la plupart déjà importées)
 
-La doc montre que `health_score` a la racine du `result` est un **nombre simple** (74), pas un objet. Mais dans les donnees reelles qu'on a observees en base, c'etait un objet `{ total: 74, components: {...} }`. Le fix qu'on a applique gere les deux cas, donc c'est couvert.
+### Changement 3 — OneShot : Formulaire avant paiement
 
-### Conclusion
+**Fichiers** : `src/pages/OneShot.tsx` et `src/pages/OneShotSuccess.tsx`
 
-**Aucune modification supplementaire necessaire.** Le code est compatible avec la doc API v1.1. Le fix `health_score` deja applique couvre les deux formats possibles (nombre ou objet avec `.total`).
+**OneShot.tsx** :
+- Ajouter imports : `useForm`, `zodResolver`, `z`, composants Form, Textarea, Label, Input
+- Schema Zod `preCheckoutSchema` (name, whatsapp, tiktok, objectives)
+- `useForm` avec le schema
+- `handleCheckout` accepte `formData?` → sauvegarde en `sessionStorage("oneshot_pre_form")` avant redirect Stripe
+- Hero : remplacer le bouton seul par le formulaire + bouton submit
+- Footer CTA : scroll to top au lieu de `handleCheckout()`
+
+**OneShotSuccess.tsx** :
+- Dans `useEffect` après vérification : lire `sessionStorage("oneshot_pre_form")`, auto-submit via `send-oneshot-form`, marquer `oneshot_form_submitted`
+- Supprimer tout le state `step`, `useForm`, le formulaire JSX
+- Afficher directement : message de confirmation + bouton Calendly + fallback email
+- Supprimer imports inutiles (useForm, zodResolver, z, Form components, Textarea)
+
+### Fichiers impactés
+
+| Fichier | Action |
+|---------|--------|
+| `src/pages/DiagnosticStart.tsx` | Modifié (step 1 + step 7 + handleBlockerNext + handleIdentityNext) |
+| `src/pages/OneShot.tsx` | Modifié (ajout formulaire pré-checkout) |
+| `src/pages/OneShotSuccess.tsx` | Modifié (suppression formulaire, auto-submit, affichage direct Calendly) |
+
+Aucun autre fichier modifié. DiagnosticContext, edge functions, et composants UI restent intacts.
 

@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Zap, BarChart3, FileText, TrendingUp, Search } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
+import { trackPostHogEvent } from "@/lib/posthog";
 import { SEOHead } from "@/components/SEOHead";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";

@@ -204,7 +204,7 @@ const DiagnosticResult = () => {
                 </Button>
                 <Button variant="outline" size="lg" asChild className="w-full" onClick={() => trackEvent("diagnostic_cta_click", { offer: "PREMIUM" })}>
                   <a href={CALENDLY_URL} target="_blank" rel="noopener noreferrer">
-                    Découvrir Wav Premium <ExternalLink className="w-4 h-4 ml-2" />
+                    Découvrir Wav Premium (45 min) <ExternalLink className="w-4 h-4 ml-2" />
                   </a>
                 </Button>
                 <MailFooter />

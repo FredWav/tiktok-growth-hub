@@ -176,7 +176,7 @@ export default function QuarantecinqJours() {
           </p>
 
           <p className="text-lg font-semibold mb-8 text-gold-gradient">
-            987 € — Tarif préférentiel de 799 € pour les alumni One Shot.
+            987 € - Tarif préférentiel de 799 € pour les alumni One Shot.
           </p>
 
           <Button

@@ -137,7 +137,7 @@ export default function WavPremiumApplication() {
     return (
       <Layout>
         <SEOHead
-          title="Candidature envoyée — Wav Premium | Fred Wav"
+          title="Candidature envoyée - Wav Premium | Fred Wav"
           description="Ta candidature au Wav Premium a bien été envoyée. Réserve ton appel de qualification."
           path="/wav-premium/candidature"
         />

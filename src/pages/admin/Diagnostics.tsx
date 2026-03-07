@@ -153,21 +153,21 @@ const Diagnostics = () => {
                     <TableCell className="text-cream font-medium">
                       {lead.first_name || ""} {lead.last_name || ""}
                     </TableCell>
-                    <TableCell className="text-cream/80">{lead.email || "—"}</TableCell>
-                    <TableCell className="text-cream/80">{lead.tiktok || "—"}</TableCell>
+                    <TableCell className="text-cream/80">{lead.email || "-"}</TableCell>
+                    <TableCell className="text-cream/80">{lead.tiktok || "-"}</TableCell>
                     <TableCell>
                       <Badge variant="outline" className="text-cream/70 border-cream/20">
                         {stepLabels[lead.current_step] || `${lead.current_step}`}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-cream/80">
-                      {lead.budget ? budgetLabels[lead.budget] || lead.budget : "—"}
+                      {lead.budget ? budgetLabels[lead.budget] || lead.budget : "-"}
                     </TableCell>
                     <TableCell className="text-cream/80">
-                      {lead.temps || "—"}
+                      {lead.temps || "-"}
                     </TableCell>
                     <TableCell className="text-cream/80">
-                      {lead.recommended_offer ? offerLabels[lead.recommended_offer] || lead.recommended_offer : "—"}
+                      {lead.recommended_offer ? offerLabels[lead.recommended_offer] || lead.recommended_offer : "-"}
                     </TableCell>
                     <TableCell>
                       <Badge variant={lead.completed ? "default" : "destructive"}>
@@ -198,31 +198,31 @@ const Diagnostics = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-cream/50 text-sm">Email</p>
-                    <p>{selected.email || "—"}</p>
+                    <p>{selected.email || "-"}</p>
                   </div>
                   <div>
                     <p className="text-cream/50 text-sm">TikTok</p>
-                    <p>{selected.tiktok || "—"}</p>
+                    <p>{selected.tiktok || "-"}</p>
                   </div>
                   <div>
                     <p className="text-cream/50 text-sm">Niveau (audience)</p>
-                    <p>{selected.level || "—"}</p>
+                    <p>{selected.level || "-"}</p>
                   </div>
                   <div>
                     <p className="text-cream/50 text-sm">Objectif</p>
-                    <p>{selected.objective || "—"}</p>
+                    <p>{selected.objective || "-"}</p>
                   </div>
                   <div>
                     <p className="text-cream/50 text-sm">Budget</p>
-                    <p>{selected.budget ? budgetLabels[selected.budget] || selected.budget : "—"}</p>
+                    <p>{selected.budget ? budgetLabels[selected.budget] || selected.budget : "-"}</p>
                   </div>
                   <div>
                     <p className="text-cream/50 text-sm">Temps/semaine</p>
-                    <p>{selected.temps || "—"}</p>
+                    <p>{selected.temps || "-"}</p>
                   </div>
                   <div>
                     <p className="text-cream/50 text-sm">Offre recommandée</p>
-                    <p>{selected.recommended_offer ? offerLabels[selected.recommended_offer] || selected.recommended_offer : "—"}</p>
+                    <p>{selected.recommended_offer ? offerLabels[selected.recommended_offer] || selected.recommended_offer : "-"}</p>
                   </div>
                   <div>
                     <p className="text-cream/50 text-sm">Étape atteinte</p>

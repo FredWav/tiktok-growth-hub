@@ -218,10 +218,10 @@ function MobileTestimonialCarousel({ testimonials }: { testimonials: Testimonial
         {testimonials.map((testimonial, index) => (
           <div key={index} className="flex-[0_0_92%] min-w-0 pl-3 first:pl-0">
             <Card className="h-full">
-              <CardContent className="p-6">
+              <CardContent className="p-6 flex flex-col h-full">
                 <Quote className="h-8 w-8 text-primary/30 mb-4" />
-                <p className="text-muted-foreground mb-4">{testimonial.content}</p>
-                <div className="flex items-center justify-between">
+                <p className="text-muted-foreground mb-4 flex-1">{testimonial.content}</p>
+                <div className="flex items-center justify-between mt-auto">
                   <div>
                     <div className="font-semibold">{testimonial.name}</div>
                     <div className="text-sm text-muted-foreground">{testimonial.role}</div>
@@ -333,10 +333,10 @@ export default function Preuves() {
         <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {testimonials.map((testimonial, index) => (
             <Card key={index} className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
+              <CardContent className="p-6 flex flex-col h-full">
                 <Quote className="h-8 w-8 text-primary/30 mb-4" />
-                <p className="text-muted-foreground mb-4">{testimonial.content}</p>
-                <div className="flex items-center justify-between">
+                <p className="text-muted-foreground mb-4 flex-1">{testimonial.content}</p>
+                <div className="flex items-center justify-between mt-auto">
                   <div>
                     <div className="font-semibold">{testimonial.name}</div>
                     <div className="text-sm text-muted-foreground">{testimonial.role}</div>
@@ -443,17 +443,19 @@ export default function Preuves() {
               </div>
               <h3 className="font-semibold text-lg mb-2">{offer.title}</h3>
               <p className="text-sm text-muted-foreground mb-4">{offer.description}</p>
-              <Button
-                variant="premium"
-                size="sm"
-                asChild
-                onClick={() => trackEvent(offer.trackEvent, { location: "preuves_bottom" })}
-              >
-                <Link to={offer.href}>
-                  {offer.cta}
-                  <ArrowRight className="ml-2 h-3 w-3" />
-                </Link>
-              </Button>
+              <div className="flex justify-center">
+                <Button
+                  variant="premium"
+                  size="sm"
+                  asChild
+                  onClick={() => trackEvent(offer.trackEvent, { location: "preuves_bottom" })}
+                >
+                  <Link to={offer.href}>
+                    {offer.cta}
+                    <ArrowRight className="ml-2 h-3 w-3" />
+                  </Link>
+                </Button>
+              </div>
             </div>
           ))}
         </div>

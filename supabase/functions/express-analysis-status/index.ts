@@ -74,7 +74,7 @@ async function sendResultEmail(email: string, username: string, sessionId: strin
           </p>
         </div>
         <div style="border-top: 1px solid #333; padding-top: 20px; text-align: center;">
-          <p style="color: #666; font-size: 12px;">FredWav — Coaching TikTok</p>
+          <p style="color: #666; font-size: 12px;">FredWav - Coaching TikTok</p>
         </div>
       </div>`;
 

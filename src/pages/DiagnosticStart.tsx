@@ -234,7 +234,7 @@ const DiagnosticStart = () => {
         </div>
       )}
 
-      <div className="flex-1 flex items-center justify-center px-4 py-12 md:py-20">
+      <div className="flex-1 flex items-center justify-center px-4 py-12 md:py-20 min-h-[80vh]">
         <div className="w-full max-w-2xl">
           {step >= 1 && step <= TOTAL_STEPS && (
             <Button

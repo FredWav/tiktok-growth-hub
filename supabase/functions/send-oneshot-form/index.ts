@@ -79,9 +79,9 @@ Deno.serve(async (req) => {
             { name: "📱 WhatsApp", value: whatsapp, inline: true },
             { name: "🎵 TikTok", value: tiktok, inline: true },
             { name: "🎯 Objectifs", value: objectives.slice(0, 1024) },
-            { name: "📍 Source", value: origin_source || "—", inline: true },
-            { name: "🔥 Déclencheur", value: conversion_trigger || "—", inline: true },
-            { name: "📊 PostHog", value: posthog_id ? `[Voir](https://us.posthog.com/person/${posthog_id})` : "—", inline: true },
+            { name: "📍 Source", value: origin_source || "-", inline: true },
+            { name: "🔥 Déclencheur", value: conversion_trigger || "-", inline: true },
+            { name: "📊 PostHog", value: posthog_id ? `[Voir](https://us.posthog.com/person/${posthog_id})` : "-", inline: true },
           ],
           timestamp: new Date().toISOString(),
         }],
@@ -119,9 +119,9 @@ Deno.serve(async (req) => {
               <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">WhatsApp</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(whatsapp)}</td></tr>
               <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Compte TikTok</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(tiktok)}</td></tr>
               <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; vertical-align: top;">Objectifs</td><td style="padding: 12px; border-bottom: 1px solid #eee; white-space: pre-wrap;">${escapeHtml(objectives)}</td></tr>
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Source</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(origin_source || "—")}</td></tr>
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Déclencheur</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(conversion_trigger || "—")}</td></tr>
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">PostHog ID</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(posthog_id || "—")}</td></tr>
+              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Source</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(origin_source || "-")}</td></tr>
+              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Déclencheur</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(conversion_trigger || "-")}</td></tr>
+              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">PostHog ID</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(posthog_id || "-")}</td></tr>
             </table>
           </div>`;
 
@@ -133,7 +133,7 @@ Deno.serve(async (req) => {
         await transporter.sendMail({
           from: "noreply@fredwav.com",
           to: "fredwavcm@gmail.com",
-          subject: `🎯 Nouvelle réservation One Shot — ${name}`,
+          subject: `🎯 Nouvelle réservation One Shot - ${name}`,
           html: htmlBody,
         });
         console.log("Email sent for", name);

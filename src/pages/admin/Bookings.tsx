@@ -87,7 +87,7 @@ const Bookings = () => {
                     <TableCell className="text-cream font-medium">{sub.name}</TableCell>
                     <TableCell className="text-cream/80">{sub.email}</TableCell>
                     <TableCell className="text-cream/80">{sub.whatsapp}</TableCell>
-                    <TableCell className="text-cream/80">{sub.tiktok ? `@${sub.tiktok}` : "—"}</TableCell>
+                    <TableCell className="text-cream/80">{sub.tiktok ? `@${sub.tiktok}` : "-"}</TableCell>
                     <TableCell className="text-cream/80 max-w-[200px] truncate">{sub.objectives}</TableCell>
                   </TableRow>
                 ))}
@@ -119,7 +119,7 @@ const Bookings = () => {
                   </div>
                   <div>
                     <p className="text-cream/50 text-sm">TikTok</p>
-                    <p>{selected.tiktok ? `@${selected.tiktok}` : "—"}</p>
+                    <p>{selected.tiktok ? `@${selected.tiktok}` : "-"}</p>
                   </div>
                   <div>
                     <p className="text-cream/50 text-sm">Stripe Session</p>

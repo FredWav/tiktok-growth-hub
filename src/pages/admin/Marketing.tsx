@@ -249,16 +249,16 @@ export default function AdminMarketing() {
         posthog_id: a.posthog_id, email: a.email || null,
       }));
       const diags: Lead[] = ((diagRes.data as any[]) || []).map((d: any) => ({
-        date: d.created_at, name: [d.first_name, d.last_name].filter(Boolean).join(" ") || "—",
+        date: d.created_at, name: [d.first_name, d.last_name].filter(Boolean).join(" ") || "-",
         offer: "Diagnostic", source: d.origin_source, follower_since: d.follower_since,
         current_revenue: null, posthog_id: d.posthog_id, email: d.email || null,
       }));
       const oneshots: Lead[] = ((oneshotRes.data as any[]) || []).map((o: any) => ({
-        date: o.created_at, name: o.name || "—", offer: "One Shot", source: o.origin_source,
+        date: o.created_at, name: o.name || "-", offer: "One Shot", source: o.origin_source,
         follower_since: null, current_revenue: null, posthog_id: o.posthog_id, email: o.email || null,
       }));
       const express: Lead[] = ((expressRes.data as any[]) || []).map((e: any) => ({
-        date: e.created_at, name: e.tiktok_username || e.email || "—", offer: "Analyse Express",
+        date: e.created_at, name: e.tiktok_username || e.email || "-", offer: "Analyse Express",
         source: null, follower_since: null, current_revenue: null, posthog_id: null, email: e.email || null,
       }));
 
@@ -314,7 +314,7 @@ export default function AdminMarketing() {
     return Math.round((leads.filter((l) => l.source).length / leads.length) * 100);
   }, [leads]);
 
-  // pipelineValue removed — now using monthlyRevenue from bookings query
+  // pipelineValue removed - now using monthlyRevenue from bookings query
 
   const lineChartConfig = { leads: { label: "Leads", color: "hsl(43, 74%, 49%)" } };
   const barChartConfig = { value: { label: "Leads", color: "hsl(43, 74%, 49%)" } };
@@ -608,7 +608,7 @@ export default function AdminMarketing() {
                 <div className="bg-noir rounded-lg p-4 border border-primary/10 text-center">
                   <div className="flex items-center justify-center gap-1.5 mb-1">
                     <DollarSign className="h-4 w-4 text-primary" />
-                    <p className="text-2xl font-bold text-primary">{monthlyRevenue > 0 ? `${monthlyRevenue.toLocaleString("fr-FR")} €` : "—"}</p>
+                    <p className="text-2xl font-bold text-primary">{monthlyRevenue > 0 ? `${monthlyRevenue.toLocaleString("fr-FR")} €` : "-"}</p>
                   </div>
                   <p className="text-xs text-cream/60">CA du mois</p>
                 </div>
@@ -745,9 +745,9 @@ export default function AdminMarketing() {
                             {lead.offer}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-cream/70 text-sm">{lead.source || "—"}</TableCell>
-                        <TableCell className="text-cream/70 text-sm">{lead.follower_since || "—"}</TableCell>
-                        <TableCell className="text-cream/70 text-sm">{lead.current_revenue || "—"}</TableCell>
+                        <TableCell className="text-cream/70 text-sm">{lead.source || "-"}</TableCell>
+                        <TableCell className="text-cream/70 text-sm">{lead.follower_since || "-"}</TableCell>
+                        <TableCell className="text-cream/70 text-sm">{lead.current_revenue || "-"}</TableCell>
                         <TableCell>
                           {lead.posthog_id ? (
                             <a
@@ -759,7 +759,7 @@ export default function AdminMarketing() {
                               Voir <ExternalLink className="h-3 w-3" />
                             </a>
                           ) : (
-                            <span className="text-cream/40 text-sm">—</span>
+                            <span className="text-cream/40 text-sm">-</span>
                           )}
                         </TableCell>
                       </TableRow>

@@ -81,13 +81,13 @@ const Applications = () => {
                     </TableCell>
                     <TableCell className="text-cream/80">{app.email}</TableCell>
                     <TableCell className="text-cream/80">
-                      {app.tiktok_username ? `@${app.tiktok_username}` : "—"}
+                      {app.tiktok_username ? `@${app.tiktok_username}` : "-"}
                     </TableCell>
                     <TableCell className="text-cream/80 max-w-[200px] truncate">
                       {app.current_level}
                     </TableCell>
                     <TableCell className="text-cream/80">
-                      {app.origin_source || "—"}
+                      {app.origin_source || "-"}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -117,7 +117,7 @@ const Applications = () => {
                   </div>
                   <div>
                     <p className="text-cream/50 text-sm">TikTok</p>
-                    <p>{selected.tiktok_username ? `@${selected.tiktok_username}` : "—"}</p>
+                    <p>{selected.tiktok_username ? `@${selected.tiktok_username}` : "-"}</p>
                   </div>
                   <div>
                     <p className="text-cream/50 text-sm">Niveau</p>
@@ -125,19 +125,19 @@ const Applications = () => {
                   </div>
                   <div>
                     <p className="text-cream/50 text-sm">CA actuel</p>
-                    <p>{selected.current_revenue || "—"}</p>
+                    <p>{selected.current_revenue || "-"}</p>
                   </div>
                   <div>
                     <p className="text-cream/50 text-sm">Objectif CA</p>
-                    <p>{selected.revenue_goal || "—"}</p>
+                    <p>{selected.revenue_goal || "-"}</p>
                   </div>
                   <div>
                     <p className="text-cream/50 text-sm">Source</p>
-                    <p>{selected.origin_source || "—"}</p>
+                    <p>{selected.origin_source || "-"}</p>
                   </div>
                   <div>
                     <p className="text-cream/50 text-sm">Follower depuis</p>
-                    <p>{selected.follower_since || "—"}</p>
+                    <p>{selected.follower_since || "-"}</p>
                   </div>
                 </div>
                 <div>

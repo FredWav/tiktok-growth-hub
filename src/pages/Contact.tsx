@@ -97,12 +97,14 @@ export default function Contact() {
             <p className="text-muted-foreground text-sm mb-6">
               Pas besoin d'attendre. Réserve un One Shot et on en parle directement.
             </p>
-            <Button variant="hero" size="lg" asChild onClick={() => trackEvent("cta_one_shot_click", { location: "contact" })}>
-              <Link to="/one-shot">
-                Réserver mon One Shot (179€)
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button variant="hero" size="lg" asChild onClick={() => trackEvent("cta_one_shot_click", { location: "contact" })}>
+                <Link to="/one-shot">
+                  Réserver mon One Shot (179€)
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </Section>

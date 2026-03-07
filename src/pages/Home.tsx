@@ -66,6 +66,17 @@ const proofs = [
 ];
 
 const offers = [
+    {
+    icon: Crown,
+    title: "VIP",
+    subtitle: "Progresser dans la durée",
+    description: "Lives hebdo, feedback Discord 5/7, ressources exclusives. Le cadre continu des créateurs ambitieux.",
+    price: "À partir de 99€/mois",
+    cta: "Rejoindre le VIP",
+    href: "/offres/vip",
+    recommended: false,
+    trackEvent: "cta_vip_click",
+  },
   {
     icon: Zap,
     title: "One Shot",
@@ -87,18 +98,7 @@ const offers = [
     href: "/45-jours",
     recommended: false,
     trackEvent: "cta_45j_click",
-  },
-  {
-    icon: Crown,
-    title: "VIP",
-    subtitle: "Progresser dans la durée",
-    description: "Lives hebdo, feedback Discord 5/7, ressources exclusives. Le cadre continu des créateurs ambitieux.",
-    price: "À partir de 99€/mois",
-    cta: "Rejoindre le VIP",
-    href: "/offres/vip",
-    recommended: false,
-    trackEvent: "cta_vip_click",
-  },
+  }
 ];
 
 const faqItems = [
@@ -248,8 +248,8 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="text-center mt-8">
-          <Button variant="hero" size="xl" asChild onClick={() => trackEvent("cta_one_shot_click", { location: "deliverables" })}>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in mt-8">
+          <Button variant="hero" size="xl" asChild onClick={() => trackEvent("cta_one_shot_click", { location: "body" })}>
             <Link to="/one-shot">
               Réserver mon One Shot (179€)
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -294,13 +294,13 @@ export default function Home() {
           subtitle="Trois formules, trois niveaux d'engagement."
         />
 
-        <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+        <div className="flex flex-col md:flex-row md:items-stretch gap-6 lg:gap-8 max-w-5xl mx-auto">
           {offers.map((offer) => (
             <Card
               key={offer.title}
-              className={`relative flex flex-col transition-all duration-300 hover:shadow-lg ${
+              className={`relative flex flex-col flex-1 basis-0 min-w-0 transition-all duration-300 hover:shadow-lg ${
                 offer.recommended
-                  ? "border-primary shadow-gold md:-mt-4 md:mb-4"
+                  ? "border-primary shadow-gold"
                   : "border-border hover:border-primary/50"
               }`}
             >
@@ -312,7 +312,7 @@ export default function Home() {
                 </div>
               )}
 
-              <CardHeader className="text-center pb-4">
+              <CardHeader className="text-center pt-8 pb-4">
                 <div className={`mx-auto mb-4 p-3 rounded-full ${offer.recommended ? "bg-primary/10" : "bg-muted"}`}>
                   <offer.icon className={`h-6 w-6 ${offer.recommended ? "text-primary" : "text-muted-foreground"}`} />
                 </div>
@@ -323,22 +323,24 @@ export default function Home() {
               <CardContent className="flex-1 flex flex-col">
                 <p className="text-muted-foreground text-center mb-6 text-sm flex-1">{offer.description}</p>
 
-                <div className="text-center mb-6">
-                  <span className="text-2xl font-semibold">{offer.price}</span>
-                </div>
+                <div className="mt-auto">
+                  <div className="text-center mb-6">
+                    <span className="text-2xl font-semibold">{offer.price}</span>
+                  </div>
 
-                <Button
-                  variant={offer.recommended ? "hero" : "premium"}
-                  size="lg"
-                  className="w-full"
-                  asChild
-                  onClick={() => trackEvent(offer.trackEvent, { location: "choose_section" })}
-                >
-                  <Link to={offer.href}>
-                    {offer.cta}
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
+                  <Button
+                    variant={offer.recommended ? "hero" : "premium"}
+                    size="lg"
+                    className="w-full"
+                    asChild
+                    onClick={() => trackEvent(offer.trackEvent, { location: "choose_section" })}
+                  >
+                    <Link to={offer.href}>
+                      {offer.cta}
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
@@ -376,12 +378,14 @@ export default function Home() {
           <p className="text-cream/70 text-lg mb-8">
             Commence par un One Shot. 1h30 pour clarifier ta stratégie, sans engagement sur la suite.
           </p>
-          <Button variant="hero" size="xl" asChild onClick={() => trackEvent("cta_one_shot_click", { location: "footer_cta" })}>
-            <Link to="/one-shot">
-              Réserver mon One Shot (179€)
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button variant="hero" size="xl" asChild onClick={() => trackEvent("cta_one_shot_click", { location: "bottom" })}>
+              <Link to="/one-shot">
+                Réserver mon One Shot (179€)
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+          </div>
           <p className="text-xs text-cream/50 mt-4">Paiement en 3x avec Klarna et 4x avec PayPal disponible, sous réserve d'acceptation.</p>
         </div>
       </Section>

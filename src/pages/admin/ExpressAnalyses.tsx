@@ -248,10 +248,10 @@ const ExpressAnalyses = () => {
                         )}
                       </TableCell>
                       <TableCell className="text-cream/80">
-                        {analysis.health_score != null ? `${analysis.health_score}/100` : "—"}
+                        {analysis.health_score != null ? `${analysis.health_score}/100` : "-"}
                       </TableCell>
                       <TableCell className="text-red-400 text-sm max-w-[200px] truncate">
-                        {analysis.error_message || "—"}
+                        {analysis.error_message || "-"}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
@@ -279,7 +279,7 @@ const ExpressAnalyses = () => {
                             <Loader2 className="h-4 w-4 animate-spin text-cream/40" />
                           )}
                           {!canDownload && !showRetry && !isProcessing && !isRetrying && (
-                            <span className="text-cream/30">—</span>
+                            <span className="text-cream/30">-</span>
                           )}
                         </div>
                       </TableCell>

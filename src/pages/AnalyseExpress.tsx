@@ -109,7 +109,7 @@ export default function AnalyseExpress() {
             Entre ton @ TikTok, paye 11,90€, et reçois un diagnostic complet de ton compte avec un rapport PDF téléchargeable.
           </p>
           <p className="text-sm text-muted-foreground/70 mb-10">
-            Disponible uniquement pour TikTok pour le moment — d'autres plateformes arrivent bientôt.
+            Disponible uniquement pour TikTok pour le moment, d'autres plateformes arrivent bientôt.
           </p>
 
           {/* Form */}

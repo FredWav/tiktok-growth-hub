@@ -893,7 +893,7 @@ body {
         <!-- FOOTER -->
         <div class="footer avoid-break">
           <div class="footer-brand">⚡ FredWav</div>
-          <p>Analyse TikTok Express — Rapport généré le ${dateStr}</p>
+          <p>Analyse TikTok Express - Rapport généré le ${dateStr}</p>
           <p><a href="https://fredwav.com" target="_blank">fredwav.com</a></p>
         </div>
       </div>

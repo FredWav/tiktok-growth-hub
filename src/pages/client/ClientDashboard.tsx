@@ -55,7 +55,7 @@ const ClientDashboard: React.FC = () => {
                 </div>
                 <div className="flex-1">
                   <p className="text-cream font-medium">Mes RDV</p>
-                  <p className="text-cream/60 text-sm">Prochain : —</p>
+                  <p className="text-cream/60 text-sm">Prochain : -</p>
                 </div>
                 <ArrowRight className="h-5 w-5 text-cream/40 group-hover:text-primary transition-colors" />
               </div>

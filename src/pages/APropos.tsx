@@ -66,7 +66,7 @@ export default function APropos() {
             </h1>
             <p className="text-lg text-muted-foreground mb-6">
               Stratégiste en contenu et formats courts, j'accompagne entrepreneurs et créateurs 
-              à construire une présence qui génère des clients — pas juste des likes.
+              à construire une présence qui génère des clients, pas juste des likes.
             </p>
             <p className="text-muted-foreground">
               Mon approche est simple : stratégie, analyse, performance mesurable. 
@@ -136,7 +136,7 @@ export default function APropos() {
               De là est née une méthode structurée.
             </p>
             <p>
-              Aujourd'hui, j'accompagne plus de 300 créateurs — entrepreneurs, experts, marques —
+              Aujourd'hui, j'accompagne plus de 300 créateurs, entrepreneurs, experts, marques,
               qui veulent transformer leur contenu en levier business.
             </p>
           </blockquote>
@@ -145,25 +145,20 @@ export default function APropos() {
 
       {/* Philosophie */}
       <Section variant="cream" size="lg">
-        <div className="max-w-3xl mx-auto">
-          <SectionHeader
-            title="Ma philosophie"
-            align="center"
-          />
+        <div className="max-w-2xl mx-auto text-center space-y-8">
+          <SectionHeader title="Ma philosophie" align="center" />
 
-          <blockquote className="border-l-4 border-primary/30 pl-6 space-y-6 text-muted-foreground text-lg">
-            <p className="text-foreground font-semibold">
-              Chaque contenu doit servir un objectif.
+          <p className="text-muted-foreground text-lg">
+            Un contenu qui ne génère ni autorité, ni audience qualifiée, ni clients
+            est un divertissement personnel. Pas une stratégie.
+          </p>
+
+          <div className="border-t border-border pt-8">
+            <p className="font-display font-semibold text-3xl md:text-4xl text-foreground leading-snug">
+              "On ne poste pas pour exister.<br />
+              On poste pour convertir."
             </p>
-            <p>
-              Un contenu qui ne génère ni autorité, ni audience qualifiée, ni clients
-              est un divertissement personnel. Pas une stratégie.
-            </p>
-            <p className="text-foreground font-display font-semibold text-2xl md:text-3xl leading-snug">
-              On ne poste pas pour exister.<br />
-              On poste pour convertir.
-            </p>
-          </blockquote>
+          </div>
         </div>
       </Section>
 

@@ -46,7 +46,7 @@ export function WavSocialScanPopup() {
       </button>
       <p className="font-semibold text-sm mb-1">⚡ Analyse ton compte en 2 min</p>
       <p className="text-xs text-muted-foreground mb-3">
-        Health score, métriques clés et recommandations. Rapport PDF inclus — 11,90€.
+        Health score, métriques clés et recommandations. Rapport PDF inclus pour 11,90€.
       </p>
       <div className="flex gap-2">
         <Button size="sm" onClick={handleGo} className="flex-1 gap-1.5 text-xs">

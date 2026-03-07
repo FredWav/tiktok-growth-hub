@@ -200,9 +200,9 @@ export default function OneShot() {
                     <FormMessage />
                   </FormItem>
                 )} />
-                <Button type="submit" variant="hero" size="xl" className="w-full" disabled={loading}>
-                  {loading ? "Redirection..." : "Réserver et payer mon One Shot (179€)"}
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                <Button type="submit" variant="hero" size="xl" className="w-full h-auto py-4 whitespace-normal text-center" disabled={loading}>
+                  {loading ? "Redirection..." : "Réserver et payer (179€)"}
+                  <ArrowRight className="ml-2 h-5 w-5 shrink-0" />
                 </Button>
               </form>
             </Form>
@@ -401,10 +401,15 @@ export default function OneShot() {
             179€ pour repartir avec un plan d'action clair.
             Pas de bullshit, que du concret.
           </p>
-          <Button variant="hero" size="xl" onClick={() => { trackEvent("cta_one_shot_click", { location: "oneshot_footer" }); document.getElementById("oneshot-form")?.scrollIntoView({ behavior: "smooth" }); }}>
-            Réserver mon One Shot (179€)
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{ animationDelay: "0.2s" }}>
+            <Button variant="hero" size="xl" onClick={() => { trackEvent("cta_one_shot_click", { location: "oneshot_footer" }); document.getElementById("oneshot-form")?.scrollIntoView({ behavior: "smooth" }); }}>
+              <span className="inline-flex items-center gap-2">
+                Réserver mon One Shot (179€)
+                <ArrowRight className="h-5 w-5 shrink-0" />
+              </span>
+            </Button>
+          </div>
           <p className="text-xs text-muted-foreground mt-3">
             Paiement en 3x avec Klarna et 4x avec PayPal disponible, sous réserve d'acceptation.
           </p>

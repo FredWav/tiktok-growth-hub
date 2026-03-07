@@ -11,9 +11,9 @@ const DISCORD_WEBHOOK_URL =
   "https://discord.com/api/webhooks/1476936142149390498/PWhNWcdB4iqoFrfF7dFAdhpeMDwuLPNjvGiuZxp_0ubpjdxncA2UFTHcXMZzPiXtT6Bg";
 
 const LEVEL_LABELS: Record<string, string> = {
-  beginner: "Débutant — teste encore son positionnement",
-  intermediate: "Intermédiaire — publie mais stagne",
-  advanced: "Avancé — fait des vues mais ne convertit pas",
+  beginner: "Débutant - teste encore son positionnement",
+  intermediate: "Intermédiaire - publie mais stagne",
+  advanced: "Avancé - fait des vues mais ne convertit pas",
   "0-5k": "0-5k abonnés",
   "5k-50k": "5k-50k abonnés",
   "50k+": "50k+ abonnés",
@@ -71,13 +71,13 @@ Deno.serve(async (req) => {
     // ── 1. Discord webhook ──
     try {
       const fields = [
-        { name: "🎵 TikTok", value: tiktok || "—", inline: true },
-        { name: "📊 Niveau", value: LEVEL_LABELS[level] || level || "—", inline: false },
-        { name: "🎯 Objectif", value: OBJECTIVE_LABELS[objective] || objective || "—", inline: false },
-        { name: "🚧 Blocage", value: (blocker || "—").slice(0, 1024), inline: false },
-        { name: "💰 Budget", value: BUDGET_LABELS[budget] || budget || "—", inline: true },
-        { name: "⏱️ Temps/semaine", value: temps || "—", inline: true },
-        { name: "🏷️ Offre recommandée", value: OFFER_LABELS[recommended_offer] || recommended_offer || "—", inline: true },
+        { name: "🎵 TikTok", value: tiktok || "-", inline: true },
+        { name: "📊 Niveau", value: LEVEL_LABELS[level] || level || "-", inline: false },
+        { name: "🎯 Objectif", value: OBJECTIVE_LABELS[objective] || objective || "-", inline: false },
+        { name: "🚧 Blocage", value: (blocker || "-").slice(0, 1024), inline: false },
+        { name: "💰 Budget", value: BUDGET_LABELS[budget] || budget || "-", inline: true },
+        { name: "⏱️ Temps/semaine", value: temps || "-", inline: true },
+        { name: "🏷️ Offre recommandée", value: OFFER_LABELS[recommended_offer] || recommended_offer || "-", inline: true },
       ];
       if (email) {
         fields.unshift({ name: "📧 Email", value: email, inline: true });
@@ -123,13 +123,13 @@ Deno.serve(async (req) => {
               <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
                 <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; width: 160px;">Nom</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(first_name)} ${escapeHtml(last_name || "")}</td></tr>
                 <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Email</td><td style="padding: 12px; border-bottom: 1px solid #eee;"><a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></td></tr>
-                <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">TikTok</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(tiktok || "—")}</td></tr>
-                <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Niveau</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(LEVEL_LABELS[level] || level || "—")}</td></tr>
-                <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Objectif</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(OBJECTIVE_LABELS[objective] || objective || "—")}</td></tr>
-                <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; vertical-align: top;">Blocage</td><td style="padding: 12px; border-bottom: 1px solid #eee; white-space: pre-wrap;">${escapeHtml(blocker || "—")}</td></tr>
-                <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Budget</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(BUDGET_LABELS[budget] || budget || "—")}</td></tr>
-                <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Temps/semaine</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(temps || "—")}</td></tr>
-                <tr style="background: #f9f6f1;"><td style="padding: 12px; font-weight: bold; color: #c8a97e;">Offre recommandée</td><td style="padding: 12px; font-weight: bold; color: #c8a97e;">${escapeHtml(OFFER_LABELS[recommended_offer] || recommended_offer || "—")}</td></tr>
+                <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">TikTok</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(tiktok || "-")}</td></tr>
+                <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Niveau</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(LEVEL_LABELS[level] || level || "-")}</td></tr>
+                <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Objectif</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(OBJECTIVE_LABELS[objective] || objective || "-")}</td></tr>
+                <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; vertical-align: top;">Blocage</td><td style="padding: 12px; border-bottom: 1px solid #eee; white-space: pre-wrap;">${escapeHtml(blocker || "-")}</td></tr>
+                <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Budget</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(BUDGET_LABELS[budget] || budget || "-")}</td></tr>
+                <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Temps/semaine</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(temps || "-")}</td></tr>
+                <tr style="background: #f9f6f1;"><td style="padding: 12px; font-weight: bold; color: #c8a97e;">Offre recommandée</td><td style="padding: 12px; font-weight: bold; color: #c8a97e;">${escapeHtml(OFFER_LABELS[recommended_offer] || recommended_offer || "-")}</td></tr>
               </table>
             </div>`;
 
@@ -141,7 +141,7 @@ Deno.serve(async (req) => {
           await transporter.sendMail({
             from: "noreply@fredwav.com",
             to: "fredwavcm@gmail.com",
-            subject: `🩺 Nouveau diagnostic — ${first_name} ${last_name || ""}`.trim(),
+            subject: `🩺 Nouveau diagnostic - ${first_name} ${last_name || ""}`.trim(),
             html: htmlBody,
           });
           console.log("Email sent for", first_name);

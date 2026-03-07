@@ -307,6 +307,11 @@ export default function OneShot() {
         </div>
       </Section>
 
+      {/* Social proof */}
+      <Section variant="cream" size="md">
+        <TrustedBy filter="one_shot" />
+      </Section>
+
       {/* FAQ */}
       <Section variant="default" size="lg">
         <SectionHeader title="Questions fréquentes" />

@@ -37,6 +37,7 @@ const navItems = [
   { label: "Candidatures", href: "/admin/applications", icon: ClipboardList },
   { label: "Diagnostics", href: "/admin/diagnostics", icon: Stethoscope },
   { label: "Marketing", href: "/admin/marketing", icon: BarChart3 },
+  { label: "Témoignages", href: "/admin/testimonials", icon: Star },
   { label: "Paramètres", href: "/admin/settings", icon: Settings },
 ];
 

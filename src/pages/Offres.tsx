@@ -263,6 +263,11 @@ export default function Offres() {
         </div>
       </Section>
 
+      {/* Social proof */}
+      <Section variant="default" size="md">
+        <TrustedBy />
+      </Section>
+
       {/* CTA */}
       <Section variant="cream" size="lg">
         <div className="max-w-2xl mx-auto text-center">

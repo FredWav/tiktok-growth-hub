@@ -317,6 +317,11 @@ export default function QuarantecinqJours() {
         </div>
       </Section>
 
+      {/* Social proof */}
+      <Section variant="cream" size="md">
+        <TrustedBy filter="premium" />
+      </Section>
+
       {/* FAQ */}
       <Section variant="default" size="lg">
         <SectionHeader title="Questions fréquentes" />

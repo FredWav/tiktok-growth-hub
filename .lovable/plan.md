@@ -1,30 +1,26 @@
 
 
-## Analyse de compatibilite avec la doc API complete
+## Plan : Mise en forme des sections "Mon parcours", "Ma philosophie" et transition icon "Ma façon de travailler"
 
-### Ce qui fonctionne deja correctement
+### 1. Sections "Mon parcours" et "Ma philosophie" — Centrer les titres + mise en forme
 
-| Aspect | Code actuel | Verdict |
-|--------|------------|---------|
-| `health_score` (nombre ou objet) | Fix applique : extrait `.total` si objet | OK |
-| Status `processing_insights` | Tombe dans le `else` → retourne `processing` au front | OK |
-| Status `completed` / `failed` | Gere explicitement | OK |
-| `ai_insights` detection | Check truthy/string vide | OK |
+**Fichier** : `src/pages/APropos.tsx`
 
-### Probleme identifie : `processing_insights` traite comme simple `processing`
+- **Parcours (ligne 102-105)** : Changer `align="left"` en `align="center"` sur le `SectionHeader`
+- **Parcours contenu (lignes 107-139)** : Structurer visuellement le texte avec des blocs distincts. Ajouter des séparateurs ou des mises en exergue sur les phrases clés (ex: "De là est née une méthode structurée" en `text-foreground font-semibold`). Centrer le wrapper `text-center` sur les paragraphes courts pour un rendu plus aéré.
+- **Philosophie (ligne 146-148)** : Changer `align="left"` en `align="center"` sur le `SectionHeader`
+- **Philosophie contenu (lignes 151-163)** : Centrer le texte (`text-center`), mettre en valeur la phrase forte "On ne poste pas pour exister. On poste pour convertir." avec un style plus impactant (taille plus grande, bordure gold à gauche ou quote style).
 
-La doc revele un statut **`processing_insights`** (progress ~97%) ou le scraping est fini mais l'IA genere encore (~2 min). Le code actuel le traite comme `processing` generique, ce qui fonctionne mais :
+### 2. Section "Ma façon de travailler" — Transition smooth sur le background de l'icon
 
-1. **Le front ne sait pas** que le scraping est fini et que seule l'IA reste — l'UX pourrait afficher un message plus precis
-2. **Le `current_step`** est deja transmis au front (`job.current_step`), donc le message "Generating AI strategic insights..." devrait arriver naturellement
+**Fichier** : `src/pages/APropos.tsx`
 
-**Verdict : pas de bug, ca fonctionne.** Le polling continue jusqu'a `completed`.
+- Lignes 179 et 194 : Le `group-hover:from-primary/25 group-hover:to-primary/10` utilise des classes de gradient qui ne s'animent pas de manière fluide avec `transition-all` car Tailwind ne peut pas transitionner les stops de gradient CSS.
+- **Fix** : Remplacer l'approche gradient par une approche avec deux couches superposées (un div de base + un div hover en `opacity-0 group-hover:opacity-100 transition-opacity duration-300`) ou plus simplement utiliser `bg-primary/10 group-hover:bg-primary/20 transition-colors duration-300` au lieu du gradient, ce qui permet une vraie transition CSS fluide.
 
-### Seul point d'attention restant
+### Fichiers impactés
 
-La doc montre que `health_score` a la racine du `result` est un **nombre simple** (74), pas un objet. Mais dans les donnees reelles qu'on a observees en base, c'etait un objet `{ total: 74, components: {...} }`. Le fix qu'on a applique gere les deux cas, donc c'est couvert.
-
-### Conclusion
-
-**Aucune modification supplementaire necessaire.** Le code est compatible avec la doc API v1.1. Le fix `health_score` deja applique couvre les deux formats possibles (nombre ou objet avec `.total`).
+| Fichier | Modifications |
+|---------|--------------|
+| `src/pages/APropos.tsx` | Centrer titres Parcours/Philosophie, mise en forme texte, fix transition icon |
 

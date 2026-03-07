@@ -22,6 +22,8 @@ const DiagnosticProcessing = () => {
     if (!isComplete) {
       console.log("[DiagnosticProcessing] Redirecting to /start (incomplete)");
       navigate("/start", { replace: true });
+    } else {
+      trackPostHogEvent("processing_screen_viewed");
     }
   }, [isComplete, navigate]);
 

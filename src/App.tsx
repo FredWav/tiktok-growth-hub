@@ -82,6 +82,7 @@ const App = () => (
         <CookieConsent />
         <ScrollToTop />
         <PostHogPageTracker />
+        <DiagnosticProvider>
         <AuthProvider>
           <Routes>
             {/* Public routes */}

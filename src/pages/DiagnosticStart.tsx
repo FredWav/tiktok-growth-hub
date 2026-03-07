@@ -155,18 +155,9 @@ const DiagnosticStart = () => {
   };
 
   const handleBlockerNext = () => {
-    const minChars = data.audience === "5k-50k" || data.audience === "50k+" ? 150 : 10;
-    console.log("[Diagnostic] handleBlockerNext — blocage length:", data.blocage.trim().length, "minChars:", minChars);
-    if (data.blocage.trim().length < minChars) {
-      console.log("[Diagnostic] Blocage too short");
-      if (minChars === 150) {
-        trackPostHogEvent("validation_error_triggered", { error_type: "min_length_150", audience_level: data.audience });
-      }
-      setErrors({
-        blocage: minChars === 150
-          ? "Merci de détailler ton blocage (min. 150 caractères) pour une analyse précise."
-          : "Sois plus précis (10 caractères minimum)",
-      });
+    console.log("[Diagnostic] handleBlockerNext — blocage:", data.blocage.trim());
+    if (!data.blocage.trim()) {
+      setErrors({ blocage: "Sélectionne une option" });
       return;
     }
     setErrors({});

@@ -39,7 +39,9 @@ const DiagnosticResult = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("[DiagnosticResult] isComplete:", isComplete, "data:", data);
     if (!isComplete) {
+      console.log("[DiagnosticResult] Redirecting to /start (incomplete)");
       navigate("/start", { replace: true });
     }
     sessionStorage.setItem("from_diagnostic", "true");
@@ -86,6 +88,7 @@ const DiagnosticResult = () => {
   };
 
   const offer = getOffer();
+  console.log("[DiagnosticResult] score:", score, "scoreLabel:", scoreLabel, "offer:", offer, "audience:", data.audience, "budget:", data.budget);
 
   const MailFooter = () => (
     <p className="text-sm text-muted-foreground mt-4">

@@ -67,6 +67,8 @@ const DiagnosticStart = () => {
   const progress = step === 0 ? 0 : Math.round((Math.min(step, TOTAL_STEPS) / TOTAL_STEPS) * 100);
 
   const saveLead = async (fields: Record<string, any>, currentStep: number, completed = false) => {
+    const mode = leadIdRef.current ? "UPDATE" : "INSERT";
+    console.log(`[Diagnostic] saveLead — mode=${mode}, step=${currentStep}, completed=${completed}, fields=`, fields);
     try {
       if (!leadIdRef.current) {
         const { data: row, error } = await supabase
@@ -74,15 +76,25 @@ const DiagnosticStart = () => {
           .insert({ ...fields, current_step: currentStep, completed } as any)
           .select("id")
           .single();
-        if (!error && row) leadIdRef.current = (row as any).id;
+        if (error) {
+          console.error("[Diagnostic] INSERT error:", error);
+        } else if (row) {
+          leadIdRef.current = (row as any).id;
+          console.log("[Diagnostic] INSERT success, leadId=", leadIdRef.current);
+        }
       } else {
-        await supabase
+        const { error } = await supabase
           .from("diagnostic_leads" as any)
           .update({ ...fields, current_step: currentStep, completed } as any)
           .eq("id", leadIdRef.current);
+        if (error) {
+          console.error("[Diagnostic] UPDATE error:", error);
+        } else {
+          console.log("[Diagnostic] UPDATE success, leadId=", leadIdRef.current);
+        }
       }
     } catch (e) {
-      console.error("Error saving diagnostic lead:", e);
+      console.error("[Diagnostic] saveLead exception:", e);
     }
   };
 
@@ -97,28 +109,34 @@ const DiagnosticStart = () => {
   };
 
   const handleIdentityNext = () => {
+    console.log("[Diagnostic] handleIdentityNext — firstName:", data.firstName, "tiktokUrl:", data.tiktokUrl);
     const result = identitySchema.safeParse({ firstName: data.firstName, tiktokUrl: data.tiktokUrl });
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
       result.error.errors.forEach((e) => { if (e.path[0]) fieldErrors[e.path[0] as string] = e.message; });
+      console.log("[Diagnostic] Identity validation failed:", fieldErrors);
       setErrors(fieldErrors);
       return;
     }
     setErrors({});
+    console.log("[Diagnostic] Identity validated → step 2");
     trackEvent("diagnostic_step_identity", { tiktok: data.tiktokUrl });
     saveLead({ first_name: data.firstName, tiktok: data.tiktokUrl }, 1);
     setStep(2);
   };
 
   const handleEmailNext = () => {
+    console.log("[Diagnostic] handleEmailNext — email:", data.email);
     const result = emailSchema.safeParse({ email: data.email });
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
       result.error.errors.forEach((e) => { if (e.path[0]) fieldErrors[e.path[0] as string] = e.message; });
+      console.log("[Diagnostic] Email validation failed:", fieldErrors);
       setErrors(fieldErrors);
       return;
     }
     setErrors({});
+    console.log("[Diagnostic] Email validated → step 7");
     trackEvent("diagnostic_step_email", { email: data.email });
     saveLead({ email: data.email }, 6);
     setStep(7);
@@ -126,7 +144,9 @@ const DiagnosticStart = () => {
 
   const handleBlockerNext = () => {
     const minChars = data.audience === "5k-50k" || data.audience === "50k+" ? 150 : 10;
+    console.log("[Diagnostic] handleBlockerNext — blocage length:", data.blocage.trim().length, "minChars:", minChars);
     if (data.blocage.trim().length < minChars) {
+      console.log("[Diagnostic] Blocage too short");
       setErrors({
         blocage: minChars === 150
           ? "Merci de détailler ton blocage (min. 150 caractères) pour une analyse précise."
@@ -135,37 +155,55 @@ const DiagnosticStart = () => {
       return;
     }
     setErrors({});
+    const recommendedOffer = getRecommendedOffer();
+    console.log("[Diagnostic] handleBlockerNext — recommendedOffer:", recommendedOffer);
+    console.log("[Diagnostic] Full context:", {
+      firstName: data.firstName,
+      tiktokUrl: data.tiktokUrl,
+      audience: data.audience,
+      objectif: data.objectif,
+      budget: data.budget,
+      temps: data.temps,
+      email: data.email,
+      blocage: data.blocage.substring(0, 50) + "...",
+      recommendedOffer,
+    });
     trackEvent("diagnostic_completed", {
       audience: data.audience,
       objectif: data.objectif,
       budget: data.budget,
       temps: data.temps,
-      recommended_offer: getRecommendedOffer(),
+      recommended_offer: recommendedOffer,
     });
     saveLead(
-      { blocker: data.blocage, recommended_offer: getRecommendedOffer() },
+      { blocker: data.blocage, recommended_offer: recommendedOffer },
       7,
       true
     );
-    // Fire-and-forget notification
-    supabase.functions.invoke("notify-diagnostic", {
-      body: {
-        first_name: data.firstName,
-        email: data.email,
-        tiktok: data.tiktokUrl,
-        level: data.audience,
-        objective: data.objectif,
-        blocker: data.blocage,
-        budget: data.budget,
-        temps: data.temps,
-        recommended_offer: getRecommendedOffer(),
-      },
-    });
+    // Notification with response logging
+    const notifyPayload = {
+      first_name: data.firstName,
+      email: data.email,
+      tiktok: data.tiktokUrl,
+      level: data.audience,
+      objective: data.objectif,
+      blocker: data.blocage,
+      budget: data.budget,
+      temps: data.temps,
+      recommended_offer: recommendedOffer,
+    };
+    console.log("[Diagnostic] notify-diagnostic payload:", notifyPayload);
+    supabase.functions.invoke("notify-diagnostic", { body: notifyPayload }).then(
+      (res) => console.log("[Diagnostic] notify-diagnostic response:", res),
+      (err) => console.error("[Diagnostic] notify-diagnostic error:", err)
+    );
     sessionStorage.setItem("from_diagnostic", "true");
+    console.log("[Diagnostic] Navigating to /processing");
     navigate("/processing");
   };
 
   const selectOption = (field: keyof typeof data, value: string, dbField: string, stepNum: number) => {
+    console.log(`[Diagnostic] selectOption — field=${field}, value=${value}, dbField=${dbField}, step=${stepNum} → ${stepNum + 1}`);
     updateField(field, value);
     trackEvent(`diagnostic_step_${field}`, { [field]: value });
     saveLead({ [dbField]: value }, stepNum);

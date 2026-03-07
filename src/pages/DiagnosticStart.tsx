@@ -356,7 +356,7 @@ const DiagnosticStart = () => {
           )}
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 

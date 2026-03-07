@@ -101,24 +101,27 @@ export default function APropos() {
         <div className="max-w-3xl mx-auto">
           <SectionHeader
             title="Mon parcours"
-            align="left"
+            align="center"
           />
 
-          <div className="prose prose-lg max-w-none text-muted-foreground space-y-4">
+          <div className="text-center space-y-6 text-muted-foreground text-lg">
             <p>
               Je n'ai pas commencé avec les formats courts.<br />
               Mes premières vidéos remontent à mes 16 ans. J'en ai 35 cette année.
             </p>
             <p>
-              Ça fait 18 ans que je filme, monte, expérimente.<br />
-              20 ans que je fais de la musique.<br />
-              13 ans que je travaille le son, l'enregistrement et la technique.
+              Ça fait <span className="text-foreground font-semibold">18 ans</span> que je filme, monte, expérimente.<br />
+              <span className="text-foreground font-semibold">20 ans</span> que je fais de la musique.<br />
+              <span className="text-foreground font-semibold">13 ans</span> que je travaille le son, l'enregistrement et la technique.
             </p>
             <p>
               Les formats courts n'ont été qu'un terrain d'application supplémentaire.
             </p>
+
+            <div className="w-16 h-px bg-primary/40 mx-auto" />
+
             <p>
-              Comme tout le monde, j'ai posté sans stratégie au début.
+              Comme tout le monde, j'ai posté sans stratégie au début.<br />
               Puis j'ai décidé de comprendre la plateforme en profondeur.
             </p>
             <p>
@@ -129,11 +132,11 @@ export default function APropos() {
               Comparé médiane et moyenne.
               Compris les signaux faibles.
             </p>
-            <p>
+            <p className="text-foreground font-semibold text-xl">
               De là est née une méthode structurée.
             </p>
             <p>
-              Aujourd'hui, j'accompagne plus de 300 créateurs — entrepreneurs, experts, marques — 
+              Aujourd'hui, j'accompagne plus de 300 créateurs — entrepreneurs, experts, marques —
               qui veulent transformer leur contenu en levier business.
             </p>
           </div>
@@ -145,21 +148,23 @@ export default function APropos() {
         <div className="max-w-3xl mx-auto">
           <SectionHeader
             title="Ma philosophie"
-            align="left"
+            align="center"
           />
 
-          <div className="prose prose-lg max-w-none text-muted-foreground space-y-4">
-            <p>
-              <strong>Chaque contenu doit servir un objectif.</strong>
+          <div className="text-center space-y-6 text-muted-foreground text-lg">
+            <p className="text-foreground font-semibold">
+              Chaque contenu doit servir un objectif.
             </p>
             <p>
-              Un contenu qui ne génère ni autorité, ni audience qualifiée, ni clients 
+              Un contenu qui ne génère ni autorité, ni audience qualifiée, ni clients
               est un divertissement personnel. Pas une stratégie.
             </p>
-            <p className="text-foreground font-semibold text-xl">
-              On ne poste pas pour exister.<br />
-              On poste pour convertir.
-            </p>
+            <div className="max-w-md mx-auto border-l-4 border-primary py-4 px-6">
+              <p className="text-foreground font-display font-semibold text-2xl md:text-3xl leading-snug">
+                On ne poste pas pour exister.<br />
+                On poste pour convertir.
+              </p>
+            </div>
           </div>
         </div>
       </Section>
@@ -176,7 +181,7 @@ export default function APropos() {
               key={index}
               className="group bg-background rounded-2xl p-8 border border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-[0_8px_30px_-12px_hsl(var(--primary)/0.15)]"
             >
-              <div className="w-14 h-14 bg-gradient-to-br from-primary/15 to-primary/5 rounded-xl flex items-center justify-center mb-5 group-hover:from-primary/25 group-hover:to-primary/10 transition-all duration-300">
+              <div className="w-14 h-14 bg-primary/10 group-hover:bg-primary/20 rounded-xl flex items-center justify-center mb-5 transition-colors duration-300">
                 <value.icon className="h-6 w-6 text-primary" strokeWidth={1.5} />
               </div>
               <h3 className="font-display font-semibold text-xl mb-3">{value.title}</h3>
@@ -191,7 +196,7 @@ export default function APropos() {
               key={index + 3}
               className="group bg-background rounded-2xl p-8 border border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-[0_8px_30px_-12px_hsl(var(--primary)/0.15)]"
             >
-              <div className="w-14 h-14 bg-gradient-to-br from-primary/15 to-primary/5 rounded-xl flex items-center justify-center mb-5 group-hover:from-primary/25 group-hover:to-primary/10 transition-all duration-300">
+              <div className="w-14 h-14 bg-primary/10 group-hover:bg-primary/20 rounded-xl flex items-center justify-center mb-5 transition-colors duration-300">
                 <value.icon className="h-6 w-6 text-primary" strokeWidth={1.5} />
               </div>
               <h3 className="font-display font-semibold text-xl mb-3">{value.title}</h3>

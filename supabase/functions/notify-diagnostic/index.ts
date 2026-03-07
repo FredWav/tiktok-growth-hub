@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { first_name, last_name, email, tiktok, level, objective, blocker, budget, recommended_offer } =
+    const { first_name, last_name, email, tiktok, level, objective, blocker, budget, temps, recommended_offer } =
       await req.json();
 
     if (!first_name) {

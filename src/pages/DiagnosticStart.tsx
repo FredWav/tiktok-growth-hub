@@ -211,8 +211,10 @@ const DiagnosticStart = () => {
 
   const selectOption = (field: keyof typeof data, value: string, dbField: string, stepNum: number) => {
     console.log(`[Diagnostic] selectOption — field=${field}, value=${value}, dbField=${dbField}, step=${stepNum} → ${stepNum + 1}`);
+    const stepNameMap: Record<string, string> = { audience: "Audience", objectif: "Objectif", budget: "Budget", temps: "Temps" };
     updateField(field, value);
     trackEvent(`diagnostic_step_${field}`, { [field]: value });
+    trackPostHogEvent("step_completed", { step_name: stepNameMap[field] || field, value_selected: value });
     saveLead({ [dbField]: value }, stepNum);
     setTimeout(() => setStep(stepNum + 1), 250);
   };

@@ -182,7 +182,7 @@ const DiagnosticStart = () => {
       />
 
       {step > 0 && step <= TOTAL_STEPS && (
-        <div className="fixed top-0 left-0 right-0 z-50">
+        <div className="fixed top-16 md:top-20 left-0 right-0 z-40">
           <Progress value={progress} className="h-1.5 rounded-none" />
         </div>
       )}

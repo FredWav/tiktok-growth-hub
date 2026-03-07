@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { trackEvent, getStoredUtmSource } from "@/lib/tracking";
-import { getPostHogId } from "@/lib/posthog";
+import { trackPostHogEvent, getPostHogId } from "@/lib/posthog";
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";

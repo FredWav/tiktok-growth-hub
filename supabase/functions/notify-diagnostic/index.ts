@@ -128,6 +128,7 @@ Deno.serve(async (req) => {
                 <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Objectif</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(OBJECTIVE_LABELS[objective] || objective || "—")}</td></tr>
                 <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; vertical-align: top;">Blocage</td><td style="padding: 12px; border-bottom: 1px solid #eee; white-space: pre-wrap;">${escapeHtml(blocker || "—")}</td></tr>
                 <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Budget</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(BUDGET_LABELS[budget] || budget || "—")}</td></tr>
+                <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Temps/semaine</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(temps || "—")}</td></tr>
                 <tr style="background: #f9f6f1;"><td style="padding: 12px; font-weight: bold; color: #c8a97e;">Offre recommandée</td><td style="padding: 12px; font-weight: bold; color: #c8a97e;">${escapeHtml(OFFER_LABELS[recommended_offer] || recommended_offer || "—")}</td></tr>
               </table>
             </div>`;

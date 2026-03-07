@@ -263,6 +263,7 @@ export type Database = {
           origin_source: string | null
           posthog_id: string | null
           recommended_offer: string | null
+          temps: string | null
           tiktok: string | null
           updated_at: string
         }
@@ -283,6 +284,7 @@ export type Database = {
           origin_source?: string | null
           posthog_id?: string | null
           recommended_offer?: string | null
+          temps?: string | null
           tiktok?: string | null
           updated_at?: string
         }
@@ -303,6 +305,7 @@ export type Database = {
           origin_source?: string | null
           posthog_id?: string | null
           recommended_offer?: string | null
+          temps?: string | null
           tiktok?: string | null
           updated_at?: string
         }

@@ -156,6 +156,7 @@ const DiagnosticStart = () => {
         objective: data.objectif,
         blocker: data.blocage,
         budget: data.budget,
+        temps: data.temps,
         recommended_offer: getRecommendedOffer(),
       },
     });

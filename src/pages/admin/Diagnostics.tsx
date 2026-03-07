@@ -16,13 +16,19 @@ import { Button } from "@/components/ui/button";
 const stepLabels: Record<number, string> = {
   0: "Accueil",
   1: "Identité",
-  2: "Niveau",
+  2: "Audience",
   3: "Objectif",
-  4: "Blocage",
-  5: "Budget",
+  4: "Budget",
+  5: "Temps",
+  6: "Email",
+  7: "Blocage",
 };
 
 const budgetLabels: Record<string, string> = {
+  "0": "0 €",
+  "1-200": "1-200 €",
+  "200-500": "200-500 €",
+  "500+": "500 € +",
   none: "Aucun",
   low: "< 200 €",
   mid: "200-500 €",
@@ -30,8 +36,11 @@ const budgetLabels: Record<string, string> = {
 };
 
 const offerLabels: Record<string, string> = {
-  discord: "Discord",
+  express: "Analyse Express",
   one_shot: "One Shot",
+  one_shot_plus_premium: "One Shot + Premium",
+  premium: "Premium",
+  discord: "Discord",
   vip: "VIP",
   wav_premium: "Wav Premium",
 };
@@ -48,7 +57,7 @@ const Diagnostics = () => {
 
   const handleExportCsv = () => {
     if (!leads?.length) return;
-    const headers = ["Date", "Prénom", "Nom", "Email", "TikTok", "Niveau", "Objectif", "Blocage", "Budget", "Offre recommandée", "Étape", "Statut"];
+    const headers = ["Date", "Prénom", "Nom", "Email", "TikTok", "Niveau", "Objectif", "Blocage", "Budget", "Temps", "Offre recommandée", "Étape", "Statut"];
     const rows = leads.map((l) => [
       format(new Date(l.created_at), "yyyy-MM-dd HH:mm"),
       escapeCsv(l.first_name),
@@ -59,6 +68,7 @@ const Diagnostics = () => {
       escapeCsv(l.objective),
       escapeCsv(l.blocker),
       l.budget ? budgetLabels[l.budget] || l.budget : "",
+      escapeCsv(l.temps),
       l.recommended_offer ? offerLabels[l.recommended_offer] || l.recommended_offer : "",
       stepLabels[l.current_step] || String(l.current_step),
       l.completed ? "Complet" : "Incomplet",
@@ -125,6 +135,7 @@ const Diagnostics = () => {
                   <TableHead className="text-cream/70">TikTok</TableHead>
                   <TableHead className="text-cream/70">Étape</TableHead>
                   <TableHead className="text-cream/70">Budget</TableHead>
+                  <TableHead className="text-cream/70">Temps</TableHead>
                   <TableHead className="text-cream/70">Offre</TableHead>
                   <TableHead className="text-cream/70">Statut</TableHead>
                 </TableRow>
@@ -151,6 +162,9 @@ const Diagnostics = () => {
                     </TableCell>
                     <TableCell className="text-cream/80">
                       {lead.budget ? budgetLabels[lead.budget] || lead.budget : "—"}
+                    </TableCell>
+                    <TableCell className="text-cream/80">
+                      {lead.temps || "—"}
                     </TableCell>
                     <TableCell className="text-cream/80">
                       {lead.recommended_offer ? offerLabels[lead.recommended_offer] || lead.recommended_offer : "—"}
@@ -191,7 +205,7 @@ const Diagnostics = () => {
                     <p>{selected.tiktok || "—"}</p>
                   </div>
                   <div>
-                    <p className="text-cream/50 text-sm">Niveau</p>
+                    <p className="text-cream/50 text-sm">Niveau (audience)</p>
                     <p>{selected.level || "—"}</p>
                   </div>
                   <div>
@@ -201,6 +215,10 @@ const Diagnostics = () => {
                   <div>
                     <p className="text-cream/50 text-sm">Budget</p>
                     <p>{selected.budget ? budgetLabels[selected.budget] || selected.budget : "—"}</p>
+                  </div>
+                  <div>
+                    <p className="text-cream/50 text-sm">Temps/semaine</p>
+                    <p>{selected.temps || "—"}</p>
                   </div>
                   <div>
                     <p className="text-cream/50 text-sm">Offre recommandée</p>

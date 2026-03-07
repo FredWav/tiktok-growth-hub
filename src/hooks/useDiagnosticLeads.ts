@@ -14,6 +14,7 @@ export interface DiagnosticLead {
   blocker: string | null;
   budget: string | null;
   recommended_offer: string | null;
+  temps: string | null;
   current_step: number;
   completed: boolean;
 }

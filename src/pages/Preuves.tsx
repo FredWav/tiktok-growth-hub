@@ -150,6 +150,95 @@ const chooseOffers = [
   },
 ];
 
+type Testimonial = typeof testimonials[number];
+
+function MobileTestimonialCarousel({ testimonials }: { testimonials: Testimonial[] }) {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "center" });
+  const directionRef = useRef<"forward" | "backward">("forward");
+  const prevIndexRef = useRef(0);
+  const isUserActionRef = useRef(false);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const startAutoScroll = useCallback(() => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
+      if (!emblaApi) return;
+      if (directionRef.current === "forward") emblaApi.scrollNext();
+      else emblaApi.scrollPrev();
+    }, 4000);
+  }, [emblaApi]);
+
+  const stopAutoScroll = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    const onSelect = () => {
+      const newIndex = emblaApi.selectedScrollSnap();
+      if (isUserActionRef.current) {
+        const total = emblaApi.scrollSnapList().length;
+        const diff = (newIndex - prevIndexRef.current + total) % total;
+        if (diff <= total / 2) directionRef.current = "forward";
+        else directionRef.current = "backward";
+        isUserActionRef.current = false;
+      }
+      prevIndexRef.current = newIndex;
+    };
+
+    const onPointerDown = () => {
+      isUserActionRef.current = true;
+      stopAutoScroll();
+    };
+
+    const onPointerUp = () => {
+      startAutoScroll();
+    };
+
+    emblaApi.on("select", onSelect);
+    emblaApi.on("pointerDown", onPointerDown);
+    emblaApi.on("pointerUp", onPointerUp);
+    startAutoScroll();
+
+    return () => {
+      stopAutoScroll();
+      emblaApi.off("select", onSelect);
+      emblaApi.off("pointerDown", onPointerDown);
+      emblaApi.off("pointerUp", onPointerUp);
+    };
+  }, [emblaApi, startAutoScroll, stopAutoScroll]);
+
+  return (
+    <div className="md:hidden overflow-hidden" ref={emblaRef}>
+      <div className="flex">
+        {testimonials.map((testimonial, index) => (
+          <div key={index} className="flex-[0_0_92%] min-w-0 pl-3 first:pl-0">
+            <Card className="h-full">
+              <CardContent className="p-6">
+                <Quote className="h-8 w-8 text-primary/30 mb-4" />
+                <p className="text-muted-foreground mb-4">{testimonial.content}</p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-semibold">{testimonial.name}</div>
+                    <div className="text-sm text-muted-foreground">{testimonial.role}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-semibold text-primary">{testimonial.result}</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function Preuves() {
   return (
     <Layout>

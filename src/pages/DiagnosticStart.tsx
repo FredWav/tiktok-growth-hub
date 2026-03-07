@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useDiagnostic } from "@/contexts/DiagnosticContext";
 import { ArrowRight, ArrowLeft, Users, TrendingUp, Crown, Eye, LayoutList, Coins, ShoppingBag, Clock, Zap, Rocket, DollarSign } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
+import { trackPostHogEvent } from "@/lib/posthog";
 
 
 const TOTAL_STEPS = 7;

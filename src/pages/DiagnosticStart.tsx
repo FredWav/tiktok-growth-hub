@@ -174,8 +174,7 @@ const DiagnosticStart = () => {
 
   return (
     <Layout>
-      <div className="min-h-[calc(100vh-10rem)] bg-cream flex flex-col">
-        <SEOHead
+      <SEOHead
         title="Diagnostic Stratégique TikTok Gratuit | Fred Wav"
         description="Identifie ton point de blocage exact sur TikTok en 2 minutes. Diagnostic gratuit pour t'orienter vers la bonne stratégie."
         path="/start"

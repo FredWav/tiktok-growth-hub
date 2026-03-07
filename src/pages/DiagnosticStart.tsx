@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useDiagnostic } from "@/contexts/DiagnosticContext";
 import { ArrowRight, ArrowLeft, Users, TrendingUp, Crown, Eye, LayoutList, Coins, ShoppingBag, Clock, Zap, Rocket, DollarSign } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
+import { trackPostHogEvent } from "@/lib/posthog";
 
 
 const TOTAL_STEPS = 7;
@@ -121,6 +122,7 @@ const DiagnosticStart = () => {
     setErrors({});
     console.log("[Diagnostic] Identity validated → step 2");
     trackEvent("diagnostic_step_identity", { tiktok: data.tiktokUrl });
+    trackPostHogEvent("step_completed", { step_name: "Identity", value_selected: "completed" });
     saveLead({ first_name: data.firstName, tiktok: data.tiktokUrl }, 1);
     setStep(2);
   };
@@ -138,6 +140,7 @@ const DiagnosticStart = () => {
     setErrors({});
     console.log("[Diagnostic] Email validated → step 7");
     trackEvent("diagnostic_step_email", { email: data.email });
+    trackPostHogEvent("step_completed", { step_name: "Email", value_selected: "completed" });
     saveLead({ email: data.email }, 6);
     setStep(7);
   };
@@ -147,6 +150,9 @@ const DiagnosticStart = () => {
     console.log("[Diagnostic] handleBlockerNext — blocage length:", data.blocage.trim().length, "minChars:", minChars);
     if (data.blocage.trim().length < minChars) {
       console.log("[Diagnostic] Blocage too short");
+      if (minChars === 150) {
+        trackPostHogEvent("validation_error_triggered", { error_type: "min_length_150", audience_level: data.audience });
+      }
       setErrors({
         blocage: minChars === 150
           ? "Merci de détailler ton blocage (min. 150 caractères) pour une analyse précise."
@@ -155,6 +161,7 @@ const DiagnosticStart = () => {
       return;
     }
     setErrors({});
+    trackPostHogEvent("diagnostic_form_submitted", { audience: data.audience, objectif: data.objectif, budget: data.budget, time_available: data.temps });
     const recommendedOffer = getRecommendedOffer();
     console.log("[Diagnostic] handleBlockerNext — recommendedOffer:", recommendedOffer);
     console.log("[Diagnostic] Full context:", {
@@ -204,8 +211,10 @@ const DiagnosticStart = () => {
 
   const selectOption = (field: keyof typeof data, value: string, dbField: string, stepNum: number) => {
     console.log(`[Diagnostic] selectOption — field=${field}, value=${value}, dbField=${dbField}, step=${stepNum} → ${stepNum + 1}`);
+    const stepNameMap: Record<string, string> = { audience: "Audience", objectif: "Objectif", budget: "Budget", temps: "Temps" };
     updateField(field, value);
     trackEvent(`diagnostic_step_${field}`, { [field]: value });
+    trackPostHogEvent("step_completed", { step_name: stepNameMap[field] || field, value_selected: value });
     saveLead({ [dbField]: value }, stepNum);
     setTimeout(() => setStep(stepNum + 1), 250);
   };
@@ -249,7 +258,7 @@ const DiagnosticStart = () => {
                   Identifie ton point de blocage exact et reçois un plan d'action personnalisé en 2 minutes.
                 </p>
               </div>
-              <Button variant="hero" size="xl" onClick={() => { trackEvent("diagnostic_started"); setStep(1); }} className="w-full sm:w-auto">
+              <Button variant="hero" size="xl" onClick={() => { trackEvent("diagnostic_started"); trackPostHogEvent("diagnostic_started"); setStep(1); }} className="w-full sm:w-auto">
                 Démarrer le diagnostic <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </div>

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useDiagnostic } from "@/contexts/DiagnosticContext";
 import { SEOHead } from "@/components/SEOHead";
@@ -38,6 +38,26 @@ const ScoreCircle = ({ score }: { score: number }) => {
 const DiagnosticResult = () => {
   const { data, isComplete } = useDiagnostic();
   const navigate = useNavigate();
+  const [tracked, setTracked] = useState(false);
+
+  // ── Score calculation (must be before hooks) ──
+  const audiencePoints: Record<string, number> = { "0-5k": 10, "5k-50k": 25, "50k+": 40 };
+  const objectifPoints: Record<string, number> = { "Visibilité": 10, "Audience": 15, "Vendre": 25, "Monétiser": 30 };
+  const budgetPoints: Record<string, number> = { "0": 0, "1-200": 10, "200-500": 20, "500+": 30 };
+  const score = (audiencePoints[data.audience] || 0) + (objectifPoints[data.objectif] || 0) + (budgetPoints[data.budget] || 0);
+  const scoreLabel = score < 40 ? "Compte instable" : score <= 70 ? "Potentiel non exploité" : "Compte structuré";
+
+  // ── Offer routing ──
+  const getOffer = () => {
+    const { audience, budget } = data;
+    if (budget === "0") return "EXPRESS";
+    if (budget === "1-200" || audience === "0-5k") return "ONE_SHOT";
+    if (audience === "5k-50k" && budget === "200-500") return "ONE_SHOT_PLUS_PREMIUM";
+    if (audience === "50k+" && budget === "200-500") return "PREMIUM";
+    if ((audience === "5k-50k" || audience === "50k+") && budget === "500+") return "PREMIUM";
+    return "ONE_SHOT";
+  };
+  const offer = getOffer();
 
   useEffect(() => {
     console.log("[DiagnosticResult] isComplete:", isComplete, "data:", data);
@@ -48,26 +68,17 @@ const DiagnosticResult = () => {
     sessionStorage.setItem("from_diagnostic", "true");
   }, [isComplete, navigate]);
 
-  // Track result viewed
+  // Fire result_page_viewed once
   useEffect(() => {
-    if (isComplete && data) {
-      const audiencePoints: Record<string, number> = { "0-5k": 10, "5k-50k": 25, "50k+": 40 };
-      const objectifPoints: Record<string, number> = { "Visibilité": 10, "Audience": 15, "Vendre": 25, "Monétiser": 30 };
-      const budgetPoints: Record<string, number> = { "0": 0, "1-200": 10, "200-500": 20, "500+": 30 };
-      const s = (audiencePoints[data.audience] || 0) + (objectifPoints[data.objectif] || 0) + (budgetPoints[data.budget] || 0);
-      trackPostHogEvent("diagnostic_result_viewed", { score: s, audience: data.audience, budget: data.budget, objectif: data.objectif });
+    if (isComplete && !tracked) {
+      trackPostHogEvent("result_page_viewed", { maturity_score: score, recommended_offer: offer });
+      setTracked(true);
     }
-  }, [isComplete, data]);
+  }, [isComplete, tracked, score, offer]);
 
   if (!isComplete) return null;
 
-  // ── Score calculation ──
-  const audiencePoints: Record<string, number> = { "0-5k": 10, "5k-50k": 25, "50k+": 40 };
-  const objectifPoints: Record<string, number> = { "Visibilité": 10, "Audience": 15, "Vendre": 25, "Monétiser": 30 };
-  const budgetPoints: Record<string, number> = { "0": 0, "1-200": 10, "200-500": 20, "500+": 30 };
-
-  const score = (audiencePoints[data.audience] || 0) + (objectifPoints[data.objectif] || 0) + (budgetPoints[data.budget] || 0);
-  const scoreLabel = score < 40 ? "Compte instable" : score <= 70 ? "Potentiel non exploité" : "Compte structuré";
+  console.log("[DiagnosticResult] score:", score, "scoreLabel:", scoreLabel, "offer:", offer, "audience:", data.audience, "budget:", data.budget);
 
   // ── Strategic analysis ──
   const constat: Record<string, string> = {
@@ -88,24 +99,10 @@ const DiagnosticResult = () => {
     return "";
   };
 
-  // ── Offer routing ──
-  const getOffer = () => {
-    const { audience, budget } = data;
-    if (budget === "0") return "EXPRESS";
-    if (budget === "1-200" || audience === "0-5k") return "ONE_SHOT";
-    if (audience === "5k-50k" && budget === "200-500") return "ONE_SHOT_PLUS_PREMIUM";
-    if (audience === "50k+" && budget === "200-500") return "PREMIUM";
-    if ((audience === "5k-50k" || audience === "50k+") && budget === "500+") return "PREMIUM";
-    return "ONE_SHOT";
-  };
-
-  const offer = getOffer();
-  console.log("[DiagnosticResult] score:", score, "scoreLabel:", scoreLabel, "offer:", offer, "audience:", data.audience, "budget:", data.budget);
-
   const MailFooter = () => (
     <p className="text-sm text-muted-foreground mt-4">
       Besoin d'en discuter par écrit ?{" "}
-      <a href="mailto:fredwavcm@gmail.com" className="text-primary underline underline-offset-4 hover:text-primary/80" onClick={() => trackPostHogEvent("click_email_contact", { location: "diagnostic_result" })}>
+      <a href="mailto:fredwavcm@gmail.com" className="text-primary underline underline-offset-4 hover:text-primary/80" onClick={() => trackPostHogEvent("contact_mail_clicked", { source_offer: offer })}>
         Contacte-moi par mail.
       </a>
     </p>
@@ -162,7 +159,7 @@ const DiagnosticResult = () => {
               <CardHeader><CardTitle className="font-display text-xl">Analyse Express</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground">Fais analyser ton compte par notre IA. En 2 minutes tu sauras exactement où tu en es et quels leviers activer en priorité.</p>
-                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer }); trackPostHogEvent("click_analyse_express_diagnostic", { offer: "EXPRESS" }); }}>
+                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer }); trackPostHogEvent("cta_clicked", { offer_type: "EXPRESS", destination: "/analyse-express" }); }}>
                   <Link to="/analyse-express">Lancer le Scan de mon compte</Link>
                 </Button>
               </CardContent>
@@ -178,7 +175,7 @@ const DiagnosticResult = () => {
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Identification des erreurs de structure</li>
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Plan d'action personnalisé</li>
                 </ul>
-                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => trackEvent("diagnostic_cta_click", { offer })}>
+                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer }); trackPostHogEvent("cta_clicked", { offer_type: "ONE_SHOT", destination: "/one-shot" }); }}>
                   <Link to="/one-shot">Réserver mon Audit stratégique <ExternalLink className="w-4 h-4 ml-2" /></Link>
                 </Button>
                 <MailFooter />
@@ -195,7 +192,7 @@ const DiagnosticResult = () => {
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Structuration business</li>
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Scale de l'audience</li>
                 </ul>
-                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer }); trackPostHogEvent("click_calendly", { offer }); }}>
+                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer }); trackPostHogEvent("cta_clicked", { offer_type: "PREMIUM", destination: "calendly" }); }}>
                   <a href={CALENDLY_URL} target="_blank" rel="noopener noreferrer">
                     Réserver une discussion stratégique (45 min) <ExternalLink className="w-4 h-4 ml-2" />
                   </a>
@@ -214,10 +211,10 @@ const DiagnosticResult = () => {
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Identification des erreurs de structure</li>
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Plan d'action personnalisé</li>
                 </ul>
-                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => trackEvent("diagnostic_cta_click", { offer: "ONE_SHOT" })}>
+                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer: "ONE_SHOT" }); trackPostHogEvent("cta_clicked", { offer_type: "ONE_SHOT", destination: "/one-shot" }); }}>
                   <Link to="/one-shot">Réserver mon Audit stratégique <ExternalLink className="w-4 h-4 ml-2" /></Link>
                 </Button>
-                <Button variant="outline" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer: "PREMIUM" }); trackPostHogEvent("click_calendly", { offer: "PREMIUM" }); }}>
+                <Button variant="outline" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer: "PREMIUM" }); trackPostHogEvent("secondary_cta_clicked", { offer_type: "PREMIUM_UPSELL" }); }}>
                   <a href={CALENDLY_URL} target="_blank" rel="noopener noreferrer">
                     Découvrir Wav Premium (45 min) <ExternalLink className="w-4 h-4 ml-2" />
                   </a>

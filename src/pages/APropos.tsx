@@ -151,7 +151,7 @@ export default function APropos() {
             align="center"
           />
 
-          <div className="text-center space-y-6 text-muted-foreground text-lg">
+          <blockquote className="border-l-4 border-primary/30 pl-6 space-y-6 text-muted-foreground text-lg">
             <p className="text-foreground font-semibold">
               Chaque contenu doit servir un objectif.
             </p>
@@ -159,13 +159,11 @@ export default function APropos() {
               Un contenu qui ne génère ni autorité, ni audience qualifiée, ni clients
               est un divertissement personnel. Pas une stratégie.
             </p>
-            <div className="max-w-md mx-auto border-l-4 border-primary py-4 px-6">
-              <p className="text-foreground font-display font-semibold text-2xl md:text-3xl leading-snug">
-                On ne poste pas pour exister.<br />
-                On poste pour convertir.
-              </p>
-            </div>
-          </div>
+            <p className="text-foreground font-display font-semibold text-2xl md:text-3xl leading-snug">
+              On ne poste pas pour exister.<br />
+              On poste pour convertir.
+            </p>
+          </blockquote>
         </div>
       </Section>
 

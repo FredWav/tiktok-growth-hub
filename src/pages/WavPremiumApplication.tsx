@@ -87,6 +87,13 @@ export default function WavPremiumApplication() {
     },
   });
 
+  const handleFormFocus = () => {
+    if (!formStarted) {
+      setFormStarted(true);
+      trackPostHogEvent("wav_premium_form_start");
+    }
+  };
+
   const onSubmit = async (data: ApplicationForm) => {
     setIsSubmitting(true);
     trackEvent("wav_premium_apply", { level: data.current_level });

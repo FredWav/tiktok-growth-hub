@@ -148,21 +148,23 @@ export default function APropos() {
         <div className="max-w-3xl mx-auto">
           <SectionHeader
             title="Ma philosophie"
-            align="left"
+            align="center"
           />
 
-          <div className="prose prose-lg max-w-none text-muted-foreground space-y-4">
-            <p>
-              <strong>Chaque contenu doit servir un objectif.</strong>
+          <div className="text-center space-y-6 text-muted-foreground text-lg">
+            <p className="text-foreground font-semibold">
+              Chaque contenu doit servir un objectif.
             </p>
             <p>
-              Un contenu qui ne génère ni autorité, ni audience qualifiée, ni clients 
+              Un contenu qui ne génère ni autorité, ni audience qualifiée, ni clients
               est un divertissement personnel. Pas une stratégie.
             </p>
-            <p className="text-foreground font-semibold text-xl">
-              On ne poste pas pour exister.<br />
-              On poste pour convertir.
-            </p>
+            <div className="max-w-md mx-auto border-l-4 border-primary py-4 px-6">
+              <p className="text-foreground font-display font-semibold text-2xl md:text-3xl leading-snug">
+                On ne poste pas pour exister.<br />
+                On poste pour convertir.
+              </p>
+            </div>
           </div>
         </div>
       </Section>

@@ -304,11 +304,32 @@ const DiagnosticStart = () => {
             </div>
           )}
 
-          {/* Step 6: Blocage */}
+          {/* Step 6: Email */}
           {step === 6 && (
             <div className="animate-fade-in space-y-6">
               <div className="text-center space-y-2 mb-8">
                 <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Étape 6 sur {TOTAL_STEPS}</p>
+                <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">Où veux-tu recevoir ton diagnostic ?</h2>
+                <p className="text-muted-foreground text-sm">Ton email ne sera jamais partagé. Il sert uniquement à t'envoyer ton diagnostic.</p>
+              </div>
+              <div className="space-y-4 max-w-md mx-auto">
+                <div>
+                  <Label htmlFor="email">Adresse email</Label>
+                  <Input id="email" type="email" value={data.email} onChange={(e) => updateField("email", e.target.value)} placeholder="ton@email.com" className="mt-1.5" />
+                  {errors.email && <p className="text-destructive text-xs mt-1">{errors.email}</p>}
+                </div>
+                <Button variant="hero" size="lg" onClick={handleEmailNext} className="w-full mt-4">
+                  Suivant <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 7: Blocage */}
+          {step === 7 && (
+            <div className="animate-fade-in space-y-6">
+              <div className="text-center space-y-2 mb-8">
+                <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Étape 7 sur {TOTAL_STEPS}</p>
                 <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">Quel est ton blocage principal ?</h2>
                 {(data.audience === "5k-50k" || data.audience === "50k+") && (
                   <p className="text-muted-foreground text-sm">Détaille ta situation pour une analyse précise (min. 150 caractères).</p>

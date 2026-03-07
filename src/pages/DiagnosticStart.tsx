@@ -109,14 +109,17 @@ const DiagnosticStart = () => {
   };
 
   const handleIdentityNext = () => {
+    console.log("[Diagnostic] handleIdentityNext — firstName:", data.firstName, "tiktokUrl:", data.tiktokUrl);
     const result = identitySchema.safeParse({ firstName: data.firstName, tiktokUrl: data.tiktokUrl });
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
       result.error.errors.forEach((e) => { if (e.path[0]) fieldErrors[e.path[0] as string] = e.message; });
+      console.log("[Diagnostic] Identity validation failed:", fieldErrors);
       setErrors(fieldErrors);
       return;
     }
     setErrors({});
+    console.log("[Diagnostic] Identity validated → step 2");
     trackEvent("diagnostic_step_identity", { tiktok: data.tiktokUrl });
     saveLead({ first_name: data.firstName, tiktok: data.tiktokUrl }, 1);
     setStep(2);

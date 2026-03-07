@@ -21,7 +21,7 @@ const TOTAL_STEPS = 7;
 
 const identitySchema = z.object({
   firstName: z.string().trim().min(1, "Prénom requis").max(50),
-  tiktokUrl: z.string().trim().min(1, "Lien TikTok requis").url("Lien invalide — entre une URL complète (ex: https://tiktok.com/@toncompte)"),
+  tiktokHandle: z.string().trim().min(2, "Pseudo TikTok requis").max(50).regex(/^[a-zA-Z0-9_.]+$/, "Pseudo invalide – lettres, chiffres, _ et . uniquement"),
 });
 
 const emailSchema = z.object({

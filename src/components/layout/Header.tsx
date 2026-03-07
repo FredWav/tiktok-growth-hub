@@ -59,7 +59,7 @@ export function Header() {
           {/* Mobile Menu Button */}
           <button
             className="lg:hidden p-2"
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={() => { const next = !isOpen; setIsOpen(next); trackPostHogEvent("toggle_mobile_menu", { open: next }); }}
             aria-label="Toggle menu"
           >
             {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}

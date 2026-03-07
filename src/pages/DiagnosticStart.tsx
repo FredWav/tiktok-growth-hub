@@ -383,23 +383,52 @@ const DiagnosticStart = () => {
             <div className="animate-fade-in space-y-6">
               <div className="text-center space-y-2 mb-8">
                 <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Étape 7 sur {TOTAL_STEPS}</p>
-                <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">Quel est ton blocage principal ?</h2>
-                {(data.audience === "5k-50k" || data.audience === "50k+") && (
-                  <p className="text-muted-foreground text-sm">Détaille ta situation pour une analyse précise (min. 150 caractères).</p>
-                )}
+                <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">Quel est ton principal frein de croissance ?</h2>
+                <p className="text-muted-foreground text-sm">Sélectionne ce qui te correspond le mieux.</p>
               </div>
               <div className="max-w-lg mx-auto space-y-3">
-                <Textarea
-                  value={data.blocage}
-                  onChange={(e) => updateField("blocage", e.target.value)}
-                  placeholder="Décris ce qui te bloque concrètement..."
-                  className="min-h-[140px] resize-none"
-                />
-                {(data.audience === "5k-50k" || data.audience === "50k+") && (
-                  <p className="text-xs text-muted-foreground text-right">{data.blocage.length} / 150 caractères</p>
+                {[
+                  { value: "Je ne sais pas quoi poster", icon: HelpCircle },
+                  { value: "Mes vidéos ne font pas de vues", icon: Eye },
+                  { value: "J'ai des vues mais pas d'abonnés", icon: Users },
+                  { value: "J'ai des abonnés mais pas de clients", icon: ShoppingBag },
+                  { value: "Je manque de temps pour créer du contenu", icon: Clock },
+                  { value: "Je ne comprends pas l'algorithme", icon: TrendingUp },
+                  { value: "Je ne sais pas comment monétiser", icon: DollarSign },
+                  { value: "Autre", icon: Zap },
+                ].map(({ value, icon }) => (
+                  <OptionCard
+                    key={value}
+                    icon={icon}
+                    label={value}
+                    selected={data.blocage === value || (value === "Autre" && data.blocage.startsWith("Autre:"))}
+                    onClick={() => {
+                      if (value === "Autre") {
+                        updateField("blocage", "Autre: ");
+                      } else {
+                        updateField("blocage", value);
+                        setErrors({});
+                      }
+                    }}
+                  />
+                ))}
+                {(data.blocage === "Autre: " || data.blocage.startsWith("Autre:")) && (
+                  <Textarea
+                    value={data.blocage.replace(/^Autre:\s?/, "")}
+                    onChange={(e) => updateField("blocage", "Autre: " + e.target.value)}
+                    placeholder="Décris brièvement ton blocage..."
+                    className="min-h-[100px] resize-none mt-2"
+                    autoFocus
+                  />
                 )}
                 {errors.blocage && <p className="text-destructive text-xs">{errors.blocage}</p>}
-                <Button variant="hero" size="lg" onClick={handleBlockerNext} className="w-full">
+                <Button
+                  variant="hero"
+                  size="lg"
+                  onClick={handleBlockerNext}
+                  className="w-full"
+                  disabled={!data.blocage || data.blocage === "Autre: "}
+                >
                   Voir mon diagnostic <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>

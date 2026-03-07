@@ -1,28 +1,42 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Check, Clock, Video, FileText, HelpCircle, Zap, BarChart3, PenTool, Route, Play } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { trackEvent } from "@/lib/tracking";
 import { SEOHead } from "@/components/SEOHead";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { TrustedBy } from "@/components/TrustedBy";
 
+const preCheckoutSchema = z.object({
+  name: z.string().trim().min(1, "Nom obligatoire").max(100),
+  whatsapp: z.string().trim().min(1, "WhatsApp obligatoire").max(30),
+  tiktok: z.string().trim().min(1, "Compte TikTok obligatoire").max(100),
+  objectives: z.string().trim().min(10, "Décris brièvement tes objectifs").max(2000),
+});
+type PreCheckoutValues = z.infer<typeof preCheckoutSchema>;
+
 const steps = [
   {
-    title: "Tu réserves et tu payes",
-    description: "Paiement sécurisé via Stripe. Tu accèdes immédiatement au calendrier.",
+    title: "Tu remplis le formulaire",
+    description: "Quelques infos pour que je prépare la session en amont.",
+  },
+  {
+    title: "Tu payes en ligne",
+    description: "Paiement sécurisé via Stripe. Klarna 3x et PayPal 4x disponibles.",
   },
   {
     title: "Tu choisis ton créneau",
     description: "Créneaux disponibles du lundi au vendredi. Confirmation instantanée.",
-  },
-  {
-    title: "Tu remplis le questionnaire",
-    description: "Pour que je prépare la session en amont. Maximum 10 minutes.",
   },
   {
     title: "On se retrouve en visio",
@@ -88,12 +102,20 @@ export default function OneShot() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  const handleCheckout = async () => {
-    // Vérifier si un paiement existe déjà
+  const form = useForm<PreCheckoutValues>({
+    resolver: zodResolver(preCheckoutSchema),
+    defaultValues: { name: "", whatsapp: "", tiktok: "", objectives: "" },
+  });
+
+  const handleCheckout = async (formData?: PreCheckoutValues) => {
     const existingSessionId = localStorage.getItem("oneshot_session_id");
     if (existingSessionId) {
       navigate("/one-shot/success");
       return;
+    }
+
+    if (formData) {
+      sessionStorage.setItem("oneshot_pre_form", JSON.stringify(formData));
     }
 
     setLoading(true);
@@ -144,10 +166,47 @@ export default function OneShot() {
             Tu postes au feeling sans comprendre la mécanique de l'algorithme ? Tes vues stagnent et ton audience ne t'achète rien ? En 1h30, on coupe le bruit. On pose une stratégie de contenu millimétrée pour transformer tes abonnés en clients.
           </p>
 
-          <Button variant="hero" size="xl" onClick={() => { trackEvent("cta_one_shot_click", { location: "oneshot_hero" }); handleCheckout(); }} disabled={loading}>
-              {loading ? "Redirection..." : "Réserver mon One Shot (179€)"}
-              <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
+          {/* Pre-checkout form */}
+          <div id="oneshot-form" className="text-left bg-background rounded-xl p-6 md:p-8 shadow-sm border max-w-lg mx-auto mb-6">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit((values) => { trackEvent("cta_one_shot_click", { location: "oneshot_hero" }); handleCheckout(values); })} className="space-y-4">
+                <FormField control={form.control} name="name" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Prénom et Nom</FormLabel>
+                    <FormControl><Input placeholder="Jean Dupont" {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="whatsapp" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>WhatsApp</FormLabel>
+                    <FormControl><Input placeholder="+33 6 12 34 56 78" {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="tiktok" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Compte TikTok</FormLabel>
+                    <FormControl><Input placeholder="@toncompte" {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="objectives" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Ton objectif principal et ta situation actuelle</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="Ex : j'ai 2k abonnés, je poste 3x/semaine mais mes vues stagnent à 500 en moyenne..." className="min-h-[100px]" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <Button type="submit" variant="hero" size="xl" className="w-full" disabled={loading}>
+                  {loading ? "Redirection..." : "Réserver et payer mon One Shot (179€)"}
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </form>
+            </Form>
+          </div>
 
           <p className="text-sm text-muted-foreground mt-4">
             <Clock className="inline h-4 w-4 mr-1" />
@@ -342,9 +401,9 @@ export default function OneShot() {
             179€ pour repartir avec un plan d'action clair.
             Pas de bullshit, que du concret.
           </p>
-          <Button variant="hero" size="xl" onClick={() => { trackEvent("cta_one_shot_click", { location: "oneshot_footer" }); handleCheckout(); }} disabled={loading}>
-              {loading ? "Redirection..." : "Réserver mon One Shot (179€)"}
-              <ArrowRight className="ml-2 h-5 w-5" />
+          <Button variant="hero" size="xl" onClick={() => { trackEvent("cta_one_shot_click", { location: "oneshot_footer" }); document.getElementById("oneshot-form")?.scrollIntoView({ behavior: "smooth" }); }}>
+            Réserver mon One Shot (179€)
+            <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
           <p className="text-xs text-muted-foreground mt-3">
             Paiement en 3x avec Klarna et 4x avec PayPal disponible, sous réserve d'acceptation.

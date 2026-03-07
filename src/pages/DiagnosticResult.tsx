@@ -178,7 +178,7 @@ const DiagnosticResult = () => {
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Identification des erreurs de structure</li>
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Plan d'action personnalisé</li>
                 </ul>
-                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => trackEvent("diagnostic_cta_click", { offer })}>
+                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer }); trackPostHogEvent("cta_clicked", { offer_type: "ONE_SHOT", destination: "/one-shot" }); }}>
                   <Link to="/one-shot">Réserver mon Audit stratégique <ExternalLink className="w-4 h-4 ml-2" /></Link>
                 </Button>
                 <MailFooter />

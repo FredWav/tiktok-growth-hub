@@ -155,6 +155,7 @@ export default function WavPremiumApplication() {
                 href="https://calendly.com/fredwavcm/wav-premium"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackPostHogEvent("click_calendly_post_apply")}
               >
                 Réserver mon appel de qualification
                 <ArrowRight className="ml-2 h-5 w-5" />

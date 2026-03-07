@@ -14,7 +14,7 @@ import { ArrowRight, ArrowLeft, Users, TrendingUp, Crown, Eye, LayoutList, Coins
 import { trackEvent } from "@/lib/tracking";
 import { TikTokBrowserBanner } from "@/components/TikTokBrowserBanner";
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 7;
 
 const identitySchema = z.object({
   firstName: z.string().trim().min(1, "Prénom requis").max(50),

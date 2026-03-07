@@ -182,7 +182,7 @@ const DiagnosticResult = () => {
                 </ul>
                 <Button variant="hero" size="lg" asChild className="w-full" onClick={() => trackEvent("diagnostic_cta_click", { offer })}>
                   <a href={CALENDLY_URL} target="_blank" rel="noopener noreferrer">
-                    Réserver une discussion stratégique (15 min) <ExternalLink className="w-4 h-4 ml-2" />
+                    Réserver une discussion stratégique (45 min) <ExternalLink className="w-4 h-4 ml-2" />
                   </a>
                 </Button>
                 <MailFooter />

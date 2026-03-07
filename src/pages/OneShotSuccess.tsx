@@ -75,6 +75,7 @@ export default function OneShotSuccess() {
         }
         setVerifyState("verified");
       } catch {
+        trackPostHogEvent("oneshot_payment_error", { session_id: sessionId || "" });
         setVerifyState("error");
       }
     };

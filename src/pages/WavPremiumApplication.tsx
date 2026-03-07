@@ -67,6 +67,7 @@ type ApplicationForm = z.infer<typeof applicationSchema>;
 export default function WavPremiumApplication() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formStarted, setFormStarted] = useState(false);
 
   const form = useForm<ApplicationForm>({
     resolver: zodResolver(applicationSchema),

@@ -109,6 +109,20 @@ const DiagnosticStart = () => {
     setStep(2);
   };
 
+  const handleEmailNext = () => {
+    const result = emailSchema.safeParse({ email: data.email });
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.errors.forEach((e) => { if (e.path[0]) fieldErrors[e.path[0] as string] = e.message; });
+      setErrors(fieldErrors);
+      return;
+    }
+    setErrors({});
+    trackEvent("diagnostic_step_email", { email: data.email });
+    saveLead({ email: data.email }, 6);
+    setStep(7);
+  };
+
   const handleBlockerNext = () => {
     const minChars = data.audience === "5k-50k" || data.audience === "50k+" ? 150 : 10;
     if (data.blocage.trim().length < minChars) {

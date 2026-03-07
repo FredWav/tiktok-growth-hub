@@ -103,7 +103,11 @@ const App = () => (
             <Route path="/analyse-express" element={<AnalyseExpress />} />
             <Route path="/analyse-express/result" element={<AnalyseExpressResult />} />
             <Route path="/wav-premium/candidature" element={<WavPremiumApplication />} />
-            <Route path="/start" element={<DiagnosticStart />} />
+
+            {/* Diagnostic funnel (shared state) */}
+            <Route path="/start" element={<DiagnosticProvider><DiagnosticStart /></DiagnosticProvider>} />
+            <Route path="/processing" element={<DiagnosticProvider><DiagnosticProcessing /></DiagnosticProvider>} />
+            <Route path="/result" element={<DiagnosticProvider><DiagnosticResult /></DiagnosticProvider>} />
 
             {/* Admin routes */}
             <Route

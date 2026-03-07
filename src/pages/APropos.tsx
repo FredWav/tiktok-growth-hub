@@ -181,7 +181,7 @@ export default function APropos() {
               key={index}
               className="group bg-background rounded-2xl p-8 border border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-[0_8px_30px_-12px_hsl(var(--primary)/0.15)]"
             >
-              <div className="w-14 h-14 bg-gradient-to-br from-primary/15 to-primary/5 rounded-xl flex items-center justify-center mb-5 group-hover:from-primary/25 group-hover:to-primary/10 transition-all duration-300">
+              <div className="w-14 h-14 bg-primary/10 group-hover:bg-primary/20 rounded-xl flex items-center justify-center mb-5 transition-colors duration-300">
                 <value.icon className="h-6 w-6 text-primary" strokeWidth={1.5} />
               </div>
               <h3 className="font-display font-semibold text-xl mb-3">{value.title}</h3>

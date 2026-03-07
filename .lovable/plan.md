@@ -1,30 +1,32 @@
 
 
-## Analyse de compatibilite avec la doc API complete
+## Ajouter un event PostHog à chaque bouton/lien "Analyse Express"
 
-### Ce qui fonctionne deja correctement
+### Boutons identifiés (7 emplacements)
 
-| Aspect | Code actuel | Verdict |
-|--------|------------|---------|
-| `health_score` (nombre ou objet) | Fix applique : extrait `.total` si objet | OK |
-| Status `processing_insights` | Tombe dans le `else` → retourne `processing` au front | OK |
-| Status `completed` / `failed` | Gere explicitement | OK |
-| `ai_insights` detection | Check truthy/string vide | OK |
+1. **Header** (`src/components/layout/Header.tsx` l.9) — lien nav "Analyse Express"
+2. **Footer** (`src/components/layout/Footer.tsx` l.30) — lien footer
+3. **WavSocialScanPopup** (`src/components/WavSocialScanPopup.tsx` l.49) — bouton "Lancer mon analyse"
+4. **AnalyseExpress** (`src/pages/AnalyseExpress.tsx` l.136) — bouton submit "Lancer l'analyse (11,90€)"
+5. **AnalyseExpress** (`src/pages/AnalyseExpress.tsx` l.146) — lien "Retrouver mon analyse précédente"
+6. **DiagnosticResult** (`src/pages/DiagnosticResult.tsx` l.153-154) — bouton "Lancer le Scan de mon compte" (offre EXPRESS)
+7. **AnalyseExpressResult** (`src/pages/AnalyseExpressResult.tsx` l.232 et l.359) — boutons "Nouvelle analyse" (2 instances)
+8. **NotFound** (`src/pages/NotFound.tsx` l.49) — lien "Analyse Express"
 
-### Probleme identifie : `processing_insights` traite comme simple `processing`
+### Implémentation
 
-La doc revele un statut **`processing_insights`** (progress ~97%) ou le scraping est fini mais l'IA genere encore (~2 min). Le code actuel le traite comme `processing` generique, ce qui fonctionne mais :
+Ajouter `trackPostHogEvent` (de `src/lib/posthog.ts`) à chaque clic avec un event name unique :
 
-1. **Le front ne sait pas** que le scraping est fini et que seule l'IA reste — l'UX pourrait afficher un message plus precis
-2. **Le `current_step`** est deja transmis au front (`job.current_step`), donc le message "Generating AI strategic insights..." devrait arriver naturellement
+| Fichier | Event name | Properties |
+|---------|-----------|------------|
+| Header.tsx | `click_analyse_express_nav` | `{ location: "header" }` |
+| Footer.tsx | `click_analyse_express_nav` | `{ location: "footer" }` |
+| WavSocialScanPopup.tsx | `click_analyse_express_popup` | — |
+| AnalyseExpress.tsx (submit) | `click_analyse_express_submit` | `{ username }` |
+| AnalyseExpress.tsx (previous) | `click_analyse_express_previous` | — |
+| DiagnosticResult.tsx | `click_analyse_express_diagnostic` | `{ offer: "EXPRESS" }` |
+| AnalyseExpressResult.tsx | `click_analyse_express_new` | — |
+| NotFound.tsx | `click_analyse_express_nav` | `{ location: "404" }` |
 
-**Verdict : pas de bug, ca fonctionne.** Le polling continue jusqu'a `completed`.
-
-### Seul point d'attention restant
-
-La doc montre que `health_score` a la racine du `result` est un **nombre simple** (74), pas un objet. Mais dans les donnees reelles qu'on a observees en base, c'etait un objet `{ total: 74, components: {...} }`. Le fix qu'on a applique gere les deux cas, donc c'est couvert.
-
-### Conclusion
-
-**Aucune modification supplementaire necessaire.** Le code est compatible avec la doc API v1.1. Le fix `health_score` deja applique couvre les deux formats possibles (nombre ou objet avec `.total`).
+Pour Header et Footer, wraper les `<Link>` avec un `onClick` qui appelle `trackPostHogEvent`. Meme approche pour les autres composants.
 

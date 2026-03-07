@@ -120,7 +120,7 @@ function VideoCard({ id, alt }: { id: string; alt: string }) {
 
   return (
     <button
-      onClick={() => setPlaying(true)}
+      onClick={() => { trackEvent("click_video_play", { video_id: id, location: "45j" }); setPlaying(true); }}
       className="group relative aspect-video rounded-xl overflow-hidden shadow-lg cursor-pointer w-full"
     >
       <img

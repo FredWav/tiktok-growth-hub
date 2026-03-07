@@ -40,6 +40,11 @@ export function Header() {
                     ? "text-primary"
                     : "text-muted-foreground"
                 }`}
+                onClick={() => {
+                  if (item.href === "/analyse-express") {
+                    trackPostHogEvent("click_analyse_express_nav", { location: "header" });
+                  }
+                }}
               >
                 {item.label}
               </Link>

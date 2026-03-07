@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Instagram, Youtube, Facebook } from "lucide-react";
+import { trackPostHogEvent } from "@/lib/posthog";
 
 export function Footer() {
   return (

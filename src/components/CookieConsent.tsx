@@ -49,6 +49,8 @@ export function CookieConsent() {
     localStorage.setItem("cookie_consent", "accepted");
     enableGA();
     initPostHog();
+    // Track after init so PostHog is ready
+    setTimeout(() => trackPostHogEvent("cookie_consent_accepted"), 100);
     setVisible(false);
   };
 

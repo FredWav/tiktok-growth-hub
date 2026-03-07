@@ -287,7 +287,7 @@ export default function QuarantecinqJours() {
         </div>
 
         <div className="text-center">
-          <Button variant="premium" size="lg" asChild>
+          <Button variant="premium" size="lg" asChild onClick={() => trackEvent("click_preuves_link", { location: "45j" })}>
             <Link to="/preuves">
               Voir toutes les preuves
               <ArrowRight className="ml-2 h-4 w-4" />

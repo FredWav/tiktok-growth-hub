@@ -21,6 +21,10 @@ const identitySchema = z.object({
   tiktokUrl: z.string().trim().min(1, "Lien TikTok requis").url("Lien invalide — entre une URL complète (ex: https://tiktok.com/@toncompte)"),
 });
 
+const emailSchema = z.object({
+  email: z.string().trim().min(1, "Email requis").email("Adresse email invalide"),
+});
+
 const OptionCard = ({
   icon: Icon,
   label,

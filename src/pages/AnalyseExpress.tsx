@@ -43,6 +43,7 @@ export default function AnalyseExpress() {
       toast.error("Entre une adresse email valide");
       return;
     }
+    trackPostHogEvent("click_analyse_express_submit", { username: cleanUsername });
     setShowConfirmModal(true);
   };
 

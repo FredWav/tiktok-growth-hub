@@ -48,6 +48,17 @@ const DiagnosticResult = () => {
     sessionStorage.setItem("from_diagnostic", "true");
   }, [isComplete, navigate]);
 
+  // Track result viewed
+  useEffect(() => {
+    if (isComplete && data) {
+      const audiencePoints: Record<string, number> = { "0-5k": 10, "5k-50k": 25, "50k+": 40 };
+      const objectifPoints: Record<string, number> = { "Visibilité": 10, "Audience": 15, "Vendre": 25, "Monétiser": 30 };
+      const budgetPoints: Record<string, number> = { "0": 0, "1-200": 10, "200-500": 20, "500+": 30 };
+      const s = (audiencePoints[data.audience] || 0) + (objectifPoints[data.objectif] || 0) + (budgetPoints[data.budget] || 0);
+      trackPostHogEvent("diagnostic_result_viewed", { score: s, audience: data.audience, budget: data.budget, objectif: data.objectif });
+    }
+  }, [isComplete, data]);
+
   if (!isComplete) return null;
 
   // ── Score calculation ──

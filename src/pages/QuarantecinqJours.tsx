@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/accordion";
 import { trackEvent } from "@/lib/tracking";
 import { SEOHead } from "@/components/SEOHead";
+import { TrustedBy } from "@/components/TrustedBy";
 
 const forYou = [
   "Tu as une offre validée et tu veux faire des formats courts un vrai levier pour transformer tes abonnés en clients",

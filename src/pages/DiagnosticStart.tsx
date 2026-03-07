@@ -250,7 +250,7 @@ const DiagnosticStart = () => {
                   Identifie ton point de blocage exact et reçois un plan d'action personnalisé en 2 minutes.
                 </p>
               </div>
-              <Button variant="hero" size="xl" onClick={() => { trackEvent("diagnostic_started"); setStep(1); }} className="w-full sm:w-auto">
+              <Button variant="hero" size="xl" onClick={() => { trackEvent("diagnostic_started"); trackPostHogEvent("diagnostic_started"); setStep(1); }} className="w-full sm:w-auto">
                 Démarrer le diagnostic <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </div>

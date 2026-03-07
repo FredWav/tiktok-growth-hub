@@ -171,22 +171,13 @@ export default function Home() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{ animationDelay: "0.2s" }}>
-            <Button variant="hero" size="xl" asChild onClick={() => trackEvent("cta_one_shot_click", { location: "hero" })}>
-              <Link to="/one-shot">
-                Réserver mon One Shot (179€)
+            <Button variant="hero" size="xl" asChild onClick={() => trackEvent("cta_diagnostic_click", { location: "hero" })}>
+              <Link to="/start">
+                Commencer ton diagnostic
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
           </div>
-
-          <Link
-            to="/45-jours"
-            className="inline-block mt-4 text-sm text-muted-foreground hover:text-primary transition-colors animate-fade-in"
-            style={{ animationDelay: "0.3s" }}
-            onClick={() => trackEvent("cta_45j_click", { location: "hero_secondary" })}
-          >
-            Voir si je suis éligible au Wav Premium →
-          </Link>
         </div>
       </Section>
 

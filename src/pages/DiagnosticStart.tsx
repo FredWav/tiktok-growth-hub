@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useDiagnostic } from "@/contexts/DiagnosticContext";
-import { ArrowRight, ArrowLeft, Users, TrendingUp, Crown, Eye, LayoutList, Coins, ShoppingBag, Clock, Zap, Rocket, DollarSign } from "lucide-react";
+import { ArrowRight, ArrowLeft, Users, TrendingUp, Crown, Eye, LayoutList, Coins, ShoppingBag, Clock, Zap, Rocket, DollarSign, HelpCircle } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
 import { trackPostHogEvent } from "@/lib/posthog";
 import { TrustedBy } from "@/components/TrustedBy";

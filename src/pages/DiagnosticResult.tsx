@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ExternalLink, Mail } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
 import { trackPostHogEvent } from "@/lib/posthog";
+import { TrustedBy } from "@/components/TrustedBy";
 
 const CALENDLY_URL = "https://calendly.com/fredwavcm/wav-premium";
 
@@ -162,6 +163,7 @@ const DiagnosticResult = () => {
                 <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer }); trackPostHogEvent("cta_clicked", { offer_type: "EXPRESS", destination: "/analyse-express" }); }}>
                   <Link to="/analyse-express">Lancer le Scan de mon compte</Link>
                 </Button>
+                <TrustedBy className="mt-4" />
               </CardContent>
             </Card>
           )}
@@ -178,6 +180,7 @@ const DiagnosticResult = () => {
                 <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer }); trackPostHogEvent("cta_clicked", { offer_type: "ONE_SHOT", destination: "/one-shot" }); }}>
                   <Link to="/one-shot">Réserver mon Audit stratégique <ExternalLink className="w-4 h-4 ml-2" /></Link>
                 </Button>
+                <TrustedBy filter="one_shot" className="mt-4" />
                 <MailFooter />
               </CardContent>
             </Card>
@@ -197,6 +200,7 @@ const DiagnosticResult = () => {
                     Réserver une discussion stratégique (45 min) <ExternalLink className="w-4 h-4 ml-2" />
                   </a>
                 </Button>
+                <TrustedBy filter="premium" className="mt-4" />
                 <MailFooter />
               </CardContent>
             </Card>
@@ -219,6 +223,7 @@ const DiagnosticResult = () => {
                     Découvrir Wav Premium (45 min) <ExternalLink className="w-4 h-4 ml-2" />
                   </a>
                 </Button>
+                <TrustedBy className="mt-4" />
                 <MailFooter />
               </CardContent>
             </Card>

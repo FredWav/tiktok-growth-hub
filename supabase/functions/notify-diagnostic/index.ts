@@ -76,6 +76,7 @@ Deno.serve(async (req) => {
         { name: "🎯 Objectif", value: OBJECTIVE_LABELS[objective] || objective || "—", inline: false },
         { name: "🚧 Blocage", value: (blocker || "—").slice(0, 1024), inline: false },
         { name: "💰 Budget", value: BUDGET_LABELS[budget] || budget || "—", inline: true },
+        { name: "⏱️ Temps/semaine", value: temps || "—", inline: true },
         { name: "🏷️ Offre recommandée", value: OFFER_LABELS[recommended_offer] || recommended_offer || "—", inline: true },
       ];
       if (email) {

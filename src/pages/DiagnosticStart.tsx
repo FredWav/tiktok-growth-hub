@@ -203,6 +203,7 @@ const DiagnosticStart = () => {
   };
 
   const selectOption = (field: keyof typeof data, value: string, dbField: string, stepNum: number) => {
+    console.log(`[Diagnostic] selectOption — field=${field}, value=${value}, dbField=${dbField}, step=${stepNum} → ${stepNum + 1}`);
     updateField(field, value);
     trackEvent(`diagnostic_step_${field}`, { [field]: value });
     saveLead({ [dbField]: value }, stepNum);

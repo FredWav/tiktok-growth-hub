@@ -88,6 +88,7 @@ const DiagnosticResult = () => {
   };
 
   const offer = getOffer();
+  console.log("[DiagnosticResult] score:", score, "scoreLabel:", scoreLabel, "offer:", offer, "audience:", data.audience, "budget:", data.budget);
 
   const MailFooter = () => (
     <p className="text-sm text-muted-foreground mt-4">

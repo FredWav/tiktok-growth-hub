@@ -17,7 +17,9 @@ const DiagnosticProcessing = () => {
   const [showButton, setShowButton] = useState(false);
 
   useEffect(() => {
+    console.log("[DiagnosticProcessing] isComplete:", isComplete);
     if (!isComplete) {
+      console.log("[DiagnosticProcessing] Redirecting to /start (incomplete)");
       navigate("/start", { replace: true });
     }
   }, [isComplete, navigate]);

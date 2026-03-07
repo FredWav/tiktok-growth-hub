@@ -105,7 +105,7 @@ const DiagnosticResult = () => {
   const MailFooter = () => (
     <p className="text-sm text-muted-foreground mt-4">
       Besoin d'en discuter par écrit ?{" "}
-      <a href="mailto:fredwavcm@gmail.com" className="text-primary underline underline-offset-4 hover:text-primary/80">
+      <a href="mailto:fredwavcm@gmail.com" className="text-primary underline underline-offset-4 hover:text-primary/80" onClick={() => trackPostHogEvent("click_email_contact", { location: "diagnostic_result" })}>
         Contacte-moi par mail.
       </a>
     </p>

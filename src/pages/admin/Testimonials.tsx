@@ -207,7 +207,7 @@ const Testimonials = () => {
             </div>
 
             <div>
-              <Label>Offres associées</Label>
+              <Label className="text-cream">Offres associées</Label>
               <div className="grid grid-cols-2 gap-2 mt-2">
                 {OFFER_OPTIONS.map((opt) => (
                   <label key={opt.value} className="flex items-center gap-2 text-sm cursor-pointer">

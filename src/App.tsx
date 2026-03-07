@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -12,6 +12,7 @@ import { CookieConsent } from "@/components/CookieConsent";
 import { capturePageview } from "@/lib/posthog";
 import { captureUtmParams } from "@/lib/tracking";
 import { trackPageView, setupBeforeUnloadTracking } from "@/lib/page-tracker";
+import { DiagnosticProvider } from "./contexts/DiagnosticContext";
 
 function PostHogPageTracker() {
   const location = useLocation();
@@ -26,51 +27,52 @@ function PostHogPageTracker() {
   return null;
 }
 
-// Public pages
+// Home importée statiquement — critique path pour le FCP
 import Home from "./pages/Home";
-import Offres from "./pages/Offres";
-import QuarantecinqJours from "./pages/QuarantecinqJours";
-import VipCheckout from "./pages/VipCheckout";
-import OneShot from "./pages/OneShot";
-import OneShotSuccess from "./pages/OneShotSuccess";
-import APropos from "./pages/APropos";
-import Preuves from "./pages/Preuves";
-import Contact from "./pages/Contact";
-import Auth from "./pages/Auth";
-import ResetPassword from "./pages/ResetPassword";
-import MentionsLegales from "./pages/MentionsLegales";
-import PolitiqueConfidentialite from "./pages/PolitiqueConfidentialite";
-import CGV from "./pages/CGV";
-import NotFound from "./pages/NotFound";
-import AnalyseExpress from "./pages/AnalyseExpress";
-import AnalyseExpressResult from "./pages/AnalyseExpressResult";
-import WavPremiumApplication from "./pages/WavPremiumApplication";
-import DiagnosticStart from "./pages/DiagnosticStart";
-import DiagnosticProcessing from "./pages/DiagnosticProcessing";
-import DiagnosticResult from "./pages/DiagnosticResult";
-import { DiagnosticProvider } from "./contexts/DiagnosticContext";
 
-// Admin pages
-import AdminDashboard from "./pages/admin/Dashboard";
-import AdminClients from "./pages/admin/Clients";
-import AdminClientNew from "./pages/admin/ClientNew";
-import AdminClientDetail from "./pages/admin/ClientDetail";
-import AdminSessions from "./pages/admin/Sessions";
-import AdminBookings from "./pages/admin/Bookings";
-import AdminDeliverables from "./pages/admin/Deliverables";
-import AdminTemplates from "./pages/admin/Templates";
-import AdminSettings from "./pages/admin/Settings";
-import AdminExpressAnalyses from "./pages/admin/ExpressAnalyses";
-import AdminApplications from "./pages/admin/Applications";
-import AdminDiagnostics from "./pages/admin/Diagnostics";
-import AdminMarketing from "./pages/admin/Marketing";
-import AdminTestimonials from "./pages/admin/Testimonials";
+// Autres pages - lazy loaded
+const Offres = lazy(() => import("./pages/Offres"));
+const QuarantecinqJours = lazy(() => import("./pages/QuarantecinqJours"));
+const VipCheckout = lazy(() => import("./pages/VipCheckout"));
+const OneShot = lazy(() => import("./pages/OneShot"));
+const OneShotSuccess = lazy(() => import("./pages/OneShotSuccess"));
+const APropos = lazy(() => import("./pages/APropos"));
+const Preuves = lazy(() => import("./pages/Preuves"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Auth = lazy(() => import("./pages/Auth"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const MentionsLegales = lazy(() => import("./pages/MentionsLegales"));
+const PolitiqueConfidentialite = lazy(() => import("./pages/PolitiqueConfidentialite"));
+const CGV = lazy(() => import("./pages/CGV"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const AnalyseExpress = lazy(() => import("./pages/AnalyseExpress"));
+const AnalyseExpressResult = lazy(() => import("./pages/AnalyseExpressResult"));
+const WavPremiumApplication = lazy(() => import("./pages/WavPremiumApplication"));
+const DiagnosticStart = lazy(() => import("./pages/DiagnosticStart"));
+const DiagnosticProcessing = lazy(() => import("./pages/DiagnosticProcessing"));
+const DiagnosticResult = lazy(() => import("./pages/DiagnosticResult"));
 
-// Client pages
-import ClientDashboard from "./pages/client/ClientDashboard";
-import ClientPlan from "./pages/client/ClientPlan";
-import ClientDeliverables from "./pages/client/ClientDeliverables";
-import ClientSessions from "./pages/client/ClientSessions";
+// Admin pages - lazy loaded
+const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
+const AdminClients = lazy(() => import("./pages/admin/Clients"));
+const AdminClientNew = lazy(() => import("./pages/admin/ClientNew"));
+const AdminClientDetail = lazy(() => import("./pages/admin/ClientDetail"));
+const AdminSessions = lazy(() => import("./pages/admin/Sessions"));
+const AdminBookings = lazy(() => import("./pages/admin/Bookings"));
+const AdminDeliverables = lazy(() => import("./pages/admin/Deliverables"));
+const AdminTemplates = lazy(() => import("./pages/admin/Templates"));
+const AdminSettings = lazy(() => import("./pages/admin/Settings"));
+const AdminExpressAnalyses = lazy(() => import("./pages/admin/ExpressAnalyses"));
+const AdminApplications = lazy(() => import("./pages/admin/Applications"));
+const AdminDiagnostics = lazy(() => import("./pages/admin/Diagnostics"));
+const AdminMarketing = lazy(() => import("./pages/admin/Marketing"));
+const AdminTestimonials = lazy(() => import("./pages/admin/Testimonials"));
+
+// Client pages - lazy loaded
+const ClientDashboard = lazy(() => import("./pages/client/ClientDashboard"));
+const ClientPlan = lazy(() => import("./pages/client/ClientPlan"));
+const ClientDeliverables = lazy(() => import("./pages/client/ClientDeliverables"));
+const ClientSessions = lazy(() => import("./pages/client/ClientSessions"));
 
 const queryClient = new QueryClient();
 
@@ -85,6 +87,7 @@ const App = () => (
         <PostHogPageTracker />
         <DiagnosticProvider>
         <AuthProvider>
+          <Suspense fallback={null}>
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Home />} />
@@ -263,6 +266,7 @@ const App = () => (
             {/* 404 */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </Suspense>
         </AuthProvider>
         </DiagnosticProvider>
       </BrowserRouter>

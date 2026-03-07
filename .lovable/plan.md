@@ -1,30 +1,46 @@
 
 
-## Analyse de compatibilite avec la doc API complete
+## Audit complet du funnel diagnostic — Résultat
 
-### Ce qui fonctionne deja correctement
+### Code actuel : CORRECT
 
-| Aspect | Code actuel | Verdict |
-|--------|------------|---------|
-| `health_score` (nombre ou objet) | Fix applique : extrait `.total` si objet | OK |
-| Status `processing_insights` | Tombe dans le `else` → retourne `processing` au front | OK |
-| Status `completed` / `failed` | Gere explicitement | OK |
-| `ai_insights` detection | Check truthy/string vide | OK |
+Après vérification complète du code source, de la base de données, et de l'edge function (testée avec succès, status 200), le pipeline est **fonctionnel et cohérent**. Voici le détail :
 
-### Probleme identifie : `processing_insights` traite comme simple `processing`
+### Flow de données vérifié
 
-La doc revele un statut **`processing_insights`** (progress ~97%) ou le scraping est fini mais l'IA genere encore (~2 min). Le code actuel le traite comme `processing` generique, ce qui fonctionne mais :
+```text
+Step 1 (Identité)  → DB: first_name, tiktok      ✅
+Step 2 (Audience)  → DB: level                    ✅
+Step 3 (Objectif)  → DB: objective                ✅
+Step 4 (Budget)    → DB: budget                   ✅
+Step 5 (Temps)     → DB: temps                    ✅ (corrigé — plus d'écrasement de level)
+Step 6 (Email)     → DB: email                    ✅
+Step 7 (Blocage)   → DB: blocker, recommended_offer, completed=true  ✅
+```
 
-1. **Le front ne sait pas** que le scraping est fini et que seule l'IA reste — l'UX pourrait afficher un message plus precis
-2. **Le `current_step`** est deja transmis au front (`job.current_step`), donc le message "Generating AI strategic insights..." devrait arriver naturellement
+### Notifications (edge function testée en live — 200 OK)
+- **Discord** : tous les champs (email, tiktok, level, objective, blocker, budget, temps, recommended_offer) ✅
+- **SMTP OVH** : idem, avec tableau HTML complet ✅
+- **Labels** : LEVEL_LABELS, OBJECTIVE_LABELS, BUDGET_LABELS, OFFER_LABELS couvrent toutes les nouvelles valeurs ✅
 
-**Verdict : pas de bug, ca fonctionne.** Le polling continue jusqu'a `completed`.
+### Admin /admin/diagnostics
+- stepLabels 0-7 ✅
+- budgetLabels (0, 1-200, 200-500, 500+) ✅
+- offerLabels (express, one_shot, one_shot_plus_premium, premium) ✅
+- Colonne Temps dans le tableau ✅
+- Temps dans le dialog de détail ✅
+- Temps dans l'export CSV ✅
+- Hook useDiagnosticLeads avec `temps: string | null` ✅
 
-### Seul point d'attention restant
+### Problème identifié : données historiques corrompues
 
-La doc montre que `health_score` a la racine du `result` est un **nombre simple** (74), pas un objet. Mais dans les donnees reelles qu'on a observees en base, c'etait un objet `{ total: 74, components: {...} }`. Le fix qu'on a applique gere les deux cas, donc c'est couvert.
+La dernière entrée en base (fe5a7f0c) montre `level: "+10h"` et `temps: null` — c'est un résidu de l'ancien bug (avant le fix). Les anciennes données resteront corrompues mais les **nouvelles entrées** seront correctes.
 
-### Conclusion
+### Doublons potentiels
 
-**Aucune modification supplementaire necessaire.** Le code est compatible avec la doc API v1.1. Le fix `health_score` deja applique couvre les deux formats possibles (nombre ou objet avec `.total`).
+Le mécanisme `leadIdRef` (useRef) empêche les doublons : le premier appel `saveLead` fait un INSERT, tous les suivants font un UPDATE sur le même ID. C'est correct tant que l'utilisateur ne recharge pas la page (ce qui reset le ref et crée un nouveau lead — comportement attendu).
+
+### Verdict
+
+**Aucune modification nécessaire.** Le code actuel est cohérent de bout en bout. Le funnel, les notifications et l'admin sont synchronisés.
 

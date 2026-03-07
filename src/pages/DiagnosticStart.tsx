@@ -143,13 +143,14 @@ const DiagnosticStart = () => {
     });
     saveLead(
       { blocker: data.blocage, recommended_offer: getRecommendedOffer() },
-      6,
+      7,
       true
     );
     // Fire-and-forget notification
     supabase.functions.invoke("notify-diagnostic", {
       body: {
         first_name: data.firstName,
+        email: data.email,
         tiktok: data.tiktokUrl,
         level: data.audience,
         objective: data.objectif,

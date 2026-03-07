@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useDiagnostic } from "@/contexts/DiagnosticContext";
-import { ArrowRight, ArrowLeft, Users, TrendingUp, Crown, Eye, LayoutList, Coins, ShoppingBag, Clock, Zap, Rocket, DollarSign } from "lucide-react";
+import { ArrowRight, ArrowLeft, Users, TrendingUp, Crown, Eye, LayoutList, Coins, ShoppingBag, Clock, Zap, Rocket, DollarSign, HelpCircle } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
 import { trackPostHogEvent } from "@/lib/posthog";
 import { TrustedBy } from "@/components/TrustedBy";
@@ -21,7 +21,7 @@ const TOTAL_STEPS = 7;
 
 const identitySchema = z.object({
   firstName: z.string().trim().min(1, "Prénom requis").max(50),
-  tiktokUrl: z.string().trim().min(1, "Lien TikTok requis").url("Lien invalide — entre une URL complète (ex: https://tiktok.com/@toncompte)"),
+  tiktokHandle: z.string().trim().min(2, "Pseudo TikTok requis").max(50).regex(/^[a-zA-Z0-9_.]+$/, "Pseudo invalide – lettres, chiffres, _ et . uniquement"),
 });
 
 const emailSchema = z.object({
@@ -111,20 +111,28 @@ const DiagnosticStart = () => {
   };
 
   const handleIdentityNext = () => {
-    console.log("[Diagnostic] handleIdentityNext — firstName:", data.firstName, "tiktokUrl:", data.tiktokUrl);
-    const result = identitySchema.safeParse({ firstName: data.firstName, tiktokUrl: data.tiktokUrl });
+    // Strip leading @ if user types it
+    const handle = data.tiktokUrl.replace(/^@/, "");
+    console.log("[Diagnostic] handleIdentityNext — firstName:", data.firstName, "tiktokHandle:", handle);
+    const result = identitySchema.safeParse({ firstName: data.firstName, tiktokHandle: handle });
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
-      result.error.errors.forEach((e) => { if (e.path[0]) fieldErrors[e.path[0] as string] = e.message; });
+      result.error.errors.forEach((e) => {
+        const key = e.path[0] as string;
+        // Map schema field name to context field name for error display
+        fieldErrors[key === "tiktokHandle" ? "tiktokUrl" : key] = e.message;
+      });
       console.log("[Diagnostic] Identity validation failed:", fieldErrors);
       setErrors(fieldErrors);
       return;
     }
+    // Store cleaned handle back
+    updateField("tiktokUrl", handle);
     setErrors({});
     console.log("[Diagnostic] Identity validated → step 2");
-    trackEvent("diagnostic_step_identity", { tiktok: data.tiktokUrl });
+    trackEvent("diagnostic_step_identity", { tiktok: handle });
     trackPostHogEvent("step_completed", { step_name: "Identity", value_selected: "completed" });
-    saveLead({ first_name: data.firstName, tiktok: data.tiktokUrl }, 1);
+    saveLead({ first_name: data.firstName, tiktok: handle }, 1);
     setStep(2);
   };
 
@@ -147,18 +155,9 @@ const DiagnosticStart = () => {
   };
 
   const handleBlockerNext = () => {
-    const minChars = data.audience === "5k-50k" || data.audience === "50k+" ? 150 : 10;
-    console.log("[Diagnostic] handleBlockerNext — blocage length:", data.blocage.trim().length, "minChars:", minChars);
-    if (data.blocage.trim().length < minChars) {
-      console.log("[Diagnostic] Blocage too short");
-      if (minChars === 150) {
-        trackPostHogEvent("validation_error_triggered", { error_type: "min_length_150", audience_level: data.audience });
-      }
-      setErrors({
-        blocage: minChars === 150
-          ? "Merci de détailler ton blocage (min. 150 caractères) pour une analyse précise."
-          : "Sois plus précis (10 caractères minimum)",
-      });
+    console.log("[Diagnostic] handleBlockerNext — blocage:", data.blocage.trim());
+    if (!data.blocage.trim()) {
+      setErrors({ blocage: "Sélectionne une option" });
       return;
     }
     setErrors({});
@@ -280,8 +279,12 @@ const DiagnosticStart = () => {
                   {errors.firstName && <p className="text-destructive text-xs mt-1">{errors.firstName}</p>}
                 </div>
                 <div>
-                  <Label htmlFor="tiktokUrl">Lien de ton compte TikTok</Label>
-                  <Input id="tiktokUrl" value={data.tiktokUrl} onChange={(e) => updateField("tiktokUrl", e.target.value)} placeholder="https://tiktok.com/@toncompte" className="mt-1.5" />
+                  <Label htmlFor="tiktokHandle">Ton pseudo TikTok</Label>
+                  <div className="relative mt-1.5">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">@</span>
+                    <Input id="tiktokHandle" value={data.tiktokUrl} onChange={(e) => updateField("tiktokUrl", e.target.value.replace(/^@/, ""))} placeholder="ton_username" className="pl-8" />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">Ton pseudo TikTok, sans le @ (ex : fredwav)</p>
                   {errors.tiktokUrl && <p className="text-destructive text-xs mt-1">{errors.tiktokUrl}</p>}
                 </div>
                 <Button variant="hero" size="lg" onClick={handleIdentityNext} className="w-full mt-4">
@@ -380,23 +383,52 @@ const DiagnosticStart = () => {
             <div className="animate-fade-in space-y-6">
               <div className="text-center space-y-2 mb-8">
                 <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Étape 7 sur {TOTAL_STEPS}</p>
-                <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">Quel est ton blocage principal ?</h2>
-                {(data.audience === "5k-50k" || data.audience === "50k+") && (
-                  <p className="text-muted-foreground text-sm">Détaille ta situation pour une analyse précise (min. 150 caractères).</p>
-                )}
+                <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">Quel est ton principal frein de croissance ?</h2>
+                <p className="text-muted-foreground text-sm">Sélectionne ce qui te correspond le mieux.</p>
               </div>
               <div className="max-w-lg mx-auto space-y-3">
-                <Textarea
-                  value={data.blocage}
-                  onChange={(e) => updateField("blocage", e.target.value)}
-                  placeholder="Décris ce qui te bloque concrètement..."
-                  className="min-h-[140px] resize-none"
-                />
-                {(data.audience === "5k-50k" || data.audience === "50k+") && (
-                  <p className="text-xs text-muted-foreground text-right">{data.blocage.length} / 150 caractères</p>
+                {[
+                  { value: "Je ne sais pas quoi poster", icon: HelpCircle },
+                  { value: "Mes vidéos ne font pas de vues", icon: Eye },
+                  { value: "J'ai des vues mais pas d'abonnés", icon: Users },
+                  { value: "J'ai des abonnés mais pas de clients", icon: ShoppingBag },
+                  { value: "Je manque de temps pour créer du contenu", icon: Clock },
+                  { value: "Je ne comprends pas l'algorithme", icon: TrendingUp },
+                  { value: "Je ne sais pas comment monétiser", icon: DollarSign },
+                  { value: "Autre", icon: Zap },
+                ].map(({ value, icon }) => (
+                  <OptionCard
+                    key={value}
+                    icon={icon}
+                    label={value}
+                    selected={data.blocage === value || (value === "Autre" && data.blocage.startsWith("Autre:"))}
+                    onClick={() => {
+                      if (value === "Autre") {
+                        updateField("blocage", "Autre: ");
+                      } else {
+                        updateField("blocage", value);
+                        setErrors({});
+                      }
+                    }}
+                  />
+                ))}
+                {(data.blocage === "Autre: " || data.blocage.startsWith("Autre:")) && (
+                  <Textarea
+                    value={data.blocage.replace(/^Autre:\s?/, "")}
+                    onChange={(e) => updateField("blocage", "Autre: " + e.target.value)}
+                    placeholder="Décris brièvement ton blocage..."
+                    className="min-h-[100px] resize-none mt-2"
+                    autoFocus
+                  />
                 )}
                 {errors.blocage && <p className="text-destructive text-xs">{errors.blocage}</p>}
-                <Button variant="hero" size="lg" onClick={handleBlockerNext} className="w-full">
+                <Button
+                  variant="hero"
+                  size="lg"
+                  onClick={handleBlockerNext}
+                  className="w-full"
+                  disabled={!data.blocage || data.blocage === "Autre: "}
+                >
                   Voir mon diagnostic <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>

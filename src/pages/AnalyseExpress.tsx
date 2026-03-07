@@ -221,7 +221,7 @@ export default function AnalyseExpress() {
               <Button variant="outline" className="flex-1" onClick={handleGoBack}>
                 Ha je me suis trompé !
               </Button>
-              <Button variant="hero" className="flex-1" onClick={proceedToPayment}>
+              <Button variant="hero" className="flex-1" onClick={() => { trackPostHogEvent("click_analyse_express_confirm", { username: cleanUsername }); proceedToPayment(); }}>
                 Je valide ✅
               </Button>
             </div>

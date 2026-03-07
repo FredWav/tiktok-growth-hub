@@ -72,6 +72,7 @@ export default function AnalyseExpressResult() {
         stopPolling();
         setData(result.data);
         setLoading(false);
+        trackPostHogEvent("analyse_express_result_viewed", { username: result.username || "" });
       } else if (result.status === "failed") {
         stopPolling();
         setError(result.error || "L'analyse a échoué. Réessayez.");

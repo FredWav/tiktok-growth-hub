@@ -200,6 +200,7 @@ const DiagnosticResult = () => {
                     Réserver une discussion stratégique (45 min) <ExternalLink className="w-4 h-4 ml-2" />
                   </a>
                 </Button>
+                <TrustedBy filter="premium" className="mt-4" />
                 <MailFooter />
               </CardContent>
             </Card>

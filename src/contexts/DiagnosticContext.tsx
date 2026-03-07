@@ -18,6 +18,7 @@ const defaultData: DiagnosticData = {
   objectif: "",
   budget: "",
   temps: "",
+  email: "",
   blocage: "",
 };
 

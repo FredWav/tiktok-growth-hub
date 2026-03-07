@@ -81,7 +81,12 @@ export function Header() {
                       ? "text-primary"
                       : "text-muted-foreground"
                   }`}
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => {
+                    if (item.href === "/analyse-express") {
+                      trackPostHogEvent("click_analyse_express_nav", { location: "header_mobile" });
+                    }
+                    setIsOpen(false);
+                  }}
                 >
                   {item.label}
                 </Link>

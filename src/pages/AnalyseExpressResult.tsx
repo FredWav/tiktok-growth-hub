@@ -356,7 +356,7 @@ export default function AnalyseExpressResult() {
                   Télécharger le rapport PDF
                 </Button>
                 <Button asChild variant="outline" size="lg">
-                  <Link to="/analyse-express">Nouvelle analyse</Link>
+                  <Link to="/analyse-express" onClick={() => trackPostHogEvent("click_analyse_express_new", { location: "result" })}>Nouvelle analyse</Link>
                 </Button>
               </div>
             </div>

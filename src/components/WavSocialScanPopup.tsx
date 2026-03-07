@@ -27,6 +27,7 @@ export function WavSocialScanPopup() {
   };
 
   const handleGo = () => {
+    trackPostHogEvent("click_analyse_express_popup");
     handleClose();
     navigate("/analyse-express");
   };

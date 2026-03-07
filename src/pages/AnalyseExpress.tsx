@@ -145,7 +145,10 @@ export default function AnalyseExpress() {
 
           {existingSessionId && (
             <button
-              onClick={() => navigate(`/analyse-express/result?session_id=${existingSessionId}`)}
+              onClick={() => {
+                trackPostHogEvent("click_analyse_express_previous");
+                navigate(`/analyse-express/result?session_id=${existingSessionId}`);
+              }}
               className="mt-4 text-sm text-primary underline underline-offset-4 hover:text-primary/80"
             >
               Retrouver mon analyse précédente

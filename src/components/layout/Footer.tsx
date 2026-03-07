@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Instagram, Youtube, Facebook } from "lucide-react";
+import { trackPostHogEvent } from "@/lib/posthog";
 
 export function Footer() {
   return (
@@ -27,7 +28,7 @@ export function Footer() {
               <li><Link to="/offres" className="hover:text-primary transition-colors">Offres</Link></li>
               <li><Link to="/one-shot" className="hover:text-primary transition-colors">One Shot</Link></li>
               <li><Link to="/45-jours" className="hover:text-primary transition-colors">Wav Premium</Link></li>
-              <li><Link to="/analyse-express" className="hover:text-primary transition-colors">Analyse Express</Link></li>
+              <li><Link to="/analyse-express" className="hover:text-primary transition-colors" onClick={() => trackPostHogEvent("click_analyse_express_nav", { location: "footer" })}>Analyse Express</Link></li>
               <li><Link to="/preuves" className="hover:text-primary transition-colors">Témoignages</Link></li>
               <li><Link to="/a-propos" className="hover:text-primary transition-colors">À propos</Link></li>
               <li><Link to="/start" className="hover:text-primary transition-colors">Diagnostic gratuit</Link></li>

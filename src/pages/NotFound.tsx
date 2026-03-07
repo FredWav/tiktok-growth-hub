@@ -4,6 +4,7 @@ import { Layout } from "@/components/layout/Layout";
 import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Home, FileText, Zap } from "lucide-react";
+import { trackPostHogEvent } from "@/lib/posthog";
 
 const NotFound = () => {
   const location = useLocation();
@@ -46,7 +47,7 @@ const NotFound = () => {
             <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
               <Link to="/offres" className="hover:text-primary transition-colors">Offres</Link>
               <Link to="/45-jours" className="hover:text-primary transition-colors">Wav Premium</Link>
-              <Link to="/analyse-express" className="hover:text-primary transition-colors">Analyse Express</Link>
+              <Link to="/analyse-express" className="hover:text-primary transition-colors" onClick={() => trackPostHogEvent("click_analyse_express_nav", { location: "404" })}>Analyse Express</Link>
               <Link to="/preuves" className="hover:text-primary transition-colors">Témoignages</Link>
               <Link to="/a-propos" className="hover:text-primary transition-colors">À propos</Link>
               <Link to="/contact" className="hover:text-primary transition-colors">Contact</Link>

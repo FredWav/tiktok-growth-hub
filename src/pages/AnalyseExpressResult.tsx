@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { trackEvent } from "@/lib/tracking";
+import { trackPostHogEvent } from "@/lib/posthog";
 import { Download, Loader2, AlertCircle, RefreshCw, Target, ArrowRight } from "lucide-react";
 // @ts-ignore - html2pdf.js doesn't have proper types
 import html2pdf from "html2pdf.js";
@@ -229,7 +230,7 @@ export default function AnalyseExpressResult() {
                   Réessayer
                 </Button>
                 <Button asChild>
-                  <Link to="/analyse-express">Nouvelle analyse</Link>
+                  <Link to="/analyse-express" onClick={() => trackPostHogEvent("click_analyse_express_new", { location: "error" })}>Nouvelle analyse</Link>
                 </Button>
               </div>
             </div>
@@ -356,7 +357,7 @@ export default function AnalyseExpressResult() {
                   Télécharger le rapport PDF
                 </Button>
                 <Button asChild variant="outline" size="lg">
-                  <Link to="/analyse-express">Nouvelle analyse</Link>
+                  <Link to="/analyse-express" onClick={() => trackPostHogEvent("click_analyse_express_new", { location: "result" })}>Nouvelle analyse</Link>
                 </Button>
               </div>
             </div>

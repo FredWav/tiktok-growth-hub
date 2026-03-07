@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Zap, X } from "lucide-react";
+import { trackPostHogEvent } from "@/lib/posthog";
 
 export function WavSocialScanPopup() {
   const [open, setOpen] = useState(false);
@@ -26,6 +27,7 @@ export function WavSocialScanPopup() {
   };
 
   const handleGo = () => {
+    trackPostHogEvent("click_analyse_express_popup");
     handleClose();
     navigate("/analyse-express");
   };

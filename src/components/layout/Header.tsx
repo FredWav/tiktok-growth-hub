@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { trackPostHogEvent } from "@/lib/posthog";
 
 const navItems = [
   { label: "Accueil", href: "/" },
@@ -39,6 +40,11 @@ export function Header() {
                     ? "text-primary"
                     : "text-muted-foreground"
                 }`}
+                onClick={() => {
+                  if (item.href === "/analyse-express") {
+                    trackPostHogEvent("click_analyse_express_nav", { location: "header" });
+                  }
+                }}
               >
                 {item.label}
               </Link>
@@ -75,7 +81,12 @@ export function Header() {
                       ? "text-primary"
                       : "text-muted-foreground"
                   }`}
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => {
+                    if (item.href === "/analyse-express") {
+                      trackPostHogEvent("click_analyse_express_nav", { location: "header_mobile" });
+                    }
+                    setIsOpen(false);
+                  }}
                 >
                   {item.label}
                 </Link>

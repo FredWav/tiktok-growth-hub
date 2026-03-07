@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ExternalLink, Mail } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
+import { trackPostHogEvent } from "@/lib/posthog";
 
 const CALENDLY_URL = "https://calendly.com/fredwavcm/wav-premium";
 
@@ -150,7 +151,7 @@ const DiagnosticResult = () => {
               <CardHeader><CardTitle className="font-display text-xl">Analyse Express</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground">Fais analyser ton compte par notre IA. En 2 minutes tu sauras exactement où tu en es et quels leviers activer en priorité.</p>
-                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => trackEvent("diagnostic_cta_click", { offer })}>
+                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer }); trackPostHogEvent("click_analyse_express_diagnostic", { offer: "EXPRESS" }); }}>
                   <Link to="/analyse-express">Lancer le Scan de mon compte</Link>
                 </Button>
               </CardContent>

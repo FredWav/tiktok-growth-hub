@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Zap, BarChart3, FileText, TrendingUp, Search } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
+import { trackPostHogEvent } from "@/lib/posthog";
 import { SEOHead } from "@/components/SEOHead";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
@@ -42,6 +43,7 @@ export default function AnalyseExpress() {
       toast.error("Entre une adresse email valide");
       return;
     }
+    trackPostHogEvent("click_analyse_express_submit", { username: cleanUsername });
     setShowConfirmModal(true);
   };
 
@@ -143,7 +145,10 @@ export default function AnalyseExpress() {
 
           {existingSessionId && (
             <button
-              onClick={() => navigate(`/analyse-express/result?session_id=${existingSessionId}`)}
+              onClick={() => {
+                trackPostHogEvent("click_analyse_express_previous");
+                navigate(`/analyse-express/result?session_id=${existingSessionId}`);
+              }}
               className="mt-4 text-sm text-primary underline underline-offset-4 hover:text-primary/80"
             >
               Retrouver mon analyse précédente

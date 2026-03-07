@@ -111,20 +111,28 @@ const DiagnosticStart = () => {
   };
 
   const handleIdentityNext = () => {
-    console.log("[Diagnostic] handleIdentityNext — firstName:", data.firstName, "tiktokUrl:", data.tiktokUrl);
-    const result = identitySchema.safeParse({ firstName: data.firstName, tiktokUrl: data.tiktokUrl });
+    // Strip leading @ if user types it
+    const handle = data.tiktokUrl.replace(/^@/, "");
+    console.log("[Diagnostic] handleIdentityNext — firstName:", data.firstName, "tiktokHandle:", handle);
+    const result = identitySchema.safeParse({ firstName: data.firstName, tiktokHandle: handle });
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
-      result.error.errors.forEach((e) => { if (e.path[0]) fieldErrors[e.path[0] as string] = e.message; });
+      result.error.errors.forEach((e) => {
+        const key = e.path[0] as string;
+        // Map schema field name to context field name for error display
+        fieldErrors[key === "tiktokHandle" ? "tiktokUrl" : key] = e.message;
+      });
       console.log("[Diagnostic] Identity validation failed:", fieldErrors);
       setErrors(fieldErrors);
       return;
     }
+    // Store cleaned handle back
+    updateField("tiktokUrl", handle);
     setErrors({});
     console.log("[Diagnostic] Identity validated → step 2");
-    trackEvent("diagnostic_step_identity", { tiktok: data.tiktokUrl });
+    trackEvent("diagnostic_step_identity", { tiktok: handle });
     trackPostHogEvent("step_completed", { step_name: "Identity", value_selected: "completed" });
-    saveLead({ first_name: data.firstName, tiktok: data.tiktokUrl }, 1);
+    saveLead({ first_name: data.firstName, tiktok: handle }, 1);
     setStep(2);
   };
 

@@ -122,6 +122,7 @@ const DiagnosticStart = () => {
     setErrors({});
     console.log("[Diagnostic] Identity validated → step 2");
     trackEvent("diagnostic_step_identity", { tiktok: data.tiktokUrl });
+    trackPostHogEvent("step_completed", { step_name: "Identity", value_selected: "completed" });
     saveLead({ first_name: data.firstName, tiktok: data.tiktokUrl }, 1);
     setStep(2);
   };

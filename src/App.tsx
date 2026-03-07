@@ -64,6 +64,7 @@ import AdminExpressAnalyses from "./pages/admin/ExpressAnalyses";
 import AdminApplications from "./pages/admin/Applications";
 import AdminDiagnostics from "./pages/admin/Diagnostics";
 import AdminMarketing from "./pages/admin/Marketing";
+import AdminTestimonials from "./pages/admin/Testimonials";
 
 // Client pages
 import ClientDashboard from "./pages/client/ClientDashboard";

@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { SEOHead } from "@/components/SEOHead";
 import { z } from "zod";
+import { Mail } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,11 +14,15 @@ import { ArrowRight, ArrowLeft, Users, TrendingUp, Crown, Eye, LayoutList, Coins
 import { trackEvent } from "@/lib/tracking";
 import { TikTokBrowserBanner } from "@/components/TikTokBrowserBanner";
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 7;
 
 const identitySchema = z.object({
   firstName: z.string().trim().min(1, "Prénom requis").max(50),
   tiktokUrl: z.string().trim().min(1, "Lien TikTok requis").url("Lien invalide — entre une URL complète (ex: https://tiktok.com/@toncompte)"),
+});
+
+const emailSchema = z.object({
+  email: z.string().trim().min(1, "Email requis").email("Adresse email invalide"),
 });
 
 const OptionCard = ({
@@ -104,6 +109,20 @@ const DiagnosticStart = () => {
     setStep(2);
   };
 
+  const handleEmailNext = () => {
+    const result = emailSchema.safeParse({ email: data.email });
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.errors.forEach((e) => { if (e.path[0]) fieldErrors[e.path[0] as string] = e.message; });
+      setErrors(fieldErrors);
+      return;
+    }
+    setErrors({});
+    trackEvent("diagnostic_step_email", { email: data.email });
+    saveLead({ email: data.email }, 6);
+    setStep(7);
+  };
+
   const handleBlockerNext = () => {
     const minChars = data.audience === "5k-50k" || data.audience === "50k+" ? 150 : 10;
     if (data.blocage.trim().length < minChars) {
@@ -124,13 +143,14 @@ const DiagnosticStart = () => {
     });
     saveLead(
       { blocker: data.blocage, recommended_offer: getRecommendedOffer() },
-      6,
+      7,
       true
     );
     // Fire-and-forget notification
     supabase.functions.invoke("notify-diagnostic", {
       body: {
         first_name: data.firstName,
+        email: data.email,
         tiktok: data.tiktokUrl,
         level: data.audience,
         objective: data.objectif,
@@ -284,11 +304,32 @@ const DiagnosticStart = () => {
             </div>
           )}
 
-          {/* Step 6: Blocage */}
+          {/* Step 6: Email */}
           {step === 6 && (
             <div className="animate-fade-in space-y-6">
               <div className="text-center space-y-2 mb-8">
                 <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Étape 6 sur {TOTAL_STEPS}</p>
+                <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">Où veux-tu recevoir ton diagnostic ?</h2>
+                <p className="text-muted-foreground text-sm">Ton email ne sera jamais partagé. Il sert uniquement à t'envoyer ton diagnostic.</p>
+              </div>
+              <div className="space-y-4 max-w-md mx-auto">
+                <div>
+                  <Label htmlFor="email">Adresse email</Label>
+                  <Input id="email" type="email" value={data.email} onChange={(e) => updateField("email", e.target.value)} placeholder="ton@email.com" className="mt-1.5" />
+                  {errors.email && <p className="text-destructive text-xs mt-1">{errors.email}</p>}
+                </div>
+                <Button variant="hero" size="lg" onClick={handleEmailNext} className="w-full mt-4">
+                  Suivant <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 7: Blocage */}
+          {step === 7 && (
+            <div className="animate-fade-in space-y-6">
+              <div className="text-center space-y-2 mb-8">
+                <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Étape 7 sur {TOTAL_STEPS}</p>
                 <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">Quel est ton blocage principal ?</h2>
                 {(data.audience === "5k-50k" || data.audience === "50k+") && (
                   <p className="text-muted-foreground text-sm">Détaille ta situation pour une analyse précise (min. 150 caractères).</p>

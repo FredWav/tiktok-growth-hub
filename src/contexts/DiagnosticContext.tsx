@@ -7,6 +7,7 @@ export type DiagnosticData = {
   objectif: string;
   budget: string;
   temps: string;
+  email: string;
   blocage: string;
 };
 
@@ -17,6 +18,7 @@ const defaultData: DiagnosticData = {
   objectif: "",
   budget: "",
   temps: "",
+  email: "",
   blocage: "",
 };
 
@@ -39,7 +41,7 @@ export const DiagnosticProvider = ({ children }: { children: ReactNode }) => {
 
   const reset = () => setData(defaultData);
 
-  const isComplete = !!(data.firstName && data.tiktokUrl && data.audience && data.objectif && data.budget && data.temps && data.blocage);
+  const isComplete = !!(data.firstName && data.tiktokUrl && data.audience && data.objectif && data.budget && data.temps && data.email && data.blocage);
 
   return (
     <DiagnosticContext.Provider value={{ data, setData, updateField, reset, isComplete }}>

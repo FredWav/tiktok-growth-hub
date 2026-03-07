@@ -236,7 +236,7 @@ export default function OneShotSuccess() {
                 Merci pour ces infos ! Il ne te reste plus qu'à réserver ton créneau pour notre session.
               </p>
               <Button variant="hero" size="xl" asChild>
-                <a href="https://calendly.com/fredwavcm/accompagnement-one-shot" target="_blank" rel="noopener noreferrer">
+                <a href="https://calendly.com/fredwavcm/accompagnement-one-shot" target="_blank" rel="noopener noreferrer" onClick={() => trackPostHogEvent("click_calendly_oneshot")}>
                   <Calendar className="mr-2 h-5 w-5" />
                   Réserver mon créneau
                 </a>

@@ -156,6 +156,7 @@ const DiagnosticStart = () => {
         objective: data.objectif,
         blocker: data.blocage,
         budget: data.budget,
+        temps: data.temps,
         recommended_offer: getRecommendedOffer(),
       },
     });
@@ -296,10 +297,10 @@ const DiagnosticStart = () => {
                 <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">Combien de temps consacres-tu à TikTok par semaine ?</h2>
               </div>
               <div className="space-y-3 max-w-lg mx-auto">
-                <OptionCard icon={Clock} label="Moins de 2h" selected={data.temps === "Moins de 2h"} onClick={() => selectOption("temps", "Moins de 2h", "level", 5)} />
-                <OptionCard icon={Clock} label="2 – 5h" selected={data.temps === "2-5h"} onClick={() => selectOption("temps", "2-5h", "level", 5)} />
-                <OptionCard icon={Clock} label="5 – 10h" selected={data.temps === "5-10h"} onClick={() => selectOption("temps", "5-10h", "level", 5)} />
-                <OptionCard icon={Clock} label="+10h" selected={data.temps === "+10h"} onClick={() => selectOption("temps", "+10h", "level", 5)} />
+                <OptionCard icon={Clock} label="Moins de 2h" selected={data.temps === "Moins de 2h"} onClick={() => selectOption("temps", "Moins de 2h", "temps", 5)} />
+                <OptionCard icon={Clock} label="2 – 5h" selected={data.temps === "2-5h"} onClick={() => selectOption("temps", "2-5h", "temps", 5)} />
+                <OptionCard icon={Clock} label="5 – 10h" selected={data.temps === "5-10h"} onClick={() => selectOption("temps", "5-10h", "temps", 5)} />
+                <OptionCard icon={Clock} label="+10h" selected={data.temps === "+10h"} onClick={() => selectOption("temps", "+10h", "temps", 5)} />
               </div>
             </div>
           )}

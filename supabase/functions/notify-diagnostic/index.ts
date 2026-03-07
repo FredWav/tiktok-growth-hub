@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { first_name, last_name, email, tiktok, level, objective, blocker, budget, recommended_offer } =
+    const { first_name, last_name, email, tiktok, level, objective, blocker, budget, temps, recommended_offer } =
       await req.json();
 
     if (!first_name) {
@@ -76,6 +76,7 @@ Deno.serve(async (req) => {
         { name: "🎯 Objectif", value: OBJECTIVE_LABELS[objective] || objective || "—", inline: false },
         { name: "🚧 Blocage", value: (blocker || "—").slice(0, 1024), inline: false },
         { name: "💰 Budget", value: BUDGET_LABELS[budget] || budget || "—", inline: true },
+        { name: "⏱️ Temps/semaine", value: temps || "—", inline: true },
         { name: "🏷️ Offre recommandée", value: OFFER_LABELS[recommended_offer] || recommended_offer || "—", inline: true },
       ];
       if (email) {
@@ -127,6 +128,7 @@ Deno.serve(async (req) => {
                 <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Objectif</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(OBJECTIVE_LABELS[objective] || objective || "—")}</td></tr>
                 <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; vertical-align: top;">Blocage</td><td style="padding: 12px; border-bottom: 1px solid #eee; white-space: pre-wrap;">${escapeHtml(blocker || "—")}</td></tr>
                 <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Budget</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(BUDGET_LABELS[budget] || budget || "—")}</td></tr>
+                <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Temps/semaine</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(temps || "—")}</td></tr>
                 <tr style="background: #f9f6f1;"><td style="padding: 12px; font-weight: bold; color: #c8a97e;">Offre recommandée</td><td style="padding: 12px; font-weight: bold; color: #c8a97e;">${escapeHtml(OFFER_LABELS[recommended_offer] || recommended_offer || "—")}</td></tr>
               </table>
             </div>`;

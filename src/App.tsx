@@ -46,6 +46,9 @@ import AnalyseExpress from "./pages/AnalyseExpress";
 import AnalyseExpressResult from "./pages/AnalyseExpressResult";
 import WavPremiumApplication from "./pages/WavPremiumApplication";
 import DiagnosticStart from "./pages/DiagnosticStart";
+import DiagnosticProcessing from "./pages/DiagnosticProcessing";
+import DiagnosticResult from "./pages/DiagnosticResult";
+import { DiagnosticProvider } from "./contexts/DiagnosticContext";
 
 // Admin pages
 import AdminDashboard from "./pages/admin/Dashboard";

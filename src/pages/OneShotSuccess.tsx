@@ -65,6 +65,7 @@ export default function OneShotSuccess() {
         // Persist session_id so user can return after closing the tab
         localStorage.setItem("oneshot_session_id", sessionId);
 
+        trackPostHogEvent("oneshot_payment_verified", { session_id: sessionId });
         if (data.customer_email) {
           form.setValue("email", data.customer_email);
         }

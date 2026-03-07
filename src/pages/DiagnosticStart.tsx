@@ -261,6 +261,7 @@ const DiagnosticStart = () => {
               <Button variant="hero" size="xl" onClick={() => { trackEvent("diagnostic_started"); trackPostHogEvent("diagnostic_started"); setStep(1); }} className="w-full sm:w-auto">
                 Démarrer le diagnostic <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
+              <TrustedBy filter="diagnostic" className="mt-6" />
             </div>
           )}
 

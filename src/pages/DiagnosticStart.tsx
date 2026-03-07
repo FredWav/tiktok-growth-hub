@@ -144,7 +144,9 @@ const DiagnosticStart = () => {
 
   const handleBlockerNext = () => {
     const minChars = data.audience === "5k-50k" || data.audience === "50k+" ? 150 : 10;
+    console.log("[Diagnostic] handleBlockerNext — blocage length:", data.blocage.trim().length, "minChars:", minChars);
     if (data.blocage.trim().length < minChars) {
+      console.log("[Diagnostic] Blocage too short");
       setErrors({
         blocage: minChars === 150
           ? "Merci de détailler ton blocage (min. 150 caractères) pour une analyse précise."
@@ -153,33 +155,50 @@ const DiagnosticStart = () => {
       return;
     }
     setErrors({});
+    const recommendedOffer = getRecommendedOffer();
+    console.log("[Diagnostic] handleBlockerNext — recommendedOffer:", recommendedOffer);
+    console.log("[Diagnostic] Full context:", {
+      firstName: data.firstName,
+      tiktokUrl: data.tiktokUrl,
+      audience: data.audience,
+      objectif: data.objectif,
+      budget: data.budget,
+      temps: data.temps,
+      email: data.email,
+      blocage: data.blocage.substring(0, 50) + "...",
+      recommendedOffer,
+    });
     trackEvent("diagnostic_completed", {
       audience: data.audience,
       objectif: data.objectif,
       budget: data.budget,
       temps: data.temps,
-      recommended_offer: getRecommendedOffer(),
+      recommended_offer: recommendedOffer,
     });
     saveLead(
-      { blocker: data.blocage, recommended_offer: getRecommendedOffer() },
+      { blocker: data.blocage, recommended_offer: recommendedOffer },
       7,
       true
     );
-    // Fire-and-forget notification
-    supabase.functions.invoke("notify-diagnostic", {
-      body: {
-        first_name: data.firstName,
-        email: data.email,
-        tiktok: data.tiktokUrl,
-        level: data.audience,
-        objective: data.objectif,
-        blocker: data.blocage,
-        budget: data.budget,
-        temps: data.temps,
-        recommended_offer: getRecommendedOffer(),
-      },
-    });
+    // Notification with response logging
+    const notifyPayload = {
+      first_name: data.firstName,
+      email: data.email,
+      tiktok: data.tiktokUrl,
+      level: data.audience,
+      objective: data.objectif,
+      blocker: data.blocage,
+      budget: data.budget,
+      temps: data.temps,
+      recommended_offer: recommendedOffer,
+    };
+    console.log("[Diagnostic] notify-diagnostic payload:", notifyPayload);
+    supabase.functions.invoke("notify-diagnostic", { body: notifyPayload }).then(
+      (res) => console.log("[Diagnostic] notify-diagnostic response:", res),
+      (err) => console.error("[Diagnostic] notify-diagnostic error:", err)
+    );
     sessionStorage.setItem("from_diagnostic", "true");
+    console.log("[Diagnostic] Navigating to /processing");
     navigate("/processing");
   };
 

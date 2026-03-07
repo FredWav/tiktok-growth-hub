@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useDiagnostic } from "@/contexts/DiagnosticContext";
 import { SEOHead } from "@/components/SEOHead";

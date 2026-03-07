@@ -52,7 +52,7 @@ export function Header() {
           {/* CTA Button */}
           <div className="hidden lg:block">
             <Button asChild>
-              <Link to="/one-shot">Réserver mon One Shot (179€)</Link>
+              <Link to="/one-shot" onClick={() => trackPostHogEvent("click_nav_cta", { location: "header" })}>Réserver mon One Shot (179€)</Link>
             </Button>
           </div>
 

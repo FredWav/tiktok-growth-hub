@@ -126,14 +126,17 @@ const DiagnosticStart = () => {
   };
 
   const handleEmailNext = () => {
+    console.log("[Diagnostic] handleEmailNext — email:", data.email);
     const result = emailSchema.safeParse({ email: data.email });
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
       result.error.errors.forEach((e) => { if (e.path[0]) fieldErrors[e.path[0] as string] = e.message; });
+      console.log("[Diagnostic] Email validation failed:", fieldErrors);
       setErrors(fieldErrors);
       return;
     }
     setErrors({});
+    console.log("[Diagnostic] Email validated → step 7");
     trackEvent("diagnostic_step_email", { email: data.email });
     saveLead({ email: data.email }, 6);
     setStep(7);

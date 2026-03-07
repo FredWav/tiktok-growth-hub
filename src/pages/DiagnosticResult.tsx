@@ -163,6 +163,7 @@ const DiagnosticResult = () => {
                 <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer }); trackPostHogEvent("cta_clicked", { offer_type: "EXPRESS", destination: "/analyse-express" }); }}>
                   <Link to="/analyse-express">Lancer le Scan de mon compte</Link>
                 </Button>
+                <TrustedBy className="mt-4" />
               </CardContent>
             </Card>
           )}

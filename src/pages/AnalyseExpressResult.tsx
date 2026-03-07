@@ -229,7 +229,7 @@ export default function AnalyseExpressResult() {
                   Réessayer
                 </Button>
                 <Button asChild>
-                  <Link to="/analyse-express">Nouvelle analyse</Link>
+                  <Link to="/analyse-express" onClick={() => trackPostHogEvent("click_analyse_express_new", { location: "error" })}>Nouvelle analyse</Link>
                 </Button>
               </div>
             </div>

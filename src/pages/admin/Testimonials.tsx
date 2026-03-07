@@ -181,28 +181,29 @@ const Testimonials = () => {
         <DialogContent className="bg-noir-light border-primary/20 text-cream">
           <DialogHeader>
             <DialogTitle>{editingId ? "Modifier" : "Ajouter"} un client</DialogTitle>
+            <DialogDescription className="text-cream/50">Remplissez les informations du client à afficher.</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div>
-              <Label>Nom</Label>
-              <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="Prénom Nom" className="mt-1" />
+              <Label className="text-cream">Nom</Label>
+              <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="Prénom Nom" className="mt-1 text-cream bg-noir border-primary/20 placeholder:text-cream/30" />
             </div>
 
             <div>
-              <Label>Photo de profil</Label>
+              <Label className="text-cream">Photo de profil</Label>
               <div className="flex items-center gap-3 mt-1">
                 <Avatar className="h-14 w-14">
                   {form.avatar_url ? <AvatarImage src={form.avatar_url} /> : null}
                   <AvatarFallback className="bg-primary/10 text-primary">?</AvatarFallback>
                 </Avatar>
-                <Input type="file" accept="image/*" onChange={handleUpload} disabled={uploading} />
+                <Input type="file" accept="image/*" onChange={handleUpload} disabled={uploading} className="text-cream bg-noir border-primary/20 file:text-cream/60" />
               </div>
             </div>
 
             <div>
-              <Label>Lien TikTok</Label>
-              <Input value={form.tiktok_url} onChange={(e) => setForm((f) => ({ ...f, tiktok_url: e.target.value }))} placeholder="https://tiktok.com/@..." className="mt-1" />
+              <Label className="text-cream">Lien TikTok</Label>
+              <Input value={form.tiktok_url} onChange={(e) => setForm((f) => ({ ...f, tiktok_url: e.target.value }))} placeholder="https://tiktok.com/@..." className="mt-1 text-cream bg-noir border-primary/20 placeholder:text-cream/30" />
             </div>
 
             <div>

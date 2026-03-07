@@ -1,30 +1,36 @@
 
 
-## Analyse de compatibilite avec la doc API complete
+## Plan : Scroll horizontal infini pour les témoignages texte sur mobile
 
-### Ce qui fonctionne deja correctement
+### Contexte
+La section "Ce qu'ils en disent" (lignes 233-259) affiche les témoignages en grille `md:grid-cols-2 lg:grid-cols-3`. Sur petit écran, les 5 cards s'empilent verticalement — beaucoup de scroll.
 
-| Aspect | Code actuel | Verdict |
-|--------|------------|---------|
-| `health_score` (nombre ou objet) | Fix applique : extrait `.total` si objet | OK |
-| Status `processing_insights` | Tombe dans le `else` → retourne `processing` au front | OK |
-| Status `completed` / `failed` | Gere explicitement | OK |
-| `ai_insights` detection | Check truthy/string vide | OK |
+### Changement
 
-### Probleme identifie : `processing_insights` traite comme simple `processing`
+**Fichier** : `src/pages/Preuves.tsx`
 
-La doc revele un statut **`processing_insights`** (progress ~97%) ou le scraping est fini mais l'IA genere encore (~2 min). Le code actuel le traite comme `processing` generique, ce qui fonctionne mais :
+- Sur mobile (`md` et en dessous), remplacer la grille par un conteneur de scroll horizontal avec défilement infini (marquee CSS).
+- Sur desktop (`md+`), conserver la grille actuelle.
 
-1. **Le front ne sait pas** que le scraping est fini et que seule l'IA reste — l'UX pourrait afficher un message plus precis
-2. **Le `current_step`** est deja transmis au front (`job.current_step`), donc le message "Generating AI strategic insights..." devrait arriver naturellement
+**Approche technique** : CSS animation `marquee` avec duplication des items pour créer l'illusion de boucle infinie.
 
-**Verdict : pas de bug, ca fonctionne.** Le polling continue jusqu'a `completed`.
+- Ajouter un wrapper avec `overflow-hidden` visible uniquement sur mobile (`md:hidden`)
+- À l'intérieur, un `flex gap-4 animate-marquee` contenant les cards dupliquées (×2) pour la continuité
+- Chaque card en `min-w-[300px] shrink-0`
+- Ajouter l'animation `@keyframes marquee` dans le className via Tailwind `animate-` ou inline style
+- Ajouter `pause on hover` (`hover:pause` via animation-play-state)
+- Garder la grille actuelle avec `hidden md:grid` pour desktop
 
-### Seul point d'attention restant
+**Keyframes** à ajouter dans `tailwind.config.ts` :
+```
+marquee: { "0%": { transform: "translateX(0)" }, "100%": { transform: "translateX(-50%)" } }
+```
+Animation : `marquee 30s linear infinite`
 
-La doc montre que `health_score` a la racine du `result` est un **nombre simple** (74), pas un objet. Mais dans les donnees reelles qu'on a observees en base, c'etait un objet `{ total: 74, components: {...} }`. Le fix qu'on a applique gere les deux cas, donc c'est couvert.
+### Fichiers impactés
 
-### Conclusion
-
-**Aucune modification supplementaire necessaire.** Le code est compatible avec la doc API v1.1. Le fix `health_score` deja applique couvre les deux formats possibles (nombre ou objet avec `.total`).
+| Fichier | Modification |
+|---------|-------------|
+| `src/pages/Preuves.tsx` | Wrapper mobile marquee + grille desktop |
+| `tailwind.config.ts` | Ajouter keyframes `marquee` + animation |
 

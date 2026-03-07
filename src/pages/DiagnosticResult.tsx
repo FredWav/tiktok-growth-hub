@@ -223,6 +223,7 @@ const DiagnosticResult = () => {
                     Découvrir Wav Premium (45 min) <ExternalLink className="w-4 h-4 ml-2" />
                   </a>
                 </Button>
+                <TrustedBy className="mt-4" />
                 <MailFooter />
               </CardContent>
             </Card>

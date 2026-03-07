@@ -4,6 +4,7 @@ import { Layout } from "@/components/layout/Layout";
 import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Home, FileText, Zap } from "lucide-react";
+import { trackPostHogEvent } from "@/lib/posthog";
 
 const NotFound = () => {
   const location = useLocation();

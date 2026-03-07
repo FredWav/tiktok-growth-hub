@@ -94,6 +94,14 @@ const DiagnosticResult = () => {
   const offer = getOffer();
   console.log("[DiagnosticResult] score:", score, "scoreLabel:", scoreLabel, "offer:", offer, "audience:", data.audience, "budget:", data.budget);
 
+  // Fire result_page_viewed once
+  useEffect(() => {
+    if (!tracked) {
+      trackPostHogEvent("result_page_viewed", { maturity_score: score, recommended_offer: offer });
+      setTracked(true);
+    }
+  }, [tracked, score, offer]);
+
   const MailFooter = () => (
     <p className="text-sm text-muted-foreground mt-4">
       Besoin d'en discuter par écrit ?{" "}

@@ -39,7 +39,9 @@ const DiagnosticResult = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("[DiagnosticResult] isComplete:", isComplete, "data:", data);
     if (!isComplete) {
+      console.log("[DiagnosticResult] Redirecting to /start (incomplete)");
       navigate("/start", { replace: true });
     }
     sessionStorage.setItem("from_diagnostic", "true");

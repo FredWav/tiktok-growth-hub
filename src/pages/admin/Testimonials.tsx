@@ -219,8 +219,8 @@ const Testimonials = () => {
             </div>
 
             <div>
-              <Label>Ordre d'affichage</Label>
-              <Input type="number" value={form.display_order} onChange={(e) => setForm((f) => ({ ...f, display_order: parseInt(e.target.value) || 0 }))} className="mt-1 w-24" />
+              <Label className="text-cream">Ordre d'affichage</Label>
+              <Input type="number" value={form.display_order} onChange={(e) => setForm((f) => ({ ...f, display_order: parseInt(e.target.value) || 0 }))} className="mt-1 w-24 text-cream bg-noir border-primary/20" />
             </div>
           </div>
 

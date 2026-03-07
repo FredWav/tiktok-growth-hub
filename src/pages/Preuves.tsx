@@ -237,7 +237,31 @@ export default function Preuves() {
           subtitle="Retours directs de clients après leur accompagnement."
         />
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Mobile: marquee horizontal infini */}
+        <div className="md:hidden overflow-hidden">
+          <div className="flex gap-4 animate-marquee hover:[animation-play-state:paused] w-max">
+            {[...testimonials, ...testimonials].map((testimonial, index) => (
+              <Card key={index} className="min-w-[300px] shrink-0 hover:shadow-lg transition-shadow">
+                <CardContent className="p-6">
+                  <Quote className="h-8 w-8 text-primary/30 mb-4" />
+                  <p className="text-muted-foreground mb-4">{testimonial.content}</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-semibold">{testimonial.name}</div>
+                      <div className="text-sm text-muted-foreground">{testimonial.role}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-semibold text-primary">{testimonial.result}</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop: grille classique */}
+        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {testimonials.map((testimonial, index) => (
             <Card key={index} className="hover:shadow-lg transition-shadow">
               <CardContent className="p-6">

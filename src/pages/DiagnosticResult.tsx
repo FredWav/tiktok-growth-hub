@@ -195,7 +195,7 @@ const DiagnosticResult = () => {
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Structuration business</li>
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Scale de l'audience</li>
                 </ul>
-                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer }); trackPostHogEvent("click_calendly", { offer }); }}>
+                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer }); trackPostHogEvent("cta_clicked", { offer_type: "PREMIUM", destination: "calendly" }); }}>
                   <a href={CALENDLY_URL} target="_blank" rel="noopener noreferrer">
                     Réserver une discussion stratégique (45 min) <ExternalLink className="w-4 h-4 ml-2" />
                   </a>

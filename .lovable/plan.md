@@ -1,30 +1,25 @@
 
 
-## Analyse de compatibilite avec la doc API complete
+## Plan
 
-### Ce qui fonctionne deja correctement
+### 1. DiagnosticResult.tsx
 
-| Aspect | Code actuel | Verdict |
-|--------|------------|---------|
-| `health_score` (nombre ou objet) | Fix applique : extrait `.total` si objet | OK |
-| Status `processing_insights` | Tombe dans le `else` → retourne `processing` au front | OK |
-| Status `completed` / `failed` | Gere explicitement | OK |
-| `ai_insights` detection | Check truthy/string vide | OK |
+- Add `const CALENDLY_ONE_SHOT = "https://calendly.com/fredwavcm/appel-strategie-30min";` after `CALENDLY_URL` (line 13)
+- **ONE_SHOT block**: Change CardTitle to "Ton plan d'action personnalisé", replace `<Link to="/one-shot">` with `<a href={CALENDLY_ONE_SHOT} target="_blank">`, update PostHog destination to `"calendly_one_shot"`
+- **ONE_SHOT_PLUS_PREMIUM block**: Change CardTitle to "Ton plan d'action personnalisé", replace first `<Link to="/one-shot">` with same `<a href={CALENDLY_ONE_SHOT}>`, keep secondary Wav Premium button unchanged
 
-### Probleme identifie : `processing_insights` traite comme simple `processing`
+### 2. Home.tsx
 
-La doc revele un statut **`processing_insights`** (progress ~97%) ou le scraping est fini mais l'IA genere encore (~2 min). Le code actuel le traite comme `processing` generique, ce qui fonctionne mais :
+- Import `TrustedBy` from `@/components/TrustedBy`
+- **Delete** `proofs` array (lines 53-66)
+- **Replace testimonials section** (lines 253-279): Change title to "Ils etaient la ou tu es maintenant", subtitle to "Createurs et entrepreneurs qui ont clarifie leur strategie.", replace 3 generic cards with real quotes from Preuves.tsx:
+  - Estelle / Membre de la formation / "Ce qui m'a le plus aide..." / Analyse de compte
+  - Betty / Entrepreneure / "En tant qu'entrepreneure..." / Contrats obtenus
+  - Alex / Coffre a Cartes / "J'ai pris la formation..." / Professionnalisation
+- Keep "Voir toutes les preuves" button
+- **Add `<TrustedBy />`** after the "A qui ca s'adresse" section (after line 218), before "Ce que tu obtiens en One Shot"
 
-1. **Le front ne sait pas** que le scraping est fini et que seule l'IA reste — l'UX pourrait afficher un message plus precis
-2. **Le `current_step`** est deja transmis au front (`job.current_step`), donc le message "Generating AI strategic insights..." devrait arriver naturellement
-
-**Verdict : pas de bug, ca fonctionne.** Le polling continue jusqu'a `completed`.
-
-### Seul point d'attention restant
-
-La doc montre que `health_score` a la racine du `result` est un **nombre simple** (74), pas un objet. Mais dans les donnees reelles qu'on a observees en base, c'etait un objet `{ total: 74, components: {...} }`. Le fix qu'on a applique gere les deux cas, donc c'est couvert.
-
-### Conclusion
-
-**Aucune modification supplementaire necessaire.** Le code est compatible avec la doc API v1.1. Le fix `health_score` deja applique couvre les deux formats possibles (nombre ou objet avec `.total`).
+### Files modified
+- `src/pages/DiagnosticResult.tsx`
+- `src/pages/Home.tsx`
 

@@ -265,16 +265,22 @@ export default function Home() {
       {/* ===== Preuves ===== */}
       <Section variant="default" size="lg">
         <SectionHeader
-          title="Ce qu'ils en disent"
-          subtitle="Des résultats concrets, pas des promesses."
+          title="Ils étaient là où tu es maintenant"
+          subtitle="Créateurs et entrepreneurs qui ont clarifié leur stratégie."
         />
 
         <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-8">
-          {proofs.map((proof) => (
-            <Card key={proof.title} className="border-border">
-              <CardContent className="pt-6">
-                <h3 className="font-semibold mb-2">{proof.title}</h3>
-                <p className="text-sm text-muted-foreground">{proof.excerpt}</p>
+          {homeTestimonials.map((t) => (
+            <Card key={t.name} className="border-border">
+              <CardContent className="pt-6 flex flex-col h-full">
+                <p className="text-sm text-muted-foreground mb-4 flex-1">"{t.content}"</p>
+                <div className="flex items-center justify-between mt-auto">
+                  <div>
+                    <div className="font-semibold">{t.name}</div>
+                    <div className="text-xs text-muted-foreground">{t.role}</div>
+                  </div>
+                  <div className="text-sm font-semibold text-primary">{t.result}</div>
+                </div>
               </CardContent>
             </Card>
           ))}

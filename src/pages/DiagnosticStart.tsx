@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { SEOHead } from "@/components/SEOHead";
 import { z } from "zod";
@@ -60,7 +60,8 @@ const OptionCard = ({
 );
 
 const DiagnosticStart = () => {
-  const [step, setStep] = useState(0);
+  const [searchParams] = useSearchParams();
+  const [step, setStep] = useState(() => searchParams.get("go") === "1" ? 1 : 0);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const leadIdRef = useRef<string | null>(null);
   const navigate = useNavigate();

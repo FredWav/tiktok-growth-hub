@@ -172,7 +172,7 @@ export default function Home() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{ animationDelay: "0.2s" }}>
             <Button variant="hero" size="xl" asChild onClick={() => trackEvent("cta_diagnostic_click", { location: "hero" })}>
-              <Link to="/start">
+              <Link to="/start?go=1">
                 Réserve un appel stratégique avec moi
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>

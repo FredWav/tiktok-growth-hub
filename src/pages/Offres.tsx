@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/tracking";
 import { SEOHead } from "@/components/SEOHead";
 import { TrustedBy } from "@/components/TrustedBy";
+import { ScreenshotWall } from "@/components/ScreenshotWall";
 
 const profileSelector = [
   { label: "Un diagnostic clair", target: "one-shot", icon: Zap },

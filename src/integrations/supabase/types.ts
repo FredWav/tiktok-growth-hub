@@ -135,6 +135,42 @@ export type Database = {
           },
         ]
       }
+      client_screenshots: {
+        Row: {
+          caption: string | null
+          client_name: string | null
+          created_at: string
+          display_locations: string[]
+          display_order: number
+          id: string
+          image_url: string
+          is_active: boolean
+          offer: string[]
+        }
+        Insert: {
+          caption?: string | null
+          client_name?: string | null
+          created_at?: string
+          display_locations?: string[]
+          display_order?: number
+          id?: string
+          image_url: string
+          is_active?: boolean
+          offer?: string[]
+        }
+        Update: {
+          caption?: string | null
+          client_name?: string | null
+          created_at?: string
+          display_locations?: string[]
+          display_order?: number
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          offer?: string[]
+        }
+        Relationships: []
+      }
       clients: {
         Row: {
           company: string | null

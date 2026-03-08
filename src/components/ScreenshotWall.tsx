@@ -25,14 +25,14 @@ export const ScreenshotWall = ({
     <div className={className}>
       <SectionHeader title={title} subtitle={subtitle} />
 
-      <div className="columns-2 md:columns-3 lg:columns-4 gap-4 max-w-5xl mx-auto">
+      <div className="columns-2 md:columns-3 gap-5 max-w-4xl mx-auto">
         {screenshots.map((s) => (
           <div
             key={s.id}
-            className="mb-4 break-inside-avoid cursor-pointer group"
+            className="mb-5 break-inside-avoid cursor-pointer group"
             onClick={() => setSelected(s.image_url)}
           >
-            <div className="relative rounded-xl overflow-hidden shadow-md border border-border transition-transform group-hover:scale-[1.02]">
+            <div className="relative rounded-2xl overflow-hidden shadow-lg border border-border transition-transform group-hover:scale-[1.02]">
               <img
                 src={s.image_url}
                 alt={s.client_name ? `Message de ${s.client_name}` : "Message client"}

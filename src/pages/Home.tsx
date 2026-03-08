@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle, Zap, Target, Crown, TrendingUp, TrendingDown, Eye, FileText, Video, BarChart3, Lightbulb, MessageSquare, type LucideIcon } from "lucide-react";
+import { ArrowRight, CheckCircle, Zap, Target, Crown, TrendingUp, TrendingDown, Eye, FileText, Video, BarChart3, Lightbulb, MessageSquare, Quote, type LucideIcon } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";

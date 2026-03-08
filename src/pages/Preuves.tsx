@@ -281,37 +281,39 @@ export default function Preuves() {
       </Section>
 
       {/* CTA after videos */}
-      <Section variant="dark" size="md">
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="font-display text-2xl md:text-3xl font-semibold text-cream mb-4">
-            Prêt à obtenir les mêmes résultats ?
-          </h2>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              variant="hero"
-              size="lg"
-              asChild
-              onClick={() => trackEvent("cta_one_shot_click", { location: "preuves_mid" })}
-            >
-              <Link to="/one-shot">
-                Réserver mon One Shot (179€)
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-            <Button
-              variant="premium"
-              size="lg"
-              asChild
-              onClick={() => trackEvent("cta_45j_click", { location: "preuves_mid" })}
-            >
-              <Link to="/45-jours">
-                Candidater au Wav Premium
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
+      <div className="px-4 md:px-0">
+        <Section variant="dark" size="md" className="rounded-2xl md:rounded-none">
+          <div className="max-w-2xl mx-auto text-center">
+            <h2 className="font-display text-2xl md:text-3xl font-semibold text-cream mb-4">
+              Prêt à obtenir les mêmes résultats ?
+            </h2>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button
+                variant="hero"
+                size="lg"
+                asChild
+                onClick={() => trackEvent("cta_one_shot_click", { location: "preuves_mid" })}
+              >
+                <Link to="/one-shot">
+                  Réserver mon One Shot (179€)
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button
+                variant="premium"
+                size="lg"
+                asChild
+                onClick={() => trackEvent("cta_45j_click", { location: "preuves_mid" })}
+              >
+                <Link to="/45-jours">
+                  Candidater au Wav Premium
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
           </div>
-        </div>
-      </Section>
+        </Section>
+      </div>
 
       {/* Stats */}
       <Section variant="default" size="sm">

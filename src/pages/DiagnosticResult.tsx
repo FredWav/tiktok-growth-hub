@@ -8,6 +8,7 @@ import { ExternalLink, Mail } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
 import { trackPostHogEvent } from "@/lib/posthog";
 import { TrustedBy } from "@/components/TrustedBy";
+import { ScreenshotWall } from "@/components/ScreenshotWall";
 
 const CALENDLY_URL = "https://calendly.com/fredwavcm/wav-premium";
 const CALENDLY_ONE_SHOT = "https://calendly.com/fredwavcm/appel-strategie-30min";

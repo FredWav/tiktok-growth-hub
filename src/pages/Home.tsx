@@ -191,7 +191,7 @@ export default function Home() {
 
       {/* ===== Proof strip ===== */}
       <Section variant="dark" size="sm">
-        <div className="flex flex-wrap justify-center gap-x-8 gap-y-3">
+        <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 px-2">
           {proofStrip.map((item, index) => (
             <div key={index} className="flex items-center gap-2 text-sm text-cream/80">
               <CheckCircle className="h-4 w-4 text-primary" />

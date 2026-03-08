@@ -231,6 +231,9 @@ const DiagnosticResult = () => {
             </Card>
           )}
         </div>
+
+        {/* Screenshot Wall */}
+        <ScreenshotWall location="diagnostic_result" title="Leurs messages" subtitle="Des retours authentiques, sans filtre." className="mt-10" />
       </div>
     </div>
   );

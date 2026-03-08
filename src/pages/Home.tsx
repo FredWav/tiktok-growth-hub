@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle, Zap, Target, Crown, TrendingUp, TrendingDown, Eye, FileText, Video, BarChart3, Lightbulb, MessageSquare, Quote, type LucideIcon } from "lucide-react";
+import { ArrowRight, CheckCircle, Zap, Target, Crown, TrendingUp, TrendingDown, Eye, FileText, Video, BarChart3, Lightbulb, MessageSquare, type LucideIcon } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -50,27 +50,6 @@ const deliverables = [
   { icon: TrendingUp, text: "Optimisation de ton positionnement et de ta bio" },
   { icon: Video, text: "Replay de la session disponible après" },
   { icon: MessageSquare, text: "Analyse de tes stats et recommandations concrètes" },
-];
-
-const homeTestimonials = [
-  {
-    name: "Estelle",
-    role: "Membre de la formation",
-    content: "Ce qui m'a le plus aidé, c'était l'analyse de compte. J'ai fait une autre formation social media, et ta valeur ajoutée est visible dès le début. La communauté qui se soutient, les feedbacks directs... Merci Fred pour tout ce boulot, c'est génial.",
-    result: "Analyse de compte",
-  },
-  {
-    name: "Betty",
-    role: "Entrepreneure",
-    content: "En tant qu'entrepreneure, j'ai besoin de toucher ma cible. L'analyse de compte, les prises de conscience et les choix à faire... j'ai obtenu des contrats depuis ! Le gros plus ? Le suivi sur la durée et la communauté. Je valide et je recommande.",
-    result: "Contrats obtenus",
-  },
-  {
-    name: "Alex",
-    role: "Coffre à Cartes",
-    content: "J'ai pris la formation pour apprendre les dessous de l'application et me professionnaliser. L'accompagnement était total, l'interaction avec les autres juste parfait. Outils, tips, conseils et entraide, tout est réuni.",
-    result: "Professionnalisation",
-  },
 ];
 
 const offers = [
@@ -265,32 +244,10 @@ export default function Home() {
         </div>
       </Section>
 
-      {/* ===== Preuves ===== */}
+      {/* ===== Preuves sociales ===== */}
       <Section variant="default" size="lg">
-        <SectionHeader
-          title="Ils étaient là où tu es maintenant"
-          subtitle="Créateurs et entrepreneurs qui ont clarifié leur stratégie."
-        />
-
-        <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-8">
-          {homeTestimonials.map((t) => (
-            <Card key={t.name} className="border-border">
-              <CardContent className="pt-6 flex flex-col h-full">
-                <Quote className="h-8 w-8 text-primary/30 mb-4" />
-                <p className="text-sm text-muted-foreground mb-4 flex-1">"{t.content}"</p>
-                <div className="flex items-center justify-between mt-auto">
-                  <div>
-                    <div className="font-semibold">{t.name}</div>
-                    <div className="text-xs text-muted-foreground">{t.role}</div>
-                  </div>
-                  <div className="text-sm font-semibold text-primary">{t.result}</div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        <div className="text-center">
+        <ScreenshotWall location="home" title="Ils étaient là où tu es maintenant" subtitle="Créateurs et entrepreneurs qui ont clarifié leur stratégie." />
+        <div className="text-center mt-10">
           <Button variant="premium" size="lg" asChild onClick={() => trackEvent("click_proof_strip", { location: "home" })}>
             <Link to="/preuves">
               Voir toutes les preuves
@@ -298,11 +255,6 @@ export default function Home() {
             </Link>
           </Button>
         </div>
-      </Section>
-
-      {/* ===== Captures clients ===== */}
-      <Section variant="cream" size="lg">
-        <ScreenshotWall location="home" title="Leurs messages" subtitle="Des retours authentiques, sans filtre." />
       </Section>
 
       {/* ===== Comment choisir ===== */}

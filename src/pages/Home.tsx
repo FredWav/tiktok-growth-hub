@@ -52,27 +52,6 @@ const deliverables = [
   { icon: MessageSquare, text: "Analyse de tes stats et recommandations concrètes" },
 ];
 
-const homeTestimonials = [
-  {
-    name: "Estelle",
-    role: "Membre de la formation",
-    content: "Ce qui m'a le plus aidé, c'était l'analyse de compte. J'ai fait une autre formation social media, et ta valeur ajoutée est visible dès le début. La communauté qui se soutient, les feedbacks directs... Merci Fred pour tout ce boulot, c'est génial.",
-    result: "Analyse de compte",
-  },
-  {
-    name: "Betty",
-    role: "Entrepreneure",
-    content: "En tant qu'entrepreneure, j'ai besoin de toucher ma cible. L'analyse de compte, les prises de conscience et les choix à faire... j'ai obtenu des contrats depuis ! Le gros plus ? Le suivi sur la durée et la communauté. Je valide et je recommande.",
-    result: "Contrats obtenus",
-  },
-  {
-    name: "Alex",
-    role: "Coffre à Cartes",
-    content: "J'ai pris la formation pour apprendre les dessous de l'application et me professionnaliser. L'accompagnement était total, l'interaction avec les autres juste parfait. Outils, tips, conseils et entraide, tout est réuni.",
-    result: "Professionnalisation",
-  },
-];
-
 const offers = [
     {
     icon: Crown,

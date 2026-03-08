@@ -123,15 +123,21 @@ const Testimonials = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-display font-bold text-cream">Témoignages</h1>
-            <p className="text-cream/60 text-sm">Gérez les clients affichés sur les pages publiques.</p>
-          </div>
-          <Button onClick={openCreate} className="gap-2">
-            <Plus className="h-4 w-4" /> Ajouter
-          </Button>
-        </div>
+        <h1 className="text-2xl font-display font-bold text-cream">Témoignages & Preuves sociales</h1>
+        <p className="text-cream/60 text-sm">Gérez les clients et captures affichés sur les pages publiques.</p>
+
+        <Tabs defaultValue="clients" className="w-full">
+          <TabsList className="bg-noir border border-primary/10">
+            <TabsTrigger value="clients">Clients de confiance</TabsTrigger>
+            <TabsTrigger value="screenshots">Captures d'écran</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="clients" className="space-y-6 mt-6">
+            <div className="flex items-center justify-end">
+              <Button onClick={openCreate} className="gap-2">
+                <Plus className="h-4 w-4" /> Ajouter
+              </Button>
+            </div>
 
         {isLoading ? (
           <p className="text-cream/60">Chargement...</p>

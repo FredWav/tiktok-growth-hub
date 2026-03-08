@@ -8,6 +8,7 @@ import { trackEvent } from "@/lib/tracking";
 import { SEOHead } from "@/components/SEOHead";
 import { WavSocialScanPopup } from "@/components/WavSocialScanPopup";
 import { TrustedBy } from "@/components/TrustedBy";
+import { ScreenshotWall } from "@/components/ScreenshotWall";
 import {
   Accordion,
   AccordionContent,

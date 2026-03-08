@@ -190,16 +190,18 @@ export default function Home() {
       </Section>
 
       {/* ===== Proof strip ===== */}
-      <Section variant="dark" size="sm">
-        <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 px-2">
-          {proofStrip.map((item, index) => (
-            <div key={index} className="flex items-center gap-2 text-sm text-cream/80">
-              <CheckCircle className="h-4 w-4 text-primary" />
-              <span>{item}</span>
-            </div>
-          ))}
-        </div>
-      </Section>
+      <div className="px-4 md:px-0">
+        <Section variant="dark" size="sm" className="rounded-2xl md:rounded-none mx-0 md:mx-0">
+          <div className="flex flex-wrap justify-center gap-x-8 gap-y-3">
+            {proofStrip.map((item, index) => (
+              <div key={index} className="flex items-center gap-2 text-sm text-cream/80">
+                <CheckCircle className="h-4 w-4 text-primary" />
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
+        </Section>
+      </div>
 
       {/* ===== À qui ça s'adresse ===== */}
       <Section variant="default" size="lg">

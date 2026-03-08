@@ -298,6 +298,11 @@ export default function Home() {
         </div>
       </Section>
 
+      {/* ===== Captures clients ===== */}
+      <Section variant="cream" size="lg">
+        <ScreenshotWall location="home" title="Leurs messages" subtitle="Des retours authentiques, sans filtre." />
+      </Section>
+
       {/* ===== Comment choisir ===== */}
       <Section variant="cream" size="lg">
         <SectionHeader

@@ -275,6 +275,11 @@ export default function Preuves() {
         </div>
       </Section>
 
+      {/* Screenshot Wall */}
+      <Section variant="cream" size="lg">
+        <ScreenshotWall location="preuves" title="Leurs messages" subtitle="Des retours authentiques, sans filtre." />
+      </Section>
+
       {/* CTA after videos */}
       <Section variant="dark" size="md">
         <div className="max-w-2xl mx-auto text-center">

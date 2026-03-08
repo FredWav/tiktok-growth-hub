@@ -269,6 +269,11 @@ export default function Offres() {
         <TrustedBy />
       </Section>
 
+      {/* Screenshot Wall */}
+      <Section variant="cream" size="lg">
+        <ScreenshotWall location="offres" title="Leurs messages" subtitle="Des retours authentiques, sans filtre." />
+      </Section>
+
       {/* CTA */}
       <Section variant="cream" size="lg">
         <div className="max-w-2xl mx-auto text-center">

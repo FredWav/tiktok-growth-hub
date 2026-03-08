@@ -273,6 +273,7 @@ export default function Home() {
           {homeTestimonials.map((t) => (
             <Card key={t.name} className="border-border">
               <CardContent className="pt-6 flex flex-col h-full">
+                <Quote className="h-8 w-8 text-primary/30 mb-4" />
                 <p className="text-sm text-muted-foreground mb-4 flex-1">"{t.content}"</p>
                 <div className="flex items-center justify-between mt-auto">
                   <div>

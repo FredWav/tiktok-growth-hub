@@ -1,30 +1,18 @@
 
 
-## Analyse de compatibilite avec la doc API complete
+## Constat
 
-### Ce qui fonctionne deja correctement
+**DiagnosticResult.tsx** : toutes les modifications demandees sont deja en place (CALENDLY_ONE_SHOT, titres, liens `<a>`, tracking PostHog). Aucun changement necessaire.
 
-| Aspect | Code actuel | Verdict |
-|--------|------------|---------|
-| `health_score` (nombre ou objet) | Fix applique : extrait `.total` si objet | OK |
-| Status `processing_insights` | Tombe dans le `else` → retourne `processing` au front | OK |
-| Status `completed` / `failed` | Gere explicitement | OK |
-| `ai_insights` detection | Check truthy/string vide | OK |
+**Home.tsx** : TrustedBy, homeTestimonials, titre "Ils etaient la ou tu es maintenant" sont deja implementes. La seule difference avec la demande est l'ajout de l'icone `Quote` dans chaque carte de temoignage (comme sur Preuves.tsx).
 
-### Probleme identifie : `processing_insights` traite comme simple `processing`
+## Modifications
 
-La doc revele un statut **`processing_insights`** (progress ~97%) ou le scraping est fini mais l'IA genere encore (~2 min). Le code actuel le traite comme `processing` generique, ce qui fonctionne mais :
+### Home.tsx
 
-1. **Le front ne sait pas** que le scraping est fini et que seule l'IA reste — l'UX pourrait afficher un message plus precis
-2. **Le `current_step`** est deja transmis au front (`job.current_step`), donc le message "Generating AI strategic insights..." devrait arriver naturellement
+1. **Import** : Ajouter `Quote` dans la ligne d'import Lucide (ligne 2)
 
-**Verdict : pas de bug, ca fonctionne.** Le polling continue jusqu'a `completed`.
+2. **Cartes temoignages** (lignes 274-285) : Ajouter `<Quote className="h-8 w-8 text-primary/30 mb-4" />` au debut de chaque CardContent, avant le texte du temoignage -- alignant le design avec celui de la page Preuves.
 
-### Seul point d'attention restant
-
-La doc montre que `health_score` a la racine du `result` est un **nombre simple** (74), pas un objet. Mais dans les donnees reelles qu'on a observees en base, c'etait un objet `{ total: 74, components: {...} }`. Le fix qu'on a applique gere les deux cas, donc c'est couvert.
-
-### Conclusion
-
-**Aucune modification supplementaire necessaire.** Le code est compatible avec la doc API v1.1. Le fix `health_score` deja applique couvre les deux formats possibles (nombre ou objet avec `.total`).
+Aucun autre fichier a modifier.
 

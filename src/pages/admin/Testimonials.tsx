@@ -8,9 +8,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Pencil, Trash2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { AdminScreenshots } from "@/components/admin/AdminScreenshots";
 
 const OFFER_OPTIONS = [
   { value: "one_shot", label: "One Shot" },
@@ -121,15 +123,21 @@ const Testimonials = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-display font-bold text-cream">Témoignages</h1>
-            <p className="text-cream/60 text-sm">Gérez les clients affichés sur les pages publiques.</p>
-          </div>
-          <Button onClick={openCreate} className="gap-2">
-            <Plus className="h-4 w-4" /> Ajouter
-          </Button>
-        </div>
+        <h1 className="text-2xl font-display font-bold text-cream">Témoignages & Preuves sociales</h1>
+        <p className="text-cream/60 text-sm">Gérez les clients et captures affichés sur les pages publiques.</p>
+
+        <Tabs defaultValue="clients" className="w-full">
+          <TabsList className="bg-noir border border-primary/10">
+            <TabsTrigger value="clients">Clients de confiance</TabsTrigger>
+            <TabsTrigger value="screenshots">Captures d'écran</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="clients" className="space-y-6 mt-6">
+            <div className="flex items-center justify-end">
+              <Button onClick={openCreate} className="gap-2">
+                <Plus className="h-4 w-4" /> Ajouter
+              </Button>
+            </div>
 
         {isLoading ? (
           <p className="text-cream/60">Chargement...</p>
@@ -175,6 +183,12 @@ const Testimonials = () => {
             ))}
           </div>
         )}
+          </TabsContent>
+
+          <TabsContent value="screenshots" className="mt-6">
+            <AdminScreenshots />
+          </TabsContent>
+        </Tabs>
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

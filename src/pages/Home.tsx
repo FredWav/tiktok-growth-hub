@@ -8,6 +8,7 @@ import { trackEvent } from "@/lib/tracking";
 import { SEOHead } from "@/components/SEOHead";
 import { WavSocialScanPopup } from "@/components/WavSocialScanPopup";
 import { TrustedBy } from "@/components/TrustedBy";
+import { ScreenshotWall } from "@/components/ScreenshotWall";
 import {
   Accordion,
   AccordionContent,
@@ -295,6 +296,11 @@ export default function Home() {
             </Link>
           </Button>
         </div>
+      </Section>
+
+      {/* ===== Captures clients ===== */}
+      <Section variant="cream" size="lg">
+        <ScreenshotWall location="home" title="Leurs messages" subtitle="Des retours authentiques, sans filtre." />
       </Section>
 
       {/* ===== Comment choisir ===== */}

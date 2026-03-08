@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { trackEvent } from "@/lib/tracking";
 import { SEOHead } from "@/components/SEOHead";
+import { ScreenshotWall } from "@/components/ScreenshotWall";
 
 const videoTestimonials = [
   { id: "97xyXqwszrM", alt: "Témoignage client - Retour d'expérience sur l'accompagnement" },
@@ -272,6 +273,11 @@ export default function Preuves() {
             <VideoCard key={video.id} id={video.id} alt={video.alt} />
           ))}
         </div>
+      </Section>
+
+      {/* Screenshot Wall */}
+      <Section variant="cream" size="lg">
+        <ScreenshotWall location="preuves" title="Leurs messages" subtitle="Des retours authentiques, sans filtre." />
       </Section>
 
       {/* CTA after videos */}

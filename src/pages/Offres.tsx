@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/tracking";
 import { SEOHead } from "@/components/SEOHead";
 import { TrustedBy } from "@/components/TrustedBy";
+import { ScreenshotWall } from "@/components/ScreenshotWall";
 
 const profileSelector = [
   { label: "Un diagnostic clair", target: "one-shot", icon: Zap },
@@ -266,6 +267,11 @@ export default function Offres() {
       {/* Social proof */}
       <Section variant="default" size="md">
         <TrustedBy />
+      </Section>
+
+      {/* Screenshot Wall */}
+      <Section variant="cream" size="lg">
+        <ScreenshotWall location="offres" title="Leurs messages" subtitle="Des retours authentiques, sans filtre." />
       </Section>
 
       {/* CTA */}

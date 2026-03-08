@@ -1,11 +1,9 @@
 import { Link } from "react-router-dom";
-import { useState, useEffect, useCallback, useRef } from "react";
-import useEmblaCarousel from "embla-carousel-react";
-import { ArrowRight, Quote, TrendingUp, Users, Eye, Play, Check, X, Target, Zap, Crown } from "lucide-react";
+import { useState } from "react";
+import { ArrowRight, TrendingUp, Users, Eye, Play, Check, X, Target, Zap, Crown } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { trackEvent } from "@/lib/tracking";
 import { SEOHead } from "@/components/SEOHead";
 import { ScreenshotWall } from "@/components/ScreenshotWall";
@@ -57,39 +55,6 @@ function VideoCard({ id, alt }: { id: string; alt: string }) {
     </button>
   );
 }
-
-const testimonials = [
-  {
-    name: "Estelle",
-    role: "Membre de la formation",
-    content: "Ce qui m'a le plus aidé, c'était l'analyse de compte. J'ai fait une autre formation social media, et ta valeur ajoutée est visible dès le début. La communauté qui se soutient, les feedbacks directs... Merci Fred pour tout ce boulot, c'est génial.",
-    result: "Analyse de compte",
-  },
-  {
-    name: "Delphine",
-    role: "Membre de la formation",
-    content: "Grâce à ta patience et à tes conseils bienveillants, je me suis sentie tout de suite à l'aise. Tout est clair, concis et précis. En résumé : l'écoute, le professionnalisme, la disponibilité et les supports adaptés à tous. Je conseille vivement, même à ceux qui ne sont pas doués en informatique !",
-    result: "Mise en confiance",
-  },
-  {
-    name: "Alex",
-    role: "Coffre à Cartes",
-    content: "J'ai pris la formation pour apprendre les dessous de l'application et me professionnaliser. L'accompagnement était total, l'interaction avec les autres juste parfait. Outils, tips, conseils et entraide, tout est réuni.",
-    result: "Professionnalisation",
-  },
-  {
-    name: "Betty",
-    role: "Entrepreneure",
-    content: "En tant qu'entrepreneure, j'ai besoin de toucher ma cible. L'analyse de compte, les prises de conscience et les choix à faire... j'ai obtenu des contrats depuis ! Le gros plus ? Le suivi sur la durée et la communauté. Je valide et je recommande.",
-    result: "Contrats obtenus",
-  },
-  {
-    name: "Reva",
-    role: "Créatrice de contenu",
-    content: "Ta formation, c'est bien plus qu'un programme : c'est une vraie mine de ressources, un espace de soutien et un accompagnement hyper précieux. Grâce à toi, j'ai appris énormément de choses. Je ne lâche pas !",
-    result: "Mine de ressources",
-  },
-];
 
 const caseStudies = [
   {
@@ -151,95 +116,6 @@ const chooseOffers = [
   },
 ];
 
-type Testimonial = typeof testimonials[number];
-
-function MobileTestimonialCarousel({ testimonials }: { testimonials: Testimonial[] }) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "center" });
-  const directionRef = useRef<"forward" | "backward">("forward");
-  const prevIndexRef = useRef(0);
-  const isUserActionRef = useRef(false);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const startAutoScroll = useCallback(() => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    intervalRef.current = setInterval(() => {
-      if (!emblaApi) return;
-      if (directionRef.current === "forward") emblaApi.scrollNext();
-      else emblaApi.scrollPrev();
-    }, 4000);
-  }, [emblaApi]);
-
-  const stopAutoScroll = useCallback(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-
-    const onSelect = () => {
-      const newIndex = emblaApi.selectedScrollSnap();
-      if (isUserActionRef.current) {
-        const total = emblaApi.scrollSnapList().length;
-        const diff = (newIndex - prevIndexRef.current + total) % total;
-        if (diff <= total / 2) directionRef.current = "forward";
-        else directionRef.current = "backward";
-        isUserActionRef.current = false;
-      }
-      prevIndexRef.current = newIndex;
-    };
-
-    const onPointerDown = () => {
-      isUserActionRef.current = true;
-      stopAutoScroll();
-    };
-
-    const onPointerUp = () => {
-      startAutoScroll();
-    };
-
-    emblaApi.on("select", onSelect);
-    emblaApi.on("pointerDown", onPointerDown);
-    emblaApi.on("pointerUp", onPointerUp);
-    startAutoScroll();
-
-    return () => {
-      stopAutoScroll();
-      emblaApi.off("select", onSelect);
-      emblaApi.off("pointerDown", onPointerDown);
-      emblaApi.off("pointerUp", onPointerUp);
-    };
-  }, [emblaApi, startAutoScroll, stopAutoScroll]);
-
-  return (
-    <div className="md:hidden overflow-hidden" ref={emblaRef}>
-      <div className="flex">
-        {testimonials.map((testimonial, index) => (
-          <div key={index} className="flex-[0_0_92%] min-w-0 pl-3 first:pl-0">
-            <Card className="h-full">
-              <CardContent className="p-6 flex flex-col h-full">
-                <Quote className="h-8 w-8 text-primary/30 mb-4" />
-                <p className="text-muted-foreground mb-4 flex-1">{testimonial.content}</p>
-                <div className="flex items-center justify-between mt-auto">
-                  <div>
-                    <div className="font-semibold">{testimonial.name}</div>
-                    <div className="text-sm text-muted-foreground">{testimonial.role}</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-semibold text-primary">{testimonial.result}</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export default function Preuves() {
   return (
     <Layout>
@@ -277,7 +153,7 @@ export default function Preuves() {
 
       {/* Screenshot Wall */}
       <Section variant="cream" size="lg">
-        <ScreenshotWall location="preuves" title="Leurs messages" subtitle="Des retours authentiques, sans filtre." />
+        <ScreenshotWall location="preuves" title="Ce qu'ils en disent" subtitle="Retours directs de clients après leur accompagnement." />
       </Section>
 
       {/* CTA after videos */}
@@ -324,37 +200,6 @@ export default function Preuves() {
               <div className="text-2xl font-bold">{stat.value}</div>
               <div className="text-sm text-muted-foreground">{stat.label}</div>
             </div>
-          ))}
-        </div>
-      </Section>
-
-      {/* Testimonials */}
-      <Section variant="default" size="lg">
-        <SectionHeader
-          title="Ce qu'ils en disent"
-          subtitle="Retours directs de clients après leur accompagnement."
-        />
-
-        <MobileTestimonialCarousel testimonials={testimonials} />
-
-        {/* Desktop: grille classique */}
-        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {testimonials.map((testimonial, index) => (
-            <Card key={index} className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-6 flex flex-col h-full">
-                <Quote className="h-8 w-8 text-primary/30 mb-4" />
-                <p className="text-muted-foreground mb-4 flex-1">{testimonial.content}</p>
-                <div className="flex items-center justify-between mt-auto">
-                  <div>
-                    <div className="font-semibold">{testimonial.name}</div>
-                    <div className="text-sm text-muted-foreground">{testimonial.role}</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-semibold text-primary">{testimonial.result}</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           ))}
         </div>
       </Section>

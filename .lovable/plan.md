@@ -1,22 +1,30 @@
 
 
-## Plan : Remplacer les témoignages texte hardcodés par le ScreenshotWall sur /preuves
+## Analyse de compatibilite avec la doc API complete
 
-### Constat
+### Ce qui fonctionne deja correctement
 
-La seule page avec des commentaires texte hardcodés est **Preuves.tsx** (lignes 61-152) : 5 témoignages (Estelle, Delphine, Alex, Betty, Reva) affichés en cartes avec carousel mobile.
+| Aspect | Code actuel | Verdict |
+|--------|------------|---------|
+| `health_score` (nombre ou objet) | Fix applique : extrait `.total` si objet | OK |
+| Status `processing_insights` | Tombe dans le `else` → retourne `processing` au front | OK |
+| Status `completed` / `failed` | Gere explicitement | OK |
+| `ai_insights` detection | Check truthy/string vide | OK |
 
-Un `ScreenshotWall` existe déjà sur cette page (ligne 280) avec le titre "Leurs messages". Les vrais messages sont déjà là, les cartes hardcodées font doublon.
+### Probleme identifie : `processing_insights` traite comme simple `processing`
 
-### Modifications dans `src/pages/Preuves.tsx`
+La doc revele un statut **`processing_insights`** (progress ~97%) ou le scraping est fini mais l'IA genere encore (~2 min). Le code actuel le traite comme `processing` generique, ce qui fonctionne mais :
 
-1. **Supprimer** le tableau `testimonials` (lignes 61-92)
-2. **Supprimer** le type `Testimonial` et le composant `MobileTestimonialCarousel` (lignes 154-241)
-3. **Supprimer** toute la section "Ce qu'ils en disent" (lignes 331-360) : le SectionHeader, le carousel mobile, et la grille desktop
-4. **Agrandir le ScreenshotWall existant** : changer le titre en "Ce qu'ils en disent" et le sous-titre en "Retours directs de clients après leur accompagnement." pour reprendre le wording de la section supprimée
-5. **Nettoyer les imports** : retirer `Quote`, `useEmblaCarousel`, `useCallback`, `useRef`, `useEffect` s'ils ne sont plus utilisés, ainsi que `Card`/`CardContent`
+1. **Le front ne sait pas** que le scraping est fini et que seule l'IA reste — l'UX pourrait afficher un message plus precis
+2. **Le `current_step`** est deja transmis au front (`job.current_step`), donc le message "Generating AI strategic insights..." devrait arriver naturellement
 
-### Résultat
+**Verdict : pas de bug, ca fonctionne.** Le polling continue jusqu'a `completed`.
 
-La page /preuves affichera : Hero → Vidéos YouTube → ScreenshotWall (vrais messages, plus gros) → CTA → Stats → Études de cas → Offres. Plus aucun commentaire hardcodé.
+### Seul point d'attention restant
+
+La doc montre que `health_score` a la racine du `result` est un **nombre simple** (74), pas un objet. Mais dans les donnees reelles qu'on a observees en base, c'etait un objet `{ total: 74, components: {...} }`. Le fix qu'on a applique gere les deux cas, donc c'est couvert.
+
+### Conclusion
+
+**Aucune modification supplementaire necessaire.** Le code est compatible avec la doc API v1.1. Le fix `health_score` deja applique couvre les deux formats possibles (nombre ou objet avec `.total`).
 

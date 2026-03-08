@@ -60,7 +60,8 @@ const OptionCard = ({
 );
 
 const DiagnosticStart = () => {
-  const [step, setStep] = useState(0);
+  const [searchParams] = useSearchParams();
+  const [step, setStep] = useState(() => searchParams.get("go") === "1" ? 1 : 0);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const leadIdRef = useRef<string | null>(null);
   const navigate = useNavigate();

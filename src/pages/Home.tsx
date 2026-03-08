@@ -51,18 +51,24 @@ const deliverables = [
   { icon: MessageSquare, text: "Analyse de tes stats et recommandations concrètes" },
 ];
 
-const proofs = [
+const homeTestimonials = [
   {
-    title: "Résultats visibles dès les premières semaines",
-    excerpt: "Des créateurs qui passent de l'invisibilité à une audience qualifiée grâce à une stratégie claire.",
+    name: "Estelle",
+    role: "Membre de la formation",
+    content: "Ce qui m'a le plus aidé, c'était l'analyse de compte. J'ai fait une autre formation social media, et ta valeur ajoutée est visible dès le début. La communauté qui se soutient, les feedbacks directs... Merci Fred pour tout ce boulot, c'est génial.",
+    result: "Analyse de compte",
   },
   {
-    title: "Une méthode qui s'adapte à chaque niche",
-    excerpt: "Que tu sois coach, artisan ou e-commerçant, la stratégie s'adapte à ton marché.",
+    name: "Betty",
+    role: "Entrepreneure",
+    content: "En tant qu'entrepreneure, j'ai besoin de toucher ma cible. L'analyse de compte, les prises de conscience et les choix à faire... j'ai obtenu des contrats depuis ! Le gros plus ? Le suivi sur la durée et la communauté. Je valide et je recommande.",
+    result: "Contrats obtenus",
   },
   {
-    title: "Des retours concrets, pas du vent",
-    excerpt: "Chaque recommandation est basée sur les données, pas sur des tendances génériques.",
+    name: "Alex",
+    role: "Coffre à Cartes",
+    content: "J'ai pris la formation pour apprendre les dessous de l'application et me professionnaliser. L'accompagnement était total, l'interaction avec les autres juste parfait. Outils, tips, conseils et entraide, tout est réuni.",
+    result: "Professionnalisation",
   },
 ];
 

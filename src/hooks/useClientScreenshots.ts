@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export interface ClientScreenshot {
@@ -44,22 +44,34 @@ export const useAllClientScreenshots = () => {
 };
 
 export const useCreateClientScreenshot = () => {
-  const { useMutation, useQueryClient } = require("@tanstack/react-query");
-  // We'll use inline mutations instead
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: Omit<ClientScreenshot, "id" | "created_at">) => {
+      const { error } = await supabase.from("client_screenshots").insert(data);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["client-screenshots"] }),
+  });
 };
 
-// Export mutation helpers for admin
-export const clientScreenshotMutations = {
-  async create(data: Omit<ClientScreenshot, "id" | "created_at">) {
-    const { error } = await supabase.from("client_screenshots").insert(data);
-    if (error) throw error;
-  },
-  async update(id: string, data: Partial<ClientScreenshot>) {
-    const { error } = await supabase.from("client_screenshots").update(data).eq("id", id);
-    if (error) throw error;
-  },
-  async remove(id: string) {
-    const { error } = await supabase.from("client_screenshots").delete().eq("id", id);
-    if (error) throw error;
-  },
+export const useUpdateClientScreenshot = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...data }: { id: string } & Partial<ClientScreenshot>) => {
+      const { error } = await supabase.from("client_screenshots").update(data).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["client-screenshots"] }),
+  });
+};
+
+export const useDeleteClientScreenshot = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("client_screenshots").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["client-screenshots"] }),
+  });
 };

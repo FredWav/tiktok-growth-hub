@@ -224,6 +224,11 @@ export default function Home() {
         </div>
       </Section>
 
+      {/* ===== Trusted By ===== */}
+      <Section variant="default" size="sm">
+        <TrustedBy />
+      </Section>
+
       {/* ===== Ce que tu obtiens en One Shot ===== */}
       <Section variant="cream" size="lg">
         <SectionHeader

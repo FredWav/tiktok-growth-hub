@@ -183,6 +183,12 @@ const Testimonials = () => {
             ))}
           </div>
         )}
+          </TabsContent>
+
+          <TabsContent value="screenshots" className="mt-6">
+            <AdminScreenshots />
+          </TabsContent>
+        </Tabs>
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

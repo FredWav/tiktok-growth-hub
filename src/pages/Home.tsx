@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trackEvent } from "@/lib/tracking";
 import { SEOHead } from "@/components/SEOHead";
 import { WavSocialScanPopup } from "@/components/WavSocialScanPopup";
+import { TrustedBy } from "@/components/TrustedBy";
 import {
   Accordion,
   AccordionContent,

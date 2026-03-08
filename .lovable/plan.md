@@ -1,30 +1,35 @@
 
 
-## Analyse de compatibilite avec la doc API complete
+## Plan : Supprimer les temoignages hardcodes et agrandir le ScreenshotWall
 
-### Ce qui fonctionne deja correctement
+### Constat
 
-| Aspect | Code actuel | Verdict |
-|--------|------------|---------|
-| `health_score` (nombre ou objet) | Fix applique : extrait `.total` si objet | OK |
-| Status `processing_insights` | Tombe dans le `else` → retourne `processing` au front | OK |
-| Status `completed` / `failed` | Gere explicitement | OK |
-| `ai_insights` detection | Check truthy/string vide | OK |
+La page Home.tsx contient :
+1. Une section "Ils etaient la ou tu es maintenant" avec 3 temoignages hardcodes (Estelle, Betty, Alex) en cartes -- lignes 265-301
+2. Une section ScreenshotWall juste en dessous -- lignes 303-306
 
-### Probleme identifie : `processing_insights` traite comme simple `processing`
+L'idee : supprimer la section hardcodee et remonter/agrandir le ScreenshotWall pour qu'il devienne LA section preuve sociale principale.
 
-La doc revele un statut **`processing_insights`** (progress ~97%) ou le scraping est fini mais l'IA genere encore (~2 min). Le code actuel le traite comme `processing` generique, ce qui fonctionne mais :
+### Modifications
 
-1. **Le front ne sait pas** que le scraping est fini et que seule l'IA reste — l'UX pourrait afficher un message plus precis
-2. **Le `current_step`** est deja transmis au front (`job.current_step`), donc le message "Generating AI strategic insights..." devrait arriver naturellement
+#### Home.tsx
 
-**Verdict : pas de bug, ca fonctionne.** Le polling continue jusqu'a `completed`.
+1. **Supprimer** le tableau `homeTestimonials` (lignes 55-74) et l'import `Quote` devenu inutile
+2. **Supprimer** toute la section temoignages hardcodes (lignes 265-301) : le `SectionHeader`, la grille de cartes, le bouton "Voir toutes les preuves"
+3. **Fusionner** dans la section ScreenshotWall existante (lignes 303-306) :
+   - Passer le titre "Ils etaient la ou tu es maintenant" et le sous-titre au ScreenshotWall
+   - Ajouter le bouton "Voir toutes les preuves" sous le ScreenshotWall
+   - Changer le variant de la section en "default" pour la differencier de "Comment choisir" qui est en cream
 
-### Seul point d'attention restant
+#### ScreenshotWall.tsx
 
-La doc montre que `health_score` a la racine du `result` est un **nombre simple** (74), pas un objet. Mais dans les donnees reelles qu'on a observees en base, c'etait un objet `{ total: 74, components: {...} }`. Le fix qu'on a applique gere les deux cas, donc c'est couvert.
+4. **Agrandir l'affichage** : passer la grille de `columns-2 md:columns-3 lg:columns-4` a `columns-2 md:columns-3` avec `max-w-4xl` pour des images plus grandes et plus lisibles
+5. Augmenter le shadow et le border-radius pour plus d'impact visuel
 
-### Conclusion
+### Fichiers modifies
 
-**Aucune modification supplementaire necessaire.** Le code est compatible avec la doc API v1.1. Le fix `health_score` deja applique couvre les deux formats possibles (nombre ou objet avec `.total`).
+| Fichier | Action |
+|---------|--------|
+| `src/pages/Home.tsx` | Supprimer section temoignages hardcodes, integrer titre + CTA dans la section ScreenshotWall |
+| `src/components/ScreenshotWall.tsx` | Agrandir la grille (moins de colonnes, images plus grandes) |
 

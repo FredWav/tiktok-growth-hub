@@ -10,6 +10,7 @@ import { trackPostHogEvent } from "@/lib/posthog";
 import { TrustedBy } from "@/components/TrustedBy";
 
 const CALENDLY_URL = "https://calendly.com/fredwavcm/wav-premium";
+const CALENDLY_ONE_SHOT = "https://calendly.com/fredwavcm/appel-strategie-30min";
 
 const ScoreCircle = ({ score }: { score: number }) => {
   const radius = 54;
@@ -170,15 +171,15 @@ const DiagnosticResult = () => {
 
           {offer === "ONE_SHOT" && (
             <Card>
-              <CardHeader><CardTitle className="font-display text-xl">Audit stratégique TikTok (179 €)</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="font-display text-xl">Ton plan d'action personnalisé</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Analyse complète du compte</li>
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Identification des erreurs de structure</li>
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Plan d'action personnalisé</li>
                 </ul>
-                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer }); trackPostHogEvent("cta_clicked", { offer_type: "ONE_SHOT", destination: "/one-shot" }); }}>
-                  <Link to="/one-shot">Réserver mon Audit stratégique <ExternalLink className="w-4 h-4 ml-2" /></Link>
+                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer }); trackPostHogEvent("cta_clicked", { offer_type: "ONE_SHOT", destination: "calendly_one_shot" }); }}>
+                  <a href={CALENDLY_ONE_SHOT} target="_blank" rel="noopener noreferrer">Réserver mon appel stratégique (30 min) <ExternalLink className="w-4 h-4 ml-2" /></a>
                 </Button>
                 <TrustedBy filter="one_shot" className="mt-4" />
                 <MailFooter />
@@ -208,15 +209,15 @@ const DiagnosticResult = () => {
 
           {offer === "ONE_SHOT_PLUS_PREMIUM" && (
             <Card>
-              <CardHeader><CardTitle className="font-display text-xl">Audit stratégique TikTok (179 €)</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="font-display text-xl">Ton plan d'action personnalisé</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Analyse complète du compte</li>
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Identification des erreurs de structure</li>
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Plan d'action personnalisé</li>
                 </ul>
-                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer: "ONE_SHOT" }); trackPostHogEvent("cta_clicked", { offer_type: "ONE_SHOT", destination: "/one-shot" }); }}>
-                  <Link to="/one-shot">Réserver mon Audit stratégique <ExternalLink className="w-4 h-4 ml-2" /></Link>
+                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer: "ONE_SHOT" }); trackPostHogEvent("cta_clicked", { offer_type: "ONE_SHOT", destination: "calendly_one_shot" }); }}>
+                  <a href={CALENDLY_ONE_SHOT} target="_blank" rel="noopener noreferrer">Réserver mon appel stratégique (30 min) <ExternalLink className="w-4 h-4 ml-2" /></a>
                 </Button>
                 <Button variant="outline" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer: "PREMIUM" }); trackPostHogEvent("secondary_cta_clicked", { offer_type: "PREMIUM_UPSELL" }); }}>
                   <a href={CALENDLY_URL} target="_blank" rel="noopener noreferrer">

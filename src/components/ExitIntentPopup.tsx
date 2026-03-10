@@ -46,7 +46,7 @@ export function ExitIntentPopup() {
   const handleGo = () => {
     trackPostHogEvent("exit_intent_popup_click");
     setOpen(false);
-    navigate("/one-shot");
+    navigate("/analyse-express");
   };
 
   return (

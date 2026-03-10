@@ -61,7 +61,7 @@ export function ExitIntentPopup() {
           </DialogDescription>
         </DialogHeader>
         <Button variant="hero" size="lg" onClick={handleGo} className="w-full mt-2">
-          Voir le One Shot (Analyse Express)
+          Lancer mon Analyse Express (11,90€)
           <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
       </DialogContent>

@@ -57,7 +57,7 @@ export function ExitIntentPopup() {
             Pas encore prêt pour un accompagnement complet ?
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground pt-2">
-            Ne laisse pas ton compte stagner. Débloque ta visibilité immédiatement avec un audit chirurgical de 1h30 sur tes contenus et ta conversion.
+            Ne laisse pas ton compte stagner. Lance un audit automatique de ton profil TikTok en 3 minutes : health score, métriques clés et recommandations personnalisées.
           </DialogDescription>
         </DialogHeader>
         <Button variant="hero" size="lg" onClick={handleGo} className="w-full mt-2">

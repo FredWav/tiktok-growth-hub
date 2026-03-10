@@ -66,7 +66,7 @@ const offers = [
       "Analyse du positionnement et optimisation de ta bio.",
       "Lecture stratégique de tes contenus pour cibler les faiblesses structurelles.",
       "Diagnostic de tes hooks, estimation des points de décrochage et analyse du CTA.",
-      "Script Doctor : recommandations concrètes d'amélioration.",
+      "Replay de la session avec plan d'action concret.",
     ],
     cta: "Réserver mon One Shot (179€)",
     href: "/one-shot",

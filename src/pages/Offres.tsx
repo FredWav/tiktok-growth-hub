@@ -68,7 +68,7 @@ const offers = [
       "Diagnostic de tes hooks, estimation des points de décrochage et analyse du CTA.",
       "Script Doctor : recommandations concrètes d'amélioration.",
     ],
-    cta: "Réserver mon Analyse Express (1h30)",
+    cta: "Réserver mon One Shot (179€)",
     href: "/one-shot",
     trackEvent: "cta_one_shot_click",
     variant: "premium" as const,

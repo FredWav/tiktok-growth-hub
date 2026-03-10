@@ -1,30 +1,48 @@
 
 
-## Analyse de compatibilite avec la doc API complete
+## Plan : Vérification mobile-first + Mise à jour SEO globale
 
-### Ce qui fonctionne deja correctement
+### Constats
 
-| Aspect | Code actuel | Verdict |
-|--------|------------|---------|
-| `health_score` (nombre ou objet) | Fix applique : extrait `.total` si objet | OK |
-| Status `processing_insights` | Tombe dans le `else` → retourne `processing` au front | OK |
-| Status `completed` / `failed` | Gere explicitement | OK |
-| `ai_insights` detection | Check truthy/string vide | OK |
+**Mobile-first** : Le code est déjà mobile-first (Tailwind par défaut). Les patterns `px-4 md:px-0`, `rounded-2xl md:rounded-none`, `whitespace-normal` sont bien appliqués. Aucun problème structurel détecté.
 
-### Probleme identifie : `processing_insights` traite comme simple `processing`
+**SEO obsolète** : Plusieurs références au VIP et à l'ancien wording subsistent dans le SEO statique et dynamique.
 
-La doc revele un statut **`processing_insights`** (progress ~97%) ou le scraping est fini mais l'IA genere encore (~2 min). Le code actuel le traite comme `processing` generique, ce qui fonctionne mais :
+---
 
-1. **Le front ne sait pas** que le scraping est fini et que seule l'IA reste — l'UX pourrait afficher un message plus precis
-2. **Le `current_step`** est deja transmis au front (`job.current_step`), donc le message "Generating AI strategic insights..." devrait arriver naturellement
+### 1. `index.html` — Nettoyage SEO statique
 
-**Verdict : pas de bug, ca fonctionne.** Le polling continue jusqu'a `completed`.
+- **Meta description (l.8)** : Retirer ", VIP" → garder "One Shot, Wav Premium."
+- **JSON-LD ProfessionalService (l.70-110)** : Renommer `"Offres d'accompagnement"` → `"Accompagnements formats courts"`. Supprimer le bloc Offer VIP (l.94-109). Supprimer le prix du Wav Premium (`"price": "987"`).
+- **JSON-LD FAQPage (l.148)** : Changer "Je débute sur TikTok" → "Je débute sur les réseaux" pour cohérence avec le nouveau wording.
+- **Noscript (l.173-178)** : Remplacer "Nos offres" → "Nos accompagnements". Supprimer la ligne VIP. Retirer le prix du Wav Premium. Mettre à jour "Toutes les offres" → "Accompagnements".
 
-### Seul point d'attention restant
+### 2. `public/sitemap.xml`
 
-La doc montre que `health_score` a la racine du `result` est un **nombre simple** (74), pas un objet. Mais dans les donnees reelles qu'on a observees en base, c'etait un objet `{ total: 74, components: {...} }`. Le fix qu'on a applique gere les deux cas, donc c'est couvert.
+- Supprimer la ligne VIP (`/offres/vip`).
+- Mettre à jour les dates `lastmod` au `2026-03-10`.
 
-### Conclusion
+### 3. `src/pages/Preuves.tsx`
 
-**Aucune modification supplementaire necessaire.** Le code est compatible avec la doc API v1.1. Le fix `health_score` deja applique couvre les deux formats possibles (nombre ou objet avec `.total`).
+- **`chooseOffers` array (l.92-117)** : Supprimer la carte VIP. Changer `md:grid-cols-3` → `md:grid-cols-2` (l.291). Mettre à jour le sous-titre "Trois formules" → "Deux formules selon ton besoin."
+
+### 4. `src/pages/QuarantecinqJours.tsx`
+
+- **SEO schema (l.157)** : Supprimer `"price": "987"` du Wav Premium (le prix n'est plus affiché).
+
+### 5. `src/pages/Home.tsx` — SEO déjà à jour
+
+Aucun changement nécessaire, le SEO reflète déjà le nouveau wording.
+
+### 6. `src/pages/Offres.tsx` — SEO déjà à jour
+
+Aucun changement nécessaire.
+
+---
+
+### Fichiers modifiés
+- `index.html`
+- `public/sitemap.xml`
+- `src/pages/Preuves.tsx`
+- `src/pages/QuarantecinqJours.tsx`
 

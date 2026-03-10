@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle, Zap, Target, Crown, TrendingUp, TrendingDown, Eye, FileText, Video, BarChart3, Lightbulb, MessageSquare, type LucideIcon } from "lucide-react";
+import { ArrowRight, CheckCircle, Zap, Target, TrendingUp, AlertTriangle, BarChart3, FileText, Video, Lightbulb, MessageSquare, type LucideIcon } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trackEvent } from "@/lib/tracking";
 import { SEOHead } from "@/components/SEOHead";
 import { WavSocialScanPopup } from "@/components/WavSocialScanPopup";
+import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { TrustedBy } from "@/components/TrustedBy";
 import { ScreenshotWall } from "@/components/ScreenshotWall";
 import {
@@ -25,21 +26,22 @@ const proofStrip = [
   "Sans bullshit",
 ];
 
-const profiles: { icon: LucideIcon; title: string; description: string }[] = [
+const problems = [
   {
-    icon: TrendingDown,
-    title: "Tu postes, ça ne décolle pas",
-    description: "Tu fais des efforts mais tes vidéos stagnent à 200 vues. Tu ne sais pas ce qui cloche.",
+    icon: AlertTriangle,
+    text: "Ton positionnement est bancal et ta proposition de valeur manque de clarté.",
   },
   {
-    icon: Eye,
-    title: "Tu as des vues mais pas de clients",
-    description: "L'algo te pousse mais personne n'achète. Ton contenu divertit au lieu de convertir.",
+    icon: AlertTriangle,
+    text: "Tes hooks sont faibles et la rétention s'effondre dans les premières secondes.",
   },
   {
-    icon: Target,
-    title: "Tu veux structurer ton contenu pour vendre",
-    description: "Tu sais que les réseaux peuvent rapporter, tu veux juste la bonne méthode pour y arriver.",
+    icon: AlertTriangle,
+    text: "Tes scripts manquent de rythme et tes appels à l'action sont invisibles ou ignorés.",
+  },
+  {
+    icon: AlertTriangle,
+    text: "Tu n'arrives pas à identifier les erreurs précises qui limitent ta visibilité.",
   },
 ];
 
@@ -53,39 +55,40 @@ const deliverables = [
 ];
 
 const offers = [
-    {
-    icon: Crown,
-    title: "VIP",
-    subtitle: "Progresser dans la durée",
-    description: "Lives hebdo, feedback Discord 5/7, ressources exclusives. Le cadre continu des créateurs ambitieux.",
-    price: "À partir de 99€/mois",
-    cta: "Rejoindre le VIP",
-    href: "/offres/vip",
-    recommended: false,
-    trackEvent: "cta_vip_click",
-  },
-  {
-    icon: Zap,
-    title: "One Shot",
-    subtitle: "Diagnostic + plan d'action",
-    description: "1h30 pour comprendre ce qui bloque et repartir avec une stratégie claire. L'entrée la plus directe.",
-    price: "179€",
-    cta: "Réserver mon One Shot (179€)",
-    href: "/one-shot",
-    recommended: true,
-    trackEvent: "cta_one_shot_click",
-  },
   {
     icon: Target,
     title: "Wav Premium",
     subtitle: "Transformation guidée",
-    description: "Pour ceux qui veulent une transformation encadrée sur 45 jours. Suivi, livrables, résultats.",
-    price: "Sur candidature",
-    cta: "Candidater au Wav Premium",
+    description: "Ton copilote stratégique pendant 45 jours. On bâtit ensemble un écosystème scalable, indépendant et haut de gamme.",
+    price: null,
+    includes: [
+      "Clarification de la stratégie globale et refonte de l'architecture de contenu.",
+      "Itération rapide basée sur la data et le SEO TikTok.",
+      "Optimisation chirurgicale de chaque vidéo (rythme, rétention, conversion).",
+      "Suivi rigoureux : zéro bullshit, aucune tolérance pour le flou.",
+    ],
+    cta: "Réserve un appel stratégique avec Fred Wav",
     href: "/45-jours",
-    recommended: false,
+    recommended: true,
     trackEvent: "cta_45j_click",
-  }
+  },
+  {
+    icon: Zap,
+    title: "One Shot (Analyse Express)",
+    subtitle: "Diagnostic + plan d'action",
+    description: "Un audit chirurgical de 1h30 pour identifier les failles de ton compte et de tes vidéos. Objectif : savoir exactement quoi corriger aujourd'hui.",
+    price: "179€",
+    includes: [
+      "Analyse du positionnement et optimisation de ta bio.",
+      "Lecture stratégique de tes contenus pour cibler les faiblesses structurelles.",
+      "Diagnostic de tes hooks, estimation des points de décrochage et analyse du CTA.",
+      "Script Doctor : recommandations concrètes d'amélioration.",
+    ],
+    cta: "Réserver mon Analyse Express (1h30)",
+    href: "/one-shot",
+    recommended: false,
+    trackEvent: "cta_one_shot_click",
+  },
 ];
 
 const faqItems = [
@@ -119,6 +122,7 @@ export default function Home() {
   return (
     <Layout>
       <WavSocialScanPopup />
+      <ExitIntentPopup />
       <SEOHead title="Fred Wav - Expert Stratégie Formats Courts | Coaching et Accompagnement" description="Transforme tes réseaux en machine à clients. Diagnostic, stratégie de contenu et plan d'action avec Fred Wav, expert formats courts." path="/" keywords="stratégie formats courts, coaching réseaux sociaux, expert formats courts, plan action contenu, Fred Wav, audience réseaux, monétiser contenu" schema={[
         {
           "@context": "https://schema.org",
@@ -137,7 +141,7 @@ export default function Home() {
           "@type": "BreadcrumbList",
           "itemListElement": [
             { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://fredwav.com/" },
-            { "@type": "ListItem", "position": 2, "name": "Offres", "item": "https://fredwav.com/offres" },
+            { "@type": "ListItem", "position": 2, "name": "Accompagnements", "item": "https://fredwav.com/offres" },
             { "@type": "ListItem", "position": 3, "name": "One Shot", "item": "https://fredwav.com/one-shot" },
             { "@type": "ListItem", "position": 4, "name": "Wav Premium", "item": "https://fredwav.com/45-jours" },
             { "@type": "ListItem", "position": 5, "name": "Témoignages", "item": "https://fredwav.com/preuves" },
@@ -149,18 +153,18 @@ export default function Home() {
 
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 animate-fade-in">
-            Clarifie ta stratégie.{" "}
-            <span className="text-gold-gradient">Augmente ta visibilité.</span>
+            Arrête de naviguer à vue.{" "}
+            <span className="text-gold-gradient">Structure ta stratégie TikTok et explose tes conversions.</span>
           </h1>
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-            J'aide les créateurs et entrepreneurs à passer de "je poste au hasard" à "chaque vidéo a un objectif". Diagnostic, stratégie, plan d'action.
+            Ta visibilité stagne et ton audience ne convertit pas. Remplace le ressenti par un diagnostic précis et une architecture de contenu pensée pour l'acquisition.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{ animationDelay: "0.2s" }}>
             <Button variant="hero" size="xl" asChild onClick={() => trackEvent("cta_diagnostic_click", { location: "hero" })}>
-              <Link to="/start?go=1">
-                Réserve un appel stratégique avec moi
+              <Link to="/45-jours">
+                Réserve un appel stratégique avec Fred Wav
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
@@ -182,26 +186,19 @@ export default function Home() {
         </Section>
       </div>
 
-      {/* ===== À qui ça s'adresse ===== */}
+      {/* ===== Problème ===== */}
       <Section variant="default" size="lg">
         <SectionHeader
-          title="À qui ça s'adresse"
-          subtitle="Tu te reconnais dans une de ces situations ?"
+          title="Tu produis du contenu, mais ton acquisition est bloquée."
+          subtitle="Faire des vues pour faire des vues ne sert à rien si ton tunnel est vide. Si ta stratégie n'est pas millimétrée, tu perds des prospects qualifiés à chaque post."
         />
 
-        <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
-          {profiles.map((profile) => (
-            <Card key={profile.title} className="border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
-              <CardHeader className="text-center pb-2">
-                <div className="mx-auto mb-3 p-3 rounded-full bg-primary/10 w-fit">
-                  <profile.icon className="h-6 w-6 text-primary" />
-                </div>
-                <CardTitle className="font-display text-xl">{profile.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground text-center text-sm">{profile.description}</p>
-              </CardContent>
-            </Card>
+        <div className="grid md:grid-cols-2 gap-4 lg:gap-6 max-w-3xl mx-auto">
+          {problems.map((problem, index) => (
+            <div key={index} className="flex items-start gap-3 p-4 rounded-lg bg-destructive/5 border border-destructive/10">
+              <problem.icon className="h-5 w-5 text-destructive mt-0.5 shrink-0" />
+              <span className="text-sm">{problem.text}</span>
+            </div>
           ))}
         </div>
       </Section>
@@ -236,7 +233,7 @@ export default function Home() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in mt-8">
           <Button variant="hero" size="xl" asChild onClick={() => trackEvent("cta_one_shot_click", { location: "body" })}>
             <Link to="/one-shot">
-              Réserver mon One Shot (179€)
+              Réserver mon Analyse Express (1h30)
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
@@ -257,14 +254,14 @@ export default function Home() {
         </div>
       </Section>
 
-      {/* ===== Comment choisir ===== */}
+      {/* ===== Accompagnements ===== */}
       <Section variant="cream" size="lg">
         <SectionHeader
-          title="Comment choisir"
-          subtitle="Trois formules, trois niveaux d'engagement."
+          title="Accompagnements"
+          subtitle="Deux formules, deux niveaux d'engagement."
         />
 
-        <div className="flex flex-col md:flex-row md:items-stretch gap-6 lg:gap-8 max-w-5xl mx-auto">
+        <div className="flex flex-col md:flex-row md:items-stretch gap-6 lg:gap-8 max-w-4xl mx-auto">
           {offers.map((offer) => (
             <Card
               key={offer.title}
@@ -291,12 +288,23 @@ export default function Home() {
               </CardHeader>
 
               <CardContent className="flex-1 flex flex-col">
-                <p className="text-muted-foreground text-center mb-6 text-sm flex-1">{offer.description}</p>
+                <p className="text-muted-foreground text-center mb-4 text-sm">{offer.description}</p>
+
+                <ul className="space-y-2 mb-6 flex-1">
+                  {offer.includes.map((item, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm">
+                      <CheckCircle className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
 
                 <div className="mt-auto">
-                  <div className="text-center mb-6">
-                    <span className="text-2xl font-semibold">{offer.price}</span>
-                  </div>
+                  {offer.price && (
+                    <div className="text-center mb-6">
+                      <span className="text-2xl font-semibold">{offer.price}</span>
+                    </div>
+                  )}
 
                   <Button
                     variant={offer.recommended ? "hero" : "premium"}
@@ -351,7 +359,7 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="hero" size="xl" asChild onClick={() => trackEvent("cta_one_shot_click", { location: "bottom" })}>
               <Link to="/one-shot">
-                Réserver mon One Shot (179€)
+                Réserver mon Analyse Express (1h30)
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>

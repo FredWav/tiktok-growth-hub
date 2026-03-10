@@ -6,7 +6,7 @@ import { trackPostHogEvent } from "@/lib/posthog";
 
 const navItems = [
   { label: "Accueil", href: "/" },
-  { label: "Offres", href: "/offres" },
+  { label: "Accompagnements", href: "/offres" },
   { label: "Analyse Express", href: "/analyse-express" },
   { label: "Témoignages", href: "/preuves" },
   { label: "À propos", href: "/a-propos" },

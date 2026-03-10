@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Check, Zap, Target, Crown, Clock, Users, TrendingUp } from "lucide-react";
+import { ArrowRight, Check, Zap, Target, Clock, Users, TrendingUp } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -9,17 +9,47 @@ import { TrustedBy } from "@/components/TrustedBy";
 import { ScreenshotWall } from "@/components/ScreenshotWall";
 
 const profileSelector = [
-  { label: "Un diagnostic clair", target: "one-shot", icon: Zap },
   { label: "Une transformation encadrée", target: "wav-premium", icon: Target },
+  { label: "Un diagnostic clair", target: "one-shot", icon: Zap },
 ];
 
 const offers = [
   {
+    id: "wav-premium",
+    icon: Target,
+    title: "Wav Premium",
+    subtitle: "Transformation guidée",
+    description: "Ton copilote stratégique pendant 45 jours. On bâtit ensemble un écosystème scalable, indépendant et haut de gamme.",
+    price: null,
+    priceNote: null,
+    duration: "45 jours",
+    forWho: [
+      "Tu veux que ton contenu génère des clients, pas juste des vues",
+      "Tu es prêt à t'investir sérieusement",
+      "Tu veux un accompagnement personnalisé",
+    ],
+    notForWho: [
+      "Tu n'as pas le temps de créer du contenu",
+      "Tu cherches une solution miracle sans effort",
+    ],
+    includes: [
+      "Clarification de la stratégie globale et refonte de l'architecture de contenu.",
+      "Itération rapide basée sur la data et le SEO TikTok.",
+      "Optimisation chirurgicale de chaque vidéo (rythme, rétention, conversion).",
+      "Suivi rigoureux : zéro bullshit, aucune tolérance pour le flou.",
+    ],
+    cta: "Réserve un appel stratégique avec Fred Wav",
+    href: "/45-jours",
+    trackEvent: "cta_45j_click",
+    variant: "hero" as const,
+    recommended: true,
+  },
+  {
     id: "one-shot",
     icon: Zap,
-    title: "One Shot",
-    subtitle: "La clarté en 1h30",
-    description: "Une session intensive pour repartir avec un diagnostic clair et des recommandations actionnables.",
+    title: "One Shot (Analyse Express)",
+    subtitle: "Diagnostic + plan d'action",
+    description: "Un audit chirurgical de 1h30 pour identifier les failles de ton compte et de tes vidéos. Objectif : savoir exactement quoi corriger aujourd'hui.",
     price: "179€",
     priceNote: "Paiement unique",
     duration: "1h30",
@@ -33,57 +63,17 @@ const offers = [
       "Tu n'es pas prêt à appliquer les conseils",
     ],
     includes: [
-      "Diagnostic complet de ton compte",
-      "Analyse de ton marché et ta niche",
-      "Recommandations personnalisées",
-      "Ressources adaptées à ta situation",
-      "Replay de la session",
+      "Analyse du positionnement et optimisation de ta bio.",
+      "Lecture stratégique de tes contenus pour cibler les faiblesses structurelles.",
+      "Diagnostic de tes hooks, estimation des points de décrochage et analyse du CTA.",
+      "Script Doctor : recommandations concrètes d'amélioration.",
     ],
-    cta: "Réserver mon One Shot (179€)",
+    cta: "Réserver mon Analyse Express (1h30)",
     href: "/one-shot",
     trackEvent: "cta_one_shot_click",
-    variant: "hero" as const,
-    recommended: true,
-  },
-  {
-    id: "wav-premium",
-    icon: Target,
-    title: "Wav Premium",
-    subtitle: "Transformation guidée",
-    description: "45 jours pour transformer ton audience en revenus concrets. Suivi hebdomadaire et accès direct.",
-    price: "Sur candidature",
-    priceNote: "Appel de qualification requis",
-    duration: "45 jours",
-    forWho: [
-      "Tu veux que ton contenu génère des clients, pas juste des vues",
-      "Tu es prêt à t'investir sérieusement",
-      "Tu veux un accompagnement personnalisé",
-    ],
-    notForWho: [
-      "Tu n'as pas le temps de créer du contenu",
-      "Tu cherches une solution miracle sans effort",
-    ],
-    includes: [
-      "Onboarding complet avec stratégie sur mesure",
-      "Appels hebdomadaires de suivi",
-      "Review de tous tes contenus",
-      "Accès messagerie prioritaire",
-      "Templates et ressources exclusives",
-      "Optimisation continue de ta stratégie",
-    ],
-    cta: "Candidater au Wav Premium",
-    href: "/45-jours",
-    trackEvent: "cta_45j_click",
     variant: "premium" as const,
     recommended: false,
   },
-  // VIP offer hidden from storefront — backend routes preserved
-  // {
-  //   id: "vip",
-  //   icon: Crown,
-  //   title: "VIP",
-  //   ...
-  // },
 ];
 
 const stats = [
@@ -102,13 +92,13 @@ const scrollTo = (id: string) => {
 export default function Offres() {
   return (
     <Layout>
-      <SEOHead title="Offres et Tarifs - Fred Wav | Coaching Formats Courts" description="Découvre les offres d'accompagnement : One Shot (179€), Wav Premium et VIP. Trouve la formule adaptée à tes besoins." path="/offres" keywords="tarifs coaching formats courts, offres accompagnement, one shot, wav premium, vip, accompagnement créateur" schema={{
+      <SEOHead title="Accompagnements - Fred Wav | Coaching Formats Courts" description="Découvre les accompagnements : Wav Premium et One Shot (179€). Trouve la formule adaptée à tes besoins." path="/offres" keywords="tarifs coaching formats courts, accompagnements, one shot, wav premium, accompagnement créateur" schema={{
         "@context": "https://schema.org",
         "@type": "OfferCatalog",
-        "name": "Offres d'accompagnement Formats Courts - Fred Wav",
+        "name": "Accompagnements Formats Courts - Fred Wav",
         "itemListElement": [
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "One Shot", "description": "Session stratégique de 1h30 avec diagnostic complet et plan d'action personnalisé" }, "price": "179", "priceCurrency": "EUR" },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Wav Premium", "description": "45 jours de transformation avec suivi hebdomadaire et feedback continu" }, "price": "987", "priceCurrency": "EUR" },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Wav Premium", "description": "45 jours de transformation avec suivi hebdomadaire et feedback continu" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "One Shot (Analyse Express)", "description": "Session stratégique de 1h30 avec diagnostic complet et plan d'action personnalisé" }, "price": "179", "priceCurrency": "EUR" },
         ],
       }} />
       <Section variant="cream" size="lg">
@@ -163,7 +153,7 @@ export default function Offres() {
               {offer.recommended && (
                 <div className="text-center mb-6">
                   <span className="bg-primary text-primary-foreground text-xs font-semibold px-4 py-1.5 rounded-full">
-                    Recommandé pour commencer
+                    Recommandé
                   </span>
                 </div>
               )}
@@ -188,10 +178,12 @@ export default function Offres() {
                     {offer.description}
                   </p>
 
-                  <div className="flex items-baseline gap-2 mb-6">
-                    <span className="text-3xl font-bold">{offer.price}</span>
-                    <span className="text-muted-foreground">{offer.priceNote}</span>
-                  </div>
+                  {offer.price && (
+                    <div className="flex items-baseline gap-2 mb-6">
+                      <span className="text-3xl font-bold">{offer.price}</span>
+                      {offer.priceNote && <span className="text-muted-foreground">{offer.priceNote}</span>}
+                    </div>
+                  )}
 
                   <div className="flex items-center gap-4 text-sm text-muted-foreground mb-8">
                     <span className="flex items-center gap-1">
@@ -211,9 +203,11 @@ export default function Offres() {
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Paiement en 3x avec Klarna et 4x avec PayPal disponible, sous réserve d'acceptation.
-                  </p>
+                  {offer.price && (
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Paiement en 3x avec Klarna et 4x avec PayPal disponible, sous réserve d'acceptation.
+                    </p>
+                  )}
                 </div>
 
                 {/* Details */}
@@ -278,7 +272,7 @@ export default function Offres() {
       <Section variant="cream" size="lg">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="font-display text-3xl font-semibold mb-4">
-            Tu ne sais pas quelle offre choisir ?
+            Tu ne sais pas quel accompagnement choisir ?
           </h2>
           <p className="text-muted-foreground mb-6">
             Commence par un One Shot. On fera le point ensemble et je te conseillerai la suite adaptée à ta situation.
@@ -290,7 +284,7 @@ export default function Offres() {
             onClick={() => trackEvent("cta_one_shot_click", { location: "offres_bottom" })}
           >
             <Link to="/one-shot">
-              Réserver mon One Shot (179€)
+              Réserver mon Analyse Express (1h30)
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>

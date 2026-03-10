@@ -154,7 +154,7 @@ export default function QuarantecinqJours() {
             "name": "Wav Premium - Transformation 45 Jours",
             "description": "45 jours d'itération intensive pour transformer ton compte en actif business.",
             "provider": { "@type": "Person", "name": "Fred Wav", "url": "https://fredwav.com" },
-            "offers": { "@type": "Offer", "price": "987", "priceCurrency": "EUR" },
+            "offers": { "@type": "Offer", "priceCurrency": "EUR" },
           },
           {
             "@context": "https://schema.org",

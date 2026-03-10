@@ -106,14 +106,6 @@ const chooseOffers = [
     href: "/45-jours",
     trackEvent: "cta_45j_click",
   },
-  {
-    icon: Crown,
-    title: "VIP",
-    description: "Suivi continu, lives, feedback Discord",
-    cta: "Rejoindre le VIP",
-    href: "/offres/vip",
-    trackEvent: "cta_vip_click",
-  },
 ];
 
 export default function Preuves() {
@@ -285,10 +277,10 @@ export default function Preuves() {
       <Section variant="default" size="lg">
         <SectionHeader
           title="Quel accompagnement choisir ?"
-          subtitle="Trois formules selon ton besoin."
+          subtitle="Deux formules selon ton besoin."
         />
 
-        <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-8">
+        <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto mb-8">
           {chooseOffers.map((offer) => (
             <div key={offer.title} className="bg-muted/50 rounded-xl p-6 text-center border border-border hover:border-primary/30 transition-all">
               <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">

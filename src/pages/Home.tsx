@@ -74,8 +74,8 @@ const offers = [
   },
   {
     icon: Zap,
-    title: "One Shot (Analyse Express)",
-    subtitle: "Diagnostic + plan d'action",
+    title: "One Shot",
+    subtitle: "Session stratégique 1h30",
     description: "Un audit chirurgical de 1h30 pour identifier les failles de ton compte et de tes vidéos. Objectif : savoir exactement quoi corriger aujourd'hui.",
     price: "179€",
     includes: [

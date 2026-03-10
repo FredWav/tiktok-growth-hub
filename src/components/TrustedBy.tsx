@@ -13,7 +13,7 @@ export const TrustedBy = ({ filter, className = "" }: TrustedByProps) => {
 
   return (
     <div className={`flex flex-col items-center gap-3 ${className}`}>
-      <div className="flex items-center -space-x-3">
+      <div className="flex items-center -space-x-4">
         {clients.map((client) => (
           <a
             key={client.id}
@@ -23,7 +23,7 @@ export const TrustedBy = ({ filter, className = "" }: TrustedByProps) => {
             className="relative group"
             title={client.name}
           >
-            <Avatar className="h-11 w-11 border-2 border-background ring-1 ring-primary/20 transition-transform group-hover:scale-110 group-hover:z-10">
+            <Avatar className="h-16 w-16 border-2 border-background ring-2 ring-primary/20 transition-transform group-hover:scale-110 group-hover:z-10">
               {client.avatar_url ? (
                 <AvatarImage src={client.avatar_url} alt={client.name} />
               ) : null}

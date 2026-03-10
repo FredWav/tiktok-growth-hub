@@ -34,7 +34,7 @@ export const TrustedBy = ({ filter, className = "" }: TrustedByProps) => {
           </a>
         ))}
       </div>
-      <p className="text-xs text-muted-foreground">
+      <p className="text-sm font-medium text-muted-foreground">
         Ils m'ont fait confiance
       </p>
     </div>

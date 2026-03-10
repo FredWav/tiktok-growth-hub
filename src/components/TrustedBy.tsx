@@ -23,7 +23,7 @@ export const TrustedBy = ({ filter, className = "" }: TrustedByProps) => {
             className="relative group"
             title={client.name}
           >
-            <Avatar className="h-16 w-16 border-2 border-background ring-2 ring-primary/20 transition-transform group-hover:scale-110 group-hover:z-10">
+            <Avatar className="h-16 w-16 border-2 border-background ring-2 ring-primary/20 transition-transform group-hover:scale-125 group-hover:z-10">
               {client.avatar_url ? (
                 <AvatarImage src={client.avatar_url} alt={client.name} />
               ) : null}
@@ -34,7 +34,7 @@ export const TrustedBy = ({ filter, className = "" }: TrustedByProps) => {
           </a>
         ))}
       </div>
-      <p className="text-xs text-muted-foreground">
+      <p className="text-sm font-medium text-muted-foreground">
         Ils m'ont fait confiance
       </p>
     </div>

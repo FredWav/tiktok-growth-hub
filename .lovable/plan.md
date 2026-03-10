@@ -1,30 +1,53 @@
 
 
-## Analyse de compatibilite avec la doc API complete
+## Plan : Mise à jour de contenu + Pop-up intention de sortie
 
-### Ce qui fonctionne deja correctement
+### 1. Navbar — `src/components/layout/Header.tsx`
+Remplacer `{ label: "Offres", href: "/offres" }` par `{ label: "Accompagnements", href: "/offres" }`.
 
-| Aspect | Code actuel | Verdict |
-|--------|------------|---------|
-| `health_score` (nombre ou objet) | Fix applique : extrait `.total` si objet | OK |
-| Status `processing_insights` | Tombe dans le `else` → retourne `processing` au front | OK |
-| Status `completed` / `failed` | Gere explicitement | OK |
-| `ai_insights` detection | Check truthy/string vide | OK |
+### 2. Hero Section — `src/pages/Home.tsx`
+- Titre : "Arrête de naviguer à vue. **Structure ta stratégie TikTok et explose tes conversions.**"
+- Sous-titre : "Ta visibilité stagne et ton audience ne convertit pas. Remplace le ressenti par un diagnostic précis et une architecture de contenu pensée pour l'acquisition."
+- CTA unique : "Réserve un appel stratégique avec Fred Wav" (conserver style `variant="hero" size="xl"`).
 
-### Probleme identifie : `processing_insights` traite comme simple `processing`
+### 3. Section Problème — `src/pages/Home.tsx`
+Remplacer la section "À qui ça s'adresse" (array `profiles`) :
+- Titre : "Tu produis du contenu, mais ton acquisition est bloquée."
+- Sous-titre : "Faire des vues pour faire des vues ne sert à rien si ton tunnel est vide. Si ta stratégie n'est pas millimétrée, tu perds des prospects qualifiés à chaque post."
+- 4 puces (remplacer les 3 cartes par 4 items dans une grille 2×2) :
+  1. Ton positionnement est bancal et ta proposition de valeur manque de clarté.
+  2. Tes hooks sont faibles et la rétention s'effondre dans les premières secondes.
+  3. Tes scripts manquent de rythme et tes appels à l'action sont invisibles ou ignorés.
+  4. Tu n'arrives pas à identifier les erreurs précises qui limitent ta visibilité.
 
-La doc revele un statut **`processing_insights`** (progress ~97%) ou le scraping est fini mais l'IA genere encore (~2 min). Le code actuel le traite comme `processing` generique, ce qui fonctionne mais :
+### 4. Section Accompagnements — `src/pages/Home.tsx`
+Remplacer le titre "Comment choisir" par "Accompagnements", sous-titre "Deux formules, deux niveaux d'engagement."
 
-1. **Le front ne sait pas** que le scraping est fini et que seule l'IA reste — l'UX pourrait afficher un message plus precis
-2. **Le `current_step`** est deja transmis au front (`job.current_step`), donc le message "Generating AI strategic insights..." devrait arriver naturellement
+Remplacer l'array `offers` par 2 cartes :
 
-**Verdict : pas de bug, ca fonctionne.** Le polling continue jusqu'a `completed`.
+**Carte 1 — Wav Premium** (recommended, variant hero) :
+- Description fournie, 4 puces, pas de prix affiché.
+- CTA : "Réserve un appel stratégique avec Fred Wav" → `/45-jours`
 
-### Seul point d'attention restant
+**Carte 2 — One Shot (Analyse Express)** :
+- Description fournie, 4 puces, prix 179€.
+- CTA : "Réserver mon Analyse Express (1h30)" → `/one-shot`
 
-La doc montre que `health_score` a la racine du `result` est un **nombre simple** (74), pas un objet. Mais dans les donnees reelles qu'on a observees en base, c'etait un objet `{ total: 74, components: {...} }`. Le fix qu'on a applique gere les deux cas, donc c'est couvert.
+### 5. Pop-up intention de sortie — nouveau `src/components/ExitIntentPopup.tsx`
+- Utilise `Dialog` de shadcn (composant existant).
+- Déclencheur : `mouseleave` sur `document.documentElement` (intention de sortie desktop) OU scroll > 70% de la page.
+- Affichage une seule fois par session (`sessionStorage`).
+- Titre : "Pas encore prêt pour un accompagnement complet ?"
+- Texte : "Ne laisse pas ton compte stagner. Débloque ta visibilité immédiatement avec un audit chirurgical de 1h30 sur tes contenus et ta conversion."
+- Bouton : "Voir le One Shot (Analyse Express)" → `/one-shot`
+- Intégré dans `Home.tsx` à côté du `WavSocialScanPopup`.
 
-### Conclusion
+### 6. Page Offres — `src/pages/Offres.tsx`
+Appliquer les mêmes modifications de contenu : supprimer la carte VIP (déjà commentée), mettre à jour les textes/puces des 2 offres restantes pour correspondre au nouveau wording, supprimer le prix du Wav Premium, renommer le titre de page en "Accompagnements".
 
-**Aucune modification supplementaire necessaire.** Le code est compatible avec la doc API v1.1. Le fix `health_score` deja applique couvre les deux formats possibles (nombre ou objet avec `.total`).
+### Fichiers modifiés
+- `src/components/layout/Header.tsx`
+- `src/pages/Home.tsx`
+- `src/pages/Offres.tsx`
+- `src/components/ExitIntentPopup.tsx` (nouveau)
 

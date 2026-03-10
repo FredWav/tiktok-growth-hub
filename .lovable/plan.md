@@ -1,30 +1,27 @@
 
 
-## Analyse de compatibilite avec la doc API complete
+## Plan : Rééquilibrer le ScreenshotWall
 
-### Ce qui fonctionne deja correctement
+### Problème
+Le layout CSS `columns-3` répartit les images de haut en bas colonne par colonne. Si les images ont des hauteurs très différentes, une colonne peut être bien plus haute que les autres — d'où l'asymétrie visible.
 
-| Aspect | Code actuel | Verdict |
-|--------|------------|---------|
-| `health_score` (nombre ou objet) | Fix applique : extrait `.total` si objet | OK |
-| Status `processing_insights` | Tombe dans le `else` → retourne `processing` au front | OK |
-| Status `completed` / `failed` | Gere explicitement | OK |
-| `ai_insights` detection | Check truthy/string vide | OK |
+### Solution
+Remplacer le layout CSS `columns` par une distribution manuelle en colonnes équilibrées :
 
-### Probleme identifie : `processing_insights` traite comme simple `processing`
+1. **Dans `ScreenshotWall.tsx`** : ajouter une logique qui distribue les screenshots dans 2 (mobile) ou 3 (desktop) colonnes en round-robin, puis rendre chaque colonne comme un `flex flex-col`. Cela garantit que les items sont répartis uniformément entre les colonnes au lieu d'être empilés séquentiellement dans une seule colonne avant de passer à la suivante.
 
-La doc revele un statut **`processing_insights`** (progress ~97%) ou le scraping est fini mais l'IA genere encore (~2 min). Le code actuel le traite comme `processing` generique, ce qui fonctionne mais :
+```text
+Avant (CSS columns) :        Après (round-robin) :
+Col1  Col2  Col3             Col1  Col2  Col3
+ 1     4     7                1     2     3
+ 2     5     8                4     5     6
+ 3     6                      7     8
+```
 
-1. **Le front ne sait pas** que le scraping est fini et que seule l'IA reste — l'UX pourrait afficher un message plus precis
-2. **Le `current_step`** est deja transmis au front (`job.current_step`), donc le message "Generating AI strategic insights..." devrait arriver naturellement
+2. Utiliser un `grid grid-cols-2 md:grid-cols-3 gap-5` avec trois colonnes `flex flex-col gap-5`, chaque colonne recevant ses items en alternance.
 
-**Verdict : pas de bug, ca fonctionne.** Le polling continue jusqu'a `completed`.
+3. Conserver le `max-w-4xl mx-auto` et le padding symétrique `px-4 sm:px-6 lg:px-8` conformément aux conventions du projet.
 
-### Seul point d'attention restant
-
-La doc montre que `health_score` a la racine du `result` est un **nombre simple** (74), pas un objet. Mais dans les donnees reelles qu'on a observees en base, c'etait un objet `{ total: 74, components: {...} }`. Le fix qu'on a applique gere les deux cas, donc c'est couvert.
-
-### Conclusion
-
-**Aucune modification supplementaire necessaire.** Le code est compatible avec la doc API v1.1. Le fix `health_score` deja applique couvre les deux formats possibles (nombre ou objet avec `.total`).
+### Fichier modifié
+- `src/components/ScreenshotWall.tsx`
 

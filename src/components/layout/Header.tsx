@@ -88,8 +88,8 @@ export function Header() {
                 </Link>
               ))}
               <Button asChild className="mt-2">
-                <Link to="/one-shot" onClick={() => { trackPostHogEvent("click_nav_cta", { location: "header_mobile" }); setIsOpen(false); }}>
-                  Réserver mon One Shot (179€)
+                <Link to="/45-jours" onClick={() => { trackPostHogEvent("click_nav_cta", { location: "header_mobile" }); setIsOpen(false); }}>
+                  Réserve ton appel
                 </Link>
               </Button>
             </div>

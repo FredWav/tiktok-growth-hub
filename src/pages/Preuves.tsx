@@ -106,14 +106,6 @@ const chooseOffers = [
     href: "/45-jours",
     trackEvent: "cta_45j_click",
   },
-  {
-    icon: Crown,
-    title: "VIP",
-    description: "Suivi continu, lives, feedback Discord",
-    cta: "Rejoindre le VIP",
-    href: "/offres/vip",
-    trackEvent: "cta_vip_click",
-  },
 ];
 
 export default function Preuves() {

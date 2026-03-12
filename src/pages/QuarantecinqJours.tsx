@@ -334,31 +334,6 @@ export default function QuarantecinqJours() {
         </div>
       </Section>
 
-      {/* CTA final */}
-      <Section variant="dark" size="lg">
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="font-display text-3xl md:text-4xl font-semibold mb-4 text-cream">
-            Prêt à vivre de ton contenu ?
-          </h2>
-          <p className="text-cream/60 text-lg mb-8">
-            Le Wav Premium : 45 jours pour structurer une stratégie qui transforme tes abonnés en clients.
-          </p>
-          <Button
-            variant="hero"
-            size="xl"
-            asChild
-            onClick={() => trackEvent("cta_45j_click", { location: "footer_cta" })}
-          >
-            <Link to="/wav-premium/candidature">
-              Candidater au Wav Premium
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
-          <p className="text-sm text-cream/50 mt-6">
-            Tu hésites ? <Link to="/one-shot" className="text-primary underline hover:no-underline">Commence par un One Shot (179 €)</Link> pour valider les bases stratégiques.
-          </p>
-        </div>
-      </Section>
     </Layout>
   );
 }

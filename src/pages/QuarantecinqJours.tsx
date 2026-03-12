@@ -98,7 +98,7 @@ const faqs = [
 
 const featuredVideos = [
   { id: "g9QYqO-xiqw", alt: "Témoignage client - Retour d'expérience Wav Premium" },
-  { id: "97xyXqwszrM", alt: "Témoignage client - Retour d'expérience sur l'accompagnement" },
+  { id: "wu2CPcqp-yU", alt: "Témoignage client - Avis sur le Wav Premium" },
   { id: "cc1cRfCEJGE", alt: "Témoignage client - Résultats après coaching stratégie de contenu" },
 ];
 

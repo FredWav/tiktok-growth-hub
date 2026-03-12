@@ -245,7 +245,7 @@ export default function QuarantecinqJours() {
           subtitle="Chaque recommandation est issue de l'analyse de centaines de vidéos, pas de tendances éphémères."
         />
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto mb-8">
+        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-8">
           {featuredVideos.map((video) => (
             <VideoCard key={video.id} id={video.id} alt={video.alt} />
           ))}

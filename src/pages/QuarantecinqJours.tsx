@@ -176,22 +176,6 @@ export default function QuarantecinqJours() {
             On structure ta stratégie de monétisation : chaque vidéo a un objectif clair, chaque semaine produit un résultat mesurable. Un accompagnement intensif avec feedback chirurgical pour que ton contenu génère des clients.
           </p>
 
-
-          <Button
-            variant="hero"
-            size="xl"
-            asChild
-            onClick={() => trackEvent("cta_45j_click", { location: "hero" })}
-          >
-            <Link to="/wav-premium/candidature">
-              Candidater au Wav Premium
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
-
-          <p className="text-xs text-cream/50 mt-4">
-            Paiement en 3x avec Klarna et 4x avec PayPal disponible.
-          </p>
         </div>
       </Section>
 

@@ -251,13 +251,24 @@ export default function QuarantecinqJours() {
           ))}
         </div>
 
-        <div className="text-center">
-          <Button variant="premium" size="lg" asChild onClick={() => trackEvent("click_preuves_link", { location: "45j" })}>
-            <Link to="/preuves">
-              Voir toutes les preuves
-              <ArrowRight className="ml-2 h-4 w-4" />
+        <div className="text-center space-y-4">
+          <Button
+            variant="hero"
+            size="xl"
+            asChild
+            onClick={() => trackEvent("cta_45j_click", { location: "after_testimonials" })}
+          >
+            <Link to="/wav-premium/candidature">
+              Candidater au Wav Premium
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
+          <p className="text-xs text-cream/50">
+            Paiement en 3x avec Klarna et 4x avec PayPal disponible, sous réserve d'acceptation.
+          </p>
+          <p className="text-sm text-cream/50">
+            Tu hésites ? <Link to="/one-shot" className="text-primary underline hover:no-underline">Commence par un One Shot (179 €)</Link> pour valider les bases stratégiques.
+          </p>
         </div>
       </Section>
 

@@ -239,7 +239,7 @@ export default function QuarantecinqJours() {
       </Section>
 
       {/* Preuve Sociale - juste après l'infrastructure */}
-      <Section variant="dark" size="lg">
+      <Section variant="default" size="lg">
         <SectionHeader
           title="Basé sur la data, validé par le marché."
           subtitle="Chaque recommandation est issue de l'analyse de centaines de vidéos, pas de tendances éphémères."

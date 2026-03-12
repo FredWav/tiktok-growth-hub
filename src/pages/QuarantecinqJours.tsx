@@ -100,7 +100,6 @@ const featuredVideos = [
   { id: "g9QYqO-xiqw", alt: "Témoignage client - Retour d'expérience Wav Premium" },
   { id: "97xyXqwszrM", alt: "Témoignage client - Retour d'expérience sur l'accompagnement" },
   { id: "cc1cRfCEJGE", alt: "Témoignage client - Résultats après coaching stratégie de contenu" },
-  { id: "wu2CPcqp-yU", alt: "Témoignage client - Avis sur le Wav Premium" },
 ];
 
 function VideoCard({ id, alt }: { id: string; alt: string }) {
@@ -246,7 +245,7 @@ export default function QuarantecinqJours() {
           subtitle="Chaque recommandation est issue de l'analyse de centaines de vidéos, pas de tendances éphémères."
         />
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto mb-8">
+        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-8">
           {featuredVideos.map((video) => (
             <VideoCard key={video.id} id={video.id} alt={video.alt} />
           ))}

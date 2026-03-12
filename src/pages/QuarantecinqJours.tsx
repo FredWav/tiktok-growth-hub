@@ -176,22 +176,6 @@ export default function QuarantecinqJours() {
             On structure ta stratégie de monétisation : chaque vidéo a un objectif clair, chaque semaine produit un résultat mesurable. Un accompagnement intensif avec feedback chirurgical pour que ton contenu génère des clients.
           </p>
 
-
-          <Button
-            variant="hero"
-            size="xl"
-            asChild
-            onClick={() => trackEvent("cta_45j_click", { location: "hero" })}
-          >
-            <Link to="/wav-premium/candidature">
-              Candidater au Wav Premium
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
-
-          <p className="text-xs text-cream/50 mt-4">
-            Paiement en 3x avec Klarna et 4x avec PayPal disponible.
-          </p>
         </div>
       </Section>
 
@@ -255,6 +239,29 @@ export default function QuarantecinqJours() {
         </div>
       </Section>
 
+      {/* Preuve Sociale - juste après l'infrastructure */}
+      <Section variant="dark" size="lg">
+        <SectionHeader
+          title="Basé sur la data, validé par le marché."
+          subtitle="Chaque recommandation est issue de l'analyse de centaines de vidéos, pas de tendances éphémères."
+        />
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto mb-8">
+          {featuredVideos.map((video) => (
+            <VideoCard key={video.id} id={video.id} alt={video.alt} />
+          ))}
+        </div>
+
+        <div className="text-center">
+          <Button variant="premium" size="lg" asChild onClick={() => trackEvent("click_preuves_link", { location: "45j" })}>
+            <Link to="/preuves">
+              Voir toutes les preuves
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
+      </Section>
+
       {/* Livrables */}
       <Section variant="default" size="lg">
         <SectionHeader
@@ -269,29 +276,6 @@ export default function QuarantecinqJours() {
               <p className="text-sm font-medium">{item}</p>
             </div>
           ))}
-        </div>
-      </Section>
-
-      {/* Preuve Sociale */}
-      <Section variant="dark" size="lg">
-        <SectionHeader
-          title="Basé sur la data, validé par le marché."
-          subtitle="Chaque recommandation est issue de l'analyse de centaines de vidéos, pas de tendances éphémères."
-        />
-
-        <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-8">
-          {featuredVideos.map((video) => (
-            <VideoCard key={video.id} id={video.id} alt={video.alt} />
-          ))}
-        </div>
-
-        <div className="text-center">
-          <Button variant="premium" size="lg" asChild onClick={() => trackEvent("click_preuves_link", { location: "45j" })}>
-            <Link to="/preuves">
-              Voir toutes les preuves
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
         </div>
       </Section>
 

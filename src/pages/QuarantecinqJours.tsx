@@ -175,9 +175,6 @@ export default function QuarantecinqJours() {
             On structure ta stratégie de monétisation : chaque vidéo a un objectif clair, chaque semaine produit un résultat mesurable. Un accompagnement intensif avec feedback chirurgical pour que ton contenu génère des clients.
           </p>
 
-          <p className="text-lg font-semibold mb-8 text-gold-gradient">
-            987 € - Tarif préférentiel de 799 € pour les alumni One Shot.
-          </p>
 
           <Button
             variant="hero"

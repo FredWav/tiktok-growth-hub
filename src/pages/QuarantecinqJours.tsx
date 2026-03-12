@@ -239,7 +239,7 @@ export default function QuarantecinqJours() {
       </Section>
 
       {/* Preuve Sociale - juste après l'infrastructure */}
-      <Section variant="dark" size="lg">
+      <Section variant="default" size="lg">
         <SectionHeader
           title="Basé sur la data, validé par le marché."
           subtitle="Chaque recommandation est issue de l'analyse de centaines de vidéos, pas de tendances éphémères."
@@ -253,7 +253,7 @@ export default function QuarantecinqJours() {
       </Section>
 
       {/* CTA après témoignages */}
-      <Section variant="dark" size="lg" className="border-t border-cream/10">
+      <Section variant="dark" size="lg">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="font-display text-3xl md:text-4xl font-semibold mb-4 text-cream">
             Prêt à vivre de ton contenu ?

@@ -250,8 +250,17 @@ export default function QuarantecinqJours() {
             <VideoCard key={video.id} id={video.id} alt={video.alt} />
           ))}
         </div>
+      </Section>
 
-        <div className="text-center space-y-4">
+      {/* CTA après témoignages */}
+      <Section variant="dark" size="lg" className="border-t border-cream/10">
+        <div className="max-w-2xl mx-auto text-center">
+          <h2 className="font-display text-3xl md:text-4xl font-semibold mb-4 text-cream">
+            Prêt à vivre de ton contenu ?
+          </h2>
+          <p className="text-cream/60 text-lg mb-8">
+            Le Wav Premium : 45 jours pour structurer une stratégie qui transforme tes abonnés en clients.
+          </p>
           <Button
             variant="hero"
             size="xl"
@@ -263,10 +272,10 @@ export default function QuarantecinqJours() {
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
-          <p className="text-xs text-cream/50">
+          <p className="text-xs text-cream/50 mt-4">
             Paiement en 3x avec Klarna et 4x avec PayPal disponible, sous réserve d'acceptation.
           </p>
-          <p className="text-sm text-cream/50">
+          <p className="text-sm text-cream/50 mt-6">
             Tu hésites ? <Link to="/one-shot" className="text-primary underline hover:no-underline">Commence par un One Shot (179 €)</Link> pour valider les bases stratégiques.
           </p>
         </div>

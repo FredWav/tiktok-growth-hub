@@ -1,38 +1,30 @@
 
 
-## Probleme
+## Analyse de compatibilite avec la doc API complete
 
-Quand un utilisateur clique sur le lien dans l'email (`/analyse-express/result?session_id=xxx`), la page ne trouve pas de `job_id` en `localStorage` (puisque c'est un autre appareil ou navigateur) et relance `launchAnalysis()` qui appelle l'edge function `express-analysis` -- ce qui relance une nouvelle analyse au lieu d'afficher les resultats existants.
+### Ce qui fonctionne deja correctement
 
-## Solution
+| Aspect | Code actuel | Verdict |
+|--------|------------|---------|
+| `health_score` (nombre ou objet) | Fix applique : extrait `.total` si objet | OK |
+| Status `processing_insights` | Tombe dans le `else` → retourne `processing` au front | OK |
+| Status `completed` / `failed` | Gere explicitement | OK |
+| `ai_insights` detection | Check truthy/string vide | OK |
 
-Ajouter une etape initiale dans `AnalyseExpressResult.tsx` qui interroge la table `express_analyses` via le `stripe_session_id` **avant** de lancer quoi que ce soit :
+### Probleme identifie : `processing_insights` traite comme simple `processing`
 
-1. **Requete DB d'abord** : `SELECT * FROM express_analyses WHERE stripe_session_id = :sessionId`
-2. **Si status = "complete" et result_data existe** : afficher directement les resultats sans polling ni relancement
-3. **Si status = "processing" et job_id existe** : reprendre le polling avec ce job_id (sans relancer)
-4. **Sinon (pending sans job_id)** : lancer l'analyse normalement
+La doc revele un statut **`processing_insights`** (progress ~97%) ou le scraping est fini mais l'IA genere encore (~2 min). Le code actuel le traite comme `processing` generique, ce qui fonctionne mais :
 
-### Changement cote RLS
+1. **Le front ne sait pas** que le scraping est fini et que seule l'IA reste — l'UX pourrait afficher un message plus precis
+2. **Le `current_step`** est deja transmis au front (`job.current_step`), donc le message "Generating AI strategic insights..." devrait arriver naturellement
 
-La table `express_analyses` n'a actuellement qu'une policy admin. Il faut ajouter une policy SELECT pour les utilisateurs anonymes, filtree par `stripe_session_id` (le session_id sert de "token" d'acces).
+**Verdict : pas de bug, ca fonctionne.** Le polling continue jusqu'a `completed`.
 
-**Migration SQL** :
-```sql
-CREATE POLICY "Anyone can select express_analyses by session_id"
-ON public.express_analyses
-FOR SELECT
-TO anon, authenticated
-USING (true);
-```
+### Seul point d'attention restant
 
-Note : on peut restreindre a `true` car le `stripe_session_id` sert deja de secret non-devinable. Alternativement on pourrait faire un select via edge function, mais c'est plus simple cote client.
+La doc montre que `health_score` a la racine du `result` est un **nombre simple** (74), pas un objet. Mais dans les donnees reelles qu'on a observees en base, c'etait un objet `{ total: 74, components: {...} }`. Le fix qu'on a applique gere les deux cas, donc c'est couvert.
 
-### Fichier modifie
+### Conclusion
 
-**`src/pages/AnalyseExpressResult.tsx`** : Remplacement du `useEffect` principal (lignes 123-140) par une logique en 3 etapes :
-1. Fetch DB par `stripe_session_id`
-2. Si complete -> set data + username + loading=false, return
-3. Si processing avec job_id -> set jobIdRef + start polling, return
-4. Sinon -> `launchAnalysis()` comme avant
+**Aucune modification supplementaire necessaire.** Le code est compatible avec la doc API v1.1. Le fix `health_score` deja applique couvre les deux formats possibles (nombre ou objet avec `.total`).
 

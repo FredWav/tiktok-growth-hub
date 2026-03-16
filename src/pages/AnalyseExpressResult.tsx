@@ -124,17 +124,60 @@ export default function AnalyseExpressResult() {
     if (launchedRef.current) return;
     launchedRef.current = true;
 
-    // Check localStorage for cached job_id (refresh deduplication)
-    const cachedJobId = sessionId ? localStorage.getItem(`express_job_${sessionId}`) : null;
-    if (cachedJobId && sessionId) {
-      jobIdRef.current = cachedJobId;
-      setLoading(true);
-      startTimeRef.current = Date.now();
-      pollingRef.current = setInterval(checkStatus, POLL_INTERVAL);
-      setTimeout(checkStatus, 500);
-    } else {
-      launchAnalysis();
+    if (!sessionId) {
+      setError("Session de paiement introuvable");
+      setLoading(false);
+      return;
     }
+
+    // Step 1: Check database for existing results before launching
+    const checkDatabaseFirst = async () => {
+      try {
+        const { data: existing, error: dbError } = await supabase
+          .from("express_analyses")
+          .select("*")
+          .eq("stripe_session_id", sessionId)
+          .maybeSingle();
+
+        if (!dbError && existing) {
+          // Set username from DB
+          if (existing.tiktok_username) setUsername(existing.tiktok_username);
+
+          if ((existing.status === "complete" || existing.status === "completed") && existing.result_data) {
+            // Results already available — display directly
+            setData(existing.result_data);
+            setLoading(false);
+            trackPostHogEvent("analyse_express_result_viewed", { username: existing.tiktok_username || "" });
+            return;
+          }
+
+          if (existing.status === "processing" && existing.job_id) {
+            // Analysis in progress — resume polling with existing job_id
+            jobIdRef.current = existing.job_id;
+            localStorage.setItem(`express_job_${sessionId}`, existing.job_id);
+            startTimeRef.current = Date.now();
+            pollingRef.current = setInterval(checkStatus, POLL_INTERVAL);
+            setTimeout(checkStatus, 500);
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn("DB check failed, falling back to launch:", err);
+      }
+
+      // Fallback: check localStorage, then launch
+      const cachedJobId = localStorage.getItem(`express_job_${sessionId}`);
+      if (cachedJobId) {
+        jobIdRef.current = cachedJobId;
+        startTimeRef.current = Date.now();
+        pollingRef.current = setInterval(checkStatus, POLL_INTERVAL);
+        setTimeout(checkStatus, 500);
+      } else {
+        launchAnalysis();
+      }
+    };
+
+    checkDatabaseFirst();
 
     return () => stopPolling();
   }, [sessionId, launchAnalysis, checkStatus, stopPolling]);

@@ -66,7 +66,9 @@ const AdminExpressAnalyses = lazy(() => import("./pages/admin/ExpressAnalyses"))
 const AdminApplications = lazy(() => import("./pages/admin/Applications"));
 const AdminDiagnostics = lazy(() => import("./pages/admin/Diagnostics"));
 const AdminMarketing = lazy(() => import("./pages/admin/Marketing"));
+const AdminDeepLinks = lazy(() => import("./pages/admin/DeepLinks"));
 const AdminTestimonials = lazy(() => import("./pages/admin/Testimonials"));
+const GoRedirect = lazy(() => import("./pages/GoRedirect"));
 
 // Client pages - lazy loaded
 const ClientDashboard = lazy(() => import("./pages/client/ClientDashboard"));

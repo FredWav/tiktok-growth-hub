@@ -234,6 +234,33 @@ export type Database = {
         }
         Relationships: []
       }
+      deep_links: {
+        Row: {
+          clicks_count: number
+          created_at: string
+          id: string
+          slug: string
+          title: string
+          youtube_id: string
+        }
+        Insert: {
+          clicks_count?: number
+          created_at?: string
+          id?: string
+          slug: string
+          title: string
+          youtube_id: string
+        }
+        Update: {
+          clicks_count?: number
+          created_at?: string
+          id?: string
+          slug?: string
+          title?: string
+          youtube_id?: string
+        }
+        Relationships: []
+      }
       deliverables: {
         Row: {
           client_id: string

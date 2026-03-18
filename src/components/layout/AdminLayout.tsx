@@ -18,7 +18,7 @@ import {
   Stethoscope,
   BarChart3,
   Star,
-  Link,
+  Link as LinkIcon,
 } from "lucide-react";
 import { useState } from "react";
 import { AdminChatbot } from "@/components/admin/AdminChatbot";

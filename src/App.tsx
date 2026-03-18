@@ -111,6 +111,9 @@ const App = () => (
             <Route path="/analyse-express/result" element={<AnalyseExpressResult />} />
             <Route path="/wav-premium/candidature" element={<WavPremiumApplication />} />
 
+            {/* Deep link redirect */}
+            <Route path="/go/:slug" element={<GoRedirect />} />
+
             {/* Diagnostic funnel - wrapped outside Routes for shared state */}
             <Route path="/start" element={<DiagnosticStart />} />
             <Route path="/processing" element={<DiagnosticProcessing />} />

@@ -18,6 +18,7 @@ import {
   Stethoscope,
   BarChart3,
   Star,
+  Link as LinkIcon,
 } from "lucide-react";
 import { useState } from "react";
 import { AdminChatbot } from "@/components/admin/AdminChatbot";
@@ -37,6 +38,7 @@ const navItems = [
   { label: "Candidatures", href: "/admin/applications", icon: ClipboardList },
   { label: "Diagnostics", href: "/admin/diagnostics", icon: Stethoscope },
   { label: "Marketing", href: "/admin/marketing", icon: BarChart3 },
+  { label: "Deep Links", href: "/admin/deep-links", icon: LinkIcon },
   { label: "Témoignages", href: "/admin/testimonials", icon: Star },
   { label: "Paramètres", href: "/admin/settings", icon: Settings },
 ];

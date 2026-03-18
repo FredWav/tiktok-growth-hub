@@ -66,7 +66,9 @@ const AdminExpressAnalyses = lazy(() => import("./pages/admin/ExpressAnalyses"))
 const AdminApplications = lazy(() => import("./pages/admin/Applications"));
 const AdminDiagnostics = lazy(() => import("./pages/admin/Diagnostics"));
 const AdminMarketing = lazy(() => import("./pages/admin/Marketing"));
+const AdminDeepLinks = lazy(() => import("./pages/admin/DeepLinks"));
 const AdminTestimonials = lazy(() => import("./pages/admin/Testimonials"));
+const GoRedirect = lazy(() => import("./pages/GoRedirect"));
 
 // Client pages - lazy loaded
 const ClientDashboard = lazy(() => import("./pages/client/ClientDashboard"));
@@ -108,6 +110,9 @@ const App = () => (
             <Route path="/analyse-express" element={<AnalyseExpress />} />
             <Route path="/analyse-express/result" element={<AnalyseExpressResult />} />
             <Route path="/wav-premium/candidature" element={<WavPremiumApplication />} />
+
+            {/* Deep link redirect */}
+            <Route path="/go/:slug" element={<GoRedirect />} />
 
             {/* Diagnostic funnel - wrapped outside Routes for shared state */}
             <Route path="/start" element={<DiagnosticStart />} />
@@ -217,6 +222,14 @@ const App = () => (
               element={
                 <ProtectedRoute requiredRole="admin">
                   <AdminMarketing />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/deep-links"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AdminDeepLinks />
                 </ProtectedRoute>
               }
             />

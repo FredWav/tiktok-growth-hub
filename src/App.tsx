@@ -226,6 +226,14 @@ const App = () => (
               }
             />
             <Route
+              path="/admin/deep-links"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AdminDeepLinks />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/admin/testimonials"
               element={
                 <ProtectedRoute requiredRole="admin">

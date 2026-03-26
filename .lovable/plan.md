@@ -1,25 +1,21 @@
 
 
-## Correction de l'erreur 404 MailerLite
+## Fix MailerLite — Retirer le group ID invalide
 
-### Probleme
-Le fetch POST vers `assets.mailerlite.com/jsonp/.../subscribe` retourne 404. Cet endpoint est concu pour les soumissions de formulaires HTML classiques, pas pour des requetes JSON fetch.
+L'erreur dans les logs est claire : `"The selected groups.0 is invalid."`. Le group ID `148122258747498498` n'existe pas dans ton compte MailerLite. Le screenshot montre que l'abonne est bien ajoute a la liste generale, donc on n'a pas besoin de forcer un groupe.
 
-### Solution
-Changer la methode d'envoi dans `src/pages/Mail.tsx` pour utiliser `FormData` et soumettre en `application/x-www-form-urlencoded` vers le bon endpoint MailerLite pour les formulaires embarques :
+### Modification
 
+**`supabase/functions/mailerlite-subscribe/index.ts`** (ligne 40) : Retirer la propriete `groups` du body envoye a l'API MailerLite. Le body devient :
+
+```json
+{
+  "email": "...",
+  "fields": { "name": "..." }
+}
 ```
-https://assets.mailerlite.com/jsonp/1305909/forms/148122258747498498/subscribe
-```
 
-Le format attendu est `application/x-www-form-urlencoded` avec les champs :
-- `fields[name]` = prenom
-- `fields[email]` = email  
-- `ml-submit` = 1
-- `anticsrf` = true
+Les abonnes seront ajoutes a la liste generale (comme c'est deja le cas vu le screenshot). Tu pourras les organiser en groupes depuis l'interface MailerLite apres.
 
-### Fichier modifie
-**`src/pages/Mail.tsx`** : Remplacer le `fetch` JSON par une soumission `URLSearchParams` en mode `no-cors` (ou utiliser un formulaire HTML invisible qui soumet directement). Comme l'endpoint JSONP ne supporte pas CORS pour les reponses, la meilleure approche est de creer un `<form>` cache qui cible un `<iframe>` invisible, puis de detecter la soumission pour afficher le succes.
-
-Alternative plus simple : passer par le mode `no-cors` avec fetch — on ne pourra pas lire la reponse mais la soumission passera, et on affiche le succes directement.
+Un seul fichier modifie, un seul changement de ligne.
 

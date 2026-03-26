@@ -1,30 +1,25 @@
 
 
-## Analyse de compatibilite avec la doc API complete
+## Correction de l'erreur 404 MailerLite
 
-### Ce qui fonctionne deja correctement
+### Probleme
+Le fetch POST vers `assets.mailerlite.com/jsonp/.../subscribe` retourne 404. Cet endpoint est concu pour les soumissions de formulaires HTML classiques, pas pour des requetes JSON fetch.
 
-| Aspect | Code actuel | Verdict |
-|--------|------------|---------|
-| `health_score` (nombre ou objet) | Fix applique : extrait `.total` si objet | OK |
-| Status `processing_insights` | Tombe dans le `else` → retourne `processing` au front | OK |
-| Status `completed` / `failed` | Gere explicitement | OK |
-| `ai_insights` detection | Check truthy/string vide | OK |
+### Solution
+Changer la methode d'envoi dans `src/pages/Mail.tsx` pour utiliser `FormData` et soumettre en `application/x-www-form-urlencoded` vers le bon endpoint MailerLite pour les formulaires embarques :
 
-### Probleme identifie : `processing_insights` traite comme simple `processing`
+```
+https://assets.mailerlite.com/jsonp/1305909/forms/148122258747498498/subscribe
+```
 
-La doc revele un statut **`processing_insights`** (progress ~97%) ou le scraping est fini mais l'IA genere encore (~2 min). Le code actuel le traite comme `processing` generique, ce qui fonctionne mais :
+Le format attendu est `application/x-www-form-urlencoded` avec les champs :
+- `fields[name]` = prenom
+- `fields[email]` = email  
+- `ml-submit` = 1
+- `anticsrf` = true
 
-1. **Le front ne sait pas** que le scraping est fini et que seule l'IA reste — l'UX pourrait afficher un message plus precis
-2. **Le `current_step`** est deja transmis au front (`job.current_step`), donc le message "Generating AI strategic insights..." devrait arriver naturellement
+### Fichier modifie
+**`src/pages/Mail.tsx`** : Remplacer le `fetch` JSON par une soumission `URLSearchParams` en mode `no-cors` (ou utiliser un formulaire HTML invisible qui soumet directement). Comme l'endpoint JSONP ne supporte pas CORS pour les reponses, la meilleure approche est de creer un `<form>` cache qui cible un `<iframe>` invisible, puis de detecter la soumission pour afficher le succes.
 
-**Verdict : pas de bug, ca fonctionne.** Le polling continue jusqu'a `completed`.
-
-### Seul point d'attention restant
-
-La doc montre que `health_score` a la racine du `result` est un **nombre simple** (74), pas un objet. Mais dans les donnees reelles qu'on a observees en base, c'etait un objet `{ total: 74, components: {...} }`. Le fix qu'on a applique gere les deux cas, donc c'est couvert.
-
-### Conclusion
-
-**Aucune modification supplementaire necessaire.** Le code est compatible avec la doc API v1.1. Le fix `health_score` deja applique couvre les deux formats possibles (nombre ou objet avec `.total`).
+Alternative plus simple : passer par le mode `no-cors` avec fetch — on ne pourra pas lire la reponse mais la soumission passera, et on affiche le succes directement.
 

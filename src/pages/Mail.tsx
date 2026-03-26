@@ -57,6 +57,7 @@ export default function MailPage() {
       <SEOHead
         title="Newsletter — FredWav"
         description="Reçois les meilleurs conseils de Fred, ton conseiller anti-bullshit pour TikTok."
+        path="/mail"
       />
 
       <Section className="bg-background py-20 md:py-32">

@@ -26,25 +26,23 @@ export default function MailPage() {
     setError("");
 
     try {
-      const res = await fetch(
+      const params = new URLSearchParams();
+      params.append("fields[name]", firstName);
+      params.append("fields[email]", email);
+      params.append("ml-submit", "1");
+      params.append("anticsrf", "true");
+
+      await fetch(
         "https://assets.mailerlite.com/jsonp/1305909/forms/148122258747498498/subscribe",
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            fields: { name: firstName },
-            email,
-            groups: [],
-            ml_submit: 1,
-            anticsrf: true,
-          }),
+          mode: "no-cors",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: params.toString(),
         }
       );
-      if (res.ok) {
-        setSuccess(true);
-      } else {
-        setError("Une erreur est survenue. Réessaie !");
-      }
+      // no-cors returns opaque response, assume success
+      setSuccess(true);
     } catch {
       setError("Une erreur est survenue. Réessaie !");
     } finally {

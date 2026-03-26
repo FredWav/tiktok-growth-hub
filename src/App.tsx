@@ -51,6 +51,7 @@ const WavPremiumApplication = lazy(() => import("./pages/WavPremiumApplication")
 const DiagnosticStart = lazy(() => import("./pages/DiagnosticStart"));
 const DiagnosticProcessing = lazy(() => import("./pages/DiagnosticProcessing"));
 const DiagnosticResult = lazy(() => import("./pages/DiagnosticResult"));
+const Mail = lazy(() => import("./pages/Mail"));
 
 // Admin pages - lazy loaded
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
@@ -107,6 +108,7 @@ const App = () => (
             <Route path="/mentions-legales" element={<MentionsLegales />} />
             <Route path="/politique-de-confidentialite" element={<PolitiqueConfidentialite />} />
             <Route path="/cgv" element={<CGV />} />
+            <Route path="/mail" element={<Mail />} />
             <Route path="/analyse-express" element={<AnalyseExpress />} />
             <Route path="/analyse-express/result" element={<AnalyseExpressResult />} />
             <Route path="/wav-premium/candidature" element={<WavPremiumApplication />} />

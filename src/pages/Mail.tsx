@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,22 +27,14 @@ export default function MailPage() {
     setError("");
 
     try {
-      const params = new URLSearchParams();
-      params.append("fields[name]", firstName);
-      params.append("fields[email]", email);
-      params.append("ml-submit", "1");
-      params.append("anticsrf", "true");
-
-      await fetch(
-        "https://assets.mailerlite.com/jsonp/1305909/forms/148122258747498498/subscribe",
-        {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: params.toString(),
-        }
+      const { data, error: fnError } = await supabase.functions.invoke(
+        "mailerlite-subscribe",
+        { body: { email, firstName } }
       );
-      // no-cors returns opaque response, assume success
+
+      if (fnError) throw fnError;
+      if (data?.error) throw new Error(data.error);
+
       setSuccess(true);
     } catch {
       setError("Une erreur est survenue. Réessaie !");

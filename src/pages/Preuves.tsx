@@ -9,6 +9,8 @@ import { SEOHead } from "@/components/SEOHead";
 import { ScreenshotWall } from "@/components/ScreenshotWall";
 
 const videoTestimonials = [
+  { id: "Jh5yrsotoHM", alt: "Témoignage client - Retour d'expérience récent" },
+  { id: "p3nCwuBZRGI", alt: "Témoignage client - Nouveau retour d'expérience" },
   { id: "g9QYqO-xiqw", alt: "Témoignage client - Retour d'expérience Wav Premium" },
   { id: "97xyXqwszrM", alt: "Témoignage client - Retour d'expérience sur l'accompagnement" },
   { id: "cc1cRfCEJGE", alt: "Témoignage client - Résultats après coaching stratégie de contenu" },

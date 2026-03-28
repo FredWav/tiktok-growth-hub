@@ -55,14 +55,21 @@ export default function MailPage() {
         <div className="max-w-md mx-auto">
           <div className="bg-card border border-border rounded-xl p-8 shadow-lg">
             {success ? (
-              <div className="text-center space-y-4 py-8">
+              <div className="text-center space-y-5 py-8">
                 <CheckCircle className="h-16 w-16 text-primary mx-auto" />
                 <h1 className="text-2xl font-bold text-foreground">
                   Merci !
                 </h1>
-                <p className="text-muted-foreground">
-                  Tu fais maintenant partie de la liste. Check tes mails !
-                </p>
+                <div className="text-left space-y-3 bg-muted/50 border border-border rounded-lg p-5 text-sm text-muted-foreground leading-relaxed">
+                  <p className="font-semibold text-foreground">Une dernière chose avant qu'on commence.</p>
+                  <p>Mon premier email est déjà en route. Pour être sûr de le recevoir :</p>
+                  <ul className="list-disc list-inside space-y-1.5">
+                    <li>Vérifie tes spams et ajoute <span className="font-medium text-foreground">hello@fredwav.com</span> à tes contacts.</li>
+                    <li>Si tu es sur Gmail et que l'email atterrit dans l'onglet "Promotions", glisse-le dans ta boîte de réception principale. Ça prend 3 secondes et ça change tout pour la suite.</li>
+                  </ul>
+                  <p>Et <span className="font-medium text-foreground">réponds-moi dès le premier email</span>. Je t'offre une belle ressource si tu joues le jeu.</p>
+                  <p className="font-semibold text-foreground">À tout de suite.</p>
+                </div>
               </div>
             ) : (
               <>

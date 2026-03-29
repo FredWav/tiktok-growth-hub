@@ -13,12 +13,13 @@ import {
 } from "@/components/ui/table";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Download, Loader2, RefreshCw } from "lucide-react";
+import { Download, Loader2, RefreshCw, Search } from "lucide-react";
 import { toast } from "sonner";
 import { mapAccountDataForPDF } from "@/lib/pdf-data-mapper";
 import { generateCompletePDFHTML } from "@/lib/pdf-html-generator";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { Input } from "@/components/ui/input";
 
 const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
   pending: { label: "En attente", variant: "outline" },
@@ -76,6 +77,8 @@ const ExpressAnalyses = () => {
   const queryClient = useQueryClient();
   const [retryingIds, setRetryingIds] = useState<Set<string>>(new Set());
   const pollingRefs = useRef<Record<string, ReturnType<typeof setInterval>>>({});
+  const [manualUsername, setManualUsername] = useState("");
+  const [isLaunching, setIsLaunching] = useState(false);
 
   const stopPolling = useCallback((analysisId: string) => {
     if (pollingRefs.current[analysisId]) {
@@ -167,6 +170,45 @@ const ExpressAnalyses = () => {
     }
   };
 
+  const handleManualLaunch = async () => {
+    const username = manualUsername.replace(/^@/, "").trim();
+    if (!username) {
+      toast.error("Entre un nom d'utilisateur TikTok");
+      return;
+    }
+    try {
+      setIsLaunching(true);
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/manual-express-analysis`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({ tiktok_username: username }),
+        }
+      );
+
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Erreur");
+
+      toast.info(`Analyse lancée pour @${username}`);
+      setManualUsername("");
+      queryClient.invalidateQueries({ queryKey: ["express-analyses"] });
+      startPolling(result.analysis_id, result.job_id);
+    } catch (err: any) {
+      console.error("Manual launch error:", err);
+      toast.error(err.message || "Erreur lors du lancement");
+    } finally {
+      setIsLaunching(false);
+    }
+  };
+
   const stats = analyses
     ? {
         total: analyses.length,
@@ -179,7 +221,30 @@ const ExpressAnalyses = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <h1 className="font-display text-3xl text-primary">Analyses Express</h1>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <h1 className="font-display text-3xl text-primary">Analyses Express</h1>
+          <div className="flex items-center gap-2">
+            <Input
+              placeholder="@username"
+              value={manualUsername}
+              onChange={(e) => setManualUsername(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleManualLaunch()}
+              className="w-48 bg-noir-light border-primary/30 text-cream"
+            />
+            <Button
+              onClick={handleManualLaunch}
+              disabled={isLaunching || !manualUsername.trim()}
+              size="sm"
+            >
+              {isLaunching ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-1" />
+              ) : (
+                <Search className="h-4 w-4 mr-1" />
+              )}
+              Lancer
+            </Button>
+          </div>
+        </div>
 
         {stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

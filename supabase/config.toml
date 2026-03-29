@@ -50,3 +50,6 @@ verify_jwt = false
 
 [functions.notify-diagnostic]
 verify_jwt = false
+
+[functions.manual-express-analysis]
+verify_jwt = false

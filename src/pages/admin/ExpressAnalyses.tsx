@@ -77,6 +77,8 @@ const ExpressAnalyses = () => {
   const queryClient = useQueryClient();
   const [retryingIds, setRetryingIds] = useState<Set<string>>(new Set());
   const pollingRefs = useRef<Record<string, ReturnType<typeof setInterval>>>({});
+  const [manualUsername, setManualUsername] = useState("");
+  const [isLaunching, setIsLaunching] = useState(false);
 
   const stopPolling = useCallback((analysisId: string) => {
     if (pollingRefs.current[analysisId]) {

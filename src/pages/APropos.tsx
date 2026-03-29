@@ -206,11 +206,11 @@ export default function APropos() {
             Envie de travailler ensemble ?
           </h2>
           <p className="text-muted-foreground mb-6">
-            Commence par un One Shot. Tu verras rapidement si ma méthode est faite pour toi.
+            Candidate au Wav Premium. Tu verras rapidement si ma méthode est faite pour toi.
           </p>
-          <Button variant="hero" size="lg" asChild onClick={() => trackEvent("cta_one_shot_click", { location: "apropos" })}>
-            <Link to="/one-shot">
-              Réserver mon One Shot (179€)
+          <Button variant="hero" size="lg" asChild onClick={() => trackEvent("cta_wav_premium_click", { location: "apropos" })}>
+            <Link to="/wav-premium/candidature">
+              Candidater au Wav Premium
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>

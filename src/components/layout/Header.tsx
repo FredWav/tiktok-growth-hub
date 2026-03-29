@@ -6,11 +6,11 @@ import { trackPostHogEvent } from "@/lib/posthog";
 
 const navItems = [
   { label: "Accueil", href: "/" },
-  { label: "Accompagnements", href: "/offres" },
   { label: "Analyse Express", href: "/analyse-express" },
   { label: "Témoignages", href: "/preuves" },
   { label: "À propos", href: "/a-propos" },
   { label: "Contact", href: "/contact" },
+  { label: "Newsletter", href: "/mail" },
 ];
 
 export function Header() {
@@ -52,7 +52,7 @@ export function Header() {
           {/* CTA Button */}
           <div className="hidden lg:block">
             <Button asChild>
-              <Link to="/45-jours" onClick={() => trackPostHogEvent("click_nav_cta", { location: "header" })}>Réserve ton appel</Link>
+              <Link to="/wav-premium/candidature" onClick={() => trackPostHogEvent("click_nav_cta", { location: "header" })}>Réserve ton appel</Link>
             </Button>
           </div>
 
@@ -88,7 +88,7 @@ export function Header() {
                 </Link>
               ))}
               <Button asChild className="mt-2">
-                <Link to="/45-jours" onClick={() => { trackPostHogEvent("click_nav_cta", { location: "header_mobile" }); setIsOpen(false); }}>
+                <Link to="/wav-premium/candidature" onClick={() => { trackPostHogEvent("click_nav_cta", { location: "header_mobile" }); setIsOpen(false); }}>
                   Réserve ton appel
                 </Link>
               </Button>

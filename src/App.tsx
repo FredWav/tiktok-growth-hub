@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -31,10 +31,6 @@ function PostHogPageTracker() {
 import Home from "./pages/Home";
 
 // Autres pages - lazy loaded
-const Offres = lazy(() => import("./pages/Offres"));
-const QuarantecinqJours = lazy(() => import("./pages/QuarantecinqJours"));
-const VipCheckout = lazy(() => import("./pages/VipCheckout"));
-const OneShot = lazy(() => import("./pages/OneShot"));
 const OneShotSuccess = lazy(() => import("./pages/OneShotSuccess"));
 const APropos = lazy(() => import("./pages/APropos"));
 const Preuves = lazy(() => import("./pages/Preuves"));
@@ -94,11 +90,11 @@ const App = () => (
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Home />} />
-            <Route path="/offres" element={<Offres />} />
-            <Route path="/45-jours" element={<QuarantecinqJours />} />
-            <Route path="/offres/45-jours" element={<QuarantecinqJours />} />
-            <Route path="/offres/vip" element={<VipCheckout />} />
-            <Route path="/one-shot" element={<OneShot />} />
+            <Route path="/offres" element={<Navigate to="/" replace />} />
+            <Route path="/45-jours" element={<Navigate to="/wav-premium/candidature" replace />} />
+            <Route path="/offres/45-jours" element={<Navigate to="/wav-premium/candidature" replace />} />
+            <Route path="/offres/vip" element={<Navigate to="/" replace />} />
+            <Route path="/one-shot" element={<Navigate to="/" replace />} />
             <Route path="/one-shot/success" element={<OneShotSuccess />} />
             <Route path="/a-propos" element={<APropos />} />
             <Route path="/preuves" element={<Preuves />} />

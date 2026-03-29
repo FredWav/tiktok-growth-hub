@@ -95,12 +95,12 @@ export default function Contact() {
           <div className="bg-muted/50 rounded-xl p-8 text-center">
             <h3 className="font-semibold text-lg mb-3">Tu veux passer à l'action ?</h3>
             <p className="text-muted-foreground text-sm mb-6">
-              Pas besoin d'attendre. Réserve un One Shot et on en parle directement.
+              Pas besoin d'attendre. Candidate au Wav Premium et on en parle directement.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="hero" size="lg" asChild onClick={() => trackEvent("cta_one_shot_click", { location: "contact" })}>
-                <Link to="/one-shot">
-                  Réserver mon One Shot (179€)
+              <Button variant="hero" size="lg" asChild onClick={() => trackEvent("cta_wav_premium_click", { location: "contact" })}>
+                <Link to="/wav-premium/candidature">
+                  Candidater au Wav Premium
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>

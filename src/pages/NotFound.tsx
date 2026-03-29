@@ -36,17 +36,16 @@ const NotFound = () => {
               </Link>
             </Button>
             <Button variant="outline" asChild>
-              <Link to="/one-shot">
+              <Link to="/wav-premium/candidature">
                 <Zap className="h-4 w-4 mr-2" />
-                One Shot (179€)
+                Wav Premium
               </Link>
             </Button>
           </div>
           <nav aria-label="Liens utiles" className="text-sm text-muted-foreground space-y-2">
             <p className="font-medium text-foreground mb-3">Pages populaires :</p>
             <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
-              <Link to="/offres" className="hover:text-primary transition-colors">Offres</Link>
-              <Link to="/45-jours" className="hover:text-primary transition-colors">Wav Premium</Link>
+              <Link to="/wav-premium/candidature" className="hover:text-primary transition-colors">Wav Premium</Link>
               <Link to="/analyse-express" className="hover:text-primary transition-colors" onClick={() => trackPostHogEvent("click_analyse_express_nav", { location: "404" })}>Analyse Express</Link>
               <Link to="/preuves" className="hover:text-primary transition-colors">Témoignages</Link>
               <Link to="/a-propos" className="hover:text-primary transition-colors">À propos</Link>

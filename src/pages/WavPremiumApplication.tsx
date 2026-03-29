@@ -162,8 +162,8 @@ export default function WavPremiumApplication() {
               </a>
             </Button>
             <p className="text-sm text-muted-foreground mt-6">
-              <Link to="/45-jours" className="text-primary underline hover:no-underline">
-                ← Retour à la page Wav Premium
+              <Link to="/" className="text-primary underline hover:no-underline">
+                ← Retour à l'accueil
               </Link>
             </p>
           </div>

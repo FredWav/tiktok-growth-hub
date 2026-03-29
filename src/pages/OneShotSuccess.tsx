@@ -101,7 +101,7 @@ export default function OneShotSuccess() {
               Nous n'avons pas pu vérifier ton paiement. Si tu penses qu'il s'agit d'une erreur, contacte-nous.
             </p>
             <Button variant="hero" size="lg" asChild>
-              <Link to="/one-shot">Retour à l'offre One Shot</Link>
+              <Link to="/">Retour à l'accueil</Link>
             </Button>
           </div>
         </Section>

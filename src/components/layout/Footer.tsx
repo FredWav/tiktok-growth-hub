@@ -4,13 +4,12 @@ import { trackPostHogEvent } from "@/lib/posthog";
 
 const navLinks = [
   { label: "Accueil", href: "/", section: "navigation" },
-  { label: "Offres", href: "/offres", section: "navigation" },
-  { label: "One Shot", href: "/one-shot", section: "navigation" },
-  { label: "Wav Premium", href: "/45-jours", section: "navigation" },
+  { label: "Wav Premium", href: "/wav-premium/candidature", section: "navigation" },
   { label: "Analyse Express", href: "/analyse-express", section: "navigation" },
   { label: "Témoignages", href: "/preuves", section: "navigation" },
   { label: "À propos", href: "/a-propos", section: "navigation" },
-  { label: "Diagnostic gratuit", href: "/start", section: "navigation" },
+  { label: "Newsletter", href: "/mail", section: "navigation" },
+  { label: "Contact", href: "/contact", section: "navigation" },
 ];
 
 const socialLinks = [

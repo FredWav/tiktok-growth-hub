@@ -94,19 +94,19 @@ const stats = [
 
 const chooseOffers = [
   {
-    icon: Zap,
-    title: "One Shot",
-    description: "Diagnostic + plan d'action en 1h30",
-    cta: "Réserver mon One Shot (179€)",
-    href: "/one-shot",
-    trackEvent: "cta_one_shot_click",
-  },
-  {
     icon: Target,
     title: "Wav Premium",
     description: "Transformation encadrée sur 45 jours",
     cta: "Candidater au Wav Premium",
-    href: "/45-jours",
+    href: "/wav-premium/candidature",
+    trackEvent: "cta_wav_premium_click",
+  },
+  {
+    icon: Zap,
+    title: "Analyse Express",
+    description: "Diagnostic rapide de ton compte en 2 min",
+    cta: "Lancer mon Analyse Express",
+    href: "/analyse-express",
     trackEvent: "cta_45j_click",
   },
 ];
@@ -163,10 +163,10 @@ export default function Preuves() {
                 variant="hero"
                 size="lg"
                 asChild
-                onClick={() => trackEvent("cta_one_shot_click", { location: "preuves_mid" })}
+                onClick={() => trackEvent("cta_wav_premium_click", { location: "preuves_mid" })}
               >
-                <Link to="/one-shot">
-                  Réserver mon One Shot (179€)
+                <Link to="/wav-premium/candidature">
+                  Candidater au Wav Premium
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
@@ -174,10 +174,10 @@ export default function Preuves() {
                 variant="premium"
                 size="lg"
                 asChild
-                onClick={() => trackEvent("cta_45j_click", { location: "preuves_mid" })}
+                onClick={() => trackEvent("cta_analyse_express_click", { location: "preuves_mid" })}
               >
-                <Link to="/45-jours">
-                  Candidater au Wav Premium
+                <Link to="/analyse-express">
+                  Analyse Express
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>

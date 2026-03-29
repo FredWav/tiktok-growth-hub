@@ -326,12 +326,12 @@ export default function AnalyseExpressResult() {
                       ⚠️ Ta régularité freine ta visibilité. Tes abonnés ne te voient pas assez pour acheter. On règle ça en 1h30 ?
                     </p>
                     <p className="text-sm text-amber-800 mt-1">
-                      Une session One Shot pour débloquer ta stratégie de publication et booster ta visibilité.
+                      Le Wav Premium pour structurer ta stratégie de publication et transformer ton audience en revenus.
                     </p>
                   </div>
                   <Button asChild variant="hero" size="lg" className="shrink-0">
-                    <Link to="/one-shot">
-                      Réserver un One Shot
+                    <Link to="/wav-premium/candidature">
+                      Candidater au Wav Premium
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>

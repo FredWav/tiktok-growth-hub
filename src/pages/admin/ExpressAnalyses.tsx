@@ -221,7 +221,30 @@ const ExpressAnalyses = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <h1 className="font-display text-3xl text-primary">Analyses Express</h1>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <h1 className="font-display text-3xl text-primary">Analyses Express</h1>
+          <div className="flex items-center gap-2">
+            <Input
+              placeholder="@username"
+              value={manualUsername}
+              onChange={(e) => setManualUsername(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleManualLaunch()}
+              className="w-48 bg-noir-light border-primary/30 text-cream"
+            />
+            <Button
+              onClick={handleManualLaunch}
+              disabled={isLaunching || !manualUsername.trim()}
+              size="sm"
+            >
+              {isLaunching ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-1" />
+              ) : (
+                <Search className="h-4 w-4 mr-1" />
+              )}
+              Lancer
+            </Button>
+          </div>
+        </div>
 
         {stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

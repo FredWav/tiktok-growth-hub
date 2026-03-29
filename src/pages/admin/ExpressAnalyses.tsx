@@ -170,6 +170,45 @@ const ExpressAnalyses = () => {
     }
   };
 
+  const handleManualLaunch = async () => {
+    const username = manualUsername.replace(/^@/, "").trim();
+    if (!username) {
+      toast.error("Entre un nom d'utilisateur TikTok");
+      return;
+    }
+    try {
+      setIsLaunching(true);
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/manual-express-analysis`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({ tiktok_username: username }),
+        }
+      );
+
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Erreur");
+
+      toast.info(`Analyse lancée pour @${username}`);
+      setManualUsername("");
+      queryClient.invalidateQueries({ queryKey: ["express-analyses"] });
+      startPolling(result.analysis_id, result.job_id);
+    } catch (err: any) {
+      console.error("Manual launch error:", err);
+      toast.error(err.message || "Erreur lors du lancement");
+    } finally {
+      setIsLaunching(false);
+    }
+  };
+
   const stats = analyses
     ? {
         total: analyses.length,

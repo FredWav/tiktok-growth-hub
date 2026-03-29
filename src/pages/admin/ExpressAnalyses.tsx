@@ -13,12 +13,13 @@ import {
 } from "@/components/ui/table";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Download, Loader2, RefreshCw } from "lucide-react";
+import { Download, Loader2, RefreshCw, Search } from "lucide-react";
 import { toast } from "sonner";
 import { mapAccountDataForPDF } from "@/lib/pdf-data-mapper";
 import { generateCompletePDFHTML } from "@/lib/pdf-html-generator";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { Input } from "@/components/ui/input";
 
 const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
   pending: { label: "En attente", variant: "outline" },

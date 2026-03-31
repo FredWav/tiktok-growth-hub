@@ -188,7 +188,7 @@ export default function Home() {
           </h1>
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-            Ta visibilité stagne et ton audience ne convertit pas. Remplace le ressenti par un diagnostic précis et une architecture de contenu pensée pour l'acquisition.
+            Ta visibilité stagne et ton audience ne convertit pas. Remplace le ressenti par un diagnostic précis et une architecture de contenu pensée pour l'acquisition. <Link to="/a-propos" className="text-primary underline hover:no-underline">Découvre mon approche</Link>.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{ animationDelay: "0.2s" }}>
@@ -383,6 +383,9 @@ export default function Home() {
               </AccordionItem>
             ))}
           </Accordion>
+          <p className="text-sm text-muted-foreground text-center mt-6">
+            Tu as d'autres questions ? <Link to="/contact" className="text-primary underline hover:no-underline">Contacte-moi directement</Link>.
+          </p>
         </div>
       </Section>
 

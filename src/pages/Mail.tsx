@@ -57,9 +57,9 @@ export default function MailPage() {
             {success ? (
               <div className="text-center space-y-5 py-8">
                 <CheckCircle className="h-16 w-16 text-primary mx-auto" />
-                <h1 className="text-2xl font-bold text-foreground">
+                <h2 className="text-2xl font-bold text-foreground">
                   Merci !
-                </h1>
+                </h2>
                 <div className="text-left space-y-3 bg-muted/50 border border-border rounded-lg p-5 text-sm text-muted-foreground leading-relaxed">
                   <p className="font-semibold text-foreground">Une dernière chose avant qu'on commence.</p>
                   <p>Mon premier email est déjà en route. Pour être sûr de le recevoir :</p>

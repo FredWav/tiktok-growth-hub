@@ -65,11 +65,11 @@ export default function APropos() {
               Je suis là pour <span className="text-gold-gradient">tes résultats</span>, pas pour te vendre du rêve.
             </h1>
             <p className="text-lg text-muted-foreground mb-6">
-              Stratégiste en contenu et formats courts, j'accompagne entrepreneurs et créateurs 
-              à construire une présence qui génère des clients, pas juste des likes.
+              Stratégiste en contenu et formats courts, j'accompagne entrepreneurs et créateurs
+              à construire une présence qui génère des clients, pas juste des likes. Découvre les <Link to="/preuves" className="text-primary underline hover:no-underline">résultats concrets</Link> de mes accompagnements.
             </p>
             <p className="text-muted-foreground">
-              Mon approche est simple : stratégie, analyse, performance mesurable. 
+              Mon approche est simple : stratégie, analyse, performance mesurable.
               Pas de hacks miracles. Pas de bullshit marketing. Juste ce qui fonctionne.
             </p>
           </div>
@@ -137,7 +137,7 @@ export default function APropos() {
             </p>
             <p>
               Aujourd'hui, j'accompagne plus de 300 créateurs, entrepreneurs, experts, marques,
-              qui veulent transformer leur contenu en levier business.
+              qui veulent transformer leur contenu en levier business grâce au <Link to="/wav-premium/candidature" className="text-primary underline hover:no-underline">Wav Premium</Link>.
             </p>
           </blockquote>
         </div>

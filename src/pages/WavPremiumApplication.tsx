@@ -144,9 +144,9 @@ export default function WavPremiumApplication() {
         <Section variant="cream" size="lg">
           <div className="max-w-xl mx-auto text-center">
             <CheckCircle2 className="h-16 w-16 text-primary mx-auto mb-6" />
-            <h1 className="font-display text-3xl md:text-4xl font-semibold mb-4">
+            <h2 className="font-display text-3xl md:text-4xl font-semibold mb-4">
               Candidature envoyée !
-            </h1>
+            </h2>
             <p className="text-lg text-muted-foreground mb-8">
               Merci pour ta candidature. L'étape suivante : réserve ton appel de qualification pour qu'on échange sur ta situation.
             </p>

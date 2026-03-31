@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://fredwav.com/</loc><lastmod>2026-03-10</lastmod><priority>1.0</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://fredwav.com/offres</loc><lastmod>2026-03-10</lastmod><priority>0.9</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://fredwav.com/one-shot</loc><lastmod>2026-03-10</lastmod><priority>0.9</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://fredwav.com/45-jours</loc><lastmod>2026-03-10</lastmod><priority>0.8</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://fredwav.com/analyse-express</loc><lastmod>2026-03-10</lastmod><priority>0.8</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://fredwav.com/start</loc><lastmod>2026-03-10</lastmod><priority>0.7</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://fredwav.com/wav-premium/candidature</loc><lastmod>2026-03-10</lastmod><priority>0.7</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://fredwav.com/preuves</loc><lastmod>2026-03-10</lastmod><priority>0.7</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://fredwav.com/a-propos</loc><lastmod>2026-03-10</lastmod><priority>0.6</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://fredwav.com/contact</loc><lastmod>2026-03-10</lastmod><priority>0.5</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://fredwav.com/cgv</loc><lastmod>2026-03-10</lastmod><priority>0.3</priority><changefreq>yearly</changefreq></url>
-  <url><loc>https://fredwav.com/mentions-legales</loc><lastmod>2026-03-10</lastmod><priority>0.3</priority><changefreq>yearly</changefreq></url>
-  <url><loc>https://fredwav.com/politique-de-confidentialite</loc><lastmod>2026-03-10</lastmod><priority>0.3</priority><changefreq>yearly</changefreq></url>
+  <url><loc>https://fredwav.com/</loc><lastmod>2026-03-31</lastmod><priority>1.0</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://fredwav.com/wav-premium/candidature</loc><lastmod>2026-03-31</lastmod><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://fredwav.com/analyse-express</loc><lastmod>2026-03-31</lastmod><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://fredwav.com/preuves</loc><lastmod>2026-03-31</lastmod><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://fredwav.com/a-propos</loc><lastmod>2026-03-31</lastmod><priority>0.6</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://fredwav.com/contact</loc><lastmod>2026-03-31</lastmod><priority>0.5</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://fredwav.com/mail</loc><lastmod>2026-03-31</lastmod><priority>0.5</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://fredwav.com/start</loc><lastmod>2026-03-31</lastmod><priority>0.4</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://fredwav.com/cgv</loc><lastmod>2026-03-31</lastmod><priority>0.2</priority><changefreq>yearly</changefreq></url>
+  <url><loc>https://fredwav.com/mentions-legales</loc><lastmod>2026-03-31</lastmod><priority>0.2</priority><changefreq>yearly</changefreq></url>
+  <url><loc>https://fredwav.com/politique-de-confidentialite</loc><lastmod>2026-03-31</lastmod><priority>0.2</priority><changefreq>yearly</changefreq></url>
 </urlset>

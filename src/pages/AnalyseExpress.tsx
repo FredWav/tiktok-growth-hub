@@ -154,9 +154,6 @@ export default function AnalyseExpress() {
             <Button type="submit" variant="hero" size="lg" className="w-full" disabled={loading}>
               {loading ? "Redirection..." : "Lancer l'analyse (11,90€)"}
             </Button>
-            <p className="text-xs text-muted-foreground">
-              Paiement en 3x avec Klarna et 4x avec PayPal disponible, sous réserve d'acceptation
-            </p>
           </form>
 
           {existingSessionId && (

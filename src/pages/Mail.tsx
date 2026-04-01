@@ -64,7 +64,7 @@ export default function MailPage() {
 
             {/* Badge valeur */}
             <div className="bg-primary text-primary-foreground text-center py-2.5 px-4">
-              <span className="text-sm font-semibold tracking-wide">GRATUIT — Valeur réelle : 27€</span>
+              <span className="text-sm font-semibold tracking-wide">ACCÈS GRATUIT — Guide exclusif abonnés</span>
             </div>
 
             <div className="p-8">
@@ -92,9 +92,13 @@ export default function MailPage() {
                       <Gift className="h-8 w-8 text-primary" />
                     </div>
                     <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight">
-                      Reçois mon guide des hooks<br />
-                      <span className="text-gold-gradient">totalement gratuitement</span>
+                      Reçois le guide Ultime des hooks{" "}
+                      <s className="text-muted-foreground font-normal">d'une valeur de 27€</s>{" "}
+                      <span className="text-gold-gradient">gratuitement</span>
                     </h1>
+                    <p className="text-sm font-semibold text-primary mt-1">
+                      Réservé à mes abonnés les plus motivés
+                    </p>
                     <p className="text-muted-foreground text-sm leading-relaxed">
                       Le même guide que j'utilise avec mes clients Wav Premium pour construire des accroches qui retiennent l'attention dès la première seconde.
                     </p>

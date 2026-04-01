@@ -389,21 +389,19 @@ export default function Home() {
         </div>
       </Section>
 
-      {/* ===== Newsletter ===== */}
+      {/* ===== Guide gratuit ===== */}
       <Section variant="cream" size="md">
         <div className="max-w-2xl mx-auto text-center">
-          <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Mail className="h-6 w-6 text-primary" />
-          </div>
+          <span className="inline-block bg-primary/10 text-primary text-xs font-semibold px-3 py-1 rounded-full mb-4">GRATUIT — Valeur 27€</span>
           <h2 className="font-display text-2xl md:text-3xl font-semibold mb-3">
-            Rejoins la newsletter
+            Reçois mon guide des hooks gratuitement
           </h2>
           <p className="text-muted-foreground mb-6">
-            Stratégies, analyses et retours terrain directement dans ta boîte mail. Pas de spam, que du concret.
+            50+ hooks testés sur des millions de vues, les structures qui captent l'attention en moins de 2 secondes et les erreurs fatales qui tuent ta rétention.
           </p>
-          <Button variant="premium" size="lg" asChild onClick={() => trackEvent("cta_newsletter_click", { location: "home" })}>
+          <Button variant="hero" size="lg" asChild onClick={() => trackEvent("cta_guide_click", { location: "home" })}>
             <Link to="/mail">
-              S'inscrire à la newsletter
+              Recevoir mon guide gratuit
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>

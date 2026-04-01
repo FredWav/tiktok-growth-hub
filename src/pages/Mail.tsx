@@ -10,7 +10,7 @@ import { SEOHead } from "@/components/SEOHead";
 import { CheckCircle, Loader2, Gift, Zap, FileText, Lightbulb } from "lucide-react";
 
 const benefits = [
-  { icon: Zap, text: "50+ hooks prêts à l'emploi testés sur des millions de vues" },
+  { icon: Zap, text: "120+ hooks prêts à l'emploi testés sur des millions de vues" },
   { icon: FileText, text: "Les structures exactes qui captent l'attention en moins de 2 secondes" },
   { icon: Lightbulb, text: "Les erreurs fatales qui tuent ta rétention (et comment les corriger)" },
 ];
@@ -53,7 +53,7 @@ export default function MailPage() {
     <Layout>
       <SEOHead
         title="Guide des Hooks Gratuit (valeur 27€) — Fred Wav"
-        description="Télécharge gratuitement le guide des hooks qui captent l'attention en moins de 2 secondes. 50+ hooks testés sur des millions de vues."
+        description="Télécharge gratuitement le guide des 120+ hooks TikTok qui captent l'attention en moins de 2 secondes. Testés sur des millions de vues."
         path="/mail"
         keywords="guide hooks tiktok, hooks gratuits, accroches tiktok, rétention tiktok, Fred Wav"
       />

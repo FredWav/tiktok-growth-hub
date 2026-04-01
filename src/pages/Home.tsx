@@ -397,7 +397,7 @@ export default function Home() {
             Reçois mon guide des hooks gratuitement
           </h2>
           <p className="text-muted-foreground mb-6">
-            50+ hooks testés sur des millions de vues, les structures qui captent l'attention en moins de 2 secondes et les erreurs fatales qui tuent ta rétention.
+            120+ hooks testés sur des millions de vues, les structures qui captent l'attention en moins de 2 secondes et les erreurs fatales qui tuent ta rétention.
           </p>
           <Button variant="hero" size="lg" asChild onClick={() => trackEvent("cta_guide_click", { location: "home" })}>
             <Link to="/mail">

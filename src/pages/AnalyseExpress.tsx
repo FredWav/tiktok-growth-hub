@@ -9,6 +9,7 @@ import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import tiktokExample from "@/assets/tiktok-username-example.png";
@@ -25,6 +26,7 @@ export default function AnalyseExpress() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [subscribeToNewsletter, setSubscribeToNewsletter] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
@@ -53,7 +55,7 @@ export default function AnalyseExpress() {
     trackEvent("express_checkout_start", { username: cleanUsername });
     try {
       const { data, error } = await supabase.functions.invoke("create-express-checkout", {
-        body: { username: cleanUsername, email: email.trim() },
+        body: { username: cleanUsername, email: email.trim(), subscribeToNewsletter },
       });
 
       if (error || !data?.url) {
@@ -135,6 +137,20 @@ export default function AnalyseExpress() {
               disabled={loading}
               required
             />
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="subscribe"
+                checked={subscribeToNewsletter}
+                onCheckedChange={(v) => setSubscribeToNewsletter(v === true)}
+                disabled={loading}
+              />
+              <label
+                htmlFor="subscribe"
+                className="text-xs text-muted-foreground leading-relaxed cursor-pointer"
+              >
+                Je veux aussi recevoir le guide <span className="font-semibold text-foreground">ULTIME des hooks</span> et tous les conseils de Fred
+              </label>
+            </div>
             <Button type="submit" variant="hero" size="lg" className="w-full" disabled={loading}>
               {loading ? "Redirection..." : "Lancer l'analyse (11,90€)"}
             </Button>

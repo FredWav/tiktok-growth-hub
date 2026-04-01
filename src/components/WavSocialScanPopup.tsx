@@ -44,9 +44,9 @@ export function WavSocialScanPopup() {
       >
         <X className="h-4 w-4" />
       </button>
-      <p className="font-semibold text-sm mb-1">⚡ Analyse ton compte en 2 min</p>
+      <p className="font-semibold text-sm mb-1">⚡ Diagnostic complet de ton TikTok</p>
       <p className="text-xs text-muted-foreground mb-3">
-        Health score, métriques clés et recommandations. Rapport PDF inclus pour 11,90€.
+        Audit profil + bio, analyse de tes 30 dernières vidéos, plan d'action 14 jours et rapport PDF. 11,90€.
       </p>
       <div className="flex gap-2">
         <Button size="sm" onClick={handleGo} className="flex-1 gap-1.5 text-xs">

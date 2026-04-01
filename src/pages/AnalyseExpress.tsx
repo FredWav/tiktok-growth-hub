@@ -14,10 +14,10 @@ import { toast } from "sonner";
 import tiktokExample from "@/assets/tiktok-username-example.png";
 
 const features = [
-  { icon: BarChart3, title: "Health Score", description: "Score de santé global de ton compte sur 100" },
-  { icon: TrendingUp, title: "Métriques clés", description: "Engagement, croissance, fréquence de publication" },
-  { icon: Search, title: "Analyse de persona", description: "Identification de ton audience et positionnement" },
-  { icon: FileText, title: "Rapport PDF", description: "Télécharge ton rapport complet en PDF" },
+  { icon: BarChart3, title: "Audit profil complet", description: "Photo, bio, positionnement : analyse technique et recommandations concrètes de réécriture" },
+  { icon: TrendingUp, title: "Analyse de tes 30 vidéos", description: "Vues, rétention, engagement, hooks — chaque vidéo passée au crible avec métriques" },
+  { icon: Search, title: "Stratégie & hashtags", description: "Hashtags à tester, plan d'action 14 jours et roadmap 3-6 mois personnalisés" },
+  { icon: FileText, title: "Rapport PDF complet", description: "Résumé exécutif, points forts, axes d'amélioration et actions immédiates en PDF" },
 ];
 
 export default function AnalyseExpress() {
@@ -106,7 +106,7 @@ export default function AnalyseExpress() {
           </h1>
 
           <p className="text-lg text-muted-foreground max-w-xl mx-auto mb-4">
-            Entre ton @ TikTok, paye 11,90€, et reçois un diagnostic complet de ton compte avec un rapport PDF téléchargeable.
+            Audit de ton profil, analyse de tes 30 dernières vidéos, stratégie hashtags et plan d'action personnalisé. Rapport PDF complet pour 11,90€.
           </p>
           <p className="text-sm text-muted-foreground/70 mb-10">
             Disponible uniquement pour TikTok pour le moment, d'autres plateformes arrivent bientôt.
@@ -161,7 +161,7 @@ export default function AnalyseExpress() {
       <Section className="pb-20">
         <SectionHeader
           title="Ce que tu obtiens"
-          subtitle="Un diagnostic complet de ton compte TikTok, généré automatiquement"
+          subtitle="Un diagnostic stratégique complet de ton compte TikTok, au même niveau que les audits réalisés pour les clients Wav Premium"
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
           {features.map((f) => (

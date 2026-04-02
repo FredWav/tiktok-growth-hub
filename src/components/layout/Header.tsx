@@ -10,7 +10,7 @@ const navItems = [
   { label: "Témoignages", href: "/preuves" },
   { label: "À propos", href: "/a-propos" },
   { label: "Contact", href: "/contact" },
-  { label: "Newsletter", href: "/mail" },
+  { label: "Newsletter", href: "/newsletter" },
 ];
 
 export function Header() {

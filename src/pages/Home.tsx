@@ -400,7 +400,7 @@ export default function Home() {
             120+ hooks testés sur des millions de vues, les structures qui captent l'attention en moins de 2 secondes et les erreurs fatales qui tuent ta rétention.
           </p>
           <Button variant="hero" size="lg" asChild onClick={() => trackEvent("cta_guide_click", { location: "home" })}>
-            <Link to="/mail">
+            <Link to="/newsletter">
               Recevoir mon guide gratuit
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>

@@ -8,7 +8,7 @@ const navLinks = [
   { label: "Analyse Express", href: "/analyse-express", section: "navigation" },
   { label: "Témoignages", href: "/preuves", section: "navigation" },
   { label: "À propos", href: "/a-propos", section: "navigation" },
-  { label: "Newsletter", href: "/mail", section: "navigation" },
+  { label: "Newsletter", href: "/newsletter", section: "navigation" },
   { label: "Contact", href: "/contact", section: "navigation" },
 ];
 

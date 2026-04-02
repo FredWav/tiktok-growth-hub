@@ -54,7 +54,7 @@ export default function MailPage() {
       <SEOHead
         title="Guide des Hooks Gratuit (valeur 27€) — Fred Wav"
         description="Télécharge gratuitement le guide des 120+ hooks TikTok qui captent l'attention en moins de 2 secondes. Testés sur des millions de vues."
-        path="/mail"
+        path="/newsletter"
         keywords="guide hooks tiktok, hooks gratuits, accroches tiktok, rétention tiktok, Fred Wav"
       />
 

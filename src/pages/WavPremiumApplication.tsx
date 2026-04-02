@@ -55,8 +55,7 @@ const applicationSchema = z.object({
   current_level: z.string().min(1, "Sélectionne ton niveau actuel"),
   blockers: z.string().trim().min(10, "Décris tes points de blocage (10 caractères min.)").max(2000),
   goals: z.string().trim().min(10, "Décris tes objectifs (10 caractères min.)").max(2000),
-  current_revenue: z.string().trim().min(1, "Ce champ est obligatoire").max(200),
-  revenue_goal: z.string().trim().min(1, "Ce champ est obligatoire").max(200),
+  budget: z.string().min(1, "Sélectionne ton budget"),
   origin_source: z.string().trim().max(500).optional().or(z.literal("")),
   follower_since: z.string().optional().or(z.literal("")),
   conversion_trigger: z.string().trim().max(500).optional().or(z.literal("")),
@@ -79,8 +78,7 @@ export default function WavPremiumApplication() {
       current_level: "",
       blockers: "",
       goals: "",
-      current_revenue: "",
-      revenue_goal: "",
+      budget: "",
       origin_source: getStoredUtmSource(),
       follower_since: "",
       conversion_trigger: "",
@@ -107,8 +105,7 @@ export default function WavPremiumApplication() {
         current_level: levels.find((l) => l.value === data.current_level)?.label ?? data.current_level,
         blockers: data.blockers,
         goals: data.goals,
-        current_revenue: data.current_revenue || null,
-        revenue_goal: data.revenue_goal || null,
+        budget: data.budget || null,
         origin_source: data.origin_source || null,
         follower_since: data.follower_since || null,
         conversion_trigger: data.conversion_trigger || null,
@@ -317,35 +314,29 @@ export default function WavPremiumApplication() {
                 )}
               />
 
-              {/* Revenue fields */}
-              <div className="grid sm:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="current_revenue"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Quel est ton CA mensuel actuel ? *</FormLabel>
+              {/* Budget field */}
+              <FormField
+                control={form.control}
+                name="budget"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Quel est ton budget pour cet accompagnement ? *</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <Input placeholder="Ex : 2000€/mois, 0€, etc." {...field} />
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionne ton budget" />
+                        </SelectTrigger>
                       </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="revenue_goal"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Quel est ton objectif de CA mensuel d'ici 6 mois ? *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Ex : 5000€/mois" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+                      <SelectContent>
+                        <SelectItem value="moins_de_299">- de 299€</SelectItem>
+                        <SelectItem value="300_a_800">De 300 à 800€</SelectItem>
+                        <SelectItem value="plus_de_1000">+ de 1000€</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               {/* Attribution fields */}
               <div className="bg-accent/50 border border-border rounded-xl p-6 space-y-5">

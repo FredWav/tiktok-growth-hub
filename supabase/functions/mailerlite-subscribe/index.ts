@@ -36,6 +36,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         email,
         fields: { name: firstName || "" },
+        groups: ["183634214919341095"],
       }),
     });
 

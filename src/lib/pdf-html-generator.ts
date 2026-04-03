@@ -398,11 +398,11 @@ function generateCTASection(): string {
             <span>Accompagnement 1:1 avec un expert TikTok</span>
           </div>
         </div>
-        <div class="cta-link-box">
+        <a class="cta-link-box" href="https://fredwav.com/wav-premium/candidature" target="_blank">
           <span class="cta-link-label">Candidater au Wav Premium</span>
           <span class="cta-link-arrow">&rarr;</span>
           <span class="cta-link-url">fredwav.com/wav-premium/candidature</span>
-        </div>
+        </a>
       </div>
       <div class="cta-attribution">
         Analyse r\u00e9alis\u00e9e par FredWav &bull; fredwav.com
@@ -1150,6 +1150,8 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
+  text-decoration: none;
+  cursor: pointer;
 }
 .cta-link-label {
   font-size: 14px;

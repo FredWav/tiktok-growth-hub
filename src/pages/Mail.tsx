@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,6 +22,15 @@ export default function MailPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [subscriberCount, setSubscriberCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    supabase.functions.invoke("mailerlite-count")
+      .then(({ data }) => {
+        if (data?.count != null) setSubscriberCount(data.count);
+      })
+      .catch(() => {/* silently fail — fallback text shown */});
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -180,7 +189,11 @@ export default function MailPage() {
                     </Button>
 
                     <p className="text-center text-xs text-muted-foreground">
-                      Déjà <span className="font-semibold text-foreground">300+ créateurs</span> l'ont téléchargé
+                      Déjà{" "}
+                      <span className="font-semibold text-foreground">
+                        {subscriberCount != null ? `${subscriberCount}` : "300+"} créateur{subscriberCount !== 1 ? "s" : ""}
+                      </span>{" "}
+                      {subscriberCount != null ? "inscrit" + (subscriberCount !== 1 ? "s" : "") : "l'ont téléchargé"}
                     </p>
                   </form>
                 </>

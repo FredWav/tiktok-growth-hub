@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SEOHead } from "@/components/SEOHead";
-import { CheckCircle, Loader2, Gift, Zap, FileText, Lightbulb } from "lucide-react";
+import { CheckCircle, Loader2, Gift, Zap, FileText, Lightbulb, ShieldAlert } from "lucide-react";
 
 const benefits = [
   { icon: Zap, text: "120+ hooks prêts à l'emploi testés sur des millions de vues" },
@@ -160,7 +160,10 @@ export default function MailPage() {
                     </p>
 
                     {error && (
-                      <p className="text-destructive text-sm">{error}</p>
+                      <div className="flex items-start gap-3 bg-amber-50 border border-amber-300 rounded-xl px-4 py-3 animate-in slide-in-from-top-2 fade-in duration-300">
+                        <ShieldAlert className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+                        <p className="text-amber-800 text-sm font-medium leading-snug">{error}</p>
+                      </div>
                     )}
 
                     <Button

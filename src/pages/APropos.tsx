@@ -75,9 +75,12 @@ export default function APropos() {
           </div>
 
           <div className="relative">
-            <div className="aspect-square bg-muted rounded-2xl flex items-center justify-center">
-              <span className="text-muted-foreground text-lg">Photo profil</span>
-            </div>
+            <img
+              src="/fred-wav.jpg"
+              alt="Fred Wav - Expert Stratégie Formats Courts"
+              className="aspect-square object-cover rounded-2xl shadow-lg border border-border/50"
+              loading="lazy"
+            />
           </div>
         </div>
       </Section>

@@ -1,6 +1,6 @@
 /**
- * Génère le HTML complet du rapport PDF avec CSS intégré — Style FredWav (crème/or/noir).
- * v2 — Design premium, anti-coupure renforcé. Typographie inchangée.
+ * Generates the full HTML for the TikTok analysis PDF report -- FredWav branding (cream/gold/dark).
+ * v3 -- Professional cover page, health score breakdown, executive summary, CTA, page numbers.
  */
 
 import { PDFDataFormat, BestTime } from "./pdf-data-mapper";
@@ -77,8 +77,8 @@ const DAY_NAMES = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"
 const REGULARITY_LABELS: Record<string, string> = {
   no_gaps_72h: "Pas de pause > 72h",
   weekly_volume: "Volume hebdo",
-  day_consistency: "Régularité des jours",
-  hour_consistency: "Régularité horaire",
+  day_consistency: "R\u00e9gularit\u00e9 des jours",
+  hour_consistency: "R\u00e9gularit\u00e9 horaire",
   uniform_distribution: "Distribution uniforme",
 };
 
@@ -88,6 +88,173 @@ function getBarColor(score: number): string {
   return "#EF4444";
 }
 
+function getHealthBarColor(score: number): string {
+  if (score >= 70) return "#22C55E";
+  if (score >= 40) return "#EAB308";
+  return "#EF4444";
+}
+
+const HEALTH_COMPONENT_LABELS: Record<string, string> = {
+  engagement: "Engagement",
+  consistency: "R\u00e9gularit\u00e9",
+  content_quality: "Qualit\u00e9 du contenu",
+  growth_potential: "Potentiel de croissance",
+  technical_seo: "SEO technique",
+};
+
+function generateDonutSVG(score: number): string {
+  const radius = 80;
+  const strokeWidth = 14;
+  const circumference = 2 * Math.PI * radius;
+  const pct = Math.max(0, Math.min(100, score));
+  const offset = circumference - (pct / 100) * circumference;
+  let color = "#22C55E";
+  if (pct < 40) color = "#EF4444";
+  else if (pct < 70) color = "#EAB308";
+
+  return `
+    <svg width="200" height="200" viewBox="0 0 200 200" style="display:block;margin:0 auto;">
+      <circle cx="100" cy="100" r="${radius}" fill="none" stroke="#2A2520" stroke-width="${strokeWidth}"/>
+      <circle cx="100" cy="100" r="${radius}" fill="none" stroke="${color}" stroke-width="${strokeWidth}"
+        stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"
+        stroke-linecap="round" transform="rotate(-90 100 100)"/>
+      <text x="100" y="92" text-anchor="middle" fill="#C49A3C" font-family="Georgia, serif" font-size="48" font-weight="700">${pct}</text>
+      <text x="100" y="118" text-anchor="middle" fill="#9CA3AF" font-family="Inter, sans-serif" font-size="14">/100</text>
+    </svg>`;
+}
+
+function generateCoverPage(
+  pdfData: PDFDataFormat,
+  dateStr: string,
+  healthScoreData?: any
+): string {
+  const overallScore =
+    typeof healthScoreData === "object" && healthScoreData !== null
+      ? healthScoreData.total ?? healthScoreData.global ?? healthScoreData.score ?? 0
+      : typeof healthScoreData === "number"
+        ? healthScoreData
+        : pdfData.health_score ?? 0;
+
+  return `
+    <div class="cover-page">
+      <div class="cover-top-accent"></div>
+      <div class="cover-content">
+        <div class="cover-brand">FredWav</div>
+        <div class="cover-subtitle">RAPPORT D'ANALYSE TIKTOK</div>
+        <div class="cover-divider"></div>
+        <div class="cover-profile">
+          ${pdfData.avatar_url
+      ? `<div class="cover-avatar"><img src="${pdfData.avatar_url}" alt="Avatar" crossorigin="anonymous"></div>`
+      : `<div class="cover-avatar-placeholder"></div>`
+    }
+          <div class="cover-username">@${pdfData.username}</div>
+          ${pdfData.display_name && pdfData.display_name !== pdfData.username
+      ? `<div class="cover-display-name">${pdfData.display_name}</div>`
+      : ""
+    }
+        </div>
+        ${overallScore > 0 ? `
+        <div class="cover-score-section">
+          <div class="cover-score-label">Score de Sant\u00e9 du Compte</div>
+          ${generateDonutSVG(overallScore)}
+        </div>
+        ` : ""}
+        <div class="cover-date">${dateStr}</div>
+      </div>
+      <div class="cover-footer-line">
+        Confidentiel &bull; Pr\u00e9par\u00e9 exclusivement pour @${pdfData.username}
+      </div>
+    </div>`;
+}
+
+function generateExecutiveSummary(
+  pdfData: PDFDataFormat,
+  healthScoreData?: any
+): string {
+  const overallScore =
+    typeof healthScoreData === "object" && healthScoreData !== null
+      ? healthScoreData.total ?? healthScoreData.global ?? healthScoreData.score ?? 0
+      : typeof healthScoreData === "number"
+        ? healthScoreData
+        : pdfData.health_score ?? 0;
+
+  let verdict = "Score non disponible";
+  if (overallScore >= 80) verdict = "Excellent - compte tr\u00e8s performant";
+  else if (overallScore >= 60) verdict = "Bon - marge d'optimisation";
+  else if (overallScore >= 40) verdict = "Moyen - axes d'am\u00e9lioration significatifs";
+  else if (overallScore > 0) verdict = "Faible - actions prioritaires requises";
+
+  const niche = pdfData.persona?.niche_principale || pdfData.niche || "Non identifi\u00e9e";
+  const topForce = pdfData.persona?.forces?.[0] || "Analyse en cours";
+  const topWeakness = pdfData.persona?.faiblesses?.[0] || "Analyse en cours";
+
+  return `
+    <div class="section executive-summary avoid-break">
+      <h2 class="section-title">R\u00e9sum\u00e9 Ex\u00e9cutif</h2>
+      <div class="exec-grid">
+        <div class="exec-item">
+          <div class="exec-item-label">Niche</div>
+          <div class="exec-item-value">${niche}</div>
+        </div>
+        <div class="exec-item">
+          <div class="exec-item-label">Force principale</div>
+          <div class="exec-item-value">${topForce}</div>
+        </div>
+        <div class="exec-item">
+          <div class="exec-item-label">Axe d'am\u00e9lioration</div>
+          <div class="exec-item-value">${topWeakness}</div>
+        </div>
+        <div class="exec-item exec-item-verdict">
+          <div class="exec-item-label">Verdict Sant\u00e9</div>
+          <div class="exec-item-value">${overallScore > 0 ? overallScore + "/100 - " : ""}${verdict}</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function generateHealthScoreDetailHTML(healthScoreData?: any): string {
+  if (!healthScoreData || typeof healthScoreData !== "object") return "";
+
+  const components: Record<string, number> = healthScoreData.components || {};
+  const priorityActions: string[] = healthScoreData.priority_actions || [];
+
+  const hasComponents = Object.keys(components).length > 0;
+  if (!hasComponents && priorityActions.length === 0) return "";
+
+  return `
+    <div class="section health-detail-section avoid-break">
+      <h2 class="section-title">Score de Sant\u00e9 - D\u00e9tail</h2>
+      ${hasComponents ? `
+      <div class="health-components">
+        ${Object.entries(components).map(([key, value]) => {
+    const score = typeof value === "number" ? value : 0;
+    const pct = Math.min(score, 100);
+    const color = getHealthBarColor(score);
+    const label = HEALTH_COMPONENT_LABELS[key] || key.replace(/_/g, " ");
+    return `
+          <div class="health-component-row avoid-break">
+            <div class="health-component-header">
+              <span class="health-component-label">${label}</span>
+              <span class="health-component-score" style="color:${color}">${score}<span class="score-max">/100</span></span>
+            </div>
+            <div class="health-bar-bg">
+              <div class="health-bar" style="width:${pct}%;background:${color}"></div>
+            </div>
+          </div>`;
+  }).join("")}
+      </div>
+      ` : ""}
+      ${priorityActions.length > 0 ? `
+      <div class="priority-actions">
+        <div class="priority-actions-title">Actions prioritaires</div>
+        <ul>
+          ${priorityActions.map((action: string) => `<li>${action}</li>`).join("")}
+        </ul>
+      </div>
+      ` : ""}
+    </div>`;
+}
+
 function generateBestTimesHTML(bestTimes: BestTime[]): string {
   if (!bestTimes?.length) return "";
   const top5 = bestTimes.slice(0, 5);
@@ -95,25 +262,25 @@ function generateBestTimesHTML(bestTimes: BestTime[]): string {
 
   return `
     <div class="section best-times-section avoid-break">
-      <h2 class="section-title">🕐 Meilleurs Créneaux de Publication</h2>
+      <h2 class="section-title">Meilleurs Cr\u00e9neaux de Publication</h2>
       <div class="best-times-list">
         ${top5
-          .map((t, i) => {
-            const pct = maxViews > 0 ? (t.avg_views / maxViews) * 100 : 0;
-            const medals = ["🥇", "🥈", "🥉", `#4`, `#5`];
-            return `
+      .map((t, i) => {
+        const pct = maxViews > 0 ? (t.avg_views / maxViews) * 100 : 0;
+        const medals = ["#1", "#2", "#3", "#4", "#5"];
+        return `
           <div class="best-time-item avoid-break">
-            <div class="best-time-rank">${i < 3 ? medals[i] : medals[i]}</div>
+            <div class="best-time-rank">${medals[i]}</div>
             <div class="best-time-info">
-              <div class="best-time-label">${DAY_NAMES[t.day] || "Jour " + t.day} à ${String(t.hour).padStart(2, "0")}h00</div>
+              <div class="best-time-label">${DAY_NAMES[t.day] || "Jour " + t.day} a ${String(t.hour).padStart(2, "0")}h00</div>
               <div class="best-time-bar-bg">
                 <div class="best-time-bar" style="width: ${pct}%"></div>
               </div>
             </div>
             <div class="best-time-value">${formatNumber(t.avg_views)} vues</div>
           </div>`;
-          })
-          .join("")}
+      })
+      .join("")}
       </div>
     </div>
   `;
@@ -126,14 +293,14 @@ function generateRegularityHTML(breakdown: Record<string, { score: number; detai
   return `
     <div class="section regularity-section avoid-break">
       <h2 class="section-title">
-        📊 Régularité Détaillée
+        R\u00e9gularit\u00e9 D\u00e9taill\u00e9e
         <span class="score-badge-pill">${total}<span class="score-badge-max">/100</span></span>
       </h2>
       <div class="regularity-list">
         ${Object.entries(breakdown)
-          .map(([key, item]) => {
-            const pct = Math.min((item.score / 30) * 100, 100);
-            return `
+      .map(([key, item]) => {
+        const pct = Math.min((item.score / 30) * 100, 100);
+        return `
           <div class="regularity-item avoid-break">
             <div class="regularity-header">
               <span class="regularity-label">${REGULARITY_LABELS[key] || key}</span>
@@ -144,8 +311,8 @@ function generateRegularityHTML(breakdown: Record<string, { score: number; detai
             </div>
             <div class="regularity-details">${item.details}</div>
           </div>`;
-          })
-          .join("")}
+      })
+      .join("")}
       </div>
     </div>
   `;
@@ -155,57 +322,93 @@ function generatePersonaHTML(persona: { niche_principale?: string; forces?: stri
   if (!persona) return "";
   return `
     <div class="section persona-section avoid-break">
-      <h2 class="section-title">🎯 Persona Identifié</h2>
+      <h2 class="section-title">Persona Identifi\u00e9</h2>
       ${
-        persona.niche_principale
-          ? `
+    persona.niche_principale
+      ? `
         <div class="persona-niche-badge">${persona.niche_principale}</div>
       `
-          : ""
-      }
+      : ""
+  }
       <div class="persona-columns">
         ${
-          persona.forces?.length
-            ? `
+    persona.forces?.length
+      ? `
           <div class="persona-block forces-block">
             <div class="persona-block-header">
-              <h4>✦ Forces</h4>
+              <h4>Forces</h4>
             </div>
             <ul>${persona.forces
-              .map(
-                (f) => `
-              <li><span class="check">✓</span><span>${f}</span></li>`,
-              )
-              .join("")}
+          .map(
+            (f) => `
+              <li><span class="check">+</span><span>${f}</span></li>`,
+          )
+          .join("")}
             </ul>
           </div>
         `
-            : ""
-        }
+      : ""
+  }
         ${
-          persona.faiblesses?.length
-            ? `
+    persona.faiblesses?.length
+      ? `
           <div class="persona-block weaknesses-block">
             <div class="persona-block-header">
-              <h4>▲ Points d'amélioration</h4>
+              <h4>Points d'am\u00e9lioration</h4>
             </div>
             <ul>${persona.faiblesses
-              .map(
-                (f) => `
+          .map(
+            (f) => `
               <li><span class="warn">!</span><span>${f}</span></li>`,
-              )
-              .join("")}
+          )
+          .join("")}
             </ul>
           </div>
         `
-            : ""
-        }
+      : ""
+  }
       </div>
     </div>
   `;
 }
 
-export function generateCompletePDFHTML(pdfData: PDFDataFormat, rawInsights: string, recentVideos: any[] = []): string {
+function generateCTASection(): string {
+  return `
+    <div class="section cta-section avoid-break">
+      <div class="cta-box">
+        <div class="cta-heading">Pr\u00eat \u00e0 transformer ces insights en r\u00e9sultats concrets ?</div>
+        <div class="cta-benefits">
+          <div class="cta-benefit-item">
+            <span class="cta-bullet"></span>
+            <span>Strat\u00e9gie de contenu personnalis\u00e9e pour ta niche</span>
+          </div>
+          <div class="cta-benefit-item">
+            <span class="cta-bullet"></span>
+            <span>Plan d'action concret pour booster ton engagement</span>
+          </div>
+          <div class="cta-benefit-item">
+            <span class="cta-bullet"></span>
+            <span>Accompagnement 1:1 avec un expert TikTok</span>
+          </div>
+        </div>
+        <div class="cta-link-box">
+          <span class="cta-link-label">Candidater au Wav Premium</span>
+          <span class="cta-link-arrow">&rarr;</span>
+          <span class="cta-link-url">fredwav.com/wav-premium/candidature</span>
+        </div>
+      </div>
+      <div class="cta-attribution">
+        Analyse r\u00e9alis\u00e9e par FredWav &bull; fredwav.com
+      </div>
+    </div>`;
+}
+
+export function generateCompletePDFHTML(
+  pdfData: PDFDataFormat,
+  rawInsights: string,
+  recentVideos: any[] = [],
+  healthScoreData?: any
+): string {
   const topVideos = recentVideos.slice(0, 5);
   const topHashtags = pdfData.top_hashtags || [];
   const dateStr = new Date().toLocaleDateString("fr-FR", { year: "numeric", month: "long", day: "numeric" });
@@ -216,7 +419,7 @@ export function generateCompletePDFHTML(pdfData: PDFDataFormat, rawInsights: str
     <head>
       <meta charset="UTF-8">
       <style>
-        /* ── RESET ── */
+/* ── RESET ── */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 html, body { height: 100%; }
 body {
@@ -226,6 +429,118 @@ body {
   background: #F5EFE4;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
+  counter-reset: page;
+}
+
+/* ── COVER PAGE ── */
+.cover-page {
+  background: linear-gradient(180deg, #111111 0%, #1a1714 100%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 48px 40px 48px;
+  page-break-after: always;
+  break-after: page;
+  position: relative;
+}
+.cover-top-accent {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #C49A3C, #E8B84B, #C49A3C);
+}
+.cover-content {
+  text-align: center;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+.cover-brand {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 56px;
+  font-weight: 700;
+  color: #C49A3C;
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+.cover-subtitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #9CA3AF;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+.cover-divider {
+  width: 60px;
+  height: 2px;
+  background: #C49A3C;
+  margin: 0 auto 24px auto;
+}
+.cover-profile { margin-bottom: 20px; }
+.cover-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 3px solid #C49A3C;
+  overflow: hidden;
+  margin: 0 auto 14px auto;
+  box-shadow: 0 4px 20px rgba(196,154,60,0.30);
+}
+.cover-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cover-avatar-placeholder {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 3px solid #C49A3C;
+  background: #2A2520;
+  margin: 0 auto 14px auto;
+}
+.cover-username {
+  font-family: 'Inter', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 4px;
+}
+.cover-display-name {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: #9CA3AF;
+}
+.cover-score-section {
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+.cover-score-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #9CA3AF;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.cover-date {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: #6B7280;
+  margin-top: 8px;
+}
+.cover-footer-line {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  color: #4B5563;
+  text-align: center;
+  padding-top: 20px;
+  border-top: 1px solid #2A2520;
+  width: 100%;
 }
 
 /* ── PAGE ── */
@@ -279,25 +594,73 @@ body {
 .top-bar-right .subtitle { font-size: 14px; color: #A67C2E; font-weight: 600; }
 .top-bar-right .meta { font-size: 12px; color: #6B7280; margin-top: 2px; }
 
+/* ── EXECUTIVE SUMMARY ── */
+.executive-summary {
+  background: linear-gradient(135deg, #1a1714, #111111);
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin-bottom: 32px;
+}
+.executive-summary .section-title {
+  margin-top: 0;
+  background: none;
+  padding: 0;
+  margin-bottom: 16px;
+  color: #C49A3C;
+  font-size: 12px;
+  letter-spacing: 2px;
+}
+.exec-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.exec-item {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(196,154,60,0.15);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.exec-item-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: #C49A3C;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+.exec-item-value {
+  font-size: 13px;
+  font-weight: 500;
+  color: #E5E1D8;
+  line-height: 1.45;
+}
+.exec-item-verdict {
+  grid-column: 1 / -1;
+  border-color: rgba(196,154,60,0.35);
+  background: rgba(196,154,60,0.10);
+}
+
 /* ── PROFILE ── */
 .profile {
   display: flex;
   align-items: flex-start;
   gap: 24px;
   margin-bottom: 32px;
-  padding: 22px 24px;
+  padding: 24px 28px;
   background: #FFFFFF;
   border: 1px solid #E5E1D8;
-  border-radius: 12px;
+  border-radius: 14px;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
 }
 .profile::before {
   content: '';
   position: absolute;
-  top: 0; left: 0;
-  width: 4px; height: 100%;
-  background: linear-gradient(180deg, #C49A3C 0%, #A67C2E 100%);
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #C49A3C, #E8B84B, #C49A3C);
 }
 .profile-avatar {
   width: 90px; height: 90px;
@@ -326,36 +689,43 @@ body {
 .profile-bio { font-size: 13px; color: #6B7280; line-height: 1.5; white-space: pre-wrap; }
 
 /* ── SECTIONS ── */
-.section { margin-bottom: 28px; }
+.section { margin-bottom: 32px; }
 .section-title {
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 700;
-  color: #1A1A1A;
-  margin-bottom: 16px;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #C49A3C;
+  color: #C49A3C;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #1a1714, #111111);
+  border-radius: 8px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  line-height: 1;               /* ← fix emoji décalage */
+  gap: 10px;
+  line-height: 1;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  page-break-after: avoid;
+  break-after: avoid;
 }
 
 /* ── SCORE BADGE ── */
 .score-badge-pill {
   margin-left: auto;
-  background: linear-gradient(135deg, #C49A3C, #A67C2E);
-  color: white;
-  font-size: 13px;
-  font-weight: 700;
-  padding: 3px 12px;
+  background: #C49A3C;
+  color: #111;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 14px;
   border-radius: 20px;
   text-transform: none;
-  letter-spacing: 0;
-  display: inline-flex;         /* ← fix alignement vertical */
+  letter-spacing: 0.5px;
+  display: inline-flex;
   align-items: center;
   line-height: 1;
 }
-.score-badge-max { font-size: 11px; opacity: 0.75; }
+.score-badge-max { font-size: 10px; opacity: 0.7; }
 .score-max { color: #BDB5A6; }
 
 /* ── STATS GRID 4 ── */
@@ -368,21 +738,23 @@ body {
 .stat-card {
   background: #FFFFFF;
   border: 1px solid #E5E1D8;
-  border-radius: 10px;
-  padding: 16px;
+  border-radius: 12px;
+  padding: 18px 14px;
   text-align: center;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
-.stat-card::after {
+.stat-card::before {
   content: '';
   position: absolute;
-  bottom: 0; left: 25%; right: 25%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #C49A3C, transparent);
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #C49A3C, #E8B84B);
+  border-radius: 12px 12px 0 0;
 }
-.stat-value { font-size: 20px; font-weight: 700; color: #C49A3C; margin-bottom: 4px; }
-.stat-label { font-size: 11px; color: #6B7280; text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-value { font-size: 22px; font-weight: 800; color: #1A1A1A; margin-bottom: 4px; letter-spacing: -0.5px; }
+.stat-label { font-size: 10px; color: #A67C2E; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
 
 /* ── STATS GRID 5 ── */
 .stats-grid-5 {
@@ -424,10 +796,82 @@ body {
   font-size: 12px;
   font-weight: 500;
   border: 1.5px solid #C49A3C;
-  display: inline-flex;         /* ← fix centrage vertical */
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   line-height: 1;
+}
+
+/* ── HEALTH SCORE DETAIL ── */
+.health-detail-section {
+  background: #FFFFFF;
+  border: 1px solid #E5E1D8;
+  border-radius: 12px;
+  padding: 24px 28px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.health-detail-section .section-title { margin-top: 0; background: none; padding: 0; color: #1A1A1A; font-size: 14px; letter-spacing: 0; text-transform: none; border-bottom: 2px solid #C49A3C; padding-bottom: 8px; border-radius: 0; }
+.health-components { display: flex; flex-direction: column; gap: 14px; }
+.health-component-row { }
+.health-component-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.health-component-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1A1A1A;
+}
+.health-component-score {
+  font-size: 13px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
+.health-bar-bg {
+  background: #F0EBE1;
+  border-radius: 6px;
+  height: 10px;
+  overflow: hidden;
+}
+.health-bar {
+  height: 100%;
+  border-radius: 6px;
+}
+.priority-actions {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #EDE8DF;
+}
+.priority-actions-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #A67C2E;
+  margin-bottom: 10px;
+}
+.priority-actions ul {
+  list-style: none;
+  padding: 0;
+}
+.priority-actions li {
+  font-size: 13px;
+  color: #374151;
+  padding: 6px 0 6px 18px;
+  position: relative;
+  line-height: 1.5;
+}
+.priority-actions li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 12px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #C49A3C;
 }
 
 /* ── BEST TIMES ── */
@@ -440,13 +884,16 @@ body {
   border: 1px solid #E5E1D8;
   border-radius: 8px;
   padding: 12px 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
 .best-time-item:first-child { border-color: #C49A3C; }
 .best-time-rank {
-  font-size: 18px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #C49A3C;
   min-width: 30px;
   text-align: center;
-  line-height: 1;               /* ← fix emoji/texte */
+  line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -467,7 +914,7 @@ body {
   color: #C49A3C;
   min-width: 80px;
   text-align: right;
-  display: flex;                /* ← fix alignement vertical */
+  display: flex;
   align-items: center;
   justify-content: flex-end;
 }
@@ -485,7 +932,7 @@ body {
   font-size: 13px;
   font-weight: 600;
   color: #1A1A1A;
-  display: inline-flex;         /* ← fix alignement /30 */
+  display: inline-flex;
   align-items: center;
   line-height: 1;
 }
@@ -500,12 +947,13 @@ body {
 .persona-section {
   background: #FFFFFF;
   border: 1px solid #E5E1D8;
-  border-radius: 12px;
-  padding: 20px 24px;
+  border-radius: 14px;
+  padding: 24px 28px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
-.persona-section .section-title { margin-top: 0; }
+.persona-section .section-title { margin-top: 0; background: none; padding: 0; color: #1A1A1A; font-size: 14px; letter-spacing: 0; text-transform: none; border-bottom: 2px solid #C49A3C; padding-bottom: 8px; border-radius: 0; }
 .persona-niche-badge {
-  display: flex;                /* ← fix centrage vertical du texte */
+  display: flex;
   width: fit-content;
   align-items: center;
   justify-content: center;
@@ -551,7 +999,7 @@ body {
   color: #22C55E;
   font-weight: 700;
   flex-shrink: 0;
-  line-height: 1.45;            /* ← aligné avec le texte */
+  line-height: 1.45;
 }
 .persona-block .warn {
   color: #EAB308;
@@ -567,6 +1015,7 @@ body {
   border-radius: 8px;
   padding: 14px 16px;
   margin-bottom: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
 .video-item:last-child { margin-bottom: 0; }
 .video-header {
@@ -585,7 +1034,7 @@ body {
   padding: 3px 8px;
   flex-shrink: 0;
   margin-top: 1px;
-  display: inline-flex;         /* ← fix centrage */
+  display: inline-flex;
   align-items: center;
   line-height: 1;
 }
@@ -608,9 +1057,10 @@ body {
 .insights-section {
   background: #FFFFFF;
   border: 1px solid #E5E1D8;
-  border-radius: 12px;
-  padding: 24px 28px;
-  margin-bottom: 40px;
+  border-radius: 14px;
+  padding: 28px 32px;
+  margin-bottom: 32px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 .insights-content { font-size: 13px; color: #374151; line-height: 1.7; }
 .insights-content h2 {
@@ -646,48 +1096,141 @@ body {
   page-break-inside: avoid; break-inside: avoid;
 }
 
-/* ── FOOTER ── */
-.footer {
-  margin-top: auto;
-  padding-top: 24px;
-  padding-bottom: 16px;
-  border-top: 2px solid #C49A3C;
+/* ── CTA SECTION ── */
+.cta-section {
+  margin-bottom: 28px;
+}
+.cta-box {
+  background: linear-gradient(135deg, #1a1714 0%, #111111 100%);
+  border-radius: 12px;
+  padding: 28px 32px;
+  color: #FFFFFF;
+}
+.cta-heading {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #C49A3C;
+  margin-bottom: 18px;
+  line-height: 1.3;
+}
+.cta-benefits {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+.cta-benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #D1D5DB;
+  line-height: 1.4;
+}
+.cta-bullet {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #C49A3C;
+  flex-shrink: 0;
+}
+.cta-link-box {
+  background: rgba(196,154,60,0.12);
+  border: 1px solid rgba(196,154,60,0.30);
+  border-radius: 8px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.cta-link-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #C49A3C;
+}
+.cta-link-arrow {
+  font-size: 16px;
+  color: #C49A3C;
+}
+.cta-link-url {
+  font-size: 12px;
+  color: #9CA3AF;
+  margin-left: auto;
+}
+.cta-attribution {
   text-align: center;
   font-size: 11px;
   color: #6B7280;
+  margin-top: 14px;
 }
-.footer-brand { font-weight: 700; color: #C49A3C; font-size: 14px; margin-bottom: 4px; }
-.footer a {
+
+/* ── FOOTER ── */
+.footer {
+  margin-top: auto;
+  padding-top: 20px;
+  padding-bottom: 12px;
+  border-top: 2px solid #C49A3C;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  color: #9CA3AF;
+}
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.footer-brand {
+  font-weight: 700;
   color: #C49A3C;
-  font-weight: 600;
-  text-decoration: none;
-  border-bottom: 1px solid rgba(196, 154, 60, 0.4);
+  font-size: 13px;
+}
+.footer-center {
+  color: #9CA3AF;
+}
+.footer-right {
+  color: #9CA3AF;
 }
 
 /* ── PRINT ── */
 @media print {
   body { margin: 0; padding: 0; }
   .pdf-page { box-shadow: none; margin: 0; max-width: 100%; min-height: 100%; }
+  .cover-page { box-shadow: none; }
 }
 @page { margin: 0; size: A4; }
 
-/* Blocs entiers à ne pas couper */
-.stat-card, .stats-grid, .stats-grid-5,
-.profile, .best-time-item, .video-item,
-.regularity-item, .persona-section, .persona-block,
-.top-bar, .section, .insights-section {
+/* ── ANTI-COUPURE ── */
+/* Petits blocs individuels : ne jamais couper */
+.stat-card, .best-time-item, .video-item,
+.regularity-item, .persona-block, .exec-item,
+.health-component-row, .cta-box,
+.profile, .top-bar {
   page-break-inside: avoid;
   break-inside: avoid;
 }
-/* Un titre ne doit jamais rester seul en bas de page */
+/* Grilles de stats : elles tiennent sur une page */
+.stats-grid, .stats-grid-5 {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+/* GROS conteneurs : NE PAS mettre break-inside:avoid car ils depassent souvent 1 page */
+/* .section, .insights-section, .insights-content → on laisse couper entre sous-elements */
+
+/* Titres ne doivent jamais rester seuls en bas de page */
 .section-title, .sub-title,
 .insights-content h2, .insights-content h3 {
   page-break-after: avoid;
   break-after: avoid;
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
-/* Les paragraphes et items ne se coupent pas */
+/* Paragraphes et items individuels ne se coupent pas */
 .insights-content p,
-.insights-content li {
+.insights-content li,
+.priority-actions li {
   page-break-inside: avoid;
   break-inside: avoid;
 }
@@ -695,48 +1238,53 @@ body {
       </style>
     </head>
     <body>
+
+      <!-- ═══ COVER PAGE ═══ -->
+      ${generateCoverPage(pdfData, dateStr, healthScoreData)}
+
       <div class="pdf-page">
         <div class="content-wrapper">
 
           <!-- TOP BAR -->
           <div class="top-bar avoid-break">
-            <div class="top-bar-brand">
-              <span class="top-bar-brand-icon">⚡</span>FredWav
-            </div>
+            <div class="top-bar-brand">FredWav</div>
             <div class="top-bar-right">
               <div class="subtitle">Analyse TikTok Express</div>
-              <div class="meta">${dateStr} • @${pdfData.username}</div>
+              <div class="meta">${dateStr} | @${pdfData.username}</div>
             </div>
           </div>
 
           <!-- PROFILE -->
           <div class="profile avoid-break">
             ${
-              pdfData.avatar_url
-                ? `
+    pdfData.avatar_url
+      ? `
               <div class="profile-avatar">
                 <img src="${pdfData.avatar_url}" alt="Avatar" crossorigin="anonymous">
               </div>
             `
-                : ""
-            }
+      : ""
+  }
             <div class="profile-info">
               <div class="profile-name">${pdfData.display_name || pdfData.username}</div>
               <div class="profile-handle">
                 <span class="profile-username">@${pdfData.username}</span>
-                ${pdfData.verified ? `<span class="profile-verified">✓ Vérifié</span>` : ""}
+                ${pdfData.verified ? `<span class="profile-verified">V\u00e9rifi\u00e9</span>` : ""}
               </div>
               ${pdfData.bio ? `<div class="profile-bio">${pdfData.bio}</div>` : ""}
             </div>
           </div>
 
+          <!-- EXECUTIVE SUMMARY -->
+          ${generateExecutiveSummary(pdfData, healthScoreData)}
+
           <!-- KEY METRICS -->
-          <div class="section avoid-break">
-            <h2 class="section-title">📊 Métriques Clés</h2>
+          <div class="section">
+            <h2 class="section-title">M\u00e9triques Cl\u00e9s</h2>
             <div class="stats-grid">
               <div class="stat-card">
                 <div class="stat-value">${formatNumber(pdfData.follower_count)}</div>
-                <div class="stat-label">Abonnés</div>
+                <div class="stat-label">Abonnes</div>
               </div>
               <div class="stat-card">
                 <div class="stat-value">${formatNumber(pdfData.total_likes || pdfData.like_count)}</div>
@@ -744,7 +1292,7 @@ body {
               </div>
               <div class="stat-card">
                 <div class="stat-value">${formatNumber(pdfData.video_count)}</div>
-                <div class="stat-label">Vidéos</div>
+                <div class="stat-label">Videos</div>
               </div>
               <div class="stat-card">
                 <div class="stat-value">${(pdfData.engagement_rate || 0).toFixed(2)}%</div>
@@ -752,7 +1300,7 @@ body {
               </div>
             </div>
 
-            <div class="sub-title">Moyennes par vidéo</div>
+            <div class="sub-title">Moyennes par vid\u00e9o</div>
             <div class="stats-grid-5">
               <div class="stat-card">
                 <div class="stat-value">${formatNumber(pdfData.stats.avg_views)}</div>
@@ -776,7 +1324,7 @@ body {
               </div>
             </div>
 
-            <div class="sub-title">Médianes par vidéo</div>
+            <div class="sub-title">M\u00e9dianes par vid\u00e9o</div>
             <div class="stats-grid-5">
               <div class="stat-card">
                 <div class="stat-value">${formatNumber(pdfData.stats.median_views)}</div>
@@ -801,22 +1349,25 @@ body {
             </div>
           </div>
 
+          <!-- HEALTH SCORE DETAIL -->
+          ${generateHealthScoreDetailHTML(healthScoreData)}
+
           <!-- HASHTAGS -->
           ${
-            topHashtags.length > 0
-              ? `
+    topHashtags.length > 0
+      ? `
           <div class="section avoid-break">
-            <h2 class="section-title">#️⃣ Top Hashtags</h2>
+            <h2 class="section-title">Top Hashtags</h2>
             <div class="hashtags-wrap">
               ${topHashtags
-                .slice(0, 10)
-                .map((tag) => `<span class="hashtag-badge">${tag.startsWith("#") ? tag : "#" + tag}</span>`)
-                .join("")}
+          .slice(0, 10)
+          .map((tag) => `<span class="hashtag-badge">${tag.startsWith("#") ? tag : "#" + tag}</span>`)
+          .join("")}
             </div>
           </div>
           `
-              : ""
-          }
+      : ""
+  }
 
           <!-- BEST TIMES -->
           ${generateBestTimesHTML(pdfData.best_times || [])}
@@ -829,17 +1380,17 @@ body {
 
           <!-- TOP VIDEOS -->
           ${
-            topVideos.length > 0
-              ? `
+    topVideos.length > 0
+      ? `
           <div class="section">
-            <h2 class="section-title">🎥 Top vidéos récentes</h2>
+            <h2 class="section-title">Top Vid\u00e9os R\u00e9centes</h2>
             ${topVideos
-              .map(
-                (video, i) => `
+          .map(
+            (video, i) => `
               <div class="video-item avoid-break">
                 <div class="video-header">
                   <span class="video-index">#${i + 1}</span>
-                  <span class="video-title">${video.title || video.description || "Vidéo"}</span>
+                  <span class="video-title">${video.title || video.description || "Video"}</span>
                 </div>
                 <div class="video-stats">
                   <div>
@@ -869,32 +1420,39 @@ body {
                 </div>
               </div>
             `,
-              )
-              .join("")}
+          )
+          .join("")}
           </div>
           `
-              : ""
-          }
+      : ""
+  }
 
           <!-- AI INSIGHTS -->
           ${
-            rawInsights
-              ? `
-          <div class="insights-section avoid-break">
-            <h2 class="section-title">📝 Analyse détaillée & insights IA</h2>
+    rawInsights
+      ? `
+          <div class="insights-section">
+            <h2 class="section-title">Analyse D\u00e9taill\u00e9e &amp; Insights IA</h2>
             <div class="insights-content">${markdownToHtml(rawInsights)}</div>
           </div>
           `
-              : ""
-          }
+      : ""
+  }
+
+          <!-- CTA / UPSELL -->
+          ${generateCTASection()}
 
         </div>
 
         <!-- FOOTER -->
         <div class="footer avoid-break">
-          <div class="footer-brand">⚡ FredWav</div>
-          <p>Analyse TikTok Express - Rapport généré le ${dateStr}</p>
-          <p><a href="https://fredwav.com" target="_blank">fredwav.com</a></p>
+          <div class="footer-left">
+            <span class="footer-brand">FredWav</span>
+            <span>|</span>
+            <span>fredwav.com</span>
+          </div>
+          <div class="footer-center">Document confidentiel</div>
+          <div class="footer-right">Analyse TikTok Express</div>
         </div>
       </div>
     </body>

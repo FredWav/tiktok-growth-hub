@@ -197,7 +197,8 @@ export default function AnalyseExpressResult() {
       const htmlContent = generateCompletePDFHTML(
         pdfData,
         data.account.ai_insights || "",
-        data.account.recent_videos || []
+        data.account.recent_videos || [],
+        healthScore
       );
 
       // Élément détaché — pas dans le DOM visible

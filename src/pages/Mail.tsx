@@ -26,7 +26,7 @@ export default function MailPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!accepted) {
-      setError("Tu dois accepter de recevoir les conseils.");
+      setError("Si tu ne coches pas la case, je n'ai pas le droit de t'envoyer de mail !");
       return;
     }
     setLoading(true);

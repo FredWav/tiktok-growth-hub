@@ -184,30 +184,37 @@ function generateExecutiveSummary(
   else if (overallScore >= 40) verdict = "Moyen - axes d'am\u00e9lioration significatifs";
   else if (overallScore > 0) verdict = "Faible - actions prioritaires requises";
 
-  const niche = pdfData.persona?.niche_principale || pdfData.niche || "Non identifi\u00e9e";
-  const topForce = pdfData.persona?.forces?.[0] || "Analyse en cours";
-  const topWeakness = pdfData.persona?.faiblesses?.[0] || "Analyse en cours";
+  const niche = pdfData.persona?.niche_principale || pdfData.niche || null;
+  const topForce = pdfData.persona?.forces?.[0] || null;
+  const topWeakness = pdfData.persona?.faiblesses?.[0] || null;
+
+  // Build items dynamically — only show what we actually have
+  const items: string[] = [];
+  if (niche) {
+    items.push(`<div class="exec-item"><div class="exec-item-label">Niche d\u00e9tect\u00e9e</div><div class="exec-item-value">${niche}</div></div>`);
+  }
+  if (topForce) {
+    items.push(`<div class="exec-item"><div class="exec-item-label">Force principale</div><div class="exec-item-value">${topForce}</div></div>`);
+  }
+  if (topWeakness) {
+    items.push(`<div class="exec-item"><div class="exec-item-label">Axe d'am\u00e9lioration</div><div class="exec-item-value">${topWeakness}</div></div>`);
+  }
+  // Verdict is always shown
+  items.push(`<div class="exec-item exec-item-verdict"><div class="exec-item-label">Verdict Sant\u00e9</div><div class="exec-item-value">${overallScore > 0 ? overallScore + "/100 — " : ""}${verdict}</div></div>`);
+
+  // Add engagement rate as a bonus metric if available
+  if (pdfData.engagement_rate && pdfData.engagement_rate > 0) {
+    items.push(`<div class="exec-item"><div class="exec-item-label">Taux d'engagement</div><div class="exec-item-value">${pdfData.engagement_rate.toFixed(2)}%</div></div>`);
+  }
+  if (pdfData.follower_count && pdfData.follower_count > 0) {
+    items.push(`<div class="exec-item"><div class="exec-item-label">Abonn\u00e9s</div><div class="exec-item-value">${formatNumber(pdfData.follower_count)}</div></div>`);
+  }
 
   return `
     <div class="section executive-summary avoid-break">
       <h2 class="section-title">R\u00e9sum\u00e9 Ex\u00e9cutif</h2>
       <div class="exec-grid">
-        <div class="exec-item">
-          <div class="exec-item-label">Niche</div>
-          <div class="exec-item-value">${niche}</div>
-        </div>
-        <div class="exec-item">
-          <div class="exec-item-label">Force principale</div>
-          <div class="exec-item-value">${topForce}</div>
-        </div>
-        <div class="exec-item">
-          <div class="exec-item-label">Axe d'am\u00e9lioration</div>
-          <div class="exec-item-value">${topWeakness}</div>
-        </div>
-        <div class="exec-item exec-item-verdict">
-          <div class="exec-item-label">Verdict Sant\u00e9</div>
-          <div class="exec-item-value">${overallScore > 0 ? overallScore + "/100 - " : ""}${verdict}</div>
-        </div>
+        ${items.join("\n        ")}
       </div>
     </div>`;
 }

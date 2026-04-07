@@ -113,8 +113,8 @@ export default function WavPremiumApplication() {
       };
 
       const { error } = await supabase
-        .from("wav_premium_applications" as any)
-        .insert(payload as any);
+        .from("wav_premium_applications")
+        .insert(payload);
 
       if (error) throw error;
 

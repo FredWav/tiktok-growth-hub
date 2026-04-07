@@ -25,7 +25,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { first_name, last_name, email, tiktok_username, current_level, blockers, goals, current_revenue, revenue_goal, origin_source, follower_since, conversion_trigger, posthog_id } =
+    const { first_name, last_name, email, tiktok_username, current_level, blockers, goals, budget, origin_source, follower_since, conversion_trigger, posthog_id } =
       await req.json();
 
     if (!first_name || !last_name || !email) {
@@ -46,8 +46,7 @@ Deno.serve(async (req) => {
           { name: "📧 Email", value: email, inline: true },
           { name: "🎵 TikTok", value: tiktok_username || "-", inline: true },
           { name: "📊 Niveau", value: current_level || "-", inline: true },
-          { name: "💰 CA actuel", value: current_revenue || "-", inline: true },
-          { name: "🎯 Objectif CA", value: revenue_goal || "-", inline: true },
+          { name: "💰 Budget", value: budget || "-", inline: true },
           { name: "📍 Source", value: origin_source || "-", inline: true },
           { name: "⏳ Follower depuis", value: follower_since || "-", inline: true },
           { name: "🔥 Déclencheur", value: conversion_trigger || "-", inline: true },
@@ -87,8 +86,7 @@ Deno.serve(async (req) => {
               <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Email</td><td style="padding: 12px; border-bottom: 1px solid #eee;"><a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></td></tr>
               <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">TikTok</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(tiktok_username || "-")}</td></tr>
               <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Niveau</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(current_level || "-")}</td></tr>
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">CA actuel</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(current_revenue || "-")}</td></tr>
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Objectif CA</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(revenue_goal || "-")}</td></tr>
+              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Budget</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(budget || "-")}</td></tr>
               <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; vertical-align: top;">Blocages</td><td style="padding: 12px; border-bottom: 1px solid #eee; white-space: pre-wrap;">${escapeHtml(blockers || "-")}</td></tr>
               <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; vertical-align: top;">Objectifs</td><td style="padding: 12px; border-bottom: 1px solid #eee; white-space: pre-wrap;">${escapeHtml(goals || "-")}</td></tr>
               <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Source</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(origin_source || "-")}</td></tr>

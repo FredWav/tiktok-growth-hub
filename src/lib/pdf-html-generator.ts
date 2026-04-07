@@ -1,6 +1,6 @@
 /**
  * Generates the full HTML for the TikTok analysis PDF report -- FredWav branding (cream/gold/dark).
- * v3 -- Professional cover page, health score breakdown, executive summary, CTA, page numbers.
+ * v4 -- Shadowban status, publication frequency, section icons, improved cover, enhanced executive summary.
  */
 
 import { PDFDataFormat, BestTime } from "./pdf-data-mapper";
@@ -159,10 +159,17 @@ function generateCoverPage(
           ${generateDonutSVG(overallScore)}
         </div>
         ` : ""}
+        <div class="cover-features">
+          <div class="cover-feature-item">&#10003; Score de sant&eacute; d&eacute;taill&eacute;</div>
+          <div class="cover-feature-item">&#10003; M&eacute;triques cl&eacute;s &amp; engagement</div>
+          <div class="cover-feature-item">&#10003; Meilleurs cr&eacute;neaux de publication</div>
+          <div class="cover-feature-item">&#10003; Analyse IA approfondie</div>
+          <div class="cover-feature-item">&#10003; Persona &amp; axes d&apos;am&eacute;lioration</div>
+        </div>
         <div class="cover-date">${dateStr}</div>
       </div>
       <div class="cover-footer-line">
-        Confidentiel &bull; Pr\u00e9par\u00e9 exclusivement pour @${pdfData.username}
+        Confidentiel &bull; Pr&eacute;par&eacute; exclusivement pour @${pdfData.username}
       </div>
     </div>`;
 }
@@ -179,10 +186,11 @@ function generateExecutiveSummary(
         : pdfData.health_score ?? 0;
 
   let verdict = "Score non disponible";
-  if (overallScore >= 80) verdict = "Excellent - compte tr\u00e8s performant";
-  else if (overallScore >= 60) verdict = "Bon - marge d'optimisation";
-  else if (overallScore >= 40) verdict = "Moyen - axes d'am\u00e9lioration significatifs";
-  else if (overallScore > 0) verdict = "Faible - actions prioritaires requises";
+  let verdictColor = "#9CA3AF";
+  if (overallScore >= 80) { verdict = "Excellent — compte tr\u00e8s performant"; verdictColor = "#22C55E"; }
+  else if (overallScore >= 60) { verdict = "Bon — marge d'optimisation"; verdictColor = "#84CC16"; }
+  else if (overallScore >= 40) { verdict = "Moyen — axes d'am\u00e9lioration significatifs"; verdictColor = "#EAB308"; }
+  else if (overallScore > 0) { verdict = "Faible — actions prioritaires requises"; verdictColor = "#EF4444"; }
 
   const niche = pdfData.persona?.niche_principale || pdfData.niche || null;
   const topForce = pdfData.persona?.forces?.[0] || null;
@@ -191,28 +199,28 @@ function generateExecutiveSummary(
   // Build items dynamically — only show what we actually have
   const items: string[] = [];
   if (niche) {
-    items.push(`<div class="exec-item"><div class="exec-item-label">Niche d\u00e9tect\u00e9e</div><div class="exec-item-value">${niche}</div></div>`);
+    items.push(`<div class="exec-item"><div class="exec-item-label">Niche d&eacute;tect&eacute;e</div><div class="exec-item-value">${niche}</div></div>`);
   }
   if (topForce) {
-    items.push(`<div class="exec-item"><div class="exec-item-label">Force principale</div><div class="exec-item-value">${topForce}</div></div>`);
+    items.push(`<div class="exec-item"><div class="exec-item-label">Force principale</div><div class="exec-item-value exec-force">${topForce}</div></div>`);
   }
   if (topWeakness) {
-    items.push(`<div class="exec-item"><div class="exec-item-label">Axe d'am\u00e9lioration</div><div class="exec-item-value">${topWeakness}</div></div>`);
+    items.push(`<div class="exec-item"><div class="exec-item-label">Axe d&apos;am&eacute;lioration</div><div class="exec-item-value exec-weakness">${topWeakness}</div></div>`);
   }
   // Verdict is always shown
-  items.push(`<div class="exec-item exec-item-verdict"><div class="exec-item-label">Verdict Sant\u00e9</div><div class="exec-item-value">${overallScore > 0 ? overallScore + "/100 — " : ""}${verdict}</div></div>`);
+  items.push(`<div class="exec-item exec-item-verdict"><div class="exec-item-label">Verdict Sant&eacute;</div><div class="exec-item-value" style="color:${verdictColor}">${overallScore > 0 ? `<span style="font-size:18px;font-weight:800;">${overallScore}/100</span> — ` : ""}${verdict}</div></div>`);
 
   // Add engagement rate as a bonus metric if available
   if (pdfData.engagement_rate && pdfData.engagement_rate > 0) {
-    items.push(`<div class="exec-item"><div class="exec-item-label">Taux d'engagement</div><div class="exec-item-value">${pdfData.engagement_rate.toFixed(2)}%</div></div>`);
+    items.push(`<div class="exec-item"><div class="exec-item-label">Taux d&apos;engagement</div><div class="exec-item-value">${pdfData.engagement_rate.toFixed(2)}%</div></div>`);
   }
   if (pdfData.follower_count && pdfData.follower_count > 0) {
-    items.push(`<div class="exec-item"><div class="exec-item-label">Abonn\u00e9s</div><div class="exec-item-value">${formatNumber(pdfData.follower_count)}</div></div>`);
+    items.push(`<div class="exec-item"><div class="exec-item-label">Abonn&eacute;s</div><div class="exec-item-value">${formatNumber(pdfData.follower_count)}</div></div>`);
   }
 
   return `
     <div class="section executive-summary avoid-break">
-      <h2 class="section-title">R\u00e9sum\u00e9 Ex\u00e9cutif</h2>
+      <h2 class="section-title">&#9733; R&eacute;sum&eacute; Ex&eacute;cutif</h2>
       <div class="exec-grid">
         ${items.join("\n        ")}
       </div>
@@ -230,7 +238,7 @@ function generateHealthScoreDetailHTML(healthScoreData?: any): string {
 
   return `
     <div class="section health-detail-section avoid-break">
-      <h2 class="section-title">Score de Sant\u00e9 - D\u00e9tail</h2>
+      <h2 class="section-title">&#10084; Score de Sant&eacute; - D&eacute;tail</h2>
       ${hasComponents ? `
       <div class="health-components">
         ${Object.entries(components).map(([key, value]) => {
@@ -269,7 +277,7 @@ function generateBestTimesHTML(bestTimes: BestTime[]): string {
 
   return `
     <div class="section best-times-section avoid-break">
-      <h2 class="section-title">Meilleurs Cr\u00e9neaux de Publication</h2>
+      <h2 class="section-title">&#8987; Meilleurs Cr&eacute;neaux de Publication</h2>
       <div class="best-times-list">
         ${top5
       .map((t, i) => {
@@ -300,7 +308,7 @@ function generateRegularityHTML(breakdown: Record<string, { score: number; detai
   return `
     <div class="section regularity-section avoid-break">
       <h2 class="section-title">
-        R\u00e9gularit\u00e9 D\u00e9taill\u00e9e
+        &#128260; R&eacute;gularit&eacute; D&eacute;taill&eacute;e
         <span class="score-badge-pill">${total}<span class="score-badge-max">/100</span></span>
       </h2>
       <div class="regularity-list">
@@ -329,7 +337,7 @@ function generatePersonaHTML(persona: { niche_principale?: string; forces?: stri
   if (!persona) return "";
   return `
     <div class="section persona-section avoid-break">
-      <h2 class="section-title">Persona Identifi\u00e9</h2>
+      <h2 class="section-title">&#127775; Persona Identifi&eacute;</h2>
       ${
     persona.niche_principale
       ? `
@@ -377,6 +385,71 @@ function generatePersonaHTML(persona: { niche_principale?: string; forces?: stri
       </div>
     </div>
   `;
+}
+
+function getShadowbanColor(status: string): string {
+  const s = status.toLowerCase();
+  if (s.includes("aucun") || s.includes("non") || s.includes("none") || s.includes("low")) return "#22C55E";
+  if (s.includes("mod") || s.includes("medium")) return "#EAB308";
+  if (s.includes("probable") || s.includes("confirm") || s.includes("high")) return "#EF4444";
+  return "#9CA3AF";
+}
+
+function generateShadowbanHTML(pdfData: PDFDataFormat): string {
+  if (!pdfData.shadowban_status || pdfData.shadowban_status === "Non analysé") return "";
+  const color = getShadowbanColor(pdfData.shadowban_status);
+  return `
+    <div class="section shadowban-section avoid-break">
+      <h2 class="section-title">&#9888; Statut Shadowban</h2>
+      <div class="shadowban-card" style="border-left: 4px solid ${color};">
+        <div class="shadowban-indicator" style="background:${color};"></div>
+        <div class="shadowban-text">
+          <div class="shadowban-status" style="color:${color};">${pdfData.shadowban_status}</div>
+          <div class="shadowban-hint">Basé sur l'analyse des 30 derniers jours d'activité du compte</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function generatePublicationFrequencyHTML(pdfData: PDFDataFormat): string {
+  const freq = pdfData.publication_frequency;
+  const consistency = pdfData.consistency_score;
+  const recs = pdfData.recommendations;
+
+  if (!freq && consistency === undefined && (!recs || recs.length === 0)) return "";
+
+  const dailyAvg = freq?.daily_avg;
+  const weeklyPattern = freq?.weekly_pattern;
+
+  return `
+    <div class="section pubfreq-section avoid-break">
+      <h2 class="section-title">&#128197; Fréquence de Publication</h2>
+      <div class="pubfreq-grid">
+        ${dailyAvg !== undefined ? `
+        <div class="pubfreq-card">
+          <div class="pubfreq-value">${dailyAvg.toFixed(1)}</div>
+          <div class="pubfreq-label">Vidéos / jour</div>
+        </div>` : ""}
+        ${dailyAvg !== undefined ? `
+        <div class="pubfreq-card">
+          <div class="pubfreq-value">${(dailyAvg * 7).toFixed(1)}</div>
+          <div class="pubfreq-label">Vidéos / semaine</div>
+        </div>` : ""}
+        ${consistency !== undefined ? `
+        <div class="pubfreq-card">
+          <div class="pubfreq-value" style="color:${consistency >= 70 ? "#22C55E" : consistency >= 40 ? "#EAB308" : "#EF4444"}">${consistency}</div>
+          <div class="pubfreq-label">Score consistance</div>
+        </div>` : ""}
+      </div>
+      ${weeklyPattern ? `<div class="pubfreq-pattern">${weeklyPattern}</div>` : ""}
+      ${recs && recs.length > 0 ? `
+      <div class="pubfreq-recs">
+        <div class="pubfreq-recs-title">Recommandations de publication</div>
+        <ul>
+          ${recs.map(r => `<li>${r}</li>`).join("")}
+        </ul>
+      </div>` : ""}
+    </div>`;
 }
 
 function generateCTASection(): string {
@@ -549,6 +622,22 @@ body {
   border-top: 1px solid #2A2520;
   width: 100%;
 }
+.cover-features {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 16px;
+  margin-bottom: 4px;
+  align-items: center;
+}
+.cover-feature-item {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: #9CA3AF;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 
 /* ── PAGE ── */
 .pdf-page {
@@ -647,6 +736,8 @@ body {
   border-color: rgba(196,154,60,0.35);
   background: rgba(196,154,60,0.10);
 }
+.exec-force { color: #22C55E !important; }
+.exec-weakness { color: #EAB308 !important; }
 
 /* ── PROFILE ── */
 .profile {
@@ -1174,6 +1265,107 @@ body {
   margin-top: 14px;
 }
 
+/* ── SHADOWBAN ── */
+.shadowban-section { }
+.shadowban-card {
+  background: #FFFFFF;
+  border: 1px solid #E5E1D8;
+  border-radius: 10px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.shadowban-indicator {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.shadowban-text { flex: 1; }
+.shadowban-status {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.shadowban-hint {
+  font-size: 12px;
+  color: #6B7280;
+}
+
+/* ── PUBLICATION FREQUENCY ── */
+.pubfreq-section { }
+.pubfreq-grid {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.pubfreq-card {
+  flex: 1;
+  background: #FFFFFF;
+  border: 1px solid #E5E1D8;
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.pubfreq-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: #C49A3C;
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
+}
+.pubfreq-label {
+  font-size: 10px;
+  color: #A67C2E;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+.pubfreq-pattern {
+  font-size: 13px;
+  color: #374151;
+  background: #FBF6EE;
+  border: 1px solid #EDE8DF;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
+.pubfreq-recs {
+  padding-top: 12px;
+  border-top: 1px solid #EDE8DF;
+}
+.pubfreq-recs-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #A67C2E;
+  margin-bottom: 8px;
+}
+.pubfreq-recs ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.pubfreq-recs li {
+  font-size: 13px;
+  color: #374151;
+  padding: 5px 0 5px 18px;
+  position: relative;
+  line-height: 1.5;
+}
+.pubfreq-recs li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 12px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #C49A3C;
+}
+
 /* ── FOOTER ── */
 .footer {
   margin-top: auto;
@@ -1216,7 +1408,8 @@ body {
 .stat-card, .best-time-item, .video-item,
 .regularity-item, .persona-block, .exec-item,
 .health-component-row, .cta-box,
-.profile, .top-bar {
+.profile, .top-bar,
+.shadowban-card, .pubfreq-card {
   page-break-inside: avoid;
   break-inside: avoid;
 }
@@ -1289,7 +1482,7 @@ body {
 
           <!-- KEY METRICS -->
           <div class="section">
-            <h2 class="section-title">M\u00e9triques Cl\u00e9s</h2>
+            <h2 class="section-title">&#128202; M&eacute;triques Cl&eacute;s</h2>
             <div class="stats-grid">
               <div class="stat-card">
                 <div class="stat-value">${formatNumber(pdfData.follower_count)}</div>
@@ -1366,7 +1559,7 @@ body {
     topHashtags.length > 0
       ? `
           <div class="section avoid-break">
-            <h2 class="section-title">Top Hashtags</h2>
+            <h2 class="section-title">&#35; Top Hashtags</h2>
             <div class="hashtags-wrap">
               ${topHashtags
           .slice(0, 10)
@@ -1387,12 +1580,18 @@ body {
           <!-- PERSONA -->
           ${pdfData.persona ? generatePersonaHTML(pdfData.persona) : ""}
 
+          <!-- SHADOWBAN STATUS -->
+          ${generateShadowbanHTML(pdfData)}
+
+          <!-- PUBLICATION FREQUENCY -->
+          ${generatePublicationFrequencyHTML(pdfData)}
+
           <!-- TOP VIDEOS -->
           ${
     topVideos.length > 0
       ? `
           <div class="section">
-            <h2 class="section-title">Top Vid\u00e9os R\u00e9centes</h2>
+            <h2 class="section-title">&#127916; Top Vid&eacute;os R&eacute;centes</h2>
             ${topVideos
           .map(
             (video, i) => `
@@ -1441,7 +1640,7 @@ body {
     rawInsights
       ? `
           <div class="insights-section">
-            <h2 class="section-title">Analyse D\u00e9taill\u00e9e &amp; Insights IA</h2>
+            <h2 class="section-title">&#129504; Analyse D&eacute;taill&eacute;e &amp; Insights IA</h2>
             <div class="insights-content">${markdownToHtml(rawInsights)}</div>
           </div>
           `

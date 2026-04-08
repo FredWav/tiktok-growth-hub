@@ -53,3 +53,6 @@ verify_jwt = false
 
 [functions.manual-express-analysis]
 verify_jwt = false
+
+[functions.create-wavclub-checkout]
+verify_jwt = false

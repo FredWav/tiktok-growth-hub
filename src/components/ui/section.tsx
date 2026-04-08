@@ -12,6 +12,7 @@ interface SectionProps {
 export function Section({
   children,
   className,
+  id,
   variant = "default",
   size = "lg",
 }: SectionProps) {

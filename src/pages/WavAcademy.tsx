@@ -59,7 +59,7 @@ type CheckoutForm = z.infer<typeof checkoutSchema>;
 
 const plans = {
   acces: {
-    name: "WAV CLUB · ACCÈS",
+    name: "WAV ACADEMY · ACCÈS",
     price: "39€",
     period: "/mois",
     credits: "1 000 crédits",
@@ -68,7 +68,7 @@ const plans = {
     accentClass: "text-primary",
   },
   live: {
-    name: "WAV CLUB · LIVE",
+    name: "WAV ACADEMY · LIVE",
     price: "97€",
     period: "/mois",
     credits: "3 000 crédits",
@@ -214,7 +214,7 @@ export default function WavAcademy() {
     setIsSubmitting(true);
     trackPostHogEvent("wavclub_checkout_submit", { plan: selectedPlan });
     try {
-      const { data: result, error } = await supabase.functions.invoke("create-wavclub-checkout", {
+      const { data: result, error } = await supabase.functions.invoke("create-wavacademy-checkout", {
         body: {
           plan: selectedPlan,
           email: data.email,
@@ -239,15 +239,15 @@ export default function WavAcademy() {
     return (
       <Layout>
         <SEOHead
-          title="Bienvenue dans le Wav Club ! | Fred Wav"
-          description="Ton abonnement Wav Club est confirmé. Rejoins le Discord et commence ton premier diagnostic."
+          title="Bienvenue dans le Wav Academy ! | Fred Wav"
+          description="Ton abonnement Wav Academy est confirmé. Rejoins le Discord et commence ton premier diagnostic."
           path="/wavacademy"
         />
         <Section variant="cream" size="xl">
           <div className="max-w-xl mx-auto text-center">
             <CheckCircle2 className="h-16 w-16 text-primary mx-auto mb-6" />
             <h2 className="font-display text-3xl md:text-4xl font-semibold mb-4">
-              Bienvenue dans le Wav Club !
+              Bienvenue dans le Wav Academy !
             </h2>
             <p className="text-lg text-muted-foreground mb-4">
               Ton abonnement est confirmé. Ton accès Discord sera activé dans les prochaines minutes — vérifie tes notifications Discord.
@@ -275,8 +275,8 @@ export default function WavAcademy() {
   return (
     <Layout>
       <SEOHead
-        title="Wav Club — Le système de diagnostic continu pour créateurs | Fred Wav"
-        description="Diagnostique chaque vidéo, corrige en temps réel, signe des clients depuis ton téléphone. Le Wav Club : contenu stratégique quotidien + WavSocialScan."
+        title="Wav Academy — Le système de diagnostic continu pour créateurs | Fred Wav"
+        description="Diagnostique chaque vidéo, corrige en temps réel, signe des clients depuis ton téléphone. Le Wav Academy : contenu stratégique quotidien + WavSocialScan."
         path="/wavacademy"
         keywords="wav club, diagnostic tiktok, wavsocialscan, contenu stratégique, formats courts"
       />
@@ -286,7 +286,7 @@ export default function WavAcademy() {
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary border border-primary/20 rounded-full px-4 py-1.5 text-sm font-medium mb-8">
             <Radio className="h-3.5 w-3.5" />
-            Wav Club — Accès ouvert maintenant
+            Wav Academy — Accès ouvert maintenant
           </div>
           <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight mb-6">
             J'ai arrêté de poster tous les jours.{" "}
@@ -302,7 +302,7 @@ export default function WavAcademy() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="hero" size="xl" onClick={scrollToPlans}>
-              Rejoindre le Wav Club
+              Rejoindre le Wav Academy
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button variant="outline" size="xl" asChild>
@@ -478,7 +478,7 @@ export default function WavAcademy() {
       <Section variant="cream" size="lg" id="produit">
         <div className="max-w-3xl mx-auto">
           <p className="text-primary font-semibold uppercase tracking-widest text-sm mb-4 text-center">Le Système</p>
-          <SectionHeader title="C'est la raison pour laquelle j'ai créé le Wav Club." />
+          <SectionHeader title="C'est la raison pour laquelle j'ai créé le Wav Academy." />
 
           {/* WavSocialScan */}
           <div className="mb-10 p-8 rounded-2xl bg-background border-2 border-primary/30">
@@ -500,7 +500,7 @@ export default function WavAcademy() {
             <div className="p-4 bg-primary/5 rounded-xl border border-primary/20">
               <p className="text-sm text-foreground">
                 Normalement à partir de <strong>14,90€/mois</strong> en Standard et <strong>39,90€/mois</strong> en Premium.
-                En tant que membre du Wav Club, tu bénéficies de <strong>crédits gratuits chaque mois</strong> selon ta formule, et de{" "}
+                En tant que membre du Wav Academy, tu bénéficies de <strong>crédits gratuits chaque mois</strong> selon ta formule, et de{" "}
                 <strong>-50% sur tous les abonnements WavSocialScan</strong> si tu veux aller plus loin.
               </p>
             </div>
@@ -518,7 +518,7 @@ export default function WavAcademy() {
               </div>
             </div>
             <p className="text-foreground/80 leading-relaxed mb-4">
-              Chaque jour, un nouveau contenu stratégique est publié sur le Discord du Wav Club. Un framework, un template, une analyse de tendance, une technique applicable le jour même.
+              Chaque jour, un nouveau contenu stratégique est publié sur le Discord du Wav Academy. Un framework, un template, une analyse de tendance, une technique applicable le jour même.
             </p>
             <p className="text-foreground/80 leading-relaxed mb-4">
               <strong>Mais voilà le truc.</strong> Quand un nouveau contenu arrive, le plus ancien disparaît. Il y a toujours 15 contenus disponibles simultanément. Après, c'est parti. Pas d'archive illimitée. Pas de "je regarderai plus tard".
@@ -541,14 +541,14 @@ export default function WavAcademy() {
       <Section variant="default" size="xl" id="plans">
         <SectionHeader
           title="Choisis ta formule."
-          subtitle="Tout le monde n'est pas au même stade. Le Wav Club s'adapte à ton niveau."
+          subtitle="Tout le monde n'est pas au même stade. Le Wav Academy s'adapte à ton niveau."
         />
 
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {/* Plan ACCÈS */}
           <div className="rounded-2xl border-2 border-primary/30 bg-background p-8 flex flex-col">
             <div className="mb-6">
-              <p className="text-xs font-bold tracking-widest text-primary uppercase mb-3">🎧 WAV CLUB · ACCÈS</p>
+              <p className="text-xs font-bold tracking-widest text-primary uppercase mb-3">🎧 WAV ACADEMY · ACCÈS</p>
               <div className="flex items-baseline gap-1 mb-1">
                 <span className="font-display text-5xl font-bold">39€</span>
                 <span className="text-muted-foreground">/mois</span>
@@ -600,7 +600,7 @@ export default function WavAcademy() {
               </span>
             </div>
             <div className="mb-6">
-              <p className="text-xs font-bold tracking-widest text-primary uppercase mb-3">🎙 WAV CLUB · LIVE</p>
+              <p className="text-xs font-bold tracking-widest text-primary uppercase mb-3">🎙 WAV ACADEMY · LIVE</p>
               <div className="flex items-baseline gap-1 mb-1">
                 <span className="font-display text-5xl font-bold">97€</span>
                 <span className="text-muted-foreground">/mois</span>
@@ -648,7 +648,7 @@ export default function WavAcademy() {
           {/* Plan ÉLITE */}
           <div className="rounded-2xl border-2 border-border bg-noir text-cream p-8 flex flex-col">
             <div className="mb-6">
-              <p className="text-xs font-bold tracking-widest text-primary uppercase mb-3">🚀 WAV CLUB · ÉLITE</p>
+              <p className="text-xs font-bold tracking-widest text-primary uppercase mb-3">🚀 WAV ACADEMY · ÉLITE</p>
               <div className="flex items-baseline gap-1 mb-1">
                 <span className="font-display text-5xl font-bold">1 500€</span>
                 <span className="text-cream/60">/mois</span>
@@ -805,7 +805,7 @@ export default function WavAcademy() {
             Sur un mois, c'est 15 à 20 vidéos non diagnostiquées. Sur trois mois, 60.
           </p>
           <p className="text-cream/70 mb-10">
-            Pendant ce temps, ceux qui sont dans le Wav Club diagnostiquent chaque vidéo, corrigent chaque semaine, et captent l'audience qui aurait dû être la tienne.
+            Pendant ce temps, ceux qui sont dans le Wav Academy diagnostiquent chaque vidéo, corrigent chaque semaine, et captent l'audience qui aurait dû être la tienne.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
             <Button
@@ -813,7 +813,7 @@ export default function WavAcademy() {
               size="xl"
               onClick={() => openPlanDialog("live")}
             >
-              Rejoindre le Wav Club · Live — 97€/mois
+              Rejoindre le Wav Academy · Live — 97€/mois
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button
@@ -836,7 +836,7 @@ export default function WavAcademy() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="font-display text-2xl">
-              {selectedPlan === "acces" ? "WAV CLUB · ACCÈS — 39€/mois" : "WAV CLUB · LIVE — 97€/mois"}
+              {selectedPlan === "acces" ? "WAV ACADEMY · ACCÈS — 39€/mois" : "WAV ACADEMY · LIVE — 97€/mois"}
             </DialogTitle>
             <DialogDescription>
               Complète ces informations pour finaliser ton inscription. Tu seras redirigé vers le paiement sécurisé.

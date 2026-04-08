@@ -69,19 +69,19 @@ serve(async (req) => {
       const session = event.data.object as Stripe.Checkout.Session;
       const metadata = session.metadata;
 
-      // ── Wav Club subscription ─────────────────────────────────────────
-      if (metadata?.type?.startsWith("wavclub_")) {
+      // ── Wav Academy subscription ─────────────────────────────────────────
+      if (metadata?.type?.startsWith("wavacademy_")) {
         const plan = metadata.plan as string;
         const discordUserId = metadata.discord_user_id;
         const discordRoleEnv = metadata.discord_role_env;
         const email = metadata.email;
         const stripeSubscriptionId = session.subscription as string | null;
 
-        console.log(`WavClub checkout completed: plan=${plan}, email=${email}, discord=${discordUserId}`);
+        console.log(`WavAcademy checkout completed: plan=${plan}, email=${email}, discord=${discordUserId}`);
 
-        // Store in wavclub_subscriptions
+        // Store in wavacademy_subscriptions
         const { error: insertError } = await supabase
-          .from("wavclub_subscriptions")
+          .from("wavacademy_subscriptions")
           .insert({
             stripe_session_id: session.id,
             stripe_subscription_id: stripeSubscriptionId,
@@ -94,8 +94,8 @@ serve(async (req) => {
           });
 
         if (insertError) {
-          console.error("Error inserting wavclub_subscription:", insertError);
-          await notifyError("WavClub Webhook", `Échec insert DB • plan=${plan} • ${email}`);
+          console.error("Error inserting wavacademy_subscription:", insertError);
+          await notifyError("WavAcademy Webhook", `Échec insert DB • plan=${plan} • ${email}`);
           // Don't throw — still try to assign Discord role
         }
 
@@ -105,12 +105,12 @@ serve(async (req) => {
 
           // Mark discord_role_granted = true
           await supabase
-            .from("wavclub_subscriptions")
+            .from("wavacademy_subscriptions")
             .update({ discord_role_granted: true })
             .eq("stripe_session_id", session.id);
         }
 
-        await notifySuccess("WavClub", `Nouveau membre • ${plan} • ${email}`);
+        await notifySuccess("WavAcademy", `Nouveau membre • ${plan} • ${email}`);
 
         return new Response(JSON.stringify({ received: true }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -152,20 +152,20 @@ serve(async (req) => {
       console.log(`VIP subscription created for user ${userId}, ${durationMonths} months`);
     }
 
-    // ── customer.subscription.deleted (WavClub cancellation) ─────────────
+    // ── customer.subscription.deleted (WavAcademy cancellation) ─────────────
     if (event.type === "customer.subscription.deleted") {
       const subscription = event.data.object as Stripe.Subscription;
       const subMeta = subscription.metadata;
 
-      if (subMeta?.type?.startsWith("wavclub_")) {
+      if (subMeta?.type?.startsWith("wavacademy_")) {
         const discordUserId = subMeta.discord_user_id;
         const discordRoleEnv = subMeta.discord_role_env;
 
-        console.log(`WavClub subscription cancelled: ${subscription.id}`);
+        console.log(`WavAcademy subscription cancelled: ${subscription.id}`);
 
         // Update DB
         await supabase
-          .from("wavclub_subscriptions")
+          .from("wavacademy_subscriptions")
           .update({ status: "cancelled", discord_role_granted: false })
           .eq("stripe_subscription_id", subscription.id);
 
@@ -174,7 +174,7 @@ serve(async (req) => {
           await assignDiscordRole(discordUserId, discordRoleEnv, "revoke");
         }
 
-        await notifySuccess("WavClub", `Résiliation abonnement • ${subscription.id}`);
+        await notifySuccess("WavAcademy", `Résiliation abonnement • ${subscription.id}`);
       }
     }
 

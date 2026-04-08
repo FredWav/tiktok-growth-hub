@@ -1,8 +1,8 @@
--- Wav Club subscriptions table
+-- Wav Academy subscriptions table
 -- Tracks members for ACCÈS (39€/mois) and LIVE (97€/mois) plans
 -- ÉLITE (1500€/mois) goes through the existing wav_premium_applications flow
 
-CREATE TABLE IF NOT EXISTS wavclub_subscriptions (
+CREATE TABLE IF NOT EXISTS wavacademy_subscriptions (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   stripe_session_id text UNIQUE,
   stripe_subscription_id text UNIQUE,
@@ -16,17 +16,17 @@ CREATE TABLE IF NOT EXISTS wavclub_subscriptions (
 );
 
 -- Index for lookups by subscription ID (webhook cancellation flow)
-CREATE INDEX IF NOT EXISTS idx_wavclub_subscriptions_stripe_sub
-  ON wavclub_subscriptions (stripe_subscription_id);
+CREATE INDEX IF NOT EXISTS idx_wavacademy_subscriptions_stripe_sub
+  ON wavacademy_subscriptions (stripe_subscription_id);
 
 -- Index for lookups by email
-CREATE INDEX IF NOT EXISTS idx_wavclub_subscriptions_email
-  ON wavclub_subscriptions (email);
+CREATE INDEX IF NOT EXISTS idx_wavacademy_subscriptions_email
+  ON wavacademy_subscriptions (email);
 
 -- RLS: admin-only access (service role bypasses RLS)
-ALTER TABLE wavclub_subscriptions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE wavacademy_subscriptions ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Admin full access" ON wavclub_subscriptions
+CREATE POLICY "Admin full access" ON wavacademy_subscriptions
   FOR ALL USING (
     EXISTS (
       SELECT 1 FROM profiles

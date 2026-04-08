@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 interface SectionProps {
   children: ReactNode;
   className?: string;
+  id?: string;
   variant?: "default" | "dark" | "cream" | "gradient";
   size?: "sm" | "md" | "lg" | "xl";
 }

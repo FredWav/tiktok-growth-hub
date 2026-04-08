@@ -9,6 +9,37 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+/** Call the discord-role Edge Function to grant or revoke a role. */
+async function assignDiscordRole(
+  discordUserId: string,
+  roleEnvKey: string,
+  action: "grant" | "revoke"
+): Promise<void> {
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const roleId = Deno.env.get(roleEnvKey);
+
+  if (!roleId) {
+    console.warn(`Discord role env var not set: ${roleEnvKey}. Skipping role assignment.`);
+    return;
+  }
+
+  try {
+    const resp = await fetch(`${supabaseUrl}/functions/v1/discord-role`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${serviceKey}`,
+      },
+      body: JSON.stringify({ action, discordUserId, roleId }),
+    });
+    const result = await resp.json();
+    console.log(`Discord role ${action} (${roleEnvKey}) for ${discordUserId}:`, result);
+  } catch (err) {
+    console.error(`Failed to ${action} Discord role for ${discordUserId}:`, err);
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -33,12 +64,62 @@ serve(async (req) => {
       event = JSON.parse(body) as Stripe.Event;
     }
 
+    // ── checkout.session.completed ────────────────────────────────────────
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
       const metadata = session.metadata;
 
+      // ── Wav Club subscription ─────────────────────────────────────────
+      if (metadata?.type?.startsWith("wavclub_")) {
+        const plan = metadata.plan as string;
+        const discordUserId = metadata.discord_user_id;
+        const discordRoleEnv = metadata.discord_role_env;
+        const email = metadata.email;
+        const stripeSubscriptionId = session.subscription as string | null;
+
+        console.log(`WavClub checkout completed: plan=${plan}, email=${email}, discord=${discordUserId}`);
+
+        // Store in wavclub_subscriptions
+        const { error: insertError } = await supabase
+          .from("wavclub_subscriptions")
+          .insert({
+            stripe_session_id: session.id,
+            stripe_subscription_id: stripeSubscriptionId,
+            email,
+            discord_user_id: discordUserId || null,
+            discord_role_env: discordRoleEnv || null,
+            plan_type: plan,
+            status: "active",
+            discord_role_granted: false,
+          });
+
+        if (insertError) {
+          console.error("Error inserting wavclub_subscription:", insertError);
+          await notifyError("WavClub Webhook", `Échec insert DB • plan=${plan} • ${email}`);
+          // Don't throw — still try to assign Discord role
+        }
+
+        // Assign Discord role
+        if (discordUserId && discordRoleEnv) {
+          await assignDiscordRole(discordUserId, discordRoleEnv, "grant");
+
+          // Mark discord_role_granted = true
+          await supabase
+            .from("wavclub_subscriptions")
+            .update({ discord_role_granted: true })
+            .eq("stripe_session_id", session.id);
+        }
+
+        await notifySuccess("WavClub", `Nouveau membre • ${plan} • ${email}`);
+
+        return new Response(JSON.stringify({ received: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // ── Legacy VIP subscription ───────────────────────────────────────
       if (!metadata?.user_id || !metadata?.duration_months) {
-        console.log("Not a VIP checkout session, skipping");
+        console.log("Not a known checkout session type, skipping");
         return new Response(JSON.stringify({ received: true }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -69,6 +150,32 @@ serve(async (req) => {
 
       await notifySuccess("Stripe VIP", `Abonnement créé • ${durationMonths} mois • user ${userId}`);
       console.log(`VIP subscription created for user ${userId}, ${durationMonths} months`);
+    }
+
+    // ── customer.subscription.deleted (WavClub cancellation) ─────────────
+    if (event.type === "customer.subscription.deleted") {
+      const subscription = event.data.object as Stripe.Subscription;
+      const subMeta = subscription.metadata;
+
+      if (subMeta?.type?.startsWith("wavclub_")) {
+        const discordUserId = subMeta.discord_user_id;
+        const discordRoleEnv = subMeta.discord_role_env;
+
+        console.log(`WavClub subscription cancelled: ${subscription.id}`);
+
+        // Update DB
+        await supabase
+          .from("wavclub_subscriptions")
+          .update({ status: "cancelled", discord_role_granted: false })
+          .eq("stripe_subscription_id", subscription.id);
+
+        // Revoke Discord role
+        if (discordUserId && discordRoleEnv) {
+          await assignDiscordRole(discordUserId, discordRoleEnv, "revoke");
+        }
+
+        await notifySuccess("WavClub", `Résiliation abonnement • ${subscription.id}`);
+      }
     }
 
     return new Response(JSON.stringify({ received: true }), {

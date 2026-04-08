@@ -48,6 +48,7 @@ const DiagnosticStart = lazy(() => import("./pages/DiagnosticStart"));
 const DiagnosticProcessing = lazy(() => import("./pages/DiagnosticProcessing"));
 const DiagnosticResult = lazy(() => import("./pages/DiagnosticResult"));
 const Mail = lazy(() => import("./pages/Mail"));
+const WavAcademy = lazy(() => import("./pages/WavAcademy"));
 
 // Admin pages - lazy loaded
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
@@ -109,6 +110,7 @@ const App = () => (
             <Route path="/analyse-express" element={<AnalyseExpress />} />
             <Route path="/analyse-express/result" element={<AnalyseExpressResult />} />
             <Route path="/wav-premium/candidature" element={<WavPremiumApplication />} />
+            <Route path="/wavacademy" element={<WavAcademy />} />
 
             {/* Deep link redirect */}
             <Route path="/go/:slug" element={<GoRedirect />} />

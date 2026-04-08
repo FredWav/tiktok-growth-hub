@@ -22,7 +22,8 @@ serve(async (req) => {
   }
 
   try {
-    const { action, discordUserId } = await req.json();
+    // roleId can be passed directly (for multi-role support) or resolved from env
+    const { action, discordUserId, roleId: roleIdParam } = await req.json();
 
     if (!action || !discordUserId) {
       throw new Error("Missing action or discordUserId");
@@ -30,7 +31,8 @@ serve(async (req) => {
 
     const botToken = Deno.env.get("DISCORD_BOT_TOKEN");
     const guildId = Deno.env.get("DISCORD_GUILD_ID");
-    const roleId = Deno.env.get("DISCORD_VIP_ROLE_ID");
+    // Use explicitly passed roleId first, then fall back to legacy env var
+    const roleId = roleIdParam || Deno.env.get("DISCORD_VIP_ROLE_ID");
 
     if (!botToken || !guildId || !roleId) {
       throw new Error("Discord configuration missing");

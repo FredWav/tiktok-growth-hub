@@ -4,6 +4,7 @@ import { trackPostHogEvent } from "@/lib/posthog";
 
 const navLinks = [
   { label: "Accueil", href: "/", section: "navigation" },
+  { label: "Wav Club", href: "/wavacademy", section: "navigation" },
   { label: "Wav Premium", href: "/wav-premium/candidature", section: "navigation" },
   { label: "Analyse Express", href: "/analyse-express", section: "navigation" },
   { label: "Témoignages", href: "/preuves", section: "navigation" },

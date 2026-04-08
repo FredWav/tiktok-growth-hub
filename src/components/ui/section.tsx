@@ -32,6 +32,7 @@ export function Section({
 
   return (
     <section
+      id={id}
       className={cn(variantClasses[variant], sizeClasses[size], className)}
     >
       <div className="container mx-auto px-4">{children}</div>

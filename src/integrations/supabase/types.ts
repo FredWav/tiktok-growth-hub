@@ -866,6 +866,45 @@ export type Database = {
         }
         Relationships: []
       }
+      wavacademy_subscriptions: {
+        Row: {
+          created_at: string
+          discord_role_env: string | null
+          discord_role_granted: boolean
+          discord_user_id: string | null
+          email: string
+          id: string
+          plan_type: string
+          status: string
+          stripe_session_id: string | null
+          stripe_subscription_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          discord_role_env?: string | null
+          discord_role_granted?: boolean
+          discord_user_id?: string | null
+          email: string
+          id?: string
+          plan_type: string
+          status?: string
+          stripe_session_id?: string | null
+          stripe_subscription_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          discord_role_env?: string | null
+          discord_role_granted?: boolean
+          discord_user_id?: string | null
+          email?: string
+          id?: string
+          plan_type?: string
+          status?: string
+          stripe_session_id?: string | null
+          stripe_subscription_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

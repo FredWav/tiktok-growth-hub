@@ -1,0 +1,2 @@
+ALTER TABLE public.express_analyses ADD COLUMN IF NOT EXISTS newsletter_requested boolean DEFAULT false;
+ALTER TABLE public.express_analyses ADD COLUMN IF NOT EXISTS newsletter_subscribed boolean DEFAULT false;

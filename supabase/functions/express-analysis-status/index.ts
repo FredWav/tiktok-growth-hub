@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
-import nodemailer from "npm:nodemailer@6.9.16";
+import nodemailer from "https://esm.sh/nodemailer@6.9.16";
 import { getStripeSecretKey } from "../_shared/stripe-config.ts";
 import { notifySuccess, notifyError } from "../_shared/itpush.ts";
 import { upsertProspect } from "../_shared/upsert-prospect.ts";

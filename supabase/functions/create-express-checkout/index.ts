@@ -13,13 +13,14 @@ serve(async (req) => {
   }
 
   try {
-    const { username, email } = await req.json();
+    const { username, email, subscribeToNewsletter } = await req.json();
     if (!username || typeof username !== "string" || username.trim().length < 2) {
       throw new Error("Nom d'utilisateur TikTok invalide");
     }
 
     const cleanUsername = username.trim().replace(/^@/, "");
     const cleanEmail = email?.trim() || "";
+    const wantsNewsletter = subscribeToNewsletter === true || subscribeToNewsletter === "true";
 
     const stripe = new Stripe(getStripeSecretKey(), {
       apiVersion: "2025-08-27.basil",
@@ -39,6 +40,7 @@ serve(async (req) => {
       metadata: {
         tiktok_username: cleanUsername,
         type: "analyse_express",
+        subscribe_newsletter: wantsNewsletter ? "true" : "false",
         ...(cleanEmail ? { email: cleanEmail } : {}),
       },
       success_url: `${origin}/analyse-express/result?session_id={CHECKOUT_SESSION_ID}`,

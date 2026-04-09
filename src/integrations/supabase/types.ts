@@ -470,6 +470,8 @@ export type Database = {
           health_score: number | null
           id: string
           job_id: string | null
+          newsletter_requested: boolean
+          newsletter_subscribed: boolean
           result_data: Json | null
           status: string
           stripe_session_id: string
@@ -483,6 +485,8 @@ export type Database = {
           health_score?: number | null
           id?: string
           job_id?: string | null
+          newsletter_requested?: boolean
+          newsletter_subscribed?: boolean
           result_data?: Json | null
           status?: string
           stripe_session_id: string
@@ -496,6 +500,8 @@ export type Database = {
           health_score?: number | null
           id?: string
           job_id?: string | null
+          newsletter_requested?: boolean
+          newsletter_subscribed?: boolean
           result_data?: Json | null
           status?: string
           stripe_session_id?: string

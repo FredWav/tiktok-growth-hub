@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Download, Loader2, RefreshCw, Search } from "lucide-react";
+import { Download, Loader2, RefreshCw, Search, Mail, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import { mapAccountDataForPDF } from "@/lib/pdf-data-mapper";
 import { generateCompletePDFHTML } from "@/lib/pdf-html-generator";
@@ -79,6 +79,18 @@ const ExpressAnalyses = () => {
   const pollingRefs = useRef<Record<string, ReturnType<typeof setInterval>>>({});
   const [manualUsername, setManualUsername] = useState("");
   const [isLaunching, setIsLaunching] = useState(false);
+  const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
+
+  const handleCopyEmail = async (email: string) => {
+    try {
+      await navigator.clipboard.writeText(email);
+      setCopiedEmail(email);
+      toast.success("Email copié");
+      setTimeout(() => setCopiedEmail(null), 1500);
+    } catch {
+      toast.error("Impossible de copier l'email");
+    }
+  };
 
   const stopPolling = useCallback((analysisId: string) => {
     if (pollingRefs.current[analysisId]) {
@@ -280,6 +292,8 @@ const ExpressAnalyses = () => {
                 <TableRow className="border-primary/20">
                   <TableHead className="text-cream/70">Date</TableHead>
                   <TableHead className="text-cream/70">Username</TableHead>
+                  <TableHead className="text-cream/70">Email</TableHead>
+                  <TableHead className="text-cream/70">Newsletter</TableHead>
                   <TableHead className="text-cream/70">Statut</TableHead>
                   <TableHead className="text-cream/70">Health Score</TableHead>
                   <TableHead className="text-cream/70">Erreur</TableHead>
@@ -301,6 +315,50 @@ const ExpressAnalyses = () => {
                       </TableCell>
                       <TableCell className="text-cream font-medium">
                         @{analysis.tiktok_username}
+                      </TableCell>
+                      <TableCell className="text-cream/80 max-w-[220px]">
+                        {analysis.email ? (
+                          <div className="flex items-center gap-1.5 group">
+                            <a
+                              href={`mailto:${analysis.email}`}
+                              className="text-cream/80 hover:text-primary truncate"
+                              title={analysis.email}
+                            >
+                              {analysis.email}
+                            </a>
+                            <button
+                              type="button"
+                              onClick={() => handleCopyEmail(analysis.email!)}
+                              className="opacity-0 group-hover:opacity-100 transition-opacity text-cream/40 hover:text-primary"
+                              title="Copier l'email"
+                            >
+                              {copiedEmail === analysis.email ? (
+                                <Check className="h-3.5 w-3.5" />
+                              ) : (
+                                <Copy className="h-3.5 w-3.5" />
+                              )}
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-cream/30">-</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {analysis.newsletter_requested ? (
+                          analysis.newsletter_subscribed ? (
+                            <Badge variant="default" className="gap-1">
+                              <Mail className="h-3 w-3" />
+                              Inscrit
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="gap-1 text-yellow-400 border-yellow-500/40">
+                              <Mail className="h-3 w-3" />
+                              En attente
+                            </Badge>
+                          )
+                        ) : (
+                          <span className="text-cream/30 text-xs">Non demandé</span>
+                        )}
                       </TableCell>
                       <TableCell>
                         {isRetrying ? (

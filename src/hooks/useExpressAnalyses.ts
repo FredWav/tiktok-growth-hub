@@ -5,6 +5,9 @@ export interface ExpressAnalysis {
   id: string;
   stripe_session_id: string;
   tiktok_username: string;
+  email: string | null;
+  newsletter_requested: boolean;
+  newsletter_subscribed: boolean;
   job_id: string | null;
   status: string;
   error_message: string | null;

@@ -116,20 +116,17 @@ Deno.serve(async (req) => {
               Merci pour ta candidature, ${escapeHtml(first_name)} !
             </h1>
             <p style="color: #555; font-size: 16px; line-height: 1.6;">
-              Ta candidature au <strong>Wav Premium</strong> a bien été reçue.
+              Ta candidature au <strong>Wav Premium</strong> a bien été reçue. Je prends le temps de la lire en détail.
             </p>
-            <p style="color: #555; font-size: 16px; line-height: 1.6;">
-              La prochaine étape : <strong>réserve ton appel de qualification</strong> pour qu'on échange sur ta situation et qu'on valide ensemble si l'accompagnement est adapté à tes objectifs.
-            </p>
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="https://calendly.com/fredwavcm/wav-premium" style="display: inline-block; background-color: #c8a97e; color: #fff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
-                Réserver mon appel de qualification
-              </a>
+            <div style="background-color: #faf7f2; border-left: 4px solid #c8a97e; padding: 20px; margin: 24px 0; border-radius: 8px;">
+              <p style="color: #333; font-size: 16px; line-height: 1.6; margin: 0;">
+                <strong>Prochaine étape&nbsp;:</strong> je te recontacte personnellement par email sous <strong>48h (jours ouvrés)</strong> à cette adresse.
+              </p>
             </div>
-            <p style="color: #888; font-size: 14px; line-height: 1.5;">
-              Si tu as des questions d'ici là, réponds directement à cet email ou contacte-moi sur <a href="https://www.tiktok.com/@fredwav" style="color: #c8a97e;">TikTok</a>.
+            <p style="color: #555; font-size: 16px; line-height: 1.6;">
+              En attendant, pense à vérifier tes spams au cas où ma réponse atterrirait là-bas. Si tu as des questions entre-temps, tu peux répondre directement à cet email.
             </p>
-            <p style="color: #555; font-size: 16px; margin-top: 20px;">
+            <p style="color: #555; font-size: 16px; margin-top: 24px;">
               À très vite,<br/>
               <strong>Fred Wav</strong>
             </p>

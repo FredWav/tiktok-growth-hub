@@ -10,7 +10,7 @@ import { trackPostHogEvent } from "@/lib/posthog";
 import { TrustedBy } from "@/components/TrustedBy";
 import { ScreenshotWall } from "@/components/ScreenshotWall";
 
-const CALENDLY_URL = "https://calendly.com/fredwavcm/wav-premium";
+const WAV_PREMIUM_APPLICATION_URL = "/wav-premium/candidature";
 const CALENDLY_ONE_SHOT = "https://calendly.com/fredwavcm/appel-strategie-30min";
 
 const ScoreCircle = ({ score }: { score: number }) => {
@@ -197,10 +197,10 @@ const DiagnosticResult = () => {
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Structuration business</li>
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Scale de l'audience</li>
                 </ul>
-                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer }); trackPostHogEvent("cta_clicked", { offer_type: "PREMIUM", destination: "calendly" }); }}>
-                  <a href={CALENDLY_URL} target="_blank" rel="noopener noreferrer">
-                    Réserver une discussion stratégique (45 min) <ExternalLink className="w-4 h-4 ml-2" />
-                  </a>
+                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer }); trackPostHogEvent("cta_clicked", { offer_type: "PREMIUM", destination: "application_form" }); }}>
+                  <Link to={WAV_PREMIUM_APPLICATION_URL}>
+                    Candidater au Wav Premium <ExternalLink className="w-4 h-4 ml-2" />
+                  </Link>
                 </Button>
                 <TrustedBy filter="premium" className="mt-4" />
                 <MailFooter />
@@ -221,9 +221,9 @@ const DiagnosticResult = () => {
                   <a href={CALENDLY_ONE_SHOT} target="_blank" rel="noopener noreferrer">Réserver mon appel stratégique (30 min) <ExternalLink className="w-4 h-4 ml-2" /></a>
                 </Button>
                 <Button variant="outline" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer: "PREMIUM" }); trackPostHogEvent("secondary_cta_clicked", { offer_type: "PREMIUM_UPSELL" }); }}>
-                  <a href={CALENDLY_URL} target="_blank" rel="noopener noreferrer">
-                    Découvrir Wav Premium (45 min) <ExternalLink className="w-4 h-4 ml-2" />
-                  </a>
+                  <Link to={WAV_PREMIUM_APPLICATION_URL}>
+                    Découvrir Wav Premium <ExternalLink className="w-4 h-4 ml-2" />
+                  </Link>
                 </Button>
                 <TrustedBy className="mt-4" />
                 <MailFooter />

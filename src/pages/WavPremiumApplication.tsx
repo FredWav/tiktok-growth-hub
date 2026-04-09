@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, Mail, Clock } from "lucide-react";
 import { trackEvent, getStoredUtmSource } from "@/lib/tracking";
 import { trackPostHogEvent, identifyUser, getPostHogId } from "@/lib/posthog";
 import { Layout } from "@/components/layout/Layout";
@@ -135,7 +135,7 @@ export default function WavPremiumApplication() {
       <Layout>
         <SEOHead
           title="Candidature envoyée - Wav Premium | Fred Wav"
-          description="Ta candidature au Wav Premium a bien été envoyée. Réserve ton appel de qualification."
+          description="Ta candidature au Wav Premium a bien été envoyée. Fred te recontacte par email sous 48h jours ouvrés."
           path="/wav-premium/candidature"
         />
         <Section variant="cream" size="lg">
@@ -145,24 +145,39 @@ export default function WavPremiumApplication() {
               Candidature envoyée !
             </h2>
             <p className="text-lg text-muted-foreground mb-8">
-              Merci pour ta candidature. L'étape suivante : réserve ton appel de qualification pour qu'on échange sur ta situation.
+              Merci pour ta candidature. Je l'ai bien reçue et je prends le temps de la lire en détail.
             </p>
-            <Button variant="hero" size="xl" asChild>
-              <a
-                href="https://calendly.com/fredwavcm/wav-premium"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => trackPostHogEvent("click_calendly_post_apply")}
-              >
-                Réserver mon appel de qualification
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </a>
-            </Button>
-            <p className="text-sm text-muted-foreground mt-6">
-              <Link to="/" className="text-primary underline hover:no-underline">
+
+            <div className="bg-background border border-primary/20 rounded-2xl p-6 mb-8 text-left">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Mail className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground mb-1">Je te recontacte par email</p>
+                  <p className="text-sm text-muted-foreground">
+                    Sous <strong>48h (jours ouvrés)</strong> à l'adresse que tu viens de me communiquer.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Clock className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground mb-1">En attendant</p>
+                  <p className="text-sm text-muted-foreground">
+                    Vérifie tes spams au cas où, et prépare tes questions. On fera le point ensemble par écrit avant d'éventuellement caler un échange.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <Button variant="outline" size="lg" asChild>
+              <Link to="/" onClick={() => trackPostHogEvent("click_home_post_apply")}>
                 ← Retour à l'accueil
               </Link>
-            </p>
+            </Button>
           </div>
         </Section>
       </Layout>

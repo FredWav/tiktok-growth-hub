@@ -51,8 +51,14 @@ export default function MailPage() {
       if (data?.error) throw new Error(data.error);
 
       setSuccess(true);
-    } catch {
-      setError("Une erreur est survenue. Réessaie !");
+    } catch (err: unknown) {
+      // Show a friendly message when MailerLite rejects the email (invalid format, banned domain, etc.)
+      const message = err instanceof Error ? err.message : "";
+      if (/valid email|email.*invalid|email.*format/i.test(message)) {
+        setError("Cet email ne semble pas valide. Vérifie-le et réessaie !");
+      } else {
+        setError("Une erreur est survenue. Réessaie !");
+      }
     } finally {
       setLoading(false);
     }

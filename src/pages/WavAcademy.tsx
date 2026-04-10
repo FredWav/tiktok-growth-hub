@@ -166,6 +166,8 @@ const comparisonFeatures: { label: string; acces: FeatureValue; live: FeatureVal
   { label: "15 contenus en rotation permanente", acces: true, live: true, elite: true },
   { label: "Discord communautaire", acces: true, live: true, elite: true },
   { label: "Crédits WavSocialScan gratuits", acces: "1 000 /mois", live: "3 000 /mois", elite: "5 000 /mois" },
+  { label: "≈ analyses de vidéo / mois", acces: "10", live: "30", elite: "50" },
+  { label: "≈ analyses de compte / mois", acces: "3", live: "10", elite: "16" },
   { label: "-50% abonnements WavSocialScan", acces: true, live: true, elite: true },
   { label: "Packs thématiques archivés", acces: "À l'achat", live: "À l'achat", elite: "À l'achat" },
   { label: "Live hebdomadaire", acces: false, live: true, elite: true },
@@ -497,11 +499,14 @@ export default function WavAcademy() {
             <p className="text-foreground/80 leading-relaxed mb-4">
               Vidéo après vidéo, tu affines ta formule. <strong>En 15 à 20 vidéos diagnostiquées, tu as ton Format Signature.</strong> Celui qui convertit pour toi.
             </p>
-            <div className="p-4 bg-primary/5 rounded-xl border border-primary/20">
+            <div className="p-4 bg-primary/5 rounded-xl border border-primary/20 space-y-2">
               <p className="text-sm text-foreground">
                 Normalement à partir de <strong>14,90€/mois</strong> en Standard et <strong>39,90€/mois</strong> en Premium.
                 En tant que membre du Wav Academy, tu bénéficies de <strong>crédits gratuits chaque mois</strong> selon ta formule, et de{" "}
                 <strong>-50% sur tous les abonnements WavSocialScan</strong> si tu veux aller plus loin.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                💡 <strong>100 crédits = 1 analyse de vidéo</strong> · <strong>300 crédits = 1 analyse de compte complet</strong>
               </p>
             </div>
           </div>
@@ -556,8 +561,14 @@ export default function WavAcademy() {
               <p className="text-sm text-muted-foreground">Le diagnostic hebdomadaire et le contenu stratégique quotidien.</p>
             </div>
             <ul className="space-y-3 mb-8 flex-1">
+              <li className="flex items-start gap-3 text-sm">
+                <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold">1 000 crédits WavSocialScan/mois</span>
+                  <p className="text-xs text-muted-foreground mt-0.5">≈ 10 analyses de vidéo ou 3 analyses de compte</p>
+                </div>
+              </li>
               {[
-                "1 000 crédits WavSocialScan par mois",
                 "-50% sur tous les abonnements WavSocialScan",
                 "Contenu stratégique quotidien (Tapis Roulant)",
                 "15 contenus en rotation permanente",
@@ -608,8 +619,14 @@ export default function WavAcademy() {
               <p className="text-sm text-muted-foreground">Le diagnostic quasi quotidien et le feedback humain en direct.</p>
             </div>
             <ul className="space-y-3 mb-8 flex-1">
+              <li className="flex items-start gap-3 text-sm">
+                <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold">3 000 crédits WavSocialScan/mois</span>
+                  <p className="text-xs text-muted-foreground mt-0.5">≈ 30 analyses de vidéo ou 10 analyses de compte</p>
+                </div>
+              </li>
               {[
-                "3 000 crédits WavSocialScan par mois",
                 "-50% sur tous les abonnements WavSocialScan",
                 "Contenu stratégique quotidien (Tapis Roulant)",
                 "15 contenus en rotation permanente",
@@ -656,8 +673,14 @@ export default function WavAcademy() {
               <p className="text-sm text-cream/60">L'accompagnement total. Le diagnostic quasi illimité et moi dans ta poche.</p>
             </div>
             <ul className="space-y-3 mb-8 flex-1">
+              <li className="flex items-start gap-3 text-sm text-cream/80">
+                <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold text-cream">5 000 crédits WavSocialScan/mois</span>
+                  <p className="text-xs text-cream/60 mt-0.5">≈ 50 analyses de vidéo ou 16 analyses de compte</p>
+                </div>
+              </li>
               {[
-                "5 000 crédits WavSocialScan par mois",
                 "1h de coaching individuel par semaine",
                 "Accès WhatsApp direct",
                 "Accompagnement push (relances)",
@@ -675,9 +698,9 @@ export default function WavAcademy() {
             </ul>
             <p className="text-xs text-cream/40 mb-4">Sur candidature. Limité à 5 nouvelles places par mois.</p>
             <Button
-              variant="outline"
+              variant="premium"
               size="lg"
-              className="w-full border-cream/20 text-cream hover:bg-cream/10 hover:text-cream"
+              className="w-full"
               asChild
             >
               <Link to="/wav-premium/candidature">
@@ -817,9 +840,8 @@ export default function WavAcademy() {
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button
-              variant="outline"
+              variant="premium"
               size="xl"
-              className="border-cream/20 text-cream hover:bg-cream/10 hover:text-cream"
               onClick={() => openPlanDialog("acces")}
             >
               Commencer avec l'Accès — 39€/mois

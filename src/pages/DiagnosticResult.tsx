@@ -197,9 +197,9 @@ const DiagnosticResult = () => {
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Structuration business</li>
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Scale de l'audience</li>
                 </ul>
-                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer }); trackPostHogEvent("cta_clicked", { offer_type: "PREMIUM", destination: "application_form" }); }}>
-                  <Link to={WAV_PREMIUM_APPLICATION_URL}>
-                    Candidater au Wav Premium <ExternalLink className="w-4 h-4 ml-2" />
+                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("cta_contact_click", { offer }); trackPostHogEvent("cta_clicked", { offer_type: "PREMIUM", destination: "contact" }); }}>
+                  <Link to="/contact">
+                    Contacter Fred <ArrowRight className="w-4 h-4 ml-2" />
                   </Link>
                 </Button>
                 <TrustedBy filter="premium" className="mt-4" />

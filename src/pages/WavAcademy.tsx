@@ -703,8 +703,8 @@ export default function WavAcademy() {
               className="w-full"
               asChild
             >
-              <Link to="/wav-premium/candidature">
-                Candidater à l'Élite
+              <Link to="/contact">
+                Contacter Fred
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>

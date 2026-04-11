@@ -4,7 +4,7 @@ import { useDiagnostic } from "@/contexts/DiagnosticContext";
 import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, Mail } from "lucide-react";
+import { ArrowRight, ExternalLink, Mail } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
 import { trackPostHogEvent } from "@/lib/posthog";
 import { TrustedBy } from "@/components/TrustedBy";
@@ -220,9 +220,9 @@ const DiagnosticResult = () => {
                 <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer: "ONE_SHOT" }); trackPostHogEvent("cta_clicked", { offer_type: "ONE_SHOT", destination: "calendly_one_shot" }); }}>
                   <a href={CALENDLY_ONE_SHOT} target="_blank" rel="noopener noreferrer">Réserver mon appel stratégique (30 min) <ExternalLink className="w-4 h-4 ml-2" /></a>
                 </Button>
-                <Button variant="outline" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer: "PREMIUM" }); trackPostHogEvent("secondary_cta_clicked", { offer_type: "PREMIUM_UPSELL" }); }}>
-                  <Link to={WAV_PREMIUM_APPLICATION_URL}>
-                    Découvrir Wav Premium <ExternalLink className="w-4 h-4 ml-2" />
+                <Button variant="outline" size="lg" asChild className="w-full" onClick={() => { trackEvent("cta_contact_click", { offer: "PREMIUM" }); trackPostHogEvent("secondary_cta_clicked", { offer_type: "PREMIUM_UPSELL" }); }}>
+                  <Link to="/contact">
+                    Contacter Fred <ArrowRight className="w-4 h-4 ml-2" />
                   </Link>
                 </Button>
                 <TrustedBy className="mt-4" />

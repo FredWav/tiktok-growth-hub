@@ -4,7 +4,7 @@ import { useDiagnostic } from "@/contexts/DiagnosticContext";
 import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ExternalLink, Mail } from "lucide-react";
+import { ArrowRight, Mail } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
 import { trackPostHogEvent } from "@/lib/posthog";
 import { TrustedBy } from "@/components/TrustedBy";

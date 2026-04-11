@@ -471,10 +471,10 @@ function generateCTASection(): string {
             <span>Accompagnement 1:1 avec un expert TikTok</span>
           </div>
         </div>
-        <a class="cta-link-box" href="https://fredwav.com/wav-premium/candidature" target="_blank">
-          <span class="cta-link-label">Candidater au Wav Premium</span>
+        <a class="cta-link-box" href="https://fredwav.com/contact" target="_blank">
+          <span class="cta-link-label">Contacter Fred</span>
           <span class="cta-link-arrow">&rarr;</span>
-          <span class="cta-link-url">fredwav.com/wav-premium/candidature</span>
+          <span class="cta-link-url">fredwav.com/contact</span>
         </a>
       </div>
       <div class="cta-attribution">

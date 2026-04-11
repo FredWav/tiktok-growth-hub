@@ -113,16 +113,8 @@ export default function Contact() {
           <div className="bg-muted/50 rounded-xl p-8 text-center">
             <h3 className="font-semibold text-lg mb-3">Tu veux passer à l'action ?</h3>
             <p className="text-muted-foreground text-sm mb-6">
-              Pas besoin d'attendre. Candidate au <Link to="/wav-premium/candidature" className="text-primary underline hover:no-underline">Wav Premium</Link> et on en parle directement.
+              Pas besoin d'attendre. Envoie-moi un message via les réseaux ci-dessus ou par email et on en parle directement.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="hero" size="lg" asChild onClick={() => trackEvent("cta_wav_premium_click", { location: "contact" })}>
-                <Link to="/wav-premium/candidature">
-                  Candidater au Wav Premium
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
             <p className="text-muted-foreground text-xs mt-4">
               Envie de mieux me connaître ? <Link to="/a-propos" className="text-primary underline hover:no-underline">Découvre mon parcours</Link> ou consulte les <Link to="/preuves" className="text-primary underline hover:no-underline">témoignages clients</Link>.
             </p>

@@ -331,8 +331,8 @@ export default function AnalyseExpressResult() {
                     </p>
                   </div>
                   <Button asChild variant="hero" size="lg" className="shrink-0">
-                    <Link to="/wav-premium/candidature">
-                      Candidater au Wav Premium
+                    <Link to="/contact">
+                      Contacter Fred
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>

@@ -4,7 +4,7 @@ import { useDiagnostic } from "@/contexts/DiagnosticContext";
 import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ExternalLink, Mail } from "lucide-react";
+import { ArrowRight, ExternalLink, Mail } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
 import { trackPostHogEvent } from "@/lib/posthog";
 import { TrustedBy } from "@/components/TrustedBy";
@@ -197,9 +197,9 @@ const DiagnosticResult = () => {
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Structuration business</li>
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Scale de l'audience</li>
                 </ul>
-                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer }); trackPostHogEvent("cta_clicked", { offer_type: "PREMIUM", destination: "application_form" }); }}>
-                  <Link to={WAV_PREMIUM_APPLICATION_URL}>
-                    Candidater au Wav Premium <ExternalLink className="w-4 h-4 ml-2" />
+                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("cta_contact_click", { offer }); trackPostHogEvent("cta_clicked", { offer_type: "PREMIUM", destination: "contact" }); }}>
+                  <Link to="/contact">
+                    Contacter Fred <ArrowRight className="w-4 h-4 ml-2" />
                   </Link>
                 </Button>
                 <TrustedBy filter="premium" className="mt-4" />
@@ -220,9 +220,9 @@ const DiagnosticResult = () => {
                 <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer: "ONE_SHOT" }); trackPostHogEvent("cta_clicked", { offer_type: "ONE_SHOT", destination: "calendly_one_shot" }); }}>
                   <a href={CALENDLY_ONE_SHOT} target="_blank" rel="noopener noreferrer">Réserver mon appel stratégique (30 min) <ExternalLink className="w-4 h-4 ml-2" /></a>
                 </Button>
-                <Button variant="outline" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer: "PREMIUM" }); trackPostHogEvent("secondary_cta_clicked", { offer_type: "PREMIUM_UPSELL" }); }}>
-                  <Link to={WAV_PREMIUM_APPLICATION_URL}>
-                    Découvrir Wav Premium <ExternalLink className="w-4 h-4 ml-2" />
+                <Button variant="outline" size="lg" asChild className="w-full" onClick={() => { trackEvent("cta_contact_click", { offer: "PREMIUM" }); trackPostHogEvent("secondary_cta_clicked", { offer_type: "PREMIUM_UPSELL" }); }}>
+                  <Link to="/contact">
+                    Contacter Fred <ArrowRight className="w-4 h-4 ml-2" />
                   </Link>
                 </Button>
                 <TrustedBy className="mt-4" />

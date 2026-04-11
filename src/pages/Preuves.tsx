@@ -97,9 +97,9 @@ const chooseOffers = [
     icon: Target,
     title: "Wav Premium",
     description: "Transformation encadrée sur 45 jours",
-    cta: "Candidater au Wav Premium",
-    href: "/wav-premium/candidature",
-    trackEvent: "cta_wav_premium_click",
+    cta: "Contacter Fred",
+    href: "/contact",
+    trackEvent: "cta_contact_click",
   },
   {
     icon: Zap,
@@ -163,10 +163,10 @@ export default function Preuves() {
                 variant="hero"
                 size="lg"
                 asChild
-                onClick={() => trackEvent("cta_wav_premium_click", { location: "preuves_mid" })}
+                onClick={() => trackEvent("cta_contact_click", { location: "preuves_mid" })}
               >
-                <Link to="/wav-premium/candidature">
-                  Candidater au Wav Premium
+                <Link to="/contact">
+                  Contacter Fred
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>

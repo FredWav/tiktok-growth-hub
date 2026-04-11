@@ -209,11 +209,11 @@ export default function APropos() {
             Envie de travailler ensemble ?
           </h2>
           <p className="text-muted-foreground mb-6">
-            Candidate au Wav Premium. Tu verras rapidement si ma méthode est faite pour toi.
+            Contacte-moi directement. Tu verras rapidement si ma méthode est faite pour toi.
           </p>
-          <Button variant="hero" size="lg" asChild onClick={() => trackEvent("cta_wav_premium_click", { location: "apropos" })}>
-            <Link to="/wav-premium/candidature">
-              Candidater au Wav Premium
+          <Button variant="hero" size="lg" asChild onClick={() => trackEvent("cta_contact_click", { location: "apropos" })}>
+            <Link to="/contact">
+              Contacter Fred
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>

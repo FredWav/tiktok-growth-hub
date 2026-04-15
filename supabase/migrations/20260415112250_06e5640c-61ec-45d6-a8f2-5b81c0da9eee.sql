@@ -1,0 +1,1 @@
+ALTER TABLE wav_premium_applications ADD COLUMN IF NOT EXISTS budget text;

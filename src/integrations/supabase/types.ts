@@ -821,6 +821,7 @@ export type Database = {
       wav_premium_applications: {
         Row: {
           blockers: string
+          budget: string | null
           conversion_trigger: string | null
           created_at: string
           current_level: string
@@ -838,6 +839,7 @@ export type Database = {
         }
         Insert: {
           blockers: string
+          budget?: string | null
           conversion_trigger?: string | null
           created_at?: string
           current_level: string
@@ -855,6 +857,7 @@ export type Database = {
         }
         Update: {
           blockers?: string
+          budget?: string | null
           conversion_trigger?: string | null
           created_at?: string
           current_level?: string

@@ -212,7 +212,7 @@ export default function APropos() {
             Contacte-moi directement. Tu verras rapidement si ma méthode est faite pour toi.
           </p>
           <Button variant="hero" size="lg" asChild onClick={() => trackEvent("cta_contact_click", { location: "apropos" })}>
-            <Link to="/contact">
+            <Link to="/reserverunappel">
               Contacter Fred
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>

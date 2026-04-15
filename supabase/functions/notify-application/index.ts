@@ -29,7 +29,7 @@ Deno.serve(async (req) => {
       await req.json();
 
     if (!first_name || !last_name || !email) {
-      await notifyError("Candidature", "Champs obligatoires manquants");
+      await notifyError("Demande de contact", "Champs obligatoires manquants");
       return new Response(JSON.stringify({ error: "Champs obligatoires manquants" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
 
     // ── 1. Discord webhook ──
     const payload = {
-      content: "<@967099537439227965> <@826133033069051954>📋 **Nouvelle candidature Wav Premium !**",
+      content: "<@967099537439227965> <@826133033069051954>📋 **Nouvelle demande de contact !**",
       embeds: [{
         title: `${first_name} ${last_name}`,
         color: 0xc8a97e,
@@ -67,7 +67,7 @@ Deno.serve(async (req) => {
     if (!res.ok) {
       const text = await res.text();
       console.error("Discord webhook error:", res.status, text);
-      await notifyError("Candidature Discord", `Webhook échoué (${res.status}) • ${first_name} ${last_name}`);
+      await notifyError("Demande de contact Discord", `Webhook échoué (${res.status}) • ${first_name} ${last_name}`);
     } else {
       console.log(`Discord notification sent for ${first_name} ${last_name}`);
     }
@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
         const adminHtml = `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <h1 style="color: #333; border-bottom: 2px solid #c8a97e; padding-bottom: 10px;">
-              📋 Nouvelle candidature Wav Premium
+              📋 Nouvelle demande de contact
             </h1>
             <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
               <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; width: 160px;">Nom</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(first_name)} ${escapeHtml(last_name)}</td></tr>
@@ -104,7 +104,7 @@ Deno.serve(async (req) => {
         await transporter.sendMail({
           from: "noreply@fredwav.com",
           to: "fredwavcm@gmail.com",
-          subject: `📋 Nouvelle candidature Wav Premium - ${first_name} ${last_name}`.trim(),
+          subject: `📋 Nouvelle demande de contact - ${first_name} ${last_name}`.trim(),
           html: adminHtml,
         });
         console.log("Admin email sent for", first_name, last_name);
@@ -113,10 +113,10 @@ Deno.serve(async (req) => {
         const candidateHtml = `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <h1 style="color: #333; border-bottom: 2px solid #c8a97e; padding-bottom: 10px;">
-              Merci pour ta candidature, ${escapeHtml(first_name)} !
+              Merci pour ta demande, ${escapeHtml(first_name)} !
             </h1>
             <p style="color: #555; font-size: 16px; line-height: 1.6;">
-              Ta candidature au <strong>Wav Premium</strong> a bien été reçue. Je prends le temps de la lire en détail.
+              Ta demande de contact a bien été reçue. Je prends le temps de la lire en détail.
             </p>
             <div style="background-color: #faf7f2; border-left: 4px solid #c8a97e; padding: 20px; margin: 24px 0; border-radius: 8px;">
               <p style="color: #333; font-size: 16px; line-height: 1.6; margin: 0;">
@@ -136,7 +136,7 @@ Deno.serve(async (req) => {
           from: "noreply@fredwav.com",
           replyTo: "fredwavcm@gmail.com",
           to: email,
-          subject: `${first_name}, ta candidature Wav Premium est bien reçue !`,
+          subject: `${first_name}, ta demande est bien reçue !`,
           html: candidateHtml,
         });
         console.log("Candidate email sent to", email);
@@ -145,17 +145,17 @@ Deno.serve(async (req) => {
       }
     } catch (emailErr) {
       console.error("Email send failed:", emailErr);
-      await notifyError("Candidature Email", `Exception • ${first_name} ${last_name}`);
+      await notifyError("Demande de contact Email", `Exception • ${first_name} ${last_name}`);
     }
 
-    await notifySuccess("Candidature", `${first_name} ${last_name} • ${email}`);
+    await notifySuccess("Demande de contact", `${first_name} ${last_name} • ${email}`);
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
     console.error("Error:", error);
-    await notifyError("Candidature", `Erreur: ${error.message}`);
+    await notifyError("Demande de contact", `Erreur: ${error.message}`);
     return new Response(JSON.stringify({ error: "Erreur interne du serveur" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

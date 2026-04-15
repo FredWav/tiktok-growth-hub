@@ -703,7 +703,7 @@ export default function WavAcademy() {
               className="w-full"
               asChild
             >
-              <Link to="/contact">
+              <Link to="/reserverunappel">
                 Contacter Fred
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>

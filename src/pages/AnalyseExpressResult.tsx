@@ -331,7 +331,7 @@ export default function AnalyseExpressResult() {
                     </p>
                   </div>
                   <Button asChild variant="hero" size="lg" className="shrink-0">
-                    <Link to="/contact">
+                    <Link to="/reserverunappel">
                       Contacter Fred
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>

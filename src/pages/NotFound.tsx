@@ -36,7 +36,7 @@ const NotFound = () => {
               </Link>
             </Button>
             <Button variant="outline" asChild>
-              <Link to="/wav-premium/candidature">
+              <Link to="/reserverunappel">
                 <Zap className="h-4 w-4 mr-2" />
                 Wav Premium
               </Link>
@@ -45,7 +45,7 @@ const NotFound = () => {
           <nav aria-label="Liens utiles" className="text-sm text-muted-foreground space-y-2">
             <p className="font-medium text-foreground mb-3">Pages populaires :</p>
             <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
-              <Link to="/wav-premium/candidature" className="hover:text-primary transition-colors">Wav Premium</Link>
+              <Link to="/reserverunappel" className="hover:text-primary transition-colors">Wav Premium</Link>
               <Link to="/analyse-express" className="hover:text-primary transition-colors" onClick={() => trackPostHogEvent("click_analyse_express_nav", { location: "404" })}>Analyse Express</Link>
               <Link to="/preuves" className="hover:text-primary transition-colors">Témoignages</Link>
               <Link to="/a-propos" className="hover:text-primary transition-colors">À propos</Link>

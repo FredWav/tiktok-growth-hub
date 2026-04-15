@@ -198,7 +198,7 @@ const DiagnosticResult = () => {
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Scale de l'audience</li>
                 </ul>
                 <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("cta_contact_click", { offer }); trackPostHogEvent("cta_clicked", { offer_type: "PREMIUM", destination: "contact" }); }}>
-                  <Link to="/contact">
+                  <Link to="/reserverunappel">
                     Contacter Fred <ArrowRight className="w-4 h-4 ml-2" />
                   </Link>
                 </Button>
@@ -221,7 +221,7 @@ const DiagnosticResult = () => {
                   <a href={CALENDLY_ONE_SHOT} target="_blank" rel="noopener noreferrer">Réserver mon appel stratégique (30 min) <ExternalLink className="w-4 h-4 ml-2" /></a>
                 </Button>
                 <Button variant="outline" size="lg" asChild className="w-full" onClick={() => { trackEvent("cta_contact_click", { offer: "PREMIUM" }); trackPostHogEvent("secondary_cta_clicked", { offer_type: "PREMIUM_UPSELL" }); }}>
-                  <Link to="/contact">
+                  <Link to="/reserverunappel">
                     Contacter Fred <ArrowRight className="w-4 h-4 ml-2" />
                   </Link>
                 </Button>

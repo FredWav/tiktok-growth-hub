@@ -98,7 +98,7 @@ const chooseOffers = [
     title: "Wav Premium",
     description: "Transformation encadrée sur 45 jours",
     cta: "Contacter Fred",
-    href: "/contact",
+    href: "/reserverunappel",
     trackEvent: "cta_contact_click",
   },
   {
@@ -165,7 +165,7 @@ export default function Preuves() {
                 asChild
                 onClick={() => trackEvent("cta_contact_click", { location: "preuves_mid" })}
               >
-                <Link to="/contact">
+                <Link to="/reserverunappel">
                   Contacter Fred
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>

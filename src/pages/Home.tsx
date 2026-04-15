@@ -193,7 +193,7 @@ export default function Home() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{ animationDelay: "0.2s" }}>
             <Button variant="hero" size="xl" asChild onClick={() => trackEvent("cta_contact_click", { location: "hero" })}>
-              <Link to="/contact">
+              <Link to="/reserverunappel">
                 Contacter Fred
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
@@ -311,7 +311,7 @@ export default function Home() {
 
         <div className="flex flex-col items-center gap-4 mt-8">
           <Button variant="hero" size="xl" asChild onClick={() => trackEvent("cta_contact_click", { location: "solution_section" })}>
-            <Link to="/contact">
+            <Link to="/reserverunappel">
               Contacter Fred
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
@@ -419,7 +419,7 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="hero" size="xl" asChild onClick={() => trackEvent("cta_contact_click", { location: "bottom" })}>
-              <Link to="/contact">
+              <Link to="/reserverunappel">
                 Contacter Fred
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>

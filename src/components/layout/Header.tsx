@@ -53,7 +53,7 @@ export function Header() {
           {/* CTA Button */}
           <div className="hidden lg:block">
             <Button asChild>
-              <Link to="/wav-premium/candidature" onClick={() => trackPostHogEvent("click_nav_cta", { location: "header" })}>Réserve ton appel</Link>
+              <Link to="/reserverunappel" onClick={() => trackPostHogEvent("click_nav_cta", { location: "header" })}>Réserve ton appel</Link>
             </Button>
           </div>
 
@@ -89,7 +89,7 @@ export function Header() {
                 </Link>
               ))}
               <Button asChild className="mt-2">
-                <Link to="/wav-premium/candidature" onClick={() => { trackPostHogEvent("click_nav_cta", { location: "header_mobile" }); setIsOpen(false); }}>
+                <Link to="/reserverunappel" onClick={() => { trackPostHogEvent("click_nav_cta", { location: "header_mobile" }); setIsOpen(false); }}>
                   Réserve ton appel
                 </Link>
               </Button>

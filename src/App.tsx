@@ -43,7 +43,7 @@ const CGV = lazy(() => import("./pages/CGV"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const AnalyseExpress = lazy(() => import("./pages/AnalyseExpress"));
 const AnalyseExpressResult = lazy(() => import("./pages/AnalyseExpressResult"));
-const WavPremiumApplication = lazy(() => import("./pages/WavPremiumApplication"));
+const ReserverUnAppel = lazy(() => import("./pages/ReserverUnAppel"));
 const DiagnosticStart = lazy(() => import("./pages/DiagnosticStart"));
 const DiagnosticProcessing = lazy(() => import("./pages/DiagnosticProcessing"));
 const DiagnosticResult = lazy(() => import("./pages/DiagnosticResult"));
@@ -92,8 +92,8 @@ const App = () => (
             {/* Public routes */}
             <Route path="/" element={<Home />} />
             <Route path="/offres" element={<Navigate to="/" replace />} />
-            <Route path="/45-jours" element={<Navigate to="/wav-premium/candidature" replace />} />
-            <Route path="/offres/45-jours" element={<Navigate to="/wav-premium/candidature" replace />} />
+            <Route path="/45-jours" element={<Navigate to="/reserverunappel" replace />} />
+            <Route path="/offres/45-jours" element={<Navigate to="/reserverunappel" replace />} />
             <Route path="/offres/vip" element={<Navigate to="/" replace />} />
             <Route path="/one-shot" element={<Navigate to="/" replace />} />
             <Route path="/one-shot/success" element={<OneShotSuccess />} />
@@ -109,7 +109,9 @@ const App = () => (
             <Route path="/mail" element={<Navigate to="/newsletter" replace />} />
             <Route path="/analyse-express" element={<AnalyseExpress />} />
             <Route path="/analyse-express/result" element={<AnalyseExpressResult />} />
-            <Route path="/wav-premium/candidature" element={<WavPremiumApplication />} />
+            <Route path="/reserverunappel" element={<ReserverUnAppel />} />
+            {/* Legacy URL — kept as redirect for backwards compat (old inbound links, emails, ads) */}
+            <Route path="/wav-premium/candidature" element={<Navigate to="/reserverunappel" replace />} />
             <Route path="/wavacademy" element={<WavAcademy />} />
 
             {/* Deep link redirect */}

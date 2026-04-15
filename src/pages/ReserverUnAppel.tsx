@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
 import { SEOHead } from "@/components/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -39,6 +40,11 @@ const levels = [
   { value: "scale", label: "J'ai déjà des résultats mais je veux scaler" },
 ] as const;
 
+const blockerOptions = [
+  { value: "no_results", label: "Je ne sais pas pourquoi je n'ai pas de résultats" },
+  { value: "no_codes", label: "Je ne maîtrise pas les codes des formats courts" },
+] as const;
+
 const followerSinceOptions = [
   "Moins d'1 mois",
   "1-3 mois",
@@ -47,13 +53,13 @@ const followerSinceOptions = [
   "Je ne te suivais pas",
 ] as const;
 
-const applicationSchema = z.object({
+const contactSchema = z.object({
   first_name: z.string().trim().min(1, "Prénom requis").max(100),
   last_name: z.string().trim().min(1, "Nom requis").max(100),
   email: z.string().trim().email("Email invalide").max(255),
   tiktok_username: z.string().trim().max(100).optional().or(z.literal("")),
   current_level: z.string().min(1, "Sélectionne ton niveau actuel"),
-  blockers: z.string().trim().min(10, "Décris tes points de blocage (10 caractères min.)").max(2000),
+  blockers: z.array(z.string()).min(1, "Sélectionne au moins un blocage"),
   goals: z.string().trim().min(10, "Décris tes objectifs (10 caractères min.)").max(2000),
   budget: z.string().min(1, "Sélectionne ton budget"),
   origin_source: z.string().trim().max(500).optional().or(z.literal("")),
@@ -61,22 +67,22 @@ const applicationSchema = z.object({
   conversion_trigger: z.string().trim().max(500).optional().or(z.literal("")),
 });
 
-type ApplicationForm = z.infer<typeof applicationSchema>;
+type ContactForm = z.infer<typeof contactSchema>;
 
-export default function WavPremiumApplication() {
+export default function ReserverUnAppel() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formStarted, setFormStarted] = useState(false);
 
-  const form = useForm<ApplicationForm>({
-    resolver: zodResolver(applicationSchema),
+  const form = useForm<ContactForm>({
+    resolver: zodResolver(contactSchema),
     defaultValues: {
       first_name: "",
       last_name: "",
       email: "",
       tiktok_username: "",
       current_level: "",
-      blockers: "",
+      blockers: [],
       goals: "",
       budget: "",
       origin_source: getStoredUtmSource(),
@@ -88,22 +94,27 @@ export default function WavPremiumApplication() {
   const handleFormFocus = () => {
     if (!formStarted) {
       setFormStarted(true);
-      trackPostHogEvent("wav_premium_form_start");
+      trackPostHogEvent("reserverunappel_form_start");
     }
   };
 
-  const onSubmit = async (data: ApplicationForm) => {
+  const onSubmit = async (data: ContactForm) => {
     setIsSubmitting(true);
-    trackEvent("wav_premium_apply", { level: data.current_level });
+    trackEvent("reserverunappel_submit", { level: data.current_level });
     identifyUser(data.email, { first_name: data.first_name, last_name: data.last_name });
     try {
-      const payload = {
+      const blockersText = data.blockers
+        .map((v) => blockerOptions.find((o) => o.value === v)?.label ?? v)
+        .join(" • ");
+
+      // Full payload sent to the notification (email + Discord) — always includes budget
+      const notifyPayload = {
         first_name: data.first_name,
         last_name: data.last_name,
         email: data.email,
         tiktok_username: data.tiktok_username || null,
         current_level: levels.find((l) => l.value === data.current_level)?.label ?? data.current_level,
-        blockers: data.blockers,
+        blockers: blockersText,
         goals: data.goals,
         budget: data.budget || null,
         origin_source: data.origin_source || null,
@@ -112,18 +123,32 @@ export default function WavPremiumApplication() {
         posthog_id: getPostHogId(),
       };
 
-      const { error } = await supabase
+      // Fire notification FIRST so the lead is always captured (email to admin + Discord),
+      // even if the DB insert fails for any reason.
+      const notifyPromise = supabase.functions.invoke("notify-application", {
+        body: notifyPayload,
+      });
+
+      // DB payload: excludes `budget` until the add-budget-column migration is applied
+      // in production. Once applied, `budget` can be re-added here.
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { budget: _budget, ...dbPayload } = notifyPayload;
+
+      const { error: dbError } = await supabase
         .from("wav_premium_applications")
-        .insert(payload);
+        .insert(dbPayload);
 
-      if (error) throw error;
+      await notifyPromise.catch((err) => console.error("Notification error:", err));
 
-      supabase.functions.invoke("notify-application", {
-        body: payload,
-      }).catch((err) => console.error("Notification error:", err));
+      if (dbError) {
+        // The admin was still notified (email + Discord), so the lead isn't lost.
+        // Log for diagnostics but treat the submission as a success from the user's POV.
+        console.error("DB insert error (non-blocking):", dbError);
+      }
 
       setSubmitted(true);
-    } catch {
+    } catch (err) {
+      console.error("Submission error:", err);
       toast.error("Une erreur est survenue. Réessaie ou contacte-nous directement.");
     } finally {
       setIsSubmitting(false);
@@ -134,18 +159,18 @@ export default function WavPremiumApplication() {
     return (
       <Layout>
         <SEOHead
-          title="Candidature envoyée - Wav Premium | Fred Wav"
-          description="Ta candidature au Wav Premium a bien été envoyée. Fred te recontacte par email sous 48h jours ouvrés."
-          path="/wav-premium/candidature"
+          title="Demande envoyée - Réserver un appel | Fred Wav"
+          description="Ta demande a bien été envoyée. Fred te recontacte par email sous 48h jours ouvrés."
+          path="/reserverunappel"
         />
         <Section variant="cream" size="lg">
           <div className="max-w-xl mx-auto text-center">
             <CheckCircle2 className="h-16 w-16 text-primary mx-auto mb-6" />
             <h2 className="font-display text-3xl md:text-4xl font-semibold mb-4">
-              Candidature envoyée !
+              Demande envoyée !
             </h2>
             <p className="text-lg text-muted-foreground mb-8">
-              Merci pour ta candidature. Je l'ai bien reçue et je prends le temps de la lire en détail.
+              Merci pour ta demande. Je l'ai bien reçue et je prends le temps de la lire en détail.
             </p>
 
             <div className="bg-background border border-primary/20 rounded-2xl p-6 mb-8 text-left">
@@ -174,7 +199,7 @@ export default function WavPremiumApplication() {
             </div>
 
             <Button variant="outline" size="lg" asChild>
-              <Link to="/" onClick={() => trackPostHogEvent("click_home_post_apply")}>
+              <Link to="/" onClick={() => trackPostHogEvent("click_home_post_contact")}>
                 ← Retour à l'accueil
               </Link>
             </Button>
@@ -187,18 +212,18 @@ export default function WavPremiumApplication() {
   return (
     <Layout>
       <SEOHead
-        title="Candidature Wav Premium | Fred Wav"
-        description="Remplis le formulaire pour candidater au Wav Premium : 45 jours d'accompagnement intensif TikTok."
-        path="/wav-premium/candidature"
-        keywords="candidature wav premium, accompagnement tiktok, coaching tiktok"
+        title="Réserver un appel | Fred Wav"
+        description="Premier contact avec Fred Wav : remplis le formulaire pour qu'on puisse échanger par écrit avant un éventuel appel."
+        path="/reserverunappel"
+        keywords="réserver un appel, contact fred wav, premier contact tiktok, coaching formats courts"
       />
       <Section variant="cream" size="lg">
         <div className="max-w-2xl mx-auto text-center mb-10">
           <h1 className="font-display text-3xl md:text-4xl font-semibold tracking-tight mb-4">
-            Candidater au <span className="text-gold-gradient">Wav Premium</span>
+            Réserver un <span className="text-gold-gradient">appel</span>
           </h1>
           <p className="text-muted-foreground text-lg">
-            Remplis ce formulaire pour qu'on puisse évaluer si l'accompagnement est adapté à ta situation.
+            C'est notre premier contact. Plus j'ai d'infos sur ta situation, plus je peux répondre efficacement à ta demande.
           </p>
         </div>
       </Section>
@@ -206,7 +231,7 @@ export default function WavPremiumApplication() {
       <Section variant="default" size="lg">
         <div className="max-w-2xl mx-auto">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit, (errors) => trackPostHogEvent("wav_premium_form_error", { fields: Object.keys(errors).join(",") }))} onFocus={handleFormFocus} className="space-y-8">
+            <form onSubmit={form.handleSubmit(onSubmit, (errors) => trackPostHogEvent("reserverunappel_form_error", { fields: Object.keys(errors).join(",") }))} onFocus={handleFormFocus} className="space-y-8">
               {/* Identity */}
               <div className="grid sm:grid-cols-2 gap-4">
                 <FormField
@@ -293,19 +318,46 @@ export default function WavPremiumApplication() {
                 )}
               />
 
+              {/* Blockers — multi-select */}
               <FormField
                 control={form.control}
                 name="blockers"
-                render={({ field }) => (
+                render={() => (
                   <FormItem>
                     <FormLabel>Quels sont tes principaux points de blocage ? *</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Ex : manque de régularité, pas de vues, pas de conversions, je ne sais pas quoi poster..."
-                        rows={4}
-                        {...field}
-                      />
-                    </FormControl>
+                    <div className="space-y-3 mt-2">
+                      {blockerOptions.map((opt) => (
+                        <FormField
+                          key={opt.value}
+                          control={form.control}
+                          name="blockers"
+                          render={({ field }) => (
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value?.includes(opt.value)}
+                                  onCheckedChange={(checked) => {
+                                    const current = field.value || [];
+                                    if (checked) {
+                                      field.onChange([...current, opt.value]);
+                                    } else {
+                                      field.onChange(current.filter((v: string) => v !== opt.value));
+                                    }
+                                  }}
+                                  id={`blocker-${opt.value}`}
+                                />
+                              </FormControl>
+                              <Label
+                                htmlFor={`blocker-${opt.value}`}
+                                className="font-normal cursor-pointer"
+                              >
+                                {opt.label}
+                              </Label>
+                            </FormItem>
+                          )}
+                        />
+                      ))}
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -316,7 +368,7 @@ export default function WavPremiumApplication() {
                 name="goals"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Quels sont tes objectifs avec cet accompagnement ? *</FormLabel>
+                    <FormLabel>Quels sont tes objectifs ? *</FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder="Ex : gagner en visibilité, convertir mon audience en clients, construire une stratégie claire..."
@@ -335,7 +387,7 @@ export default function WavPremiumApplication() {
                 name="budget"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Quel est ton budget pour cet accompagnement ? *</FormLabel>
+                    <FormLabel>Quel est ton budget pour un accompagnement ? *</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -413,7 +465,7 @@ export default function WavPremiumApplication() {
                 className="w-full"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Envoi en cours..." : "Envoyer ma candidature"}
+                {isSubmitting ? "Envoi en cours..." : "Envoyer ma demande"}
                 {!isSubmitting && <ArrowRight className="ml-2 h-5 w-5" />}
               </Button>
             </form>

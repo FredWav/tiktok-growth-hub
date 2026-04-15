@@ -35,9 +35,11 @@ export async function upsertProspect(data: ProspectData) {
     }
   } else {
     // Insert new prospect (no user_id since they don't have an account)
+    // Use tiktok handle as fallback display name when no real name is available
+    const displayName = data.full_name || (data.tiktok ? `@${data.tiktok}` : null);
     await supabase.from("clients").insert({
       email: data.email,
-      full_name: data.full_name || null,
+      full_name: displayName,
       tiktok: data.tiktok || null,
       origin_source: data.origin_source || null,
       offer: data.offer,

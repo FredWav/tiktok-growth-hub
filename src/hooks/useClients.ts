@@ -58,9 +58,21 @@ export const useClients = () => {
             .limit(1)
             .maybeSingle();
 
+          // Name priority: auth profile (linked account) → direct full_name column
+          // (set for prospects created via upsertProspect) → email → tiktok handle
+          const profileName = profilesMap.get(client.user_id) || null;
+          const directName = (client as Record<string, unknown>).full_name as string | null || null;
+          const emailFallback = (client as Record<string, unknown>).email as string | null || null;
+          const tiktokFallback = (client as Record<string, unknown>).tiktok as string | null;
+          const displayName =
+            profileName ||
+            directName ||
+            emailFallback ||
+            (tiktokFallback ? `@${tiktokFallback}` : null);
+
           return {
             ...client,
-            profile: { full_name: profilesMap.get(client.user_id) || null },
+            profile: { full_name: displayName },
             total_tasks: totalTasks || 0,
             done_tasks: doneTasks || 0,
             next_session: nextSession?.scheduled_at || null,

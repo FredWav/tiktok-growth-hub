@@ -187,7 +187,9 @@ const Clients: React.FC = () => {
                     <TableCell>
                       <div>
                         <p className="font-medium text-cream">
-                          {client.profile?.full_name || "Sans nom"}
+                          {client.profile?.full_name ?? (
+                            <span className="text-cream/40 italic">Sans nom</span>
+                          )}
                         </p>
                         {client.company && (
                           <p className="text-sm text-cream/60">{client.company}</p>

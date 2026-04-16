@@ -4,7 +4,6 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 import nodemailer from "https://esm.sh/nodemailer@6.9.16";
 import { getStripeSecretKey } from "../_shared/stripe-config.ts";
 import { notifySuccess, notifyError } from "../_shared/itpush.ts";
-import { upsertProspect } from "../_shared/upsert-prospect.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -180,20 +179,6 @@ serve(async (req) => {
       // Send result email
       if (customerEmail) {
         await sendResultEmail(customerEmail, username, session_id);
-      }
-
-      // Upsert prospect in CRM
-      if (customerEmail) {
-        try {
-          await upsertProspect({
-            email: customerEmail,
-            tiktok: username,
-            offer: "one_shot",
-            origin_source: "analyse_express",
-          });
-        } catch (e) {
-          console.warn("Failed to upsert prospect:", e);
-        }
       }
 
       return new Response(

@@ -31,7 +31,6 @@ function PostHogPageTracker() {
 import Home from "./pages/Home";
 
 // Autres pages - lazy loaded
-const OneShotSuccess = lazy(() => import("./pages/OneShotSuccess"));
 const APropos = lazy(() => import("./pages/APropos"));
 const Preuves = lazy(() => import("./pages/Preuves"));
 const Contact = lazy(() => import("./pages/Contact"));
@@ -56,7 +55,6 @@ const AdminClients = lazy(() => import("./pages/admin/Clients"));
 const AdminClientNew = lazy(() => import("./pages/admin/ClientNew"));
 const AdminClientDetail = lazy(() => import("./pages/admin/ClientDetail"));
 const AdminSessions = lazy(() => import("./pages/admin/Sessions"));
-const AdminBookings = lazy(() => import("./pages/admin/Bookings"));
 const AdminDeliverables = lazy(() => import("./pages/admin/Deliverables"));
 const AdminTemplates = lazy(() => import("./pages/admin/Templates"));
 const AdminSettings = lazy(() => import("./pages/admin/Settings"));
@@ -94,9 +92,9 @@ const App = () => (
             <Route path="/offres" element={<Navigate to="/" replace />} />
             <Route path="/45-jours" element={<Navigate to="/reserverunappel" replace />} />
             <Route path="/offres/45-jours" element={<Navigate to="/reserverunappel" replace />} />
-            <Route path="/offres/vip" element={<Navigate to="/" replace />} />
-            <Route path="/one-shot" element={<Navigate to="/" replace />} />
-            <Route path="/one-shot/success" element={<OneShotSuccess />} />
+            <Route path="/offres/vip" element={<Navigate to="/wavacademy" replace />} />
+            <Route path="/one-shot" element={<Navigate to="/reserverunappel" replace />} />
+            <Route path="/one-shot/success" element={<Navigate to="/" replace />} />
             <Route path="/a-propos" element={<APropos />} />
             <Route path="/preuves" element={<Preuves />} />
             <Route path="/contact" element={<Contact />} />
@@ -160,14 +158,6 @@ const App = () => (
               element={
                 <ProtectedRoute requiredRole="admin">
                   <AdminSessions />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/bookings"
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <AdminBookings />
                 </ProtectedRoute>
               }
             />

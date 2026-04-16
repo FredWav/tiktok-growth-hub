@@ -40,7 +40,7 @@ export default function PolitiqueConfidentialite() {
           <h2 className="font-display text-xl font-semibold mt-8 mb-3">3. Finalités du traitement</h2>
           <p className="text-muted-foreground mb-4">Le traitement de vos données répond aux objectifs suivants :</p>
           <ul className="list-disc pl-6 text-muted-foreground mb-4 space-y-1">
-            <li><strong>Exécution du contrat :</strong> Gestion des commandes, accès au Discord VIP, planification des sessions de conseil et suivi stratégique.</li>
+            <li><strong>Exécution du contrat :</strong> Gestion des commandes, accès aux espaces Discord Wav Academy, planification des sessions de conseil et suivi stratégique.</li>
             <li><strong>Support Client :</strong> Réponse aux demandes de contact et assistance technique pour le SaaS Wav Social Scan.</li>
             <li><strong>Communication :</strong> Envoi d'emails transactionnels (confirmation de commande, factures) et, sous réserve de votre consentement, de newsletters stratégiques.</li>
             <li><strong>Sécurité :</strong> Prévention de la fraude et protection contre les accès non autorisés.</li>

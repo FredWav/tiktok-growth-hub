@@ -37,12 +37,13 @@ const budgetLabels: Record<string, string> = {
 
 const offerLabels: Record<string, string> = {
   express: "Analyse Express",
-  one_shot: "One Shot",
-  one_shot_plus_premium: "One Shot + Premium",
-  premium: "Premium",
-  discord: "Discord",
-  vip: "VIP",
+  premium: "Wav Premium",
   wav_premium: "Wav Premium",
+  // Legacy values kept for historical rows
+  one_shot: "One Shot (archivé)",
+  one_shot_plus_premium: "One Shot + Premium (archivé)",
+  discord: "Discord",
+  vip: "VIP (archivé)",
 };
 
 const escapeCsv = (val: string | null | undefined) => {

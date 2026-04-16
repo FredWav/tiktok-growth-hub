@@ -160,9 +160,9 @@ export const ClientOverviewTab: React.FC<ClientOverviewTabProps> = ({
               </p>
               <p className="text-sm text-cream/40">
                 {nextSession.type === "closing_45j" && "Closing Wav Premium"}
-                {nextSession.type === "closing_vip" && "Closing VIP"}
                 {nextSession.type === "suivi" && "Suivi"}
-                {nextSession.type === "one_shot" && "One Shot"}
+                {nextSession.type === "closing_vip" && "Closing VIP (archivé)"}
+                {nextSession.type === "one_shot" && "One Shot (archivé)"}
               </p>
               {nextSession.meeting_link && (
                 <a

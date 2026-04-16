@@ -117,39 +117,11 @@ serve(async (req) => {
         });
       }
 
-      // ── Legacy VIP subscription ───────────────────────────────────────
-      if (!metadata?.user_id || !metadata?.duration_months) {
-        console.log("Not a known checkout session type, skipping");
-        return new Response(JSON.stringify({ received: true }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
-      const userId = metadata.user_id;
-      const durationMonths = parseInt(metadata.duration_months);
-      const startsAt = new Date();
-      const expiresAt = new Date();
-      expiresAt.setMonth(expiresAt.getMonth() + durationMonths);
-
-      const { error: subError } = await supabase
-        .from("vip_subscriptions")
-        .insert({
-          user_id: userId,
-          stripe_session_id: session.id,
-          duration_months: durationMonths,
-          starts_at: startsAt.toISOString(),
-          expires_at: expiresAt.toISOString(),
-          status: "active",
-        });
-
-      if (subError) {
-        console.error("Error creating vip_subscription:", subError);
-        await notifyError("Stripe VIP", `Échec insert DB • user ${userId} • ${durationMonths} mois`);
-        throw subError;
-      }
-
-      await notifySuccess("Stripe VIP", `Abonnement créé • ${durationMonths} mois • user ${userId}`);
-      console.log(`VIP subscription created for user ${userId}, ${durationMonths} months`);
+      // Unknown checkout session type — just acknowledge
+      console.log("Not a known checkout session type, skipping");
+      return new Response(JSON.stringify({ received: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     // ── customer.subscription.deleted (WavAcademy cancellation) ─────────────

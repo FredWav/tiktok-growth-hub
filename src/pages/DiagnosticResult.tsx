@@ -4,14 +4,13 @@ import { useDiagnostic } from "@/contexts/DiagnosticContext";
 import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, ExternalLink, Mail } from "lucide-react";
+import { ArrowRight, Mail } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
 import { trackPostHogEvent } from "@/lib/posthog";
 import { TrustedBy } from "@/components/TrustedBy";
 import { ScreenshotWall } from "@/components/ScreenshotWall";
 
-const WAV_PREMIUM_APPLICATION_URL = "/wav-premium/candidature";
-const CALENDLY_ONE_SHOT = "https://calendly.com/fredwavcm/appel-strategie-30min";
+const BOOK_CALL_URL = "/reserverunappel";
 
 const ScoreCircle = ({ score }: { score: number }) => {
   const radius = 54;
@@ -43,7 +42,7 @@ const DiagnosticResult = () => {
   const navigate = useNavigate();
   const [tracked, setTracked] = useState(false);
 
-  // ── Score calculation (must be before hooks) ──
+  // ── Score calculation ──
   const audiencePoints: Record<string, number> = { "0-5k": 10, "5k-50k": 25, "50k+": 40 };
   const objectifPoints: Record<string, number> = { "Visibilité": 10, "Audience": 15, "Vendre": 25, "Monétiser": 30 };
   const budgetPoints: Record<string, number> = { "0": 0, "1-200": 10, "200-500": 20, "500+": 30 };
@@ -51,27 +50,17 @@ const DiagnosticResult = () => {
   const scoreLabel = score < 40 ? "Compte instable" : score <= 70 ? "Potentiel non exploité" : "Compte structuré";
 
   // ── Offer routing ──
-  const getOffer = () => {
-    const { audience, budget } = data;
-    if (budget === "0") return "EXPRESS";
-    if (budget === "1-200" || audience === "0-5k") return "ONE_SHOT";
-    if (audience === "5k-50k" && budget === "200-500") return "ONE_SHOT_PLUS_PREMIUM";
-    if (audience === "50k+" && budget === "200-500") return "PREMIUM";
-    if ((audience === "5k-50k" || audience === "50k+") && budget === "500+") return "PREMIUM";
-    return "ONE_SHOT";
-  };
-  const offer = getOffer();
+  // Budget 0 → Analyse Express (self-serve paid scan)
+  // Everything else → Wav Premium via direct contact form
+  const offer: "EXPRESS" | "WAV_PREMIUM" = data.budget === "0" ? "EXPRESS" : "WAV_PREMIUM";
 
   useEffect(() => {
-    console.log("[DiagnosticResult] isComplete:", isComplete, "data:", data);
     if (!isComplete) {
-      console.log("[DiagnosticResult] Redirecting to /start (incomplete)");
       navigate("/start", { replace: true });
     }
     sessionStorage.setItem("from_diagnostic", "true");
   }, [isComplete, navigate]);
 
-  // Fire result_page_viewed once
   useEffect(() => {
     if (isComplete && !tracked) {
       trackPostHogEvent("result_page_viewed", { maturity_score: score, recommended_offer: offer });
@@ -80,8 +69,6 @@ const DiagnosticResult = () => {
   }, [isComplete, tracked, score, offer]);
 
   if (!isComplete) return null;
-
-  console.log("[DiagnosticResult] score:", score, "scoreLabel:", scoreLabel, "offer:", offer, "audience:", data.audience, "budget:", data.budget);
 
   // ── Strategic analysis ──
   const constat: Record<string, string> = {
@@ -105,7 +92,11 @@ const DiagnosticResult = () => {
   const MailFooter = () => (
     <p className="text-sm text-muted-foreground mt-4">
       Besoin d'en discuter par écrit ?{" "}
-      <a href="mailto:fredwavcm@gmail.com" className="text-primary underline underline-offset-4 hover:text-primary/80" onClick={() => trackPostHogEvent("contact_mail_clicked", { source_offer: offer })}>
+      <a
+        href="mailto:fredwavcm@gmail.com"
+        className="text-primary underline underline-offset-4 hover:text-primary/80"
+        onClick={() => trackPostHogEvent("contact_mail_clicked", { source_offer: offer })}
+      >
         Contacte-moi par mail.
       </a>
     </p>
@@ -161,71 +152,56 @@ const DiagnosticResult = () => {
             <Card>
               <CardHeader><CardTitle className="font-display text-xl">Analyse Express</CardTitle></CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-muted-foreground">Fais analyser ton compte par notre IA. En 2 minutes tu sauras exactement où tu en es et quels leviers activer en priorité.</p>
-                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer }); trackPostHogEvent("cta_clicked", { offer_type: "EXPRESS", destination: "/analyse-express" }); }}>
-                  <Link to="/analyse-express">Lancer le Scan de mon compte</Link>
+                <p className="text-muted-foreground">
+                  Sans budget pour un accompagnement, l'Analyse Express est le meilleur point de départ.
+                  En 2 minutes, une IA analyse ton compte et te dit exactement où tu en es et quels leviers activer en priorité.
+                </p>
+                <Button
+                  variant="hero"
+                  size="lg"
+                  asChild
+                  className="w-full"
+                  onClick={() => {
+                    trackEvent("diagnostic_cta_click", { offer });
+                    trackPostHogEvent("cta_clicked", { offer_type: "EXPRESS", destination: "/analyse-express" });
+                  }}
+                >
+                  <Link to="/analyse-express">Lancer le scan de mon compte</Link>
                 </Button>
                 <TrustedBy className="mt-4" />
-              </CardContent>
-            </Card>
-          )}
-
-          {offer === "ONE_SHOT" && (
-            <Card>
-              <CardHeader><CardTitle className="font-display text-xl">Ton plan d'action personnalisé</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
-                <ul className="space-y-2 text-muted-foreground">
-                  <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Analyse complète du compte</li>
-                  <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Identification des erreurs de structure</li>
-                  <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Plan d'action personnalisé</li>
-                </ul>
-                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer }); trackPostHogEvent("cta_clicked", { offer_type: "ONE_SHOT", destination: "calendly_one_shot" }); }}>
-                  <a href={CALENDLY_ONE_SHOT} target="_blank" rel="noopener noreferrer">Réserver mon appel stratégique (30 min) <ExternalLink className="w-4 h-4 ml-2" /></a>
-                </Button>
-                <TrustedBy filter="one_shot" className="mt-4" />
                 <MailFooter />
               </CardContent>
             </Card>
           )}
 
-          {offer === "PREMIUM" && (
+          {offer === "WAV_PREMIUM" && (
             <Card>
               <CardHeader><CardTitle className="font-display text-xl">Wav Premium</CardTitle></CardHeader>
               <CardContent className="space-y-4">
+                <p className="text-muted-foreground">
+                  Ton profil correspond à un accompagnement personnalisé. On commence par un échange pour cadrer ta situation,
+                  puis Fred te recontacte avec un plan d'action adapté à tes objectifs et ton niveau.
+                </p>
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Accompagnement sur mesure</li>
-                  <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Structuration business</li>
-                  <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Scale de l'audience</li>
+                  <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Structuration business et contenu</li>
+                  <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Scale de l'audience et monétisation</li>
                 </ul>
-                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("cta_contact_click", { offer }); trackPostHogEvent("cta_clicked", { offer_type: "PREMIUM", destination: "contact" }); }}>
-                  <Link to="/reserverunappel">
+                <Button
+                  variant="hero"
+                  size="lg"
+                  asChild
+                  className="w-full"
+                  onClick={() => {
+                    trackEvent("cta_contact_click", { offer });
+                    trackPostHogEvent("cta_clicked", { offer_type: "WAV_PREMIUM", destination: "reserverunappel" });
+                  }}
+                >
+                  <Link to={BOOK_CALL_URL}>
                     Contacter Fred <ArrowRight className="w-4 h-4 ml-2" />
                   </Link>
                 </Button>
                 <TrustedBy filter="premium" className="mt-4" />
-                <MailFooter />
-              </CardContent>
-            </Card>
-          )}
-
-          {offer === "ONE_SHOT_PLUS_PREMIUM" && (
-            <Card>
-              <CardHeader><CardTitle className="font-display text-xl">Ton plan d'action personnalisé</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
-                <ul className="space-y-2 text-muted-foreground">
-                  <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Analyse complète du compte</li>
-                  <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Identification des erreurs de structure</li>
-                  <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Plan d'action personnalisé</li>
-                </ul>
-                <Button variant="hero" size="lg" asChild className="w-full" onClick={() => { trackEvent("diagnostic_cta_click", { offer: "ONE_SHOT" }); trackPostHogEvent("cta_clicked", { offer_type: "ONE_SHOT", destination: "calendly_one_shot" }); }}>
-                  <a href={CALENDLY_ONE_SHOT} target="_blank" rel="noopener noreferrer">Réserver mon appel stratégique (30 min) <ExternalLink className="w-4 h-4 ml-2" /></a>
-                </Button>
-                <Button variant="outline" size="lg" asChild className="w-full" onClick={() => { trackEvent("cta_contact_click", { offer: "PREMIUM" }); trackPostHogEvent("secondary_cta_clicked", { offer_type: "PREMIUM_UPSELL" }); }}>
-                  <Link to="/reserverunappel">
-                    Contacter Fred <ArrowRight className="w-4 h-4 ml-2" />
-                  </Link>
-                </Button>
-                <TrustedBy className="mt-4" />
                 <MailFooter />
               </CardContent>
             </Card>

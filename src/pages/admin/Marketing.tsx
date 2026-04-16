@@ -32,9 +32,8 @@ interface Lead {
 
 const OFFER_PRIORITY: Record<string, number> = {
   "Wav Premium": 1,
-  "One Shot": 2,
-  "Analyse Express": 3,
-  "Diagnostic": 4,
+  "Analyse Express": 2,
+  "Diagnostic": 3,
 };
 
 const CHART_COLORS = [
@@ -209,26 +208,18 @@ export default function AdminMarketing() {
     };
   }, [pageViews]);
 
-  // ---- Real revenue (bookings + oneshot) ----
+  // ---- Real revenue (bookings only) ----
   const { data: monthlyRevenue = 0 } = useQuery({
     queryKey: ["marketing-real-revenue"],
     queryFn: async () => {
       const monthStart = startOfMonth(new Date()).toISOString();
-      const [bookingsRes, oneshotCountRes] = await Promise.all([
-        supabase
-          .from("bookings")
-          .select("amount_cents")
-          .eq("payment_status", "paid")
-          .gte("paid_at", monthStart),
-        supabase
-          .from("oneshot_submissions")
-          .select("id", { count: "exact", head: true })
-          .gte("created_at", monthStart),
-      ]);
-      const bookingsTotal = (bookingsRes.data || []).reduce((sum: number, b: any) => sum + (b.amount_cents || 0), 0);
-      const oneshotCount = oneshotCountRes.count || 0;
-      const ONE_SHOT_PRICE_CENTS = 17900; // 179€
-      return (bookingsTotal + oneshotCount * ONE_SHOT_PRICE_CENTS) / 100;
+      const { data } = await supabase
+        .from("bookings")
+        .select("amount_cents")
+        .eq("payment_status", "paid")
+        .gte("paid_at", monthStart);
+      const bookingsTotal = (data || []).reduce((sum: number, b: any) => sum + (b.amount_cents || 0), 0);
+      return bookingsTotal / 100;
     },
   });
 
@@ -236,10 +227,9 @@ export default function AdminMarketing() {
   const { data: leads = [], isLoading } = useQuery({
     queryKey: ["marketing-leads"],
     queryFn: async () => {
-      const [appsRes, diagRes, oneshotRes, expressRes] = await Promise.all([
+      const [appsRes, diagRes, expressRes] = await Promise.all([
         supabase.from("wav_premium_applications" as any).select("created_at, first_name, last_name, email, origin_source, follower_since, current_revenue, posthog_id").order("created_at", { ascending: false }).limit(200),
         supabase.from("diagnostic_leads" as any).select("created_at, first_name, last_name, email, origin_source, follower_since, posthog_id").eq("completed", true).order("created_at", { ascending: false }).limit(200),
-        supabase.from("oneshot_submissions" as any).select("created_at, name, email, origin_source, posthog_id").order("created_at", { ascending: false }).limit(200),
         supabase.from("express_analyses").select("created_at, tiktok_username, email, status").order("created_at", { ascending: false }).limit(200),
       ]);
 
@@ -253,16 +243,12 @@ export default function AdminMarketing() {
         offer: "Diagnostic", source: d.origin_source, follower_since: d.follower_since,
         current_revenue: null, posthog_id: d.posthog_id, email: d.email || null,
       }));
-      const oneshots: Lead[] = ((oneshotRes.data as any[]) || []).map((o: any) => ({
-        date: o.created_at, name: o.name || "-", offer: "One Shot", source: o.origin_source,
-        follower_since: null, current_revenue: null, posthog_id: o.posthog_id, email: o.email || null,
-      }));
       const express: Lead[] = ((expressRes.data as any[]) || []).map((e: any) => ({
         date: e.created_at, name: e.tiktok_username || e.email || "-", offer: "Analyse Express",
         source: null, follower_since: null, current_revenue: null, posthog_id: null, email: e.email || null,
       }));
 
-      const allLeads = [...apps, ...diags, ...oneshots, ...express];
+      const allLeads = [...apps, ...diags, ...express];
       const byEmail = new Map<string, Lead>();
       const noEmail: Lead[] = [];
       for (const lead of allLeads) {
@@ -551,12 +537,12 @@ export default function AdminMarketing() {
                   <option value="https://fredwav.com">Accueil</option>
                   <option value="https://fredwav.com/start">Diagnostic (/start)</option>
                   <option value="https://fredwav.com/analyse-express">Analyse Express</option>
-                  <option value="https://fredwav.com/one-shot">One Shot</option>
-                  <option value="https://fredwav.com/offres">Offres</option>
                   <option value="https://fredwav.com/reserverunappel">Réserver un appel</option>
+                  <option value="https://fredwav.com/wavacademy">Wav Academy</option>
                   <option value="https://fredwav.com/preuves">Témoignages</option>
                   <option value="https://fredwav.com/a-propos">À Propos</option>
                   <option value="https://fredwav.com/contact">Contact</option>
+                  <option value="https://fredwav.com/newsletter">Newsletter</option>
                 </select>
               </div>
               <div className="grid grid-cols-3 gap-3">
@@ -735,8 +721,6 @@ export default function AdminMarketing() {
                             className={
                               lead.offer === "Wav Premium"
                                 ? "bg-primary/20 text-primary border-primary/30"
-                                : lead.offer === "One Shot"
-                                ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
                                 : lead.offer === "Analyse Express"
                                 ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
                                 : "bg-violet-500/20 text-violet-400 border-violet-500/30"

@@ -102,13 +102,11 @@ const DiagnosticStart = () => {
   };
 
   const getRecommendedOffer = () => {
-    const { audience, budget } = data;
+    const { budget } = data;
+    // Budget 0€ → Analyse Express (entry-level paid scan)
+    // Everything else → Wav Premium via direct contact
     if (budget === "0") return "express";
-    if (budget === "1-200" || audience === "0-5k") return "one_shot";
-    if (audience === "5k-50k" && budget === "200-500") return "one_shot_plus_premium";
-    if (audience === "50k+" && budget === "200-500") return "premium";
-    if ((audience === "5k-50k" || audience === "50k+") && budget === "500+") return "premium";
-    return "one_shot";
+    return "wav_premium";
   };
 
   const handleIdentityNext = () => {

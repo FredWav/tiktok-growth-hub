@@ -6,7 +6,6 @@ import {
   LayoutDashboard,
   Users,
   Calendar,
-  CreditCard,
   FileText,
   Mail,
   Settings,
@@ -29,9 +28,8 @@ interface AdminLayoutProps {
 
 const navItems = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { label: "Prospects & Clients", href: "/admin/clients", icon: Users },
+  { label: "Clients", href: "/admin/clients", icon: Users },
   { label: "Sessions", href: "/admin/sessions", icon: Calendar },
-  { label: "Réservations", href: "/admin/bookings", icon: CreditCard },
   { label: "Livrables", href: "/admin/deliverables", icon: FileText },
   { label: "Templates", href: "/admin/templates", icon: Mail },
   { label: "Analyses Express", href: "/admin/analyses", icon: Zap },

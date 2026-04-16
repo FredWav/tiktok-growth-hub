@@ -24,16 +24,15 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 const OFFER_OPTIONS = [
-  { value: "one_shot", label: "One Shot" },
   { value: "premium", label: "Wav Premium" },
   { value: "diagnostic", label: "Diagnostic" },
   { value: "express", label: "Analyse Express" },
+  { value: "one_shot", label: "One Shot (archivé)" },
 ];
 
 const LOCATION_OPTIONS = [
   { value: "home", label: "Accueil" },
   { value: "preuves", label: "Preuves" },
-  { value: "offres", label: "Offres" },
   { value: "diagnostic_result", label: "Résultat diagnostic" },
 ];
 

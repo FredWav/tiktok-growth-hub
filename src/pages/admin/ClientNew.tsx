@@ -37,7 +37,7 @@ const clientFormSchema = z.object({
   phone: z.string().optional(),
   instagram: z.string().optional(),
   website: z.string().url("URL invalide").optional().or(z.literal("")),
-  offer: z.enum(["one_shot", "45_jours", "vip"]),
+  offer: z.enum(["45_jours"]),
   status: z.enum(["prospect", "active", "completed", "cancelled"]),
   start_date: z.string().optional(),
   end_date: z.string().optional(),
@@ -72,7 +72,7 @@ const ClientNew = () => {
       phone: "",
       instagram: "",
       website: "",
-      offer: "one_shot",
+      offer: "45_jours",
       status: "prospect",
       start_date: "",
       end_date: "",
@@ -436,9 +436,7 @@ const ClientNew = () => {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="one_shot">One Shot</SelectItem>
                             <SelectItem value="45_jours">Wav Premium</SelectItem>
-                            <SelectItem value="vip">VIP</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />

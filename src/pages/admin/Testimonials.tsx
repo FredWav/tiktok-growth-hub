@@ -15,10 +15,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { AdminScreenshots } from "@/components/admin/AdminScreenshots";
 
 const OFFER_OPTIONS = [
-  { value: "one_shot", label: "One Shot" },
   { value: "premium", label: "Wav Premium" },
   { value: "diagnostic", label: "Diagnostic" },
   { value: "express", label: "Analyse Express" },
+  { value: "one_shot", label: "One Shot (archivé)" },
 ];
 
 const emptyForm = {

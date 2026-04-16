@@ -103,10 +103,10 @@ export const ClientSessionsTab: React.FC<ClientSessionsTabProps> = ({
 
   const getSessionTypeLabel = (type: Session["type"]) => {
     const labels: Record<Session["type"], string> = {
-      closing_45j: "Closing 45 jours",
-      closing_vip: "Closing VIP",
+      closing_45j: "Closing Wav Premium",
+      closing_vip: "Closing VIP (archivé)",
       suivi: "Suivi",
-      one_shot: "One Shot",
+      one_shot: "One Shot (archivé)",
     };
     return labels[type];
   };
@@ -150,9 +150,7 @@ export const ClientSessionsTab: React.FC<ClientSessionsTabProps> = ({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="suivi">Suivi</SelectItem>
-                    <SelectItem value="closing_45j">Closing 45 jours</SelectItem>
-                    <SelectItem value="closing_vip">Closing VIP</SelectItem>
-                    <SelectItem value="one_shot">One Shot</SelectItem>
+                    <SelectItem value="closing_45j">Closing Wav Premium</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -101,9 +101,9 @@ const Clients: React.FC = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Toutes les offres</SelectItem>
-              <SelectItem value="one_shot">One Shot</SelectItem>
               <SelectItem value="45_jours">Wav Premium</SelectItem>
-              <SelectItem value="vip">VIP</SelectItem>
+              <SelectItem value="one_shot">One Shot (archivé)</SelectItem>
+              <SelectItem value="vip">VIP (archivé)</SelectItem>
             </SelectContent>
           </Select>
 

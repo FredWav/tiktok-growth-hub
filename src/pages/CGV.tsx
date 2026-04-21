@@ -19,7 +19,7 @@ export default function CGV() {
             <li><strong>Adresse :</strong> 2 route de Malagué, 86270 Coussay-les-Bois, France</li>
             <li><strong>Contact :</strong> <a href="mailto:contact@fredwav.com" className="text-primary underline">contact@fredwav.com</a></li>
             <li><strong>TVA :</strong> Non applicable, article 293 B du CGI (franchise en base)</li>
-            <li><strong>Assurance :</strong> Responsabilité Civile Professionnelle souscrite auprès de [Nom de ton assurance - ex: AXA/Hiscox]</li>
+            <li><strong>Assurance :</strong> Responsabilité Civile Professionnelle — <em className="text-destructive font-semibold">[À COMPLÉTER — souscription RC Pro obligatoire]</em></li>
           </ul>
 
           {/* ARTICLE 2 */}
@@ -44,7 +44,7 @@ export default function CGV() {
           {/* ARTICLE 4 */}
           <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 4 — Définitions</h2>
           <ul className="text-muted-foreground mb-4 space-y-1">
-            <li><strong>Prestations :</strong> Wav Premium (accompagnement 45 jours) et Analyse Express (rapport d'analyse automatisé).</li>
+            <li><strong>Prestations :</strong> Wav Premium (accompagnement 45 jours), Wav Academy (abonnement communauté Discord) et Analyse Express (rapport d'analyse automatisé).</li>
             <li><strong>Contenus numériques :</strong> rapports PDF, ressources, checklists et templates éventuellement remis dans le cadre de la prestation.</li>
             <li><strong>Plateformes tierces :</strong> TikTok, Instagram, YouTube, Discord, WhatsApp, Stripe, PayPal, Klarna. Fred Wav n'est pas responsable de leurs pannes, interruptions, changements de conditions d'utilisation, ni des conséquences pouvant en découler.</li>
           </ul>
@@ -60,6 +60,16 @@ export default function CGV() {
           <h3 className="font-display text-lg font-medium mt-4 mb-2">5.2 Analyse Express</h3>
           <p className="text-muted-foreground mb-4">
             Analyse automatisée d'un compte TikTok via outil d'analyse. Le client reçoit un rapport détaillé (PDF + dashboard). Prestation de contenu numérique délivrée immédiatement après paiement.
+          </p>
+
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">5.3 Wav Academy (abonnement)</h3>
+          <p className="text-muted-foreground mb-4">
+            Abonnement mensuel ou annuel donnant accès à la communauté Discord Wav Academy, aux ressources documentaires (cours, replays, checklists, méthodes, templates) et aux lives hebdomadaires. L'abonnement ne comprend aucun suivi individuel personnalisé.
+          </p>
+
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">5.4 Évolution du contenu</h3>
+          <p className="text-muted-foreground mb-4">
+            Le contenu exact des offres (ressources, formats, modalités) est celui présenté au moment de l'achat. Le contenu de la Wav Academy peut évoluer pour s'adapter et s'améliorer (formats, ressources, organisation), sans diminution substantielle de la valeur globale. Les prix peuvent être modifiés pour l'avenir ; le nouveau prix s'applique aux renouvellements futurs, et le client peut résilier avant l'échéance.
           </p>
 
           {/* ARTICLE 6 */}
@@ -160,7 +170,27 @@ export default function CGV() {
           </p>
 
           {/* ARTICLE 12 */}
-          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 12 — Médiation (B2C)</h2>
+          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 12 — Abonnement Wav Academy (renouvellement, résiliation, suspension)</h2>
+
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">12.1 Renouvellement</h3>
+          <p className="text-muted-foreground mb-4">
+            La Wav Academy est un abonnement à reconduction automatique (mensuel ou annuel selon la formule choisie) jusqu'à résiliation par le client.
+          </p>
+
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">12.2 Résiliation</h3>
+          <p className="text-muted-foreground mb-4">
+            Le client peut résilier à tout moment via le lien de gestion d'abonnement communiqué lors de l'achat ou depuis son espace Stripe.
+            Pour éviter le prélèvement suivant, la résiliation doit être effectuée au plus tard 24h avant l'échéance de renouvellement.
+            Toute période commencée est due. L'accès est maintenu jusqu'à la fin de la période payée.
+          </p>
+
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">12.3 Suspension</h3>
+          <p className="text-muted-foreground mb-4">
+            En cas d'impayé, de rejet de paiement, de rétrofacturation, ou de violation des règles de communauté (harcèlement, spam, diffusion de contenus réservés, comportements abusifs), l'accès peut être suspendu ou résilié sans remboursement.
+          </p>
+
+          {/* ARTICLE 13 */}
+          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 13 — Médiation (B2C)</h2>
           <p className="text-muted-foreground mb-2">
             En cas de litige non résolu par le service client (<a href="mailto:contact@fredwav.com" className="text-primary underline">contact@fredwav.com</a>), et après réclamation écrite préalable, le client consommateur peut saisir le médiateur :
           </p>
@@ -174,16 +204,16 @@ export default function CGV() {
             Modalités : saisie via le formulaire disponible sur le site du médiateur.
           </p>
 
-          {/* ARTICLE 13 */}
-          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 13 — Droit applicable et juridiction</h2>
+          {/* ARTICLE 14 */}
+          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 14 — Droit applicable et juridiction</h2>
           <p className="text-muted-foreground mb-4">
             Les CGV sont soumises au droit français.
             En cas de litige avec un professionnel, le Tribunal de Commerce de Poitiers (86) sera seul compétent.
             En cas de litige avec un consommateur, les juridictions compétentes seront déterminées conformément aux règles applicables du Code de la consommation et du Code de procédure civile.
           </p>
 
-          {/* ARTICLE 14 */}
-          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 14 — Plateforme européenne de règlement en ligne des litiges (ODR/RLL)</h2>
+          {/* ARTICLE 15 */}
+          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 15 — Plateforme européenne de règlement en ligne des litiges (ODR/RLL)</h2>
           <p className="text-muted-foreground mb-4">
             La plateforme européenne de règlement en ligne des litiges (ODR/RLL) est fermée depuis le 20 juillet 2025.
           </p>
@@ -207,8 +237,9 @@ export default function CGV() {
           <h2 className="font-display text-xl font-semibold mt-14 mb-3 border-t pt-8">Annexe 2 — Consentements express (cases à cocher au checkout)</h2>
           <div className="bg-muted/50 rounded-lg p-4 mb-4 space-y-3 text-sm text-muted-foreground">
             <p>☐ Je reconnais avoir lu et accepté les CGV.</p>
-            <p>☐ Je demande l'exécution immédiate de la prestation Wav Premium avant la fin du délai légal de rétractation de 14 jours.</p>
+            <p>☐ (Wav Premium) Je demande l'exécution immédiate de la prestation avant la fin du délai légal de rétractation de 14 jours et je reconnais que l'Audit Stratégique Initial, les frais administratifs et les frais de transaction resteront acquis au Vendeur en cas de rétractation.</p>
             <p>☐ (Analyse Express) Je demande l'accès immédiat au rapport numérique et je reconnais perdre mon droit de rétractation dès le démarrage de la fourniture du contenu numérique.</p>
+            <p>☐ (Wav Academy) Je demande l'accès immédiat aux contenus numériques et je reconnais perdre mon droit de rétractation dès le démarrage de la fourniture du contenu numérique.</p>
           </div>
         </div>
       </Section>

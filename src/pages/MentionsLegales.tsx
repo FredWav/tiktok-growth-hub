@@ -38,15 +38,18 @@ export default function MentionsLegales() {
 
           <h2 className="font-display text-xl font-semibold mt-8 mb-3">Données personnelles</h2>
           <p className="text-muted-foreground mb-4">
-            Les données collectées via ce site (email, nom, informations de paiement) sont utilisées exclusivement dans le cadre de la relation commerciale. Elles ne sont jamais revendues à des tiers. Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Pour exercer ce droit, contactez : contact@fredwav.com.
+            Les données collectées via ce site (email, nom, informations de paiement) sont utilisées exclusivement dans le cadre de la relation commerciale. Elles ne sont jamais revendues à des tiers. Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Pour exercer ce droit, contactez : <a href="mailto:contact@fredwav.com" className="text-primary hover:underline">contact@fredwav.com</a>.
+          </p>
+          <p className="text-muted-foreground mb-4">
+            Pour plus de détails, consultez notre <a href="/politique-de-confidentialite" className="text-primary hover:underline">Politique de confidentialité</a>.
           </p>
 
           <h2 className="font-display text-xl font-semibold mt-8 mb-3">Cookies</h2>
           <p className="text-muted-foreground mb-4">
-            Ce site peut utiliser des cookies techniques nécessaires à son fonctionnement. Aucun cookie publicitaire n'est utilisé.
+            Ce site utilise des cookies techniques nécessaires à son fonctionnement, ainsi que des cookies d'analyse (Google Analytics, PostHog) activés uniquement avec votre consentement via le bandeau cookies. Aucun cookie publicitaire n'est utilisé. Pour en savoir plus, consultez notre <a href="/politique-de-confidentialite" className="text-primary hover:underline">Politique de confidentialité</a>.
           </p>
 
-          <p className="text-sm text-muted-foreground mt-12">Dernière mise à jour : février 2026</p>
+          <p className="text-sm text-muted-foreground mt-12">Dernière mise à jour : avril 2026</p>
         </div>
       </Section>
     </Layout>

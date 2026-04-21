@@ -10,7 +10,7 @@ export default function PolitiqueConfidentialite() {
         <div className="max-w-3xl mx-auto prose prose-neutral">
           <h1 className="font-display text-3xl md:text-4xl font-semibold mb-4">Politique de confidentialité</h1>
 
-          <p className="text-muted-foreground mb-6">Dernière mise à jour : 25 février 2026</p>
+          <p className="text-muted-foreground mb-6">Dernière mise à jour : 21 avril 2026</p>
 
           <p className="text-muted-foreground mb-6">
             La présente Politique de confidentialité détaille la manière dont Fred Wav (Frédéric Olalde) collecte, utilise et protège les données personnelles des utilisateurs, conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi Informatique et Libertés.
@@ -32,7 +32,8 @@ export default function PolitiqueConfidentialite() {
           <ul className="list-disc pl-6 text-muted-foreground mb-4 space-y-1">
             <li><strong>Identité :</strong> Nom, prénom.</li>
             <li><strong>Contact :</strong> Adresse email, numéro de téléphone (obligatoire pour le suivi WhatsApp Wav Premium).</li>
-            <li><strong>Données professionnelles :</strong> Identifiant de compte, URL de compte, statistiques publiques et données de profil nécessaires au diagnostic stratégique.</li>
+            <li><strong>Données professionnelles :</strong> Identifiant de compte TikTok, statistiques publiques et données de profil nécessaires au diagnostic stratégique.</li>
+            <li><strong>Données de formulaire :</strong> Niveau actuel, points de blocage, objectifs, budget envisagé, source de découverte, durée de suivi et élément déclencheur — collectés via le formulaire de contact pour qualifier la demande.</li>
             <li><strong>Paiement :</strong> Les transactions sont gérées par Stripe. Fred Wav n'a jamais accès à vos coordonnées bancaires complètes.</li>
             <li><strong>Données techniques :</strong> Adresse IP, type de navigateur (via les logs du serveur pour la sécurité).</li>
           </ul>
@@ -59,19 +60,22 @@ export default function PolitiqueConfidentialite() {
             Vos données sont strictement confidentielles. Elles ne sont jamais revendues. Elles sont transmises uniquement à nos prestataires de confiance pour l'exécution du service :
           </p>
           <ul className="list-disc pl-6 text-muted-foreground mb-4 space-y-1">
-            <li><strong>Paiement :</strong> Stripe.</li>
-            <li><strong>Communication :</strong> WhatsApp (Meta), Discord.</li>
-            <li><strong>Hébergement :</strong> Lovable Labs Inc (1111B South Governors Avenue, Dover, DE 19904, USA).</li>
+            <li><strong>Paiement :</strong> Stripe Inc. (San Francisco, USA).</li>
+            <li><strong>Communication :</strong> WhatsApp (Meta Platforms Inc., USA), Discord Inc. (USA).</li>
+            <li><strong>Newsletter :</strong> MailerLite (UAB MailerLite, Lituanie / USA).</li>
+            <li><strong>Hébergement et base de données :</strong> Lovable Labs Inc (Dover, DE, USA) et Supabase Inc. (San Francisco, USA).</li>
+            <li><strong>Analyse comportementale :</strong> PostHog Inc. (San Francisco, USA) — utilisé pour comprendre l'usage du site et améliorer l'expérience, activé uniquement avec votre consentement.</li>
           </ul>
           <p className="text-muted-foreground mb-4">
-            Certains prestataires peuvent être situés hors UE (ex : WhatsApp, Discord). Dans ce cas, nous veillons à ce que le transfert soit encadré par des clauses contractuelles types ou des mécanismes de protection adéquats.
+            Certains prestataires sont situés hors UE (États-Unis). Les transferts sont encadrés par des clauses contractuelles types (SCC) ou le Data Privacy Framework UE-US, conformément aux exigences du RGPD.
           </p>
 
           <h2 className="font-display text-xl font-semibold mt-8 mb-3">6. Durée de conservation</h2>
           <ul className="list-disc pl-6 text-muted-foreground mb-4 space-y-1">
-            <li><strong>Données clients :</strong> Conservées pendant toute la durée de la relation commerciale.</li>
-            <li><strong>Données comptables/facturation :</strong> Conservées 10 ans (obligation légale française).</li>
-            <li><strong>Données de prospection (newsletter) :</strong> Conservées pendant 3 ans à compter du dernier contact, sauf désinscription.</li>
+            <li><strong>Données clients :</strong> Conservées pendant toute la durée de la relation commerciale, puis 3 ans après la fin de la dernière prestation (sauf obligation légale de conservation plus longue).</li>
+            <li><strong>Données comptables/facturation :</strong> Conservées 10 ans (obligation légale française, art. L123-22 du Code de commerce).</li>
+            <li><strong>Données de prospection (newsletter, formulaires de contact) :</strong> Conservées pendant 3 ans à compter du dernier contact, sauf désinscription.</li>
+            <li><strong>Données analytiques (PostHog) :</strong> Anonymisées ou supprimées après 24 mois.</li>
           </ul>
 
           <h2 className="font-display text-xl font-semibold mt-8 mb-3">7. Vos Droits</h2>
@@ -91,6 +95,7 @@ export default function PolitiqueConfidentialite() {
           <ul className="list-disc pl-6 text-muted-foreground mb-4 space-y-1">
             <li><strong>Cookies techniques :</strong> Essentiels à la navigation et à la mémorisation de votre session.</li>
             <li><strong>Mesure d'audience :</strong> Google Analytics (identifiant G-E361JPZX7D), activé uniquement avec votre consentement explicite via le bandeau cookies. Aucune donnée n'est collectée à des fins publicitaires.</li>
+            <li><strong>Analyse comportementale :</strong> PostHog, utilisé pour comprendre les parcours utilisateur et améliorer l'expérience du site. Activé uniquement avec votre consentement via le bandeau cookies. Les données collectées incluent les pages visitées, les clics et les interactions, sans finalité publicitaire.</li>
           </ul>
           <p className="text-muted-foreground mb-4">
             Vous pouvez modifier votre choix à tout moment en supprimant vos cookies ou via les paramètres de votre navigateur.

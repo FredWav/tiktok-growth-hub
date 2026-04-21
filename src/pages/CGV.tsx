@@ -83,6 +83,9 @@ export default function CGV() {
           <p className="text-muted-foreground mb-4">
             <strong>Rétrofacturation (chargeback) :</strong> toute rétrofacturation entraîne la suspension immédiate des accès et l'exigibilité des sommes dues. Le vendeur pourra réclamer, sur justificatifs, les frais réellement supportés du fait de l'impayé ou de la rétrofacturation (frais de traitement du prestataire de paiement, frais de recouvrement, frais administratifs externes si applicable).
           </p>
+          <p className="text-muted-foreground mb-4">
+            <strong>Frais de transaction en cas de remboursement :</strong> en cas de remboursement accepté par le Vendeur, les frais de transaction facturés par les prestataires de paiement (Stripe, PayPal, etc.) et non restitués au Vendeur restent à la charge exclusive du Client. Ces frais seront déduits de plein droit du montant total à rembourser.
+          </p>
 
           {/* ARTICLE 8 */}
           <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 8 — Exécution, retards, annulation, report</h2>
@@ -110,8 +113,18 @@ export default function CGV() {
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">9.1 Démarrage avant la fin des 14 jours (Wav Premium)</h3>
           <p className="text-muted-foreground mb-4">
-            Si le client demande expressément le démarrage de son accompagnement Wav Premium avant la fin du délai de 14 jours, et exerce ensuite sa rétractation, le vendeur peut facturer un montant proportionnel à ce qui a été exécuté.
-            <br /><strong>Important :</strong> aucune somme n'est due par le consommateur si sa demande expresse n'a pas été recueillie correctement ou si les obligations d'information n'ont pas été respectées.
+            Si le Client demande le démarrage de l'accompagnement Wav Premium avant la fin du délai de 14 jours, il reconnaît expressément que l'Audit Stratégique Initial constitue une prestation de service distincte, exécutée et livrée dès le début de la collaboration.
+          </p>
+          <p className="text-muted-foreground mb-2">
+            En cas d'exercice du droit de rétractation après le début de cette exécution, les frais suivants resteront acquis au Vendeur et seront déduits du remboursement :
+          </p>
+          <ul className="text-muted-foreground mb-4 space-y-1">
+            <li>Le montant forfaitaire de l'Audit Stratégique Initial s'élevant à <strong>149 €</strong> ;</li>
+            <li>Les frais administratifs de gestion de dossier et d'immobilisation de calendrier s'élevant à <strong>48 €</strong> ;</li>
+            <li>Les frais de transaction mentionnés à l'Article 7.</li>
+          </ul>
+          <p className="text-muted-foreground mb-4">
+            Si la prestation d'accompagnement est pleinement exécutée avant la fin du délai de 14 jours, le Client reconnaît qu'il perd tout droit de rétractation.
           </p>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">9.2 Contenus numériques (Analyse Express)</h3>

@@ -1,43 +1,57 @@
+# Sync Wav Academy : migrations + déploiement record-wavacademy-consent
 
+## État vérifié (repo Lovable est bien sur 11eae65 ou plus récent)
 
-## Plan : Lancer une analyse manuelle depuis /admin/analyses + fix build error
+- ✅ `supabase/functions/record-wavacademy-consent/index.ts` présent dans le repo
+- ✅ `supabase/functions/create-wavacademy-checkout/` absent (suppression volontaire confirmée)
+- ✅ `src/pages/WavAcademy.tsx` ligne 225 invoke bien `record-wavacademy-consent`
+- ✅ Migrations présentes dans le repo : `20260428000000_create_wavacademy_claims.sql` + `20260428120000_create_wavacademy_consents.sql`
+- ❌ **Tables `wavacademy_claims` et `wavacademy_consents` absentes en base** (vérifié via `to_regclass` → NULL/NULL)
+- ❌ Edge function `record-wavacademy-consent` non déployée (404 en prod)
 
-### Probleme actuel
-1. L'analyse de @tanguycimalando est bloquee en "processing"
-2. Pas de moyen de lancer une analyse manuellement sans passer par le flux Stripe
-3. **Build error** : `check-vip-expiry/index.ts` utilise `npm:@supabase/supabase-js@2.57.2` au lieu de `https://esm.sh/...`
+Donc le repo est synchronisé, c'est juste que les migrations n'ont jamais tourné et la function n'a jamais été déployée sur l'instance Cloud.
 
-### Modifications
+## Actions à exécuter en mode Build
 
-**1. Fix build error — `supabase/functions/check-vip-expiry/index.ts`**
-Ligne 2 : remplacer `import { createClient } from "npm:@supabase/supabase-js@2.57.2"` par `import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4"`
+### 1. Appliquer les 2 migrations
+Exécuter le SQL des deux fichiers via l'outil migration Lovable Cloud :
+- `supabase/migrations/20260428000000_create_wavacademy_claims.sql` → crée `wavacademy_claims`
+- `supabase/migrations/20260428120000_create_wavacademy_consents.sql` → crée `wavacademy_consents`
 
-**2. Ajouter un formulaire de lancement manuel — `src/pages/admin/ExpressAnalyses.tsx`**
-Ajouter en haut de la page un champ input + bouton "Lancer une analyse" :
-- L'admin entre un username TikTok (avec ou sans @)
-- Au clic, appel a `retry-express-analysis` modifie (ou une nouvelle edge function `manual-express-analysis`)
-- Cree un enregistrement dans `express_analyses` avec un `stripe_session_id` fictif (`manual-{timestamp}`)
-- Lance l'analyse via l'API WavSocialScan
-- Polling automatique jusqu'a completion
-- Le bouton PDF apparait quand c'est termine
+Vérification post-migration :
+```sql
+SELECT to_regclass('public.wavacademy_claims'), to_regclass('public.wavacademy_consents');
+```
+Doit renvoyer les 2 noms de tables (non NULL).
 
-**3. Nouvelle edge function `manual-express-analysis`**
-Creer `supabase/functions/manual-express-analysis/index.ts` :
-- Verifie le role admin (meme pattern que `retry-express-analysis`)
-- Recoit `{ tiktok_username }`
-- Appelle `POST /accounts/{username}/analyze` sur l'API WavSocialScan
-- Cree un enregistrement `express_analyses` avec `stripe_session_id: "manual-{Date.now()}"`, `status: "processing"`, `job_id`
-- Retourne `{ job_id, analysis_id }`
+### 2. Déployer l'edge function
+Déployer **uniquement** `record-wavacademy-consent` via `supabase--deploy_edge_functions`.
 
-**4. UI dans ExpressAnalyses.tsx**
-- Input avec placeholder `@username`
-- Bouton "Lancer l'analyse"
-- Apres lancement, l'analyse apparait dans le tableau avec le polling existant via `check-express-job`
-- Le PDF est telechargeable une fois l'analyse complete (deja gere)
+Pas besoin de toucher `supabase/config.toml` : la function est publique (appelée depuis le frontend sans JWT user), et le défaut Lovable est déjà `verify_jwt = false`. La function valide elle-même les inputs (plan ∈ {acces, live}, email, deux consentements).
 
-### Fichiers modifies
-- `supabase/functions/check-vip-expiry/index.ts` (fix import)
-- `supabase/functions/manual-express-analysis/index.ts` (nouveau)
-- `src/pages/admin/ExpressAnalyses.tsx` (ajout formulaire + logique)
-- `supabase/config.toml` (ajouter config pour `manual-express-analysis`)
+### 3. Ne PAS recréer `create-wavacademy-checkout`
+Si une erreur mentionne `STRIPE_PRICE_WAVACADEMY_ACCES` ou `STRIPE_PRICE_WAVACADEMY_LIVE` → on ignore. Ces secrets sont obsolètes (plus référencés nulle part dans le code). Le nouveau flux passe par les Stripe Payment Links codés en dur dans `record-wavacademy-consent/index.ts` (constante `PAYMENT_LINKS`).
 
+### 4. Curl de validation
+```
+POST /functions/v1/record-wavacademy-consent
+Body: {"plan":"acces","email":"test@example.com","consent_cgv":true,"consent_renonciation":true}
+```
+Attendu : HTTP 200 + `{ consent_id: "<uuid>", payment_url: "https://buy.stripe.com/dRm6oG9da4uZbLk2HecMM0w?client_reference_id=...&prefilled_email=test%40example.com" }`
+
+Vérification base :
+```sql
+SELECT id, email, plan_type, consent_cgv, consent_renonciation, cgv_version 
+FROM wavacademy_consents 
+WHERE email='test@example.com' 
+ORDER BY created_at DESC LIMIT 1;
+```
+
+### 5. Rapport final
+Je renvoie : statut migrations, statut deploy, code HTTP du curl, payload JSON renvoyé, et confirmation de la ligne insérée.
+
+## Notes techniques
+
+- Aucun nouveau secret requis. Tous les secrets utilisés par `record-wavacademy-consent` (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`) sont auto-fournis et présents.
+- `notifyError` (ITPush) est déjà câblé via `_shared/itpush.ts` et `ITPUSH_ENABLED` est dans les secrets.
+- Les Stripe Payment Links sont publics et hardcodés (acces + live), donc rien à configurer côté secrets Stripe pour ce flux-là.

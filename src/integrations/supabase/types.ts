@@ -875,6 +875,89 @@ export type Database = {
         }
         Relationships: []
       }
+      wavacademy_claims: {
+        Row: {
+          claimed_at: string | null
+          created_at: string
+          discord_role_env: string
+          discord_user_id: string | null
+          email: string
+          expires_at: string
+          plan_type: string
+          subscription_id: string | null
+          token: string
+        }
+        Insert: {
+          claimed_at?: string | null
+          created_at?: string
+          discord_role_env: string
+          discord_user_id?: string | null
+          email: string
+          expires_at?: string
+          plan_type: string
+          subscription_id?: string | null
+          token?: string
+        }
+        Update: {
+          claimed_at?: string | null
+          created_at?: string
+          discord_role_env?: string
+          discord_user_id?: string | null
+          email?: string
+          expires_at?: string
+          plan_type?: string
+          subscription_id?: string | null
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wavacademy_claims_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "wavacademy_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wavacademy_consents: {
+        Row: {
+          cgv_version: string
+          consent_cgv: boolean
+          consent_renonciation: boolean
+          created_at: string
+          email: string
+          id: string
+          ip_address: string | null
+          plan_type: string
+          stripe_session_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          cgv_version?: string
+          consent_cgv: boolean
+          consent_renonciation: boolean
+          created_at?: string
+          email: string
+          id?: string
+          ip_address?: string | null
+          plan_type: string
+          stripe_session_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          cgv_version?: string
+          consent_cgv?: boolean
+          consent_renonciation?: boolean
+          created_at?: string
+          email?: string
+          id?: string
+          ip_address?: string | null
+          plan_type?: string
+          stripe_session_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       wavacademy_subscriptions: {
         Row: {
           created_at: string

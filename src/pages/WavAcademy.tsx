@@ -222,20 +222,19 @@ export default function WavAcademy() {
     setIsSubmitting(true);
     trackPostHogEvent("wavclub_checkout_submit", { plan: selectedPlan });
     try {
-      const { data: result, error } = await supabase.functions.invoke("create-wavacademy-checkout", {
+      const { data: result, error } = await supabase.functions.invoke("record-wavacademy-consent", {
         body: {
           plan: selectedPlan,
           email: data.email,
           consent_cgv: data.consent_cgv,
           consent_renonciation: data.consent_renonciation,
-          consent_timestamp: new Date().toISOString(),
         },
       });
 
       if (error) throw new Error(error.message);
-      if (!result?.url) throw new Error("URL de paiement manquante");
+      if (!result?.payment_url) throw new Error("URL de paiement manquante");
 
-      window.location.href = result.url;
+      window.location.href = result.payment_url;
     } catch (err: unknown) {
       console.error("Checkout error:", err);
       toast.error("Une erreur est survenue. Réessaie ou contacte-nous.");

@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { plan, email, discord_user_id } = await req.json();
+    const { plan, email, consent_cgv, consent_renonciation, consent_timestamp } = await req.json();
 
     if (!plan || !(plan in PLAN_CONFIG)) {
       return new Response(
@@ -50,12 +50,14 @@ Deno.serve(async (req) => {
       );
     }
 
-    if (!discord_user_id || !/^\d{17,21}$/.test(discord_user_id.trim())) {
+    if (consent_cgv !== true || consent_renonciation !== true) {
       return new Response(
-        JSON.stringify({ error: "ID Discord invalide (doit être un nombre de 17-21 chiffres)" }),
+        JSON.stringify({ error: "Les consentements CGV et renonciation au droit de rétractation sont obligatoires" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    const consentIso = typeof consent_timestamp === "string" ? consent_timestamp : new Date().toISOString();
 
     const config = PLAN_CONFIG[plan as Plan];
     const priceId = Deno.env.get(config.envKey);
@@ -79,16 +81,20 @@ Deno.serve(async (req) => {
       metadata: {
         type: `wavacademy_${plan}`,
         plan,
-        discord_user_id: discord_user_id.trim(),
         discord_role_env: config.discordRoleEnv,
         email: email.trim(),
+        consent_cgv: "true",
+        consent_renonciation: "true",
+        consent_timestamp: consentIso,
       },
       subscription_data: {
         metadata: {
           type: `wavacademy_${plan}`,
           plan,
-          discord_user_id: discord_user_id.trim(),
           discord_role_env: config.discordRoleEnv,
+          consent_cgv: "true",
+          consent_renonciation: "true",
+          consent_timestamp: consentIso,
         },
       },
       success_url: `${origin}/wavacademy?success=true`,

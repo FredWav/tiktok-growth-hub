@@ -72,45 +72,75 @@ serve(async (req) => {
       // ── Wav Academy subscription ─────────────────────────────────────────
       if (metadata?.type?.startsWith("wavacademy_")) {
         const plan = metadata.plan as string;
-        const discordUserId = metadata.discord_user_id;
         const discordRoleEnv = metadata.discord_role_env;
-        const email = metadata.email;
+        const email = metadata.email || (session.customer_details?.email ?? null);
         const stripeSubscriptionId = session.subscription as string | null;
 
-        console.log(`WavAcademy checkout completed: plan=${plan}, email=${email}, discord=${discordUserId}`);
+        console.log(`WavAcademy checkout completed: plan=${plan}, email=${email}`);
 
-        // Store in wavacademy_subscriptions
-        const { error: insertError } = await supabase
+        // Store in wavacademy_subscriptions (Discord user id will be filled at claim time)
+        const { data: subRow, error: insertError } = await supabase
           .from("wavacademy_subscriptions")
           .insert({
             stripe_session_id: session.id,
             stripe_subscription_id: stripeSubscriptionId,
             email,
-            discord_user_id: discordUserId || null,
+            discord_user_id: null,
             discord_role_env: discordRoleEnv || null,
             plan_type: plan,
             status: "active",
             discord_role_granted: false,
-          });
+          })
+          .select("id")
+          .single();
 
         if (insertError) {
           console.error("Error inserting wavacademy_subscription:", insertError);
           await notifyError("WavAcademy Webhook", `Échec insert DB • plan=${plan} • ${email}`);
-          // Don't throw — still try to assign Discord role
         }
 
-        // Assign Discord role
-        if (discordUserId && discordRoleEnv) {
-          await assignDiscordRole(discordUserId, discordRoleEnv, "grant");
+        // Create a single-use claim token (7-day expiry)
+        let claimToken: string | null = null;
+        if (subRow?.id && email && discordRoleEnv) {
+          const { data: claimRow, error: claimErr } = await supabase
+            .from("wavacademy_claims")
+            .insert({
+              subscription_id: subRow.id,
+              email,
+              plan_type: plan,
+              discord_role_env: discordRoleEnv,
+            })
+            .select("token")
+            .single();
 
-          // Mark discord_role_granted = true
-          await supabase
-            .from("wavacademy_subscriptions")
-            .update({ discord_role_granted: true })
-            .eq("stripe_session_id", session.id);
+          if (claimErr) {
+            console.error("Error creating wavacademy_claim:", claimErr);
+            await notifyError("WavAcademy Webhook", `Échec création claim • ${email} • ${claimErr.message}`);
+          } else {
+            claimToken = claimRow.token as string;
+          }
         }
 
-        await notifySuccess("WavAcademy", `Nouveau membre • ${plan} • ${email}`);
+        // Send activation email with claim link
+        if (claimToken && email) {
+          try {
+            const supabaseUrl = Deno.env.get("SUPABASE_URL");
+            const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+            await fetch(`${supabaseUrl}/functions/v1/send-claim-email`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${serviceKey}`,
+              },
+              body: JSON.stringify({ email, token: claimToken, plan_type: plan }),
+            });
+          } catch (mailErr) {
+            console.error("Failed to invoke send-claim-email:", mailErr);
+            await notifyError("WavAcademy Webhook", `Échec envoi email claim • ${email}`);
+          }
+        }
+
+        await notifySuccess("WavAcademy", `Nouveau membre • ${plan} • ${email} • claim envoyé`);
 
         return new Response(JSON.stringify({ received: true }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -130,10 +160,16 @@ serve(async (req) => {
       const subMeta = subscription.metadata;
 
       if (subMeta?.type?.startsWith("wavacademy_")) {
-        const discordUserId = subMeta.discord_user_id;
         const discordRoleEnv = subMeta.discord_role_env;
 
         console.log(`WavAcademy subscription cancelled: ${subscription.id}`);
+
+        // Look up the actual Discord user id (filled in at claim time, not in metadata)
+        const { data: subRow } = await supabase
+          .from("wavacademy_subscriptions")
+          .select("discord_user_id, discord_role_env")
+          .eq("stripe_subscription_id", subscription.id)
+          .maybeSingle();
 
         // Update DB
         await supabase
@@ -142,8 +178,10 @@ serve(async (req) => {
           .eq("stripe_subscription_id", subscription.id);
 
         // Revoke Discord role
-        if (discordUserId && discordRoleEnv) {
-          await assignDiscordRole(discordUserId, discordRoleEnv, "revoke");
+        const userId = subRow?.discord_user_id;
+        const roleEnv = subRow?.discord_role_env || discordRoleEnv;
+        if (userId && roleEnv) {
+          await assignDiscordRole(userId, roleEnv, "revoke");
         }
 
         await notifySuccess("WavAcademy", `Résiliation abonnement • ${subscription.id}`);

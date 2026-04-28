@@ -42,18 +42,19 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 type Plan = "acces" | "live";
 
 const checkoutSchema = z.object({
   email: z.string().trim().email("Email invalide"),
-  discord_user_id: z
-    .string()
-    .trim()
-    .min(17, "L'ID Discord doit contenir au moins 17 chiffres")
-    .max(21, "ID Discord invalide")
-    .regex(/^\d+$/, "L'ID Discord ne contient que des chiffres"),
+  consent_cgv: z.literal(true, {
+    errorMap: () => ({ message: "Tu dois accepter les CGV pour continuer" }),
+  }),
+  consent_renonciation: z.literal(true, {
+    errorMap: () => ({ message: "La renonciation au droit de rétractation est requise pour un accès immédiat" }),
+  }),
 });
 type CheckoutForm = z.infer<typeof checkoutSchema>;
 
@@ -198,7 +199,12 @@ export default function WavAcademy() {
 
   const form = useForm<CheckoutForm>({
     resolver: zodResolver(checkoutSchema),
-    defaultValues: { email: "", discord_user_id: "" },
+    defaultValues: {
+      email: "",
+      consent_cgv: false as unknown as true,
+      consent_renonciation: false as unknown as true,
+    },
+    mode: "onChange",
   });
 
   const openPlanDialog = (plan: Plan) => {
@@ -220,7 +226,9 @@ export default function WavAcademy() {
         body: {
           plan: selectedPlan,
           email: data.email,
-          discord_user_id: data.discord_user_id,
+          consent_cgv: data.consent_cgv,
+          consent_renonciation: data.consent_renonciation,
+          consent_timestamp: new Date().toISOString(),
         },
       });
 
@@ -249,21 +257,15 @@ export default function WavAcademy() {
           <div className="max-w-xl mx-auto text-center">
             <CheckCircle2 className="h-16 w-16 text-primary mx-auto mb-6" />
             <h2 className="font-display text-3xl md:text-4xl font-semibold mb-4">
-              Bienvenue dans le Wav Academy !
+              Paiement confirmé !
             </h2>
             <p className="text-lg text-muted-foreground mb-4">
-              Ton abonnement est confirmé. Ton accès Discord sera activé dans les prochaines minutes — vérifie tes notifications Discord.
+              Vérifie ta boîte mail — un email avec ton lien d'activation Discord vient d'être envoyé.
             </p>
             <p className="text-muted-foreground mb-8">
-              En attendant, prépare le lien de ta dernière vidéo TikTok. Ton premier diagnostic t'attend.
+              Tu auras juste à te connecter avec ton compte Discord, et ton rôle sera attribué automatiquement. Le lien est valable 7 jours.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="hero" size="xl" asChild>
-                <a href="https://discord.gg/YJx4qr6RaE" target="_blank" rel="noopener noreferrer">
-                  Rejoindre le Discord
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </a>
-              </Button>
               <Button variant="outline" size="xl" asChild>
                 <Link to="/">Retour à l'accueil</Link>
               </Button>
@@ -881,23 +883,55 @@ export default function WavAcademy() {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="discord_user_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Ton ID Discord *</FormLabel>
-                    <FormControl>
-                      <Input type="text" placeholder="123456789012345678" {...field} />
-                    </FormControl>
-                    <p className="text-xs text-muted-foreground mt-1.5 leading-snug">
-                      Nécessaire pour activer ton rôle Discord automatiquement après le paiement.{" "}
-                      <strong>Comment le trouver&nbsp;:</strong> ouvre Discord → Paramètres utilisateur → Avancé → active "Mode développeur" → reviens sur ton profil → clic droit → "Copier l'identifiant".
-                    </p>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="space-y-3 rounded-md border border-border/60 bg-muted/30 p-4">
+                <FormField
+                  control={form.control}
+                  name="consent_cgv"
+                  render={({ field }) => (
+                    <FormItem className="flex items-start gap-3 space-y-0">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value === true}
+                          onCheckedChange={(v) => field.onChange(v === true)}
+                          className="mt-0.5"
+                        />
+                      </FormControl>
+                      <div className="flex-1">
+                        <FormLabel className="text-sm font-normal leading-snug cursor-pointer">
+                          J'accepte les{" "}
+                          <Link to="/cgv" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">
+                            Conditions Générales de Vente
+                          </Link>
+                          .
+                        </FormLabel>
+                        <FormMessage className="mt-1" />
+                      </div>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="consent_renonciation"
+                  render={({ field }) => (
+                    <FormItem className="flex items-start gap-3 space-y-0">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value === true}
+                          onCheckedChange={(v) => field.onChange(v === true)}
+                          className="mt-0.5"
+                        />
+                      </FormControl>
+                      <div className="flex-1">
+                        <FormLabel className="text-sm font-normal leading-snug cursor-pointer">
+                          Je souhaite démarrer immédiatement et renonce expressément à mon droit de rétractation de 14 jours, conformément à l'article L221-28 du Code de la consommation.
+                        </FormLabel>
+                        <FormMessage className="mt-1" />
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <div className="pt-2">
                 <Button
@@ -905,7 +939,7 @@ export default function WavAcademy() {
                   variant="hero"
                   size="lg"
                   className="w-full"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !form.formState.isValid}
                 >
                   {isSubmitting ? (
                     <>

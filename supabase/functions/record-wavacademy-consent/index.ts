@@ -16,6 +16,7 @@ const PAYMENT_LINKS: Record<string, string> = {
 };
 
 const CGV_VERSION = "v1"; // bump if /cgv text materially changes
+//bump
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {

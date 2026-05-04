@@ -62,3 +62,9 @@ verify_jwt = false
 
 [functions.mailerlite-subscribe]
 verify_jwt = false
+
+[functions.express-analysis-status]
+verify_jwt = false
+
+[functions.reconcile-express-analyses]
+verify_jwt = false

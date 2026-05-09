@@ -76,51 +76,47 @@ serve(async (req) => {
       throw new Error("Paiement non confirmé");
     }
 
-    username = session.metadata?.tiktok_username;
-    if (!username) throw new Error("Username TikTok introuvable dans la session");
+    // ── 1. Résoudre la ligne express_analyses ──
+    // Soit déjà liée à cette session Stripe (retry), soit via client_reference_id
+    // posé par create-express-checkout sur le Payment Link.
+    let row: any = null;
+    {
+      const { data: bySession } = await supabase
+        .from("express_analyses")
+        .select("id, tiktok_username, email, newsletter_requested, job_id")
+        .eq("stripe_session_id", session_id)
+        .maybeSingle();
+      row = bySession ?? null;
+    }
+    if (!row && session.client_reference_id) {
+      const { data: byRef } = await supabase
+        .from("express_analyses")
+        .select("id, tiktok_username, email, newsletter_requested, job_id")
+        .eq("id", session.client_reference_id)
+        .maybeSingle();
+      row = byRef ?? null;
+      if (row) {
+        // Lie définitivement la session Stripe à cette ligne d'intention.
+        await supabase
+          .from("express_analyses")
+          .update({ stripe_session_id: session_id })
+          .eq("id", row.id);
+      }
+    }
+    if (!row) throw new Error("Intention d'analyse introuvable pour cette session");
 
-    customerEmail = session.metadata?.email || session.customer_email || null;
-    wantsNewsletter = session.metadata?.subscribe_newsletter === "true";
+    analysisId = row.id;
+    username = row.tiktok_username;
+    customerEmail = row.email || session.customer_details?.email || null;
+    wantsNewsletter = row.newsletter_requested === true;
 
-    const existingJobId = session.metadata?.job_id;
-    if (existingJobId) {
-      console.log(`Returning existing job_id ${existingJobId} for session ${session_id}`);
-      return new Response(JSON.stringify({ username, job_id: existingJobId, status: "processing" }), {
+    // Idempotence: si on a déjà lancé l'analyse, on retourne le job_id existant.
+    if (row.job_id) {
+      console.log(`Returning existing job_id ${row.job_id} for session ${session_id}`);
+      return new Response(JSON.stringify({ username, job_id: row.job_id, status: "processing" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
       });
-    }
-
-    // ── 1. Insert express_analyses row EARLY (status=pending) ──
-    // This guarantees the email + username are saved even if the API call below fails,
-    // so the admin can manually retry the analysis or contact the customer.
-    try {
-      const { data: insertData, error: insertError } = await supabase
-        .from("express_analyses")
-        .insert({
-          stripe_session_id: session_id,
-          tiktok_username: username,
-          status: "pending",
-          email: customerEmail,
-          newsletter_requested: wantsNewsletter,
-        })
-        .select("id")
-        .single();
-
-      if (insertError) {
-        // Could be a duplicate (idempotent retry) — try to fetch existing row
-        console.warn("Insert failed, attempting to find existing row:", insertError.message);
-        const { data: existing } = await supabase
-          .from("express_analyses")
-          .select("id")
-          .eq("stripe_session_id", session_id)
-          .maybeSingle();
-        analysisId = existing?.id ?? null;
-      } else {
-        analysisId = insertData.id;
-      }
-    } catch (dbErr) {
-      console.warn("Failed to insert express_analyses record (early):", dbErr);
     }
 
     // ── 2. Trigger newsletter subscription right away (don't wait for analysis) ──
@@ -169,14 +165,6 @@ serve(async (req) => {
           .eq("id", analysisId);
       }
       throw new Error("job_id non retourné par l'API");
-    }
-
-    try {
-      await stripe.checkout.sessions.update(session_id, {
-        metadata: { ...session.metadata, job_id: jobId },
-      });
-    } catch (updateErr) {
-      console.warn("Failed to update Stripe session metadata with job_id:", updateErr);
     }
 
     // ── 4. Update DB row with job_id + status=processing ──

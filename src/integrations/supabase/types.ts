@@ -474,7 +474,7 @@ export type Database = {
           newsletter_subscribed: boolean | null
           result_data: Json | null
           status: string
-          stripe_session_id: string
+          stripe_session_id: string | null
           tiktok_username: string
         }
         Insert: {
@@ -489,7 +489,7 @@ export type Database = {
           newsletter_subscribed?: boolean | null
           result_data?: Json | null
           status?: string
-          stripe_session_id: string
+          stripe_session_id?: string | null
           tiktok_username: string
         }
         Update: {
@@ -504,7 +504,7 @@ export type Database = {
           newsletter_subscribed?: boolean | null
           result_data?: Json | null
           status?: string
-          stripe_session_id?: string
+          stripe_session_id?: string | null
           tiktok_username?: string
         }
         Relationships: []

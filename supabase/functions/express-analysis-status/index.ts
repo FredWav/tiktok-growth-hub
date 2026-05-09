@@ -111,8 +111,16 @@ serve(async (req) => {
     const session = await stripe.checkout.sessions.retrieve(session_id);
     if (session.payment_status !== "paid") throw new Error("Paiement non confirmé");
 
-    const username = session.metadata?.tiktok_username;
-    if (!username) throw new Error("Username TikTok introuvable dans la session");
+    // Le username vient maintenant de la table express_analyses (Payment Link
+    // ne supporte pas la metadata par-session côté création).
+    const supabaseLookup = getSupabase();
+    const { data: lookupRow } = await supabaseLookup
+      .from("express_analyses")
+      .select("tiktok_username")
+      .eq("stripe_session_id", session_id)
+      .maybeSingle();
+    const username = lookupRow?.tiktok_username as string | undefined;
+    if (!username) throw new Error("Username TikTok introuvable pour cette session");
 
     const apiKey = Deno.env.get("WAV_SOCIAL_SCAN_API_KEY");
     if (!apiKey) throw new Error("Clé API WavSocialScan non configurée");

@@ -145,7 +145,7 @@ export default function Home() {
     <Layout>
       <WavSocialScanPopup />
       <ExitIntentPopup />
-      <SEOHead title="Fred Wav - Expert Stratégie Formats Courts | Coaching et Accompagnement" description="Transforme tes réseaux en machine à clients. Stratégie de contenu, coaching intensif 45 jours et plan d'action avec Fred Wav, expert formats courts." path="/" keywords="stratégie formats courts, coaching réseaux sociaux, expert formats courts, wav premium, Fred Wav, monétiser contenu, accompagnement créateur" schema={[
+      <SEOHead title="Fred Wav — Expert Stratégie Formats Courts" description="Transforme tes réseaux en machine à clients. Stratégie de contenu, coaching intensif 45 jours et plan d'action avec Fred Wav, expert formats courts." path="/" keywords="stratégie formats courts, coaching réseaux sociaux, expert formats courts, wav premium, Fred Wav, monétiser contenu, accompagnement créateur" schema={[
         {
           "@context": "https://schema.org",
           "@type": "FAQPage",

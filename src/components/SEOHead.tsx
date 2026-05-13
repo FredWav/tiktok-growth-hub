@@ -40,7 +40,7 @@ export function SEOHead({ title, description, path, keywords, noindex, schema }:
     setMeta("twitter:title", title);
     setMeta("twitter:description", description);
     setMeta("twitter:site", "@FredWav");
-    setMeta("twitter:image", "https://lovable.dev/opengraph-image-p98pqg.png");
+    setMeta("twitter:image", "https://fredwav.com/og-image.png");
 
     // Canonical
     let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;

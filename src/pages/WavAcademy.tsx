@@ -16,9 +16,9 @@ import {
   RefreshCw,
   Clock,
   Loader2,
-  ChevronDown,
 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
+import { VideoCard } from "@/components/VideoCard";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -284,37 +284,39 @@ export default function WavAcademy() {
         keywords="wav club, diagnostic tiktok, wavsocialscan, contenu stratégique, formats courts"
       />
 
-      {/* ── HERO ─────────────────────────────────────────────────────────── */}
+      {/* ── HERO (VSL) ───────────────────────────────────────────────────── */}
       <Section variant="cream" size="xl">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary border border-primary/20 rounded-full px-4 py-1.5 text-sm font-medium mb-8">
             <Radio className="h-3.5 w-3.5" />
             Wav Academy — Accès ouvert maintenant
           </div>
-          <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight mb-6">
-            J'ai arrêté de poster tous les jours.{" "}
-            <span className="text-gold-gradient">Mon premier client est arrivé en DM</span>{" "}
-            trois semaines plus tard.
+          <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight mb-8">
+            <span className="text-gold-gradient">Wav Academy</span>
           </h1>
-          <p className="text-xl md:text-2xl text-muted-foreground mb-4 max-w-3xl mx-auto leading-relaxed">
-            Pas grâce à une vidéo virale. Grâce à une vidéo à <strong>843 vues</strong>.
-          </p>
-          <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
-            La différence entre un créateur qui cumule les vues et un créateur qui signe des clients&nbsp;?
-            Le second sait exactement <strong>quoi mesurer</strong> après chaque vidéo.
-          </p>
+          <div className="max-w-3xl mx-auto mb-10">
+            <VideoCard
+              id="MfqFnAi-wfg"
+              alt="Wav Academy — Présentation par Fred Wav"
+              location="wavacademy_vsl"
+            />
+          </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="hero" size="xl" onClick={scrollToPlans}>
-              Rejoindre le Wav Academy
+            <Button variant="hero" size="xl" onClick={() => openPlanDialog("acces")}>
+              Rejoindre Accès — 39€/mois
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            <Button variant="outline" size="xl" asChild>
-              <a href="#produit">
-                Voir comment ça marche
-                <ChevronDown className="ml-2 h-4 w-4" />
-              </a>
+            <Button variant="hero" size="xl" onClick={() => openPlanDialog("live")}>
+              Rejoindre Live — 97€/mois
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
+          <button
+            onClick={scrollToPlans}
+            className="mt-6 text-sm text-muted-foreground underline-offset-4 hover:underline"
+          >
+            Voir tous les plans et détails ↓
+          </button>
         </div>
       </Section>
 

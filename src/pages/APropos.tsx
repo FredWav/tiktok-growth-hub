@@ -34,12 +34,42 @@ const values = [
   },
 ];
 
+// Stats qui évoluent automatiquement avec le temps.
+// Pour ajuster, changer uniquement les constantes ci-dessous.
+const BIRTH_YEAR = 1991;          // Fred a 35 ans en 2026
+const VIDEO_START_YEAR = 2007;    // 19 ans d'expérience en 2026
+const MUSIC_START_YEAR = 2005;    // 21 ans en 2026
+const SOUND_START_YEAR = 2013;    // 13 ans en 2026
+
+// Référence cumul d'abonnés + croissance estimée par mois.
+// Arrondi à la dizaine de milliers inférieure pour ne pas survendre.
+const SUBS_REF_DATE = new Date(2026, 4, 1); // 1er mai 2026
+const SUBS_REF_VALUE = 330_000;
+const SUBS_GROWTH_PER_MONTH = 5_000;
+
+const yearsSince = (startYear: number) =>
+  new Date().getFullYear() - startYear;
+
+const currentAge = () => yearsSince(BIRTH_YEAR);
+
+const cumulatedSubsLabel = () => {
+  const now = new Date();
+  const monthsElapsed =
+    (now.getFullYear() - SUBS_REF_DATE.getFullYear()) * 12 +
+    (now.getMonth() - SUBS_REF_DATE.getMonth());
+  const total =
+    SUBS_REF_VALUE + Math.max(0, monthsElapsed) * SUBS_GROWTH_PER_MONTH;
+  // Arrondi à la dizaine de milliers inférieure (330K, 340K, 350K…)
+  const roundedK = Math.floor(total / 10_000) * 10;
+  return `${roundedK}K`;
+};
+
 const stats = [
   { value: "300+", label: "Créateurs accompagnés" },
   { value: "10M+", label: "Vues générées via stratégies déployées" },
-  { value: "18 ans", label: "D'expérience en création vidéo" },
-  { value: "20 ans", label: "Dans la musique et la création artistique" },
-  { value: "280K", label: "Abonnés cumulés" },
+  { value: `${yearsSince(VIDEO_START_YEAR)} ans`, label: "D'expérience en création vidéo" },
+  { value: `${yearsSince(MUSIC_START_YEAR)} ans`, label: "Dans la musique et la création artistique" },
+  { value: cumulatedSubsLabel(), label: "Abonnés cumulés" },
   { value: "35K", label: "Abonnés Instagram" },
   { value: "30K", label: "Abonnés YouTube" },
   { value: "95%", label: "Taux de satisfaction" },
@@ -48,13 +78,13 @@ const stats = [
 export default function APropos() {
   return (
     <Layout>
-      <SEOHead title="À propos de Fred Wav | Expert Stratégie Formats Courts" description="18 ans d'expérience vidéo, 300+ créateurs accompagnés, 10M+ vues générées. Découvre le parcours et la méthode." path="/a-propos" keywords="Fred Wav, expert formats courts, parcours, méthode data-driven, accompagnement créateur" schema={{
+      <SEOHead title="À propos de Fred Wav | Expert Stratégie Formats Courts" description={`${yearsSince(VIDEO_START_YEAR)} ans d'expérience vidéo, 300+ créateurs accompagnés, 10M+ vues générées. Découvre le parcours et la méthode.`} path="/a-propos" keywords="Fred Wav, expert formats courts, parcours, méthode data-driven, accompagnement créateur" schema={{
         "@context": "https://schema.org",
         "@type": "Person",
         "name": "Fred Wav",
         "jobTitle": "Expert Stratégie Formats Courts",
         "url": "https://fredwav.com/a-propos",
-        "description": "Stratégiste en contenu et formats courts. 18 ans d'expérience vidéo, 300+ créateurs accompagnés, 10M+ vues générées.",
+        "description": `Stratégiste en contenu et formats courts. ${yearsSince(VIDEO_START_YEAR)} ans d'expérience vidéo, 300+ créateurs accompagnés, 10M+ vues générées.`,
         "knowsAbout": ["Stratégie formats courts", "Marketing vidéo", "Hook engineering", "Réseaux sociaux", "Croissance organique"],
         "sameAs": ["https://www.tiktok.com/@fredwav", "https://www.instagram.com/levraifredwav/", "https://www.youtube.com/@Fredwavconseils"],
       }} />
@@ -110,12 +140,12 @@ export default function APropos() {
           <blockquote className="border-l-4 border-primary/30 pl-6 space-y-6 text-muted-foreground text-lg">
             <p>
               Je n'ai pas commencé avec les formats courts.<br />
-              Mes premières vidéos remontent à mes 16 ans. J'en ai 35 cette année.
+              Mes premières vidéos remontent à mes 16 ans. J'en ai {currentAge()} cette année.
             </p>
             <p>
-              Ça fait <span className="text-foreground font-semibold">18 ans</span> que je filme, monte, expérimente.<br />
-              <span className="text-foreground font-semibold">20 ans</span> que je fais de la musique.<br />
-              <span className="text-foreground font-semibold">13 ans</span> que je travaille le son, l'enregistrement et la technique.
+              Ça fait <span className="text-foreground font-semibold">{yearsSince(VIDEO_START_YEAR)} ans</span> que je filme, monte, expérimente.<br />
+              <span className="text-foreground font-semibold">{yearsSince(MUSIC_START_YEAR)} ans</span> que je fais de la musique.<br />
+              <span className="text-foreground font-semibold">{yearsSince(SOUND_START_YEAR)} ans</span> que je travaille le son, l'enregistrement et la technique.
             </p>
             <p>
               Les formats courts n'ont été qu'un terrain d'application supplémentaire.

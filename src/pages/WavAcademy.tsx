@@ -79,6 +79,14 @@ const plans = {
   },
 };
 
+// ── Stats dynamiques ───────────────────────────────────────────────────────
+// Les années évoluent automatiquement avec le temps. Ajuster les années de
+// départ ici pour modifier les chiffres affichés sur toutes les sections.
+const AUDIOVISUAL_START_YEAR = 2006; // 20 ans en 2026
+const SHORT_FORMATS_START_YEAR = 2020; // 6 ans en 2026
+const yearsSince = (startYear: number) =>
+  new Date().getFullYear() - startYear;
+
 // ── Proof strip ────────────────────────────────────────────────────────────
 const proofItems = [
   "Diagnostic IA instantané",
@@ -454,10 +462,14 @@ export default function WavAcademy() {
       {/* ── CREDIBILITY ──────────────────────────────────────────────────── */}
       <Section variant="default" size="md">
         <div className="max-w-3xl mx-auto">
-          <div className="grid sm:grid-cols-3 gap-6 text-center mb-10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center mb-10">
             <div className="p-6 rounded-2xl bg-accent/40 border border-border">
-              <p className="font-display text-4xl font-bold text-primary mb-2">20 ans</p>
-              <p className="text-muted-foreground text-sm">d'expérience formats courts</p>
+              <p className="font-display text-4xl font-bold text-primary mb-2">{yearsSince(AUDIOVISUAL_START_YEAR)} ans</p>
+              <p className="text-muted-foreground text-sm">d'expérience dans l'audiovisuel</p>
+            </div>
+            <div className="p-6 rounded-2xl bg-accent/40 border border-border">
+              <p className="font-display text-4xl font-bold text-primary mb-2">{yearsSince(SHORT_FORMATS_START_YEAR)} ans</p>
+              <p className="text-muted-foreground text-sm">sur les formats courts</p>
             </div>
             <div className="p-6 rounded-2xl bg-accent/40 border border-border">
               <p className="font-display text-4xl font-bold text-primary mb-2">250+</p>

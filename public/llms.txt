@@ -1,0 +1,43 @@
+# Fred Wav
+
+> Expert stratégie TikTok - On ne poste pas pour exister, on poste pour convertir. Accompagnement premium pour créateurs et marques qui veulent performer sur TikTok.
+
+## Pages principales
+
+- [Accueil](/): Landing page principale avec présentation des offres, témoignages et appel à l'action.
+- [À propos](/a-propos): Présentation de Fred Wav, son parcours et sa philosophie sur la création de contenu.
+- [Témoignages](/preuves): Avant/Après, résultats clients et preuves sociales (vidéos, screenshots).
+- [Contact](/contact): Formulaire de contact pour toute demande.
+- [Réserver un appel](/reserverunappel): Page de prise de rendez-vous pour discuter d'un accompagnement.
+- [Diagnostic gratuit](/start): Funnel de 7 questions pour évaluer ta maturité TikTok et découvrir l'offre adaptée.
+
+## Offres et services
+
+- [Analyse Express](/analyse-express): Audit TikTok automatisé (score de santé, meilleures heures, hashtags, régularité) basé sur ton profil.
+- [Wav Academy](/wavacademy): Programme de formation TikTok avec 3 niveaux (Accès, Live, Elite) incluant accès Discord et coaching.
+- [Offres](/offres): Redirection vers les différentes offres d'accompagnement.
+- [45 Jours](/45-jours): Redirection vers la page de réservation pour l'offre d'accompagnement Wav Premium.
+- [One Shot](/one-shot): Redirection vers la page de réservation pour le coaching One Shot.
+
+## Ressources et contenu
+
+- [Newsletter](/newsletter): Inscription à la newsletter stratégie TikTok.
+- [Deep Links](/go/:slug): Redirections intelligentes vers les vidéos YouTube (ouverture forcée dans l'application native).
+- [Réclamation Wav Academy](/claim/:token): Page de réclamation pour les membres Wav Academy avec attribution de rôle Discord.
+
+## Pages légales
+
+- [Conditions Générales de Vente](/cgv): CGV du site.
+- [Mentions légales](/mentions-legales): Informations légales de l'entreprise (Fred Wav - SIRET 953 718 405 00010).
+- [Politique de confidentialité](/politique-de-confidentialite): Politique de gestion des données personnelles et cookies.
+
+## Connexion et compte
+
+- [Authentification](/auth): Page de connexion et inscription.
+- [Réinitialisation mot de passe](/auth/reset-password): Réinitialisation du mot de passe.
+
+## Optional
+
+- [Résultat Analyse Express](/analyse-express/result): Page de résultat de l'audit TikTok (accès après analyse).
+- [Traitement diagnostic](/processing): Écran de chargement pendant l'analyse du diagnostic.
+- [Résultat diagnostic](/result): Page de résultat du diagnostic avec recommandation d'offre personnalisée.

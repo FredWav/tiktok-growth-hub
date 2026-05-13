@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle2, Mail, Clock } from "lucide-react";
+import { ArrowRight, CheckCircle2, Mail, Clock, Sparkles } from "lucide-react";
 import { trackEvent, getStoredUtmSource } from "@/lib/tracking";
 import { trackPostHogEvent, identifyUser, getPostHogId } from "@/lib/posthog";
 import { Layout } from "@/components/layout/Layout";
@@ -71,6 +71,7 @@ type ContactForm = z.infer<typeof contactSchema>;
 
 export default function ReserverUnAppel() {
   const [submitted, setSubmitted] = useState(false);
+  const [redirectToAcademy, setRedirectToAcademy] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formStarted, setFormStarted] = useState(false);
 
@@ -99,6 +100,14 @@ export default function ReserverUnAppel() {
   };
 
   const onSubmit = async (data: ContactForm) => {
+    // Budget trop bas pour un accompagnement personnalisé : on redirige vers Wav Academy.
+    if (data.budget === "10_a_100") {
+      trackPostHogEvent("reserverunappel_redirect_academy", { budget: data.budget });
+      identifyUser(data.email, { first_name: data.first_name, last_name: data.last_name });
+      setRedirectToAcademy(true);
+      return;
+    }
+
     setIsSubmitting(true);
     trackEvent("reserverunappel_submit", { level: data.current_level });
     identifyUser(data.email, { first_name: data.first_name, last_name: data.last_name });
@@ -154,6 +163,50 @@ export default function ReserverUnAppel() {
       setIsSubmitting(false);
     }
   };
+
+  if (redirectToAcademy) {
+    return (
+      <Layout>
+        <SEOHead
+          title="La Wav Academy est faite pour toi | Fred Wav"
+          description="Ton budget colle parfaitement avec la Wav Academy : la méthode complète et la communauté à partir de 39€/mois."
+          path="/reserverunappel"
+        />
+        <Section variant="cream" size="lg">
+          <div className="max-w-xl mx-auto text-center">
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
+              <Sparkles className="h-8 w-8 text-primary" />
+            </div>
+            <h2 className="font-display text-3xl md:text-4xl font-semibold mb-4">
+              La <span className="text-gold-gradient">Wav Academy</span> est faite pour toi.
+            </h2>
+            <p className="text-lg text-muted-foreground mb-4">
+              Avec ton budget, un accompagnement personnalisé avec moi n'est pas la bonne option — ce serait te survendre quelque chose qui ne te correspond pas.
+            </p>
+            <p className="text-lg text-muted-foreground mb-8">
+              Mais la <strong>Wav Academy</strong> te donne accès à toute ma méthode, au diagnostic continu et à la communauté à partir de <strong>39€/mois</strong>. C'est exactement ce qu'il te faut pour démarrer.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button variant="hero" size="xl" asChild>
+                <Link
+                  to="/wavacademy"
+                  onClick={() => trackPostHogEvent("reserverunappel_click_academy_cta")}
+                >
+                  Découvrir Wav Academy
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button variant="outline" size="xl" asChild>
+                <Link to="/" onClick={() => trackPostHogEvent("click_home_post_redirect_academy")}>
+                  Retour à l'accueil
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </Section>
+      </Layout>
+    );
+  }
 
   if (submitted) {
     return (
@@ -395,9 +448,9 @@ export default function ReserverUnAppel() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="moins_de_299">- de 299€</SelectItem>
-                        <SelectItem value="300_a_800">De 300 à 800€</SelectItem>
-                        <SelectItem value="plus_de_1000">+ de 1000€</SelectItem>
+                        <SelectItem value="10_a_100">De 10€ à 100€</SelectItem>
+                        <SelectItem value="100_a_300">De 100€ à 300€</SelectItem>
+                        <SelectItem value="1000_plus">1000€ et +</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

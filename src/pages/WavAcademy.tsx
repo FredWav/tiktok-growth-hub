@@ -184,7 +184,7 @@ const comparisonFeatures: { label: string; acces: FeatureValue; live: FeatureVal
 // ── Render feature cell ────────────────────────────────────────────────────
 function FeatureCell({ value }: { value: FeatureValue }) {
   if (value === true) return <Check className="h-5 w-5 text-primary mx-auto" />;
-  if (value === false) return <X className="h-4 w-4 text-muted-foreground/40 mx-auto" />;
+  if (value === false) return <X className="h-4 w-4 text-muted-foreground mx-auto" />;
   return <span className="text-sm font-medium text-foreground">{value}</span>;
 }
 
@@ -586,7 +586,7 @@ export default function WavAcademy() {
                 "Discord premium",
                 "Coaching individuel",
               ].map((f) => (
-                <li key={f} className="flex items-start gap-3 text-sm text-muted-foreground/50">
+                <li key={f} className="flex items-start gap-3 text-sm text-muted-foreground">
                   <X className="h-4 w-4 flex-shrink-0 mt-0.5" />
                   <span>{f}</span>
                 </li>
@@ -645,7 +645,7 @@ export default function WavAcademy() {
                 "Accès WhatsApp direct",
                 "Accompagnement push",
               ].map((f) => (
-                <li key={f} className="flex items-start gap-3 text-sm text-muted-foreground/50">
+                <li key={f} className="flex items-start gap-3 text-sm text-muted-foreground">
                   <X className="h-4 w-4 flex-shrink-0 mt-0.5" />
                   <span>{f}</span>
                 </li>

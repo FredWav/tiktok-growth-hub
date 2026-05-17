@@ -186,23 +186,6 @@ const DiagnosticStart = () => {
       7,
       true
     );
-    // Notification with response logging
-    const notifyPayload = {
-      first_name: data.firstName,
-      email: data.email,
-      tiktok: data.tiktokUrl,
-      level: data.audience,
-      objective: data.objectif,
-      blocker: data.blocage,
-      budget: data.budget,
-      temps: data.temps,
-      recommended_offer: recommendedOffer,
-    };
-    console.log("[Diagnostic] notify-diagnostic payload:", notifyPayload);
-    supabase.functions.invoke("notify-diagnostic", { body: notifyPayload }).then(
-      (res) => console.log("[Diagnostic] notify-diagnostic response:", res),
-      (err) => console.error("[Diagnostic] notify-diagnostic error:", err)
-    );
     sessionStorage.setItem("from_diagnostic", "true");
     console.log("[Diagnostic] Navigating to /processing");
     navigate("/processing");

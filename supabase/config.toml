@@ -3,9 +3,6 @@ project_id = "rdpykyvqcckxpygwblxf"
 [functions.admin-assistant]
 verify_jwt = false
 
-[functions.invite-client]
-verify_jwt = false
-
 [functions.setup-admin]
 verify_jwt = false
 
@@ -46,9 +43,6 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.check-express-job]
-verify_jwt = false
-
-[functions.notify-diagnostic]
 verify_jwt = false
 
 [functions.manual-express-analysis]

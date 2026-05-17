@@ -51,27 +51,13 @@ const WavAcademy = lazy(() => import("./pages/WavAcademy"));
 const Claim = lazy(() => import("./pages/Claim"));
 
 // Admin pages - lazy loaded
-const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
-const AdminClients = lazy(() => import("./pages/admin/Clients"));
-const AdminClientNew = lazy(() => import("./pages/admin/ClientNew"));
-const AdminClientDetail = lazy(() => import("./pages/admin/ClientDetail"));
-const AdminSessions = lazy(() => import("./pages/admin/Sessions"));
-const AdminDeliverables = lazy(() => import("./pages/admin/Deliverables"));
-const AdminTemplates = lazy(() => import("./pages/admin/Templates"));
 const AdminSettings = lazy(() => import("./pages/admin/Settings"));
 const AdminExpressAnalyses = lazy(() => import("./pages/admin/ExpressAnalyses"));
 const AdminApplications = lazy(() => import("./pages/admin/Applications"));
-const AdminDiagnostics = lazy(() => import("./pages/admin/Diagnostics"));
 const AdminMarketing = lazy(() => import("./pages/admin/Marketing"));
 const AdminDeepLinks = lazy(() => import("./pages/admin/DeepLinks"));
 const AdminTestimonials = lazy(() => import("./pages/admin/Testimonials"));
 const GoRedirect = lazy(() => import("./pages/GoRedirect"));
-
-// Client pages - lazy loaded
-const ClientDashboard = lazy(() => import("./pages/client/ClientDashboard"));
-const ClientPlan = lazy(() => import("./pages/client/ClientPlan"));
-const ClientDeliverables = lazy(() => import("./pages/client/ClientDeliverables"));
-const ClientSessions = lazy(() => import("./pages/client/ClientSessions"));
 
 const queryClient = new QueryClient();
 
@@ -124,62 +110,7 @@ const App = () => (
             <Route path="/result" element={<DiagnosticResult />} />
 
             {/* Admin routes */}
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <AdminDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/clients"
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <AdminClients />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/clients/new"
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <AdminClientNew />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/clients/:id"
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <AdminClientDetail />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/sessions"
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <AdminSessions />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/deliverables"
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <AdminDeliverables />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/templates"
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <AdminTemplates />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/admin" element={<Navigate to="/admin/marketing" replace />} />
             <Route
               path="/admin/settings"
               element={
@@ -196,20 +127,11 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
-
             <Route
               path="/admin/applications"
               element={
                 <ProtectedRoute requiredRole="admin">
                   <AdminApplications />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/diagnostics"
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <AdminDiagnostics />
                 </ProtectedRoute>
               }
             />
@@ -234,40 +156,6 @@ const App = () => (
               element={
                 <ProtectedRoute requiredRole="admin">
                   <AdminTestimonials />
-                </ProtectedRoute>
-              }
-            />
-
-            {/* Client routes */}
-            <Route
-              path="/app"
-              element={
-                <ProtectedRoute requiredRole="client">
-                  <ClientDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/app/plan"
-              element={
-                <ProtectedRoute requiredRole="client">
-                  <ClientPlan />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/app/deliverables"
-              element={
-                <ProtectedRoute requiredRole="client">
-                  <ClientDeliverables />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/app/sessions"
-              element={
-                <ProtectedRoute requiredRole="client">
-                  <ClientSessions />
                 </ProtectedRoute>
               }
             />

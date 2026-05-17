@@ -3,18 +3,12 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
-  LayoutDashboard,
-  Users,
-  Calendar,
-  FileText,
-  Mail,
   Settings,
   LogOut,
   Menu,
   X,
   Zap,
   ClipboardList,
-  Stethoscope,
   BarChart3,
   Star,
   Link as LinkIcon,
@@ -27,14 +21,8 @@ interface AdminLayoutProps {
 }
 
 const navItems = [
-  { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { label: "Clients", href: "/admin/clients", icon: Users },
-  { label: "Sessions", href: "/admin/sessions", icon: Calendar },
-  { label: "Livrables", href: "/admin/deliverables", icon: FileText },
-  { label: "Templates", href: "/admin/templates", icon: Mail },
   { label: "Analyses Express", href: "/admin/analyses", icon: Zap },
   { label: "Candidatures", href: "/admin/applications", icon: ClipboardList },
-  { label: "Diagnostics", href: "/admin/diagnostics", icon: Stethoscope },
   { label: "Marketing", href: "/admin/marketing", icon: BarChart3 },
   { label: "Deep Links", href: "/admin/deep-links", icon: LinkIcon },
   { label: "Témoignages", href: "/admin/testimonials", icon: Star },

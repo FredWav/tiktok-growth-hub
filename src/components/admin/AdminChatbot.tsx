@@ -63,20 +63,20 @@ export const AdminChatbot: React.FC = () => {
               </div>
               <h3 className="font-semibold text-lg mb-2">Bonjour !</h3>
               <p className="text-muted-foreground text-sm mb-6">
-                Je suis ton assistant. Je peux t'aider à gérer tes clients, rendez-vous et tâches.
+                Je suis ton assistant. Je peux lire tes leads, analyses express, candidatures, stats marketing et revenus.
               </p>
               <div className="space-y-2 w-full max-w-xs">
-                <SuggestionButton onClick={() => sendMessage("Montre-moi mes clients actifs")}>
-                  Voir mes clients actifs
+                <SuggestionButton onClick={() => sendMessage("Combien de candidatures Wav Premium cette semaine ?")}>
+                  Candidatures de la semaine
                 </SuggestionButton>
-                <SuggestionButton onClick={() => sendMessage("Quels sont mes prochains RDV ?")}>
-                  Prochains rendez-vous
+                <SuggestionButton onClick={() => sendMessage("Montre-moi les derniers leads diagnostic")}>
+                  Derniers leads diagnostic
                 </SuggestionButton>
-                <SuggestionButton onClick={() => sendMessage("Combien de tâches en retard ?")}>
-                  Tâches en retard
+                <SuggestionButton onClick={() => sendMessage("Quelles sont mes meilleures sources de trafic sur 30 jours ?")}>
+                  Top sources de trafic
                 </SuggestionButton>
-                <SuggestionButton onClick={() => sendMessage("Montre-moi les stats du dashboard")}>
-                  Stats du dashboard
+                <SuggestionButton onClick={() => sendMessage("Revenus du mois en cours")}>
+                  Revenus du mois
                 </SuggestionButton>
               </div>
             </div>

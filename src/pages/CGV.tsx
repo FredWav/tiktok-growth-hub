@@ -9,7 +9,7 @@ export default function CGV() {
       <Section variant="default" size="lg">
         <div className="max-w-3xl mx-auto prose prose-neutral">
           <h1 className="font-display text-3xl md:text-4xl font-semibold mb-2">Conditions Générales de Vente (CGV) — Fred Wav</h1>
-          <p className="text-sm text-muted-foreground mb-10">Dernière mise à jour : 15 avril 2026</p>
+          <p className="text-sm text-muted-foreground mb-10">Dernière mise à jour : 17 mai 2026</p>
 
           {/* ARTICLE 1 */}
           <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 1 — Identification du vendeur</h2>
@@ -115,6 +115,45 @@ export default function CGV() {
             <strong>Wav Premium :</strong> la durée d'accompagnement est de 45 jours calendaires. Les reports ne prolongent pas automatiquement la durée, sauf accord écrit.
           </p>
 
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">8.1 Caractère forfaitaire et non-remboursement</h3>
+          <p className="text-muted-foreground mb-4">
+            Toute prestation payée auprès du Vendeur — qu'il s'agisse de Wav Premium, des abonnements Wav Academy (toutes formules) ou de l'Analyse Express — constitue un forfait global et indivisible, correspondant à un dispositif construit, réservé et planifié dans son ensemble. Le prix n'est pas décomposable par session, par ressource, par fonctionnalité, par semaine ou par période d'abonnement entamée.
+          </p>
+          <p className="text-muted-foreground mb-4">
+            Après l'expiration du délai de rétractation, ou après sa renonciation valable dans les conditions de l'Article 9, toute interruption, suspension ou arrêt de la prestation à la seule initiative du Client, pour convenance personnelle, ne donne lieu à aucun remboursement, total ou partiel.
+          </p>
+          <p className="text-muted-foreground mb-4">
+            <strong>Accompagnements individuels (Wav Premium) :</strong> les sessions et ressources déjà délivrées sont définitivement dues. Les sessions non encore consommées restent acquises au Client et disponibles dans la limite de la durée de validité prévue à l'article 8.2 ci-dessous, sans pouvoir donner lieu à un remboursement en numéraire.
+          </p>
+          <p className="text-muted-foreground mb-4">
+            <strong>Abonnements (Wav Academy, toutes formules) :</strong> toute période d'abonnement (mensuelle ou annuelle) commencée est intégralement et définitivement due, sans remboursement, même partiel ou au prorata, quel que soit le niveau d'utilisation effective. Les modalités de résiliation pour l'avenir sont prévues à l'Article 12.
+          </p>
+          <p className="text-muted-foreground mb-4">
+            <strong>Prestations à livraison numérique immédiate (Analyse Express) :</strong> le rapport et les contenus délivrés sont définitivement dus dès leur mise à disposition, le Client ayant expressément demandé l'exécution immédiate et renoncé à son droit de rétractation dans les conditions de l'article 9.2.
+          </p>
+          <p className="text-muted-foreground mb-4">
+            La présente clause ne s'applique pas lorsque l'interruption résulte d'un manquement du Vendeur à ses obligations. Dans ce cas, les dispositions de l'Article 10 s'appliquent.
+          </p>
+
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">8.2 Durée de validité (accompagnements individuels à durée déterminée)</h3>
+          <p className="text-muted-foreground mb-4">
+            L'accompagnement individuel à durée déterminée (notamment Wav Premium), y compris en cas de suspension prévue à l'article 8.3, doit être pleinement réalisé dans un délai maximum de 45 jours calendaires à compter de la date du premier rendez-vous. Passé ce délai, les sessions non consommées sont caduques et ne peuvent donner lieu ni à exécution ni à remboursement.
+          </p>
+
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">8.3 Suspension à la demande du Client (accompagnements individuels)</h3>
+          <p className="text-muted-foreground mb-4">
+            À titre exceptionnel, le Client peut demander la suspension temporaire de son accompagnement individuel à durée déterminée. Cette suspension est soumise à l'accord écrit préalable du Vendeur.
+          </p>
+          <p className="text-muted-foreground mb-4">
+            La demande s'effectue par écrit. Le Client peut bénéficier d'une seule suspension, d'une durée maximale de 30 jours. Pendant la suspension, le décompte des 45 jours calendaires prévu à l'article 8.2 est gelé et reprend à la date de reprise convenue.
+          </p>
+          <p className="text-muted-foreground mb-4">
+            La suspension est formalisée par email valant support durable, précisant la date de début de suspension et la nouvelle date de fin d'accompagnement. La suspension ne donne lieu à aucun remboursement et ne modifie pas la durée de validité maximale prévue à l'article 8.2.
+          </p>
+          <p className="text-muted-foreground mb-4">
+            Pour la suspension d'un abonnement Wav Academy, se reporter à l'Article 12.
+          </p>
+
           {/* ARTICLE 9 */}
           <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 9 — Droit de rétractation (B2C uniquement)</h2>
           <p className="text-muted-foreground mb-4">
@@ -146,7 +185,19 @@ export default function CGV() {
             <li>et qu'il a reconnu perdre son droit de rétractation du fait de ce démarrage.</li>
           </ul>
 
-          <h3 className="font-display text-lg font-medium mt-4 mb-2">9.3 Confirmation sur support durable</h3>
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">9.3 Contenus numériques (Wav Academy)</h3>
+          <p className="text-muted-foreground mb-2">
+            La Wav Academy donne accès, dès la commande, à un espace de contenus numériques (Discord, ressources, replays, lives). Conformément à l'article L221-28, 13° du Code de la consommation, le droit de rétractation ne s'applique pas dès lors que :
+          </p>
+          <ul className="text-muted-foreground mb-4 space-y-1">
+            <li>le Client a donné son accord préalable et exprès pour le démarrage immédiat de la fourniture des contenus numériques avant l'expiration du délai de 14 jours,</li>
+            <li>et qu'il a expressément reconnu perdre son droit de rétractation du fait de ce démarrage.</li>
+          </ul>
+          <p className="text-muted-foreground mb-4">
+            Le Client conserve néanmoins la faculté de résilier son abonnement pour l'avenir dans les conditions de l'Article 12, les périodes commencées restant dues conformément à l'article 8.1.
+          </p>
+
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">9.4 Confirmation sur support durable</h3>
           <p className="text-muted-foreground mb-4">
             Après la commande, le vendeur adresse au client une confirmation par email (support durable) récapitulant la commande, les CGV acceptées, ainsi que, le cas échéant, les consentements au démarrage immédiat et à la perte du droit de rétractation.
           </p>

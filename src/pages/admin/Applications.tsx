@@ -13,6 +13,12 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Loader2, Trash2 } from "lucide-react";
 
+const budgetLabels: Record<string, string> = {
+  "10_a_100": "De 10€ à 100€",
+  "100_a_300": "De 100€ à 300€",
+  "1000_plus": "1000€ et +",
+};
+
 const Applications = () => {
   const { data: applications, isLoading } = useWavPremiumApplications();
   const [selected, setSelected] = useState<WavPremiumApplication | null>(null);
@@ -160,12 +166,8 @@ const Applications = () => {
                     <p>{selected.current_level}</p>
                   </div>
                   <div>
-                    <p className="text-cream/50 text-sm">CA actuel</p>
-                    <p>{selected.current_revenue || "-"}</p>
-                  </div>
-                  <div>
-                    <p className="text-cream/50 text-sm">Objectif CA</p>
-                    <p>{selected.revenue_goal || "-"}</p>
+                    <p className="text-cream/50 text-sm">Budget</p>
+                    <p>{selected.budget ? (budgetLabels[selected.budget] ?? selected.budget) : "-"}</p>
                   </div>
                   <div>
                     <p className="text-cream/50 text-sm">Source</p>
@@ -174,6 +176,10 @@ const Applications = () => {
                   <div>
                     <p className="text-cream/50 text-sm">Follower depuis</p>
                     <p>{selected.follower_since || "-"}</p>
+                  </div>
+                  <div>
+                    <p className="text-cream/50 text-sm">Ce qui t'a décidé</p>
+                    <p>{selected.conversion_trigger || "-"}</p>
                   </div>
                 </div>
                 <div>

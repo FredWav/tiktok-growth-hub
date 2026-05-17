@@ -825,7 +825,6 @@ export type Database = {
           conversion_trigger: string | null
           created_at: string
           current_level: string
-          current_revenue: string | null
           email: string
           first_name: string
           follower_since: string | null
@@ -834,7 +833,6 @@ export type Database = {
           last_name: string
           origin_source: string | null
           posthog_id: string | null
-          revenue_goal: string | null
           tiktok_username: string | null
         }
         Insert: {
@@ -843,7 +841,6 @@ export type Database = {
           conversion_trigger?: string | null
           created_at?: string
           current_level: string
-          current_revenue?: string | null
           email: string
           first_name: string
           follower_since?: string | null
@@ -852,7 +849,6 @@ export type Database = {
           last_name: string
           origin_source?: string | null
           posthog_id?: string | null
-          revenue_goal?: string | null
           tiktok_username?: string | null
         }
         Update: {
@@ -861,7 +857,6 @@ export type Database = {
           conversion_trigger?: string | null
           created_at?: string
           current_level?: string
-          current_revenue?: string | null
           email?: string
           first_name?: string
           follower_since?: string | null
@@ -870,7 +865,6 @@ export type Database = {
           last_name?: string
           origin_source?: string | null
           posthog_id?: string | null
-          revenue_goal?: string | null
           tiktok_username?: string | null
         }
         Relationships: []

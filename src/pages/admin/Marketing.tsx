@@ -25,10 +25,16 @@ interface Lead {
   offer: string;
   source: string | null;
   follower_since: string | null;
-  current_revenue: string | null;
+  budget: string | null;
   posthog_id: string | null;
   email: string | null;
 }
+
+const budgetLabels: Record<string, string> = {
+  "10_a_100": "De 10€ à 100€",
+  "100_a_300": "De 100€ à 300€",
+  "1000_plus": "1000€ et +",
+};
 
 const OFFER_PRIORITY: Record<string, number> = {
   "Wav Premium": 1,
@@ -228,24 +234,24 @@ export default function AdminMarketing() {
     queryKey: ["marketing-leads"],
     queryFn: async () => {
       const [appsRes, diagRes, expressRes] = await Promise.all([
-        supabase.from("wav_premium_applications" as any).select("created_at, first_name, last_name, email, origin_source, follower_since, current_revenue, posthog_id").order("created_at", { ascending: false }).limit(200),
+        supabase.from("wav_premium_applications" as any).select("created_at, first_name, last_name, email, origin_source, follower_since, budget, posthog_id").order("created_at", { ascending: false }).limit(200),
         supabase.from("diagnostic_leads" as any).select("created_at, first_name, last_name, email, origin_source, follower_since, posthog_id").eq("completed", true).order("created_at", { ascending: false }).limit(200),
         supabase.from("express_analyses").select("created_at, tiktok_username, email, status").order("created_at", { ascending: false }).limit(200),
       ]);
 
       const apps: Lead[] = ((appsRes.data as any[]) || []).map((a: any) => ({
         date: a.created_at, name: `${a.first_name} ${a.last_name}`, offer: "Wav Premium",
-        source: a.origin_source, follower_since: a.follower_since, current_revenue: a.current_revenue,
+        source: a.origin_source, follower_since: a.follower_since, budget: a.budget,
         posthog_id: a.posthog_id, email: a.email || null,
       }));
       const diags: Lead[] = ((diagRes.data as any[]) || []).map((d: any) => ({
         date: d.created_at, name: [d.first_name, d.last_name].filter(Boolean).join(" ") || "-",
         offer: "Diagnostic", source: d.origin_source, follower_since: d.follower_since,
-        current_revenue: null, posthog_id: d.posthog_id, email: d.email || null,
+        budget: null, posthog_id: d.posthog_id, email: d.email || null,
       }));
       const express: Lead[] = ((expressRes.data as any[]) || []).map((e: any) => ({
         date: e.created_at, name: e.tiktok_username || e.email || "-", offer: "Analyse Express",
-        source: null, follower_since: null, current_revenue: null, posthog_id: null, email: e.email || null,
+        source: null, follower_since: null, budget: null, posthog_id: null, email: e.email || null,
       }));
 
       const allLeads = [...apps, ...diags, ...express];
@@ -704,7 +710,7 @@ export default function AdminMarketing() {
                       <TableHead className="text-cream/70">Offre</TableHead>
                       <TableHead className="text-cream/70">Source</TableHead>
                       <TableHead className="text-cream/70">Follower depuis</TableHead>
-                      <TableHead className="text-cream/70">CA actuel</TableHead>
+                      <TableHead className="text-cream/70">Budget</TableHead>
                       <TableHead className="text-cream/70">PostHog</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -731,7 +737,7 @@ export default function AdminMarketing() {
                         </TableCell>
                         <TableCell className="text-cream/70 text-sm">{lead.source || "-"}</TableCell>
                         <TableCell className="text-cream/70 text-sm">{lead.follower_since || "-"}</TableCell>
-                        <TableCell className="text-cream/70 text-sm">{lead.current_revenue || "-"}</TableCell>
+                        <TableCell className="text-cream/70 text-sm">{lead.budget ? (budgetLabels[lead.budget] ?? lead.budget) : "-"}</TableCell>
                         <TableCell>
                           {lead.posthog_id ? (
                             <a

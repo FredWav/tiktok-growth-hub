@@ -13,8 +13,7 @@ export interface WavPremiumApplication {
   origin_source: string | null;
   follower_since: string | null;
   conversion_trigger: string | null;
-  current_revenue: string | null;
-  revenue_goal: string | null;
+  budget: string | null;
   created_at: string;
 }
 

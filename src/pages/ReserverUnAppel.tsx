@@ -138,14 +138,9 @@ export default function ReserverUnAppel() {
         body: notifyPayload,
       });
 
-      // DB payload: excludes `budget` until the add-budget-column migration is applied
-      // in production. Once applied, `budget` can be re-added here.
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { budget: _budget, ...dbPayload } = notifyPayload;
-
       const { error: dbError } = await supabase
         .from("wav_premium_applications")
-        .insert(dbPayload);
+        .insert(notifyPayload);
 
       await notifyPromise.catch((err) => console.error("Notification error:", err));
 

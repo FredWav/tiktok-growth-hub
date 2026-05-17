@@ -11,6 +11,8 @@ const PRICE_IDS = {
   test: {
     analyse_express: "price_1T4jiMPXtjut80rmEJgrHCDJ",
     one_shot: "price_1T4jihPXtjut80rmZqXzMdIn",
+    // TODO: replace with the actual Wav Premium price id once created in Stripe Test
+    wav_premium: "price_1T4jihPXtjut80rmZqXzMdIn",
     vip_3_months: "price_1T4jiuPXtjut80rm1jK0K66w",
     vip_6_months: "price_1T4jjuPXtjut80rmI0bmLmLh",
     vip_12_months: "price_1T4jklPXtjut80rmykmo5hbD",
@@ -18,6 +20,8 @@ const PRICE_IDS = {
   live: {
     analyse_express: "price_1T4pbIBfuzQl0PTiYbMnz92u",
     one_shot: "price_1T4pbcBfuzQl0PTity4YOdMv",
+    // TODO: replace with the actual Wav Premium price id once created in Stripe Live
+    wav_premium: "price_1T4pbcBfuzQl0PTity4YOdMv",
     vip_3_months: "price_1T4pbqBfuzQl0PTipRtbfEoW",
     vip_6_months: "price_1T4pc8BfuzQl0PTihU7VtQvo",
     vip_12_months: "price_1T4pdnBfuzQl0PTipiRe3X6a",

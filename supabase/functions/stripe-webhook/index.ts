@@ -69,6 +69,66 @@ serve(async (req) => {
       const session = event.data.object as Stripe.Checkout.Session;
       const metadata = session.metadata;
 
+      // ── sales_orders (One Shot / Wav Premium) ───────────────────────────
+      // Identified by metadata.type starting with "sales_". The order row was
+      // created server-side by create-sales-order and its id is in client_reference_id.
+      if (typeof metadata?.type === "string" && metadata.type.startsWith("sales_")) {
+        const orderId = (metadata.order_id as string) ?? session.client_reference_id ?? null;
+        if (!orderId) {
+          console.warn("[stripe-webhook] sales_* session without order id");
+          return new Response(JSON.stringify({ received: true }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+
+        const paymentIntentId =
+          typeof session.payment_intent === "string"
+            ? session.payment_intent
+            : session.payment_intent?.id ?? null;
+        const customerId =
+          typeof session.customer === "string" ? session.customer : session.customer?.id ?? null;
+        const amount = session.amount_total ?? session.amount_subtotal ?? null;
+
+        const { error: updErr } = await supabase
+          .from("sales_orders")
+          .update({
+            payment_status: "paid",
+            paid_at: new Date().toISOString(),
+            stripe_session_id: session.id,
+            stripe_payment_intent_id: paymentIntentId,
+            stripe_customer_id: customerId,
+            amount_cents: amount,
+          })
+          .eq("id", orderId);
+
+        if (updErr) {
+          console.error("[stripe-webhook] sales_orders update error:", updErr);
+          await notifyError("Sales Webhook", `Échec MAJ commande ${orderId} • ${updErr.message}`);
+        }
+
+        // Single-use: mark the invitation as consumed.
+        if (metadata.type === "sales_wav_premium") {
+          await supabase
+            .from("wav_premium_invitations")
+            .update({ used_at: new Date().toISOString(), order_id: orderId })
+            .eq("id", (await supabase
+              .from("sales_orders")
+              .select("invitation_id")
+              .eq("id", orderId)
+              .maybeSingle()).data?.invitation_id ?? "");
+        }
+
+        const product = metadata.product_type ?? "?";
+        await notifySuccess(
+          "Sales",
+          `Commande payée • ${product} • ${session.customer_details?.email ?? "?"} • ${(amount ?? 0) / 100}€`
+        );
+
+        return new Response(JSON.stringify({ received: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
       // Plan → Discord role env mapping (used when consent record drives the flow)
       const ROLE_ENV_BY_PLAN: Record<string, string> = {
         acces: "DISCORD_VIP1_ROLE_ID",

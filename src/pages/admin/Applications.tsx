@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { useWavPremiumApplications, usePurgeEmptyApplications, WavPremiumApplication } from "@/hooks/useWavPremiumApplications";
+import { useCreateWavPremiumInvitation } from "@/hooks/useSalesOrders";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
@@ -11,7 +13,8 @@ import {
 } from "@/components/ui/dialog";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Loader2, Trash2 } from "lucide-react";
+import { Loader2, Trash2, Link as LinkIcon, Copy, Check } from "lucide-react";
+import { toast } from "sonner";
 
 const budgetLabels: Record<string, string> = {
   "10_a_100": "De 10€ à 100€",
@@ -24,6 +27,58 @@ const Applications = () => {
   const [selected, setSelected] = useState<WavPremiumApplication | null>(null);
   const [confirmPurge, setConfirmPurge] = useState(false);
   const purge = usePurgeEmptyApplications();
+  const createInvitation = useCreateWavPremiumInvitation();
+  const [inviteAmount, setInviteAmount] = useState("");
+  const [inviteExpiry, setInviteExpiry] = useState("14");
+  const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const resetInviteForm = () => {
+    setInviteAmount("");
+    setInviteExpiry("14");
+    setGeneratedUrl(null);
+    setCopied(false);
+  };
+
+  const handleGenerateInvite = async () => {
+    if (!selected) return;
+    const eurs = parseFloat(inviteAmount.replace(",", "."));
+    if (!Number.isFinite(eurs) || eurs <= 0) {
+      toast.error("Montant invalide");
+      return;
+    }
+    const days = parseInt(inviteExpiry, 10);
+    if (!Number.isFinite(days) || days <= 0 || days > 60) {
+      toast.error("Durée d'expiration invalide (1–60 jours)");
+      return;
+    }
+    try {
+      const res = await createInvitation.mutateAsync({
+        application_id: selected.id,
+        amount_cents: Math.round(eurs * 100),
+        expires_in_days: days,
+        prefill_email: selected.email,
+        prefill_first_name: selected.first_name,
+        prefill_last_name: selected.last_name,
+      });
+      const url = `${window.location.origin}/checkout/wav-premium?token=${encodeURIComponent(res.token)}`;
+      setGeneratedUrl(url);
+      toast.success("Lien d'invitation généré");
+    } catch {
+      // toast already shown by hook
+    }
+  };
+
+  const handleCopy = async () => {
+    if (!generatedUrl) return;
+    try {
+      await navigator.clipboard.writeText(generatedUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Impossible de copier dans le presse-papier");
+    }
+  };
 
   const handlePurge = async () => {
     await purge.mutateAsync();
@@ -139,7 +194,15 @@ const Applications = () => {
         )}
       </div>
 
-      <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
+      <Dialog
+        open={!!selected}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelected(null);
+            resetInviteForm();
+          }
+        }}
+      >
         <DialogContent className="bg-noir-light border-primary/20 text-cream max-w-2xl max-h-[80vh] overflow-y-auto">
           {selected && (
             <>
@@ -189,6 +252,79 @@ const Applications = () => {
                 <div>
                   <p className="text-cream/50 text-sm mb-1">Objectifs</p>
                   <p className="bg-noir rounded-lg p-3 whitespace-pre-wrap text-sm">{selected.goals}</p>
+                </div>
+
+                {/* Generate Wav Premium checkout invitation */}
+                <div className="border-t border-primary/20 pt-4 mt-4 space-y-3">
+                  <div className="flex items-center gap-2 text-primary">
+                    <LinkIcon className="h-4 w-4" />
+                    <h3 className="text-sm font-semibold uppercase tracking-wider">
+                      Lien checkout Wav Premium
+                    </h3>
+                  </div>
+                  <p className="text-xs text-cream/60">
+                    Génère un lien d'invitation à usage unique. À envoyer toi-même au client
+                    (WhatsApp / email).
+                  </p>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs text-cream/50 mb-1 block">Montant (€)</label>
+                      <Input
+                        type="number"
+                        inputMode="decimal"
+                        step="0.01"
+                        min="1"
+                        placeholder="1490"
+                        value={inviteAmount}
+                        onChange={(e) => setInviteAmount(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-cream/50 mb-1 block">Expiration (jours)</label>
+                      <Input
+                        type="number"
+                        inputMode="numeric"
+                        min="1"
+                        max="60"
+                        value={inviteExpiry}
+                        onChange={(e) => setInviteExpiry(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <Button
+                    size="sm"
+                    disabled={createInvitation.isPending || !inviteAmount}
+                    onClick={handleGenerateInvite}
+                    className="w-full"
+                  >
+                    {createInvitation.isPending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        Génération…
+                      </>
+                    ) : (
+                      <>
+                        <LinkIcon className="h-4 w-4 mr-2" />
+                        Générer le lien d'invitation
+                      </>
+                    )}
+                  </Button>
+
+                  {generatedUrl && (
+                    <div className="bg-noir rounded-lg p-3 space-y-2">
+                      <p className="text-xs text-cream/50">Lien à envoyer au client :</p>
+                      <div className="flex items-center gap-2">
+                        <code className="flex-1 text-xs bg-noir-light rounded px-2 py-2 break-all">
+                          {generatedUrl}
+                        </code>
+                        <Button size="sm" variant="outline" onClick={handleCopy}>
+                          {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </>

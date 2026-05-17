@@ -12,6 +12,7 @@ import {
   BarChart3,
   Star,
   Link as LinkIcon,
+  ShoppingBag,
 } from "lucide-react";
 import { useState } from "react";
 import { AdminChatbot } from "@/components/admin/AdminChatbot";
@@ -23,6 +24,7 @@ interface AdminLayoutProps {
 const navItems = [
   { label: "Analyses Express", href: "/admin/analyses", icon: Zap },
   { label: "Candidatures", href: "/admin/applications", icon: ClipboardList },
+  { label: "Ventes", href: "/admin/ventes", icon: ShoppingBag },
   { label: "Marketing", href: "/admin/marketing", icon: BarChart3 },
   { label: "Deep Links", href: "/admin/deep-links", icon: LinkIcon },
   { label: "Témoignages", href: "/admin/testimonials", icon: Star },

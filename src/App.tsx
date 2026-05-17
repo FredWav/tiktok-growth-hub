@@ -49,6 +49,9 @@ const DiagnosticResult = lazy(() => import("./pages/DiagnosticResult"));
 const Mail = lazy(() => import("./pages/Mail"));
 const WavAcademy = lazy(() => import("./pages/WavAcademy"));
 const Claim = lazy(() => import("./pages/Claim"));
+const CheckoutOneShot = lazy(() => import("./pages/checkout/CheckoutOneShot"));
+const CheckoutWavPremium = lazy(() => import("./pages/checkout/CheckoutWavPremium"));
+const CheckoutSuccess = lazy(() => import("./pages/checkout/CheckoutSuccess"));
 
 // Admin pages - lazy loaded
 const AdminSettings = lazy(() => import("./pages/admin/Settings"));
@@ -57,6 +60,7 @@ const AdminApplications = lazy(() => import("./pages/admin/Applications"));
 const AdminMarketing = lazy(() => import("./pages/admin/Marketing"));
 const AdminDeepLinks = lazy(() => import("./pages/admin/DeepLinks"));
 const AdminTestimonials = lazy(() => import("./pages/admin/Testimonials"));
+const AdminVentes = lazy(() => import("./pages/admin/Ventes"));
 const GoRedirect = lazy(() => import("./pages/GoRedirect"));
 
 const queryClient = new QueryClient();
@@ -100,6 +104,11 @@ const App = () => (
             <Route path="/wavacademy" element={<WavAcademy />} />
             <Route path="/claim/error" element={<Claim />} />
             <Route path="/claim/:token" element={<Claim />} />
+
+            {/* Checkout pages */}
+            <Route path="/checkout/one-shot" element={<CheckoutOneShot />} />
+            <Route path="/checkout/wav-premium" element={<CheckoutWavPremium />} />
+            <Route path="/checkout/success" element={<CheckoutSuccess />} />
 
             {/* Deep link redirect */}
             <Route path="/go/:slug" element={<GoRedirect />} />
@@ -156,6 +165,14 @@ const App = () => (
               element={
                 <ProtectedRoute requiredRole="admin">
                   <AdminTestimonials />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/ventes"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AdminVentes />
                 </ProtectedRoute>
               }
             />

@@ -64,7 +64,7 @@ export default function CGV() {
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">5.3 Wav Academy (abonnement)</h3>
           <p className="text-muted-foreground mb-4">
-            Abonnement mensuel ou annuel donnant accès à la communauté Discord Wav Academy, aux ressources documentaires (cours, replays, checklists, méthodes, templates) et aux lives hebdomadaires. L'abonnement ne comprend aucun suivi individuel personnalisé.
+            Abonnement mensuel donnant accès à la communauté Discord Wav Academy, aux ressources documentaires (cours, replays, checklists, méthodes, templates), aux lives hebdomadaires avec Fred, aux canaux Discord premium, et à une session de coaching individuel de 30 minutes par mois.
           </p>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">5.4 Évolution du contenu</h3>
@@ -117,7 +117,7 @@ export default function CGV() {
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">8.1 Caractère forfaitaire et non-remboursement</h3>
           <p className="text-muted-foreground mb-4">
-            Toute prestation payée auprès du Vendeur — qu'il s'agisse de Wav Premium, des abonnements Wav Academy (toutes formules) ou de l'Analyse Express — constitue un forfait global et indivisible, correspondant à un dispositif construit, réservé et planifié dans son ensemble. Le prix n'est pas décomposable par session, par ressource, par fonctionnalité, par semaine ou par période d'abonnement entamée.
+            Toute prestation payée auprès du Vendeur — qu'il s'agisse de Wav Premium, des l'abonnement Wav Academy ou de l'Analyse Express — constitue un forfait global et indivisible, correspondant à un dispositif construit, réservé et planifié dans son ensemble. Le prix n'est pas décomposable par session, par ressource, par fonctionnalité, par semaine ou par période d'abonnement entamée.
           </p>
           <p className="text-muted-foreground mb-4">
             Après l'expiration du délai de rétractation, ou après sa renonciation valable dans les conditions de l'Article 9, toute interruption, suspension ou arrêt de la prestation à la seule initiative du Client, pour convenance personnelle, ne donne lieu à aucun remboursement, total ou partiel.
@@ -225,7 +225,7 @@ export default function CGV() {
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">12.1 Renouvellement</h3>
           <p className="text-muted-foreground mb-4">
-            La Wav Academy est un abonnement à reconduction automatique (mensuel ou annuel selon la formule choisie) jusqu'à résiliation par le client.
+            La Wav Academy est un abonnement à reconduction automatique (mensuel) jusqu'à résiliation par le client.
           </p>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">12.2 Résiliation</h3>

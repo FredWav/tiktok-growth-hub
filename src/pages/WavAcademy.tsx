@@ -14,7 +14,6 @@ import {
   Radio,
   BarChart3,
   RefreshCw,
-  Clock,
   Loader2,
 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
@@ -22,7 +21,6 @@ import { VideoCard } from "@/components/VideoCard";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { SEOHead } from "@/components/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -44,9 +42,6 @@ import {
 } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
 
-// ── Types ──────────────────────────────────────────────────────────────────
-type Plan = "acces" | "live";
-
 const checkoutSchema = z.object({
   email: z.string().trim().email("Email invalide"),
   consent_cgv: z.literal(true, {
@@ -58,32 +53,9 @@ const checkoutSchema = z.object({
 });
 type CheckoutForm = z.infer<typeof checkoutSchema>;
 
-const plans = {
-  acces: {
-    name: "WAV ACADEMY · ACCÈS",
-    price: "39€",
-    period: "/mois",
-    credits: "1 000 crédits",
-    color: "border-primary/40",
-    badge: null,
-    accentClass: "text-primary",
-  },
-  live: {
-    name: "WAV ACADEMY · LIVE",
-    price: "97€",
-    period: "/mois",
-    credits: "3 000 crédits",
-    color: "border-gold-400",
-    badge: "Populaire",
-    accentClass: "text-gold-gradient",
-  },
-};
-
 // ── Stats dynamiques ───────────────────────────────────────────────────────
-// Les années évoluent automatiquement avec le temps. Ajuster les années de
-// départ ici pour modifier les chiffres affichés sur toutes les sections.
-const AUDIOVISUAL_START_YEAR = 2006; // 20 ans en 2026
-const SHORT_FORMATS_START_YEAR = 2020; // 6 ans en 2026
+const AUDIOVISUAL_START_YEAR = 2006;
+const SHORT_FORMATS_START_YEAR = 2020;
 const yearsSince = (startYear: number) =>
   new Date().getFullYear() - startYear;
 
@@ -101,7 +73,7 @@ const proofItems = [
 const problems = [
   "Tu publies 4, 5, 7 vidéos par semaine. Zéro DM. Zéro client.",
   "Des comptes plus petits que le tien explosent du jour au lendemain.",
-  "Tu connais les hooks, les CTA, les guides. Mais le lundi matin : \u00abJe fais quoi, concrètement ?\u00bb",
+  "Tu connais les hooks, les CTA, les guides. Mais le lundi matin : «Je fais quoi, concrètement ?»",
   "Tes vidéos échouent et tu ne sais pas si c'est le montage, le sujet, l'heure ou l'algo.",
 ];
 
@@ -165,36 +137,8 @@ const frameworks = [
   { num: "04", title: "Le Format Signature Accéléré", desc: "Identifier en 15 vidéos diagnostiquées le format qui fonctionne pour toi, au lieu d'en tester 300 à l'aveugle." },
   { num: "05", title: "Le CTA Invisible", desc: "Générer des DM et des prospects sans donner l'impression de vendre." },
   { num: "06", title: "Le Système 3x", desc: "Poster 3 fois par semaine avec plus de résultats qu'en postant tous les jours à l'aveugle." },
-  { num: "07", title: "Le Pipeline Formats Courts \u2192 Clients", desc: "Passer de \u00abj'ai des vues\u00bb \u00e0 \u00abj'ai des clients\u00bb en 4 \u00e9tapes claires." },
+  { num: "07", title: "Le Pipeline Formats Courts → Clients", desc: "Passer de «j'ai des vues» à «j'ai des clients» en 4 étapes claires." },
 ];
-
-// ── Comparison table ───────────────────────────────────────────────────────
-type FeatureValue = boolean | string;
-const comparisonFeatures: { label: string; acces: FeatureValue; live: FeatureValue; elite: FeatureValue }[] = [
-  { label: "Contenu stratégique quotidien (Tapis Roulant)", acces: true, live: true, elite: true },
-  { label: "15 contenus en rotation permanente", acces: true, live: true, elite: true },
-  { label: "Discord communautaire", acces: true, live: true, elite: true },
-  { label: "Crédits WavSocialScan gratuits", acces: "1 000 /mois", live: "3 000 /mois", elite: "5 000 /mois" },
-  { label: "≈ analyses de vidéo / mois", acces: "10", live: "30", elite: "50" },
-  { label: "≈ analyses de compte / mois", acces: "3", live: "10", elite: "16" },
-  { label: "-50% abonnements WavSocialScan", acces: true, live: true, elite: true },
-  { label: "Packs thématiques archivés", acces: "À l'achat", live: "À l'achat", elite: "À l'achat" },
-  { label: "Live hebdomadaire", acces: false, live: true, elite: true },
-  { label: "Discord premium (canaux avancés)", acces: false, live: true, elite: true },
-  { label: "Coaching individuel", acces: false, live: "30 min/mois", elite: "1h/semaine" },
-  { label: "Accès WhatsApp direct", acces: false, live: false, elite: true },
-  { label: "Accompagnement push (relances)", acces: false, live: false, elite: true },
-  { label: "Audit algorithmique mensuel", acces: false, live: false, elite: true },
-  { label: "Stratégie de monétisation", acces: false, live: false, elite: true },
-  { label: "Places disponibles", acces: "Illimitées", live: "20/mois", elite: "5/mois" },
-];
-
-// ── Render feature cell ────────────────────────────────────────────────────
-function FeatureCell({ value }: { value: FeatureValue }) {
-  if (value === true) return <Check className="h-5 w-5 text-primary mx-auto" />;
-  if (value === false) return <X className="h-4 w-4 text-muted-foreground mx-auto" />;
-  return <span className="text-sm font-medium text-foreground">{value}</span>;
-}
 
 // ── Main component ─────────────────────────────────────────────────────────
 export default function WavAcademy() {
@@ -202,7 +146,6 @@ export default function WavAcademy() {
   const isSuccess = searchParams.get("success") === "true";
 
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<Plan>("acces");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<CheckoutForm>({
@@ -215,24 +158,19 @@ export default function WavAcademy() {
     mode: "onChange",
   });
 
-  const openPlanDialog = (plan: Plan) => {
-    setSelectedPlan(plan);
+  const openCheckoutDialog = () => {
     form.reset();
     setDialogOpen(true);
-    trackPostHogEvent("wavclub_checkout_open", { plan });
-  };
-
-  const scrollToPlans = () => {
-    document.getElementById("plans")?.scrollIntoView({ behavior: "smooth" });
+    trackPostHogEvent("wavclub_checkout_open", { plan: "live" });
   };
 
   const onCheckout = async (data: CheckoutForm) => {
     setIsSubmitting(true);
-    trackPostHogEvent("wavclub_checkout_submit", { plan: selectedPlan });
+    trackPostHogEvent("wavclub_checkout_submit", { plan: "live" });
     try {
       const { data: result, error } = await supabase.functions.invoke("record-wavacademy-consent", {
         body: {
-          plan: selectedPlan,
+          plan: "live",
           email: data.email,
           consent_cgv: data.consent_cgv,
           consent_renonciation: data.consent_renonciation,
@@ -289,7 +227,7 @@ export default function WavAcademy() {
         title="Wav Academy — Le système de diagnostic continu pour créateurs | Fred Wav"
         description="Diagnostique chaque vidéo, corrige en temps réel, signe des clients depuis ton téléphone. Le Wav Academy : contenu stratégique quotidien + WavSocialScan."
         path="/wavacademy"
-        keywords="wav club, diagnostic tiktok, wavsocialscan, contenu stratégique, formats courts"
+        keywords="wav academy, diagnostic tiktok, wavsocialscan, contenu stratégique, formats courts"
       />
 
       {/* ── HERO (VSL) ───────────────────────────────────────────────────── */}
@@ -310,21 +248,11 @@ export default function WavAcademy() {
             />
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="hero" size="xl" onClick={() => openPlanDialog("acces")}>
-              Rejoindre Accès — 39€/mois
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button variant="hero" size="xl" onClick={() => openPlanDialog("live")}>
-              Rejoindre Live — 97€/mois
+            <Button variant="hero" size="xl" onClick={openCheckoutDialog}>
+              Rejoindre Wav Academy — 97€/mois
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
-          <button
-            onClick={scrollToPlans}
-            className="mt-6 text-sm text-muted-foreground underline-offset-4 hover:underline"
-          >
-            Voir tous les plans et détails ↓
-          </button>
         </div>
       </Section>
 
@@ -517,7 +445,7 @@ export default function WavAcademy() {
             <div className="p-4 bg-primary/5 rounded-xl border border-primary/20 space-y-2">
               <p className="text-sm text-foreground">
                 Normalement à partir de <strong>14,90€/mois</strong> en Standard et <strong>39,90€/mois</strong> en Premium.
-                En tant que membre du Wav Academy, tu bénéficies de <strong>crédits gratuits chaque mois</strong> selon ta formule, et de{" "}
+                En tant que membre du Wav Academy, tu bénéficies de <strong>3 000 crédits gratuits chaque mois</strong>, et de{" "}
                 <strong>-50% sur tous les abonnements WavSocialScan</strong> si tu veux aller plus loin.
               </p>
               <p className="text-xs text-muted-foreground">
@@ -557,68 +485,14 @@ export default function WavAcademy() {
         </div>
       </Section>
 
-      {/* ── PLANS ────────────────────────────────────────────────────────── */}
+      {/* ── PLAN ─────────────────────────────────────────────────────────── */}
       <Section variant="default" size="xl" id="plans">
         <SectionHeader
-          title="Choisis ta formule."
-          subtitle="Tout le monde n'est pas au même stade. Le Wav Academy s'adapte à ton niveau."
+          title="Rejoins le Wav Academy."
+          subtitle="97€/mois. Sans engagement. Résiliation en 1 clic."
         />
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {/* Plan ACCÈS */}
-          <div className="rounded-2xl border-2 border-primary/30 bg-background p-8 flex flex-col">
-            <div className="mb-6">
-              <p className="text-xs font-bold tracking-widest text-primary uppercase mb-3">🎧 WAV ACADEMY · ACCÈS</p>
-              <div className="flex items-baseline gap-1 mb-1">
-                <span className="font-display text-5xl font-bold">39€</span>
-                <span className="text-muted-foreground">/mois</span>
-              </div>
-              <p className="text-sm text-muted-foreground">Le diagnostic hebdomadaire et le contenu stratégique quotidien.</p>
-            </div>
-            <ul className="space-y-3 mb-8 flex-1">
-              <li className="flex items-start gap-3 text-sm">
-                <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-semibold">1 000 crédits WavSocialScan/mois</span>
-                  <p className="text-xs text-muted-foreground mt-0.5">≈ 10 analyses de vidéo ou 3 analyses de compte</p>
-                </div>
-              </li>
-              {[
-                "-50% sur tous les abonnements WavSocialScan",
-                "Contenu stratégique quotidien (Tapis Roulant)",
-                "15 contenus en rotation permanente",
-                "Accès Discord communautaire",
-                "Packs thématiques (à l'achat)",
-              ].map((f) => (
-                <li key={f} className="flex items-start gap-3 text-sm">
-                  <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                  <span>{f}</span>
-                </li>
-              ))}
-              {[
-                "Live hebdomadaire",
-                "Discord premium",
-                "Coaching individuel",
-              ].map((f) => (
-                <li key={f} className="flex items-start gap-3 text-sm text-muted-foreground">
-                  <X className="h-4 w-4 flex-shrink-0 mt-0.5" />
-                  <span>{f}</span>
-                </li>
-              ))}
-            </ul>
-            <p className="text-xs text-muted-foreground mb-4">Pour débuter ou structurer ta stratégie de contenu à ton rythme.</p>
-            <Button
-              variant="outline"
-              size="lg"
-              className="w-full"
-              onClick={() => openPlanDialog("acces")}
-            >
-              Rejoindre — 39€/mois
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
-
-          {/* Plan LIVE */}
+        <div className="max-w-md mx-auto">
           <div className="rounded-2xl border-2 border-primary bg-background p-8 flex flex-col relative shadow-lg shadow-primary/10">
             <div className="absolute -top-4 left-1/2 -translate-x-1/2">
               <span className="bg-primary text-primary-foreground text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wide">
@@ -626,7 +500,7 @@ export default function WavAcademy() {
               </span>
             </div>
             <div className="mb-6">
-              <p className="text-xs font-bold tracking-widest text-primary uppercase mb-3">🎙 WAV ACADEMY · LIVE</p>
+              <p className="text-xs font-bold tracking-widest text-primary uppercase mb-3">🎙 WAV ACADEMY</p>
               <div className="flex items-baseline gap-1 mb-1">
                 <span className="font-display text-5xl font-bold">97€</span>
                 <span className="text-muted-foreground">/mois</span>
@@ -655,73 +529,15 @@ export default function WavAcademy() {
                   <span>{f}</span>
                 </li>
               ))}
-              {[
-                "Accès WhatsApp direct",
-                "Accompagnement push",
-              ].map((f) => (
-                <li key={f} className="flex items-start gap-3 text-sm text-muted-foreground">
-                  <X className="h-4 w-4 flex-shrink-0 mt-0.5" />
-                  <span>{f}</span>
-                </li>
-              ))}
             </ul>
-            <p className="text-xs text-muted-foreground mb-4">Places limitées à 20 par mois. Tu as une base d'audience et tu veux accélérer.</p>
             <Button
               variant="hero"
               size="lg"
               className="w-full"
-              onClick={() => openPlanDialog("live")}
+              onClick={openCheckoutDialog}
             >
               Rejoindre — 97€/mois
               <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
-
-          {/* Plan ÉLITE */}
-          <div className="rounded-2xl border-2 border-border bg-noir text-cream p-8 flex flex-col">
-            <div className="mb-6">
-              <p className="text-xs font-bold tracking-widest text-primary uppercase mb-3">🚀 WAV ACADEMY · ÉLITE</p>
-              <div className="flex items-baseline gap-1 mb-1">
-                <span className="font-display text-5xl font-bold">1 500€</span>
-                <span className="text-cream/60">/mois</span>
-              </div>
-              <p className="text-sm text-cream/60">L'accompagnement total. Le diagnostic quasi illimité et moi dans ta poche.</p>
-            </div>
-            <ul className="space-y-3 mb-8 flex-1">
-              <li className="flex items-start gap-3 text-sm text-cream/80">
-                <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-semibold text-cream">5 000 crédits WavSocialScan/mois</span>
-                  <p className="text-xs text-cream/60 mt-0.5">≈ 50 analyses de vidéo ou 16 analyses de compte</p>
-                </div>
-              </li>
-              {[
-                "1h de coaching individuel par semaine",
-                "Accès WhatsApp direct",
-                "Accompagnement push (relances)",
-                "Audit algorithmique mensuel complet",
-                "Stratégie de monétisation personnalisée",
-                "Live hebdomadaire",
-                "Discord premium",
-                "-50% abonnements WavSocialScan",
-              ].map((f) => (
-                <li key={f} className="flex items-start gap-3 text-sm text-cream/80">
-                  <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                  <span>{f}</span>
-                </li>
-              ))}
-            </ul>
-            <p className="text-xs text-cream/40 mb-4">Sur candidature. Limité à 5 nouvelles places par mois.</p>
-            <Button
-              variant="premium"
-              size="lg"
-              className="w-full"
-              asChild
-            >
-              <Link to="/reserverunappel">
-                Contacter Fred
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
             </Button>
           </div>
         </div>
@@ -791,50 +607,9 @@ export default function WavAcademy() {
         </div>
       </Section>
 
-      {/* ── COMPARISON TABLE ─────────────────────────────────────────────── */}
-      <Section variant="default" size="lg">
-        <SectionHeader title="Toutes les formules, en un coup d'œil." />
-        <div className="max-w-5xl mx-auto overflow-x-auto">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr>
-                <th className="text-left p-4 text-sm font-semibold text-muted-foreground w-1/2"></th>
-                <th className="text-center p-4 text-sm">
-                  <div className="font-bold text-foreground">ACCÈS</div>
-                  <div className="text-primary font-semibold">39€/mois</div>
-                </th>
-                <th className="text-center p-4 text-sm bg-primary/5 rounded-t-xl">
-                  <div className="font-bold text-foreground">LIVE</div>
-                  <div className="text-primary font-semibold">97€/mois</div>
-                  <div className="text-xs text-primary font-medium mt-0.5">⭐ Populaire</div>
-                </th>
-                <th className="text-center p-4 text-sm">
-                  <div className="font-bold text-foreground">ÉLITE</div>
-                  <div className="text-primary font-semibold">1 500€/mois</div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {comparisonFeatures.map(({ label, acces, live, elite }) => (
-                <tr key={label} className="border-t border-border/50">
-                  <td className="p-4 text-sm text-foreground/80">{label}</td>
-                  <td className="p-4 text-center"><FeatureCell value={acces} /></td>
-                  <td className="p-4 text-center bg-primary/5"><FeatureCell value={live} /></td>
-                  <td className="p-4 text-center"><FeatureCell value={elite} /></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Section>
-
       {/* ── URGENCY CTA ──────────────────────────────────────────────────── */}
       <Section variant="dark" size="xl">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="flex items-center justify-center gap-2 text-primary mb-6">
-            <Clock className="h-5 w-5" />
-            <span className="text-sm font-semibold uppercase tracking-wide">L'algorithme ne t'attend pas</span>
-          </div>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold text-cream mb-6">
             Chaque semaine sans diagnostic, c'est{" "}
             <span className="text-gold-gradient">3 à 5 vidéos postées à l'aveugle</span>.
@@ -849,17 +624,10 @@ export default function WavAcademy() {
             <Button
               variant="hero"
               size="xl"
-              onClick={() => openPlanDialog("live")}
+              onClick={openCheckoutDialog}
             >
-              Rejoindre le Wav Academy · Live — 97€/mois
+              Rejoindre Wav Academy — 97€/mois
               <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button
-              variant="premium"
-              size="xl"
-              onClick={() => openPlanDialog("acces")}
-            >
-              Commencer avec l'Accès — 39€/mois
             </Button>
           </div>
           <p className="text-cream/40 text-sm">
@@ -873,7 +641,7 @@ export default function WavAcademy() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="font-display text-2xl">
-              {selectedPlan === "acces" ? "WAV ACADEMY · ACCÈS — 39€/mois" : "WAV ACADEMY · LIVE — 97€/mois"}
+              WAV ACADEMY — 97€/mois
             </DialogTitle>
             <DialogDescription>
               Complète ces informations pour finaliser ton inscription. Tu seras redirigé vers le paiement sécurisé.

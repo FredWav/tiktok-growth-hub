@@ -11,7 +11,6 @@ const corsHeaders = {
 // Stripe Payment Link URLs — public, fine to ship in code.
 // If you ever rotate them, just edit here.
 const PAYMENT_LINKS: Record<string, string> = {
-  acces: "https://buy.stripe.com/dRm6oG9da4uZbLk2HecMM0w",
   live: "https://buy.stripe.com/bJe14m2OMd1v3eO2HecMM0x",
 };
 
@@ -29,7 +28,7 @@ serve(async (req) => {
 
     if (!plan || !(plan in PAYMENT_LINKS)) {
       return new Response(
-        JSON.stringify({ error: "Plan invalide (acces ou live attendu)" }),
+        JSON.stringify({ error: "Plan invalide (live attendu)" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }

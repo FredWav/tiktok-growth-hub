@@ -71,7 +71,6 @@ serve(async (req) => {
 
       // Plan → Discord role env mapping (used when consent record drives the flow)
       const ROLE_ENV_BY_PLAN: Record<string, string> = {
-        acces: "DISCORD_VIP1_ROLE_ID",
         live: "DISCORD_VIP2_ROLE_ID",
       };
 

@@ -25,10 +25,10 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { first_name, last_name, email, tiktok_username, current_level, blockers, goals, budget, origin_source, follower_since, conversion_trigger, posthog_id } =
+    const { first_name, last_name, email, tiktok_username, profil, motivation, accompagnement_type, accompagnement_critere, goals, budget, origin_source, follower_since, conversion_trigger, posthog_id } =
       await req.json();
 
-    if (!first_name || !last_name || !email) {
+    if (!first_name || !last_name || !email || !profil || !motivation || !accompagnement_type || !goals) {
       await notifyError("Demande de contact", "Champs obligatoires manquants");
       return new Response(JSON.stringify({ error: "Champs obligatoires manquants" }), {
         status: 400,
@@ -45,14 +45,16 @@ Deno.serve(async (req) => {
         fields: [
           { name: "📧 Email", value: email, inline: true },
           { name: "🎵 TikTok", value: tiktok_username || "-", inline: true },
-          { name: "📊 Niveau", value: current_level || "-", inline: true },
           { name: "💰 Budget", value: budget || "-", inline: true },
+          { name: "👤 Profil", value: profil || "-" },
+          { name: "🎯 Attente", value: motivation || "-" },
+          { name: "🤝 Accompagnement", value: accompagnement_type || "-" },
+          { name: "⭐ Ce qui compte", value: accompagnement_critere || "-" },
+          { name: "📝 Ce qui l'amène", value: (goals || "-").slice(0, 1024) },
+          { name: "🔥 Contenu déclencheur", value: (conversion_trigger || "-").slice(0, 1024) },
           { name: "📍 Source", value: origin_source || "-", inline: true },
           { name: "⏳ Follower depuis", value: follower_since || "-", inline: true },
-          { name: "🔥 Déclencheur", value: conversion_trigger || "-", inline: true },
           { name: "📊 PostHog", value: posthog_id ? `[Voir](https://us.posthog.com/person/${posthog_id})` : "-", inline: true },
-          { name: "🚧 Blockers", value: (blockers || "-").slice(0, 1024) },
-          { name: "🎯 Objectifs", value: (goals || "-").slice(0, 1024) },
         ],
         timestamp: new Date().toISOString(),
       }],
@@ -85,13 +87,15 @@ Deno.serve(async (req) => {
               <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; width: 160px;">Nom</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(first_name)} ${escapeHtml(last_name)}</td></tr>
               <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Email</td><td style="padding: 12px; border-bottom: 1px solid #eee;"><a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></td></tr>
               <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">TikTok</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(tiktok_username || "-")}</td></tr>
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Niveau</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(current_level || "-")}</td></tr>
+              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; vertical-align: top;">Profil</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(profil || "-")}</td></tr>
+              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; vertical-align: top;">Attente</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(motivation || "-")}</td></tr>
+              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; vertical-align: top;">Accompagnement</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(accompagnement_type || "-")}</td></tr>
+              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; vertical-align: top;">Ce qui compte</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(accompagnement_critere || "-")}</td></tr>
               <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Budget</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(budget || "-")}</td></tr>
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; vertical-align: top;">Blocages</td><td style="padding: 12px; border-bottom: 1px solid #eee; white-space: pre-wrap;">${escapeHtml(blockers || "-")}</td></tr>
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; vertical-align: top;">Objectifs</td><td style="padding: 12px; border-bottom: 1px solid #eee; white-space: pre-wrap;">${escapeHtml(goals || "-")}</td></tr>
+              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; vertical-align: top;">Ce qui l'amène</td><td style="padding: 12px; border-bottom: 1px solid #eee; white-space: pre-wrap;">${escapeHtml(goals || "-")}</td></tr>
               <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Source</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(origin_source || "-")}</td></tr>
               <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Follower depuis</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(follower_since || "-")}</td></tr>
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Déclencheur</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(conversion_trigger || "-")}</td></tr>
+              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; vertical-align: top;">Contenu déclencheur</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(conversion_trigger || "-")}</td></tr>
             </table>
           </div>`;
 

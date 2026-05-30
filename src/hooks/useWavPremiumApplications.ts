@@ -7,13 +7,18 @@ export interface WavPremiumApplication {
   last_name: string;
   email: string;
   tiktok_username: string | null;
-  current_level: string;
-  blockers: string;
+  profil: string | null;
+  motivation: string | null;
+  accompagnement_type: string | null;
+  accompagnement_critere: string | null;
   goals: string;
+  budget: string | null;
   origin_source: string | null;
   follower_since: string | null;
   conversion_trigger: string | null;
-  budget: string | null;
+  // Champs historiques (anciennes candidatures) — conservés pour relecture
+  current_level: string | null;
+  blockers: string | null;
   created_at: string;
 }
 

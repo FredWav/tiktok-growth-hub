@@ -104,7 +104,7 @@ const Applications = () => {
                   <TableHead className="text-cream/70">Nom</TableHead>
                   <TableHead className="text-cream/70">Email</TableHead>
                   <TableHead className="text-cream/70">TikTok</TableHead>
-                  <TableHead className="text-cream/70">Niveau</TableHead>
+                  <TableHead className="text-cream/70">Profil</TableHead>
                   <TableHead className="text-cream/70">Source</TableHead>
                 </TableRow>
               </TableHeader>
@@ -126,7 +126,7 @@ const Applications = () => {
                       {app.tiktok_username ? `@${app.tiktok_username}` : "-"}
                     </TableCell>
                     <TableCell className="text-cream/80 max-w-[200px] truncate">
-                      {app.current_level}
+                      {app.profil || "-"}
                     </TableCell>
                     <TableCell className="text-cream/80">
                       {app.origin_source || "-"}
@@ -162,10 +162,6 @@ const Applications = () => {
                     <p>{selected.tiktok_username ? `@${selected.tiktok_username}` : "-"}</p>
                   </div>
                   <div>
-                    <p className="text-cream/50 text-sm">Niveau</p>
-                    <p>{selected.current_level}</p>
-                  </div>
-                  <div>
                     <p className="text-cream/50 text-sm">Budget</p>
                     <p>{selected.budget ? (budgetLabels[selected.budget] ?? selected.budget) : "-"}</p>
                   </div>
@@ -178,18 +174,52 @@ const Applications = () => {
                     <p>{selected.follower_since || "-"}</p>
                   </div>
                   <div>
-                    <p className="text-cream/50 text-sm">Ce qui t'a décidé</p>
+                    <p className="text-cream/50 text-sm">Quel contenu t'a décidé</p>
                     <p>{selected.conversion_trigger || "-"}</p>
                   </div>
                 </div>
-                <div>
-                  <p className="text-cream/50 text-sm mb-1">Points de blocage</p>
-                  <p className="bg-noir rounded-lg p-3 whitespace-pre-wrap text-sm">{selected.blockers}</p>
+
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-cream/50 text-sm">Profil</p>
+                    <p>{selected.profil || "-"}</p>
+                  </div>
+                  <div>
+                    <p className="text-cream/50 text-sm">Attente sur TikTok</p>
+                    <p>{selected.motivation || "-"}</p>
+                  </div>
+                  <div>
+                    <p className="text-cream/50 text-sm">Type d'accompagnement souhaité</p>
+                    <p>{selected.accompagnement_type || "-"}</p>
+                  </div>
+                  <div>
+                    <p className="text-cream/50 text-sm">Ce qui compte le plus</p>
+                    <p>{selected.accompagnement_critere || "-"}</p>
+                  </div>
                 </div>
+
                 <div>
-                  <p className="text-cream/50 text-sm mb-1">Objectifs</p>
+                  <p className="text-cream/50 text-sm mb-1">Ce qui l'amène à réserver</p>
                   <p className="bg-noir rounded-lg p-3 whitespace-pre-wrap text-sm">{selected.goals}</p>
                 </div>
+
+                {(selected.current_level || selected.blockers) && (
+                  <div className="space-y-3 border-t border-primary/10 pt-4">
+                    <p className="text-cream/40 text-xs uppercase tracking-wide">Anciennes réponses</p>
+                    {selected.current_level && (
+                      <div>
+                        <p className="text-cream/50 text-sm">Niveau</p>
+                        <p>{selected.current_level}</p>
+                      </div>
+                    )}
+                    {selected.blockers && (
+                      <div>
+                        <p className="text-cream/50 text-sm mb-1">Points de blocage</p>
+                        <p className="bg-noir rounded-lg p-3 whitespace-pre-wrap text-sm">{selected.blockers}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </>
           )}

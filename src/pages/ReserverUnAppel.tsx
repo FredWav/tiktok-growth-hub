@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle2, Mail, Clock, Sparkles } from "lucide-react";
 import { trackEvent, getStoredUtmSource } from "@/lib/tracking";
 import { trackPostHogEvent, identifyUser, getPostHogId } from "@/lib/posthog";
+import { cn } from "@/lib/utils";
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
 import { SEOHead } from "@/components/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -33,16 +33,31 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-const levels = [
-  { value: "debut", label: "Je débute / Je n'ai pas encore de compte" },
-  { value: "sans_strategie", label: "Je poste mais sans vraie stratégie" },
-  { value: "stagne", label: "J'ai une audience mais je stagne" },
-  { value: "scale", label: "J'ai déjà des résultats mais je veux scaler" },
+const profilOptions = [
+  { value: "createur", label: "Créateur / créatrice : TikTok est mon média, je veux développer mon audience et mon contenu" },
+  { value: "entrepreneur", label: "Entrepreneur(e) / indépendant(e) : TikTok est un canal pour faire connaître mon activité, mes produits ou mes services" },
+  { value: "les_deux", label: "Les deux à la fois : je crée du contenu ET j'ai une activité à développer derrière" },
 ] as const;
 
-const blockerOptions = [
-  { value: "no_results", label: "Je ne sais pas pourquoi je n'ai pas de résultats" },
-  { value: "no_codes", label: "Je ne maîtrise pas les codes des formats courts" },
+const motivationOptions = [
+  { value: "comprendre_codes", label: "Comprendre enfin ce qui fait qu'une vidéo fonctionne, et le reproduire" },
+  { value: "audience_qualifiee", label: "Construire une audience fidèle et vraiment qualifiée" },
+  { value: "clients_prospects", label: "Attirer des clients ou des prospects pour mon activité" },
+  { value: "credibilite_marque", label: "Asseoir ma crédibilité et ma marque sur mon sujet" },
+  { value: "revenus_monetisation", label: "Générer des revenus directement grâce à mes vues et à la monétisation TikTok" },
+] as const;
+
+const accompagnementOptions = [
+  { value: "suivi_proche", label: "J'ai besoin de quelqu'un qui suit mon compte de près, me corrige et reste dispo quand je bloque" },
+  { value: "autonome_communaute", label: "J'avance bien seul si j'ai les bons repères, une méthode claire et une communauté pour poser mes questions" },
+  { value: "a_discuter", label: "Je ne sais pas encore, j'aimerais qu'on en parle pendant l'appel" },
+] as const;
+
+const critereOptions = [
+  { value: "suivi_perso", label: "Être suivi personnellement, pas un programme générique enregistré une fois pour toutes" },
+  { value: "reactivite", label: "Pouvoir poser mes questions au moment où je bloque, pas attendre" },
+  { value: "regard_sur_mon_compte", label: "Quelqu'un qui regarde vraiment MON compte, ma niche, mes vidéos" },
+  { value: "methode_structuree", label: "Une méthode structurée que je peux appliquer à mon rythme" },
 ] as const;
 
 const followerSinceOptions = [
@@ -58,9 +73,11 @@ const contactSchema = z.object({
   last_name: z.string().trim().min(1, "Nom requis").max(100),
   email: z.string().trim().email("Email invalide").max(255),
   tiktok_username: z.string().trim().max(100).optional().or(z.literal("")),
-  current_level: z.string().min(1, "Sélectionne ton niveau actuel"),
-  blockers: z.array(z.string()).min(1, "Sélectionne au moins un blocage"),
-  goals: z.string().trim().min(10, "Décris tes objectifs (10 caractères min.)").max(2000),
+  profil: z.string().min(1, "Sélectionne ton profil"),
+  motivation: z.string().min(1, "Sélectionne ce que tu attends de TikTok"),
+  accompagnement_type: z.string().min(1, "Sélectionne comment tu veux être accompagné"),
+  accompagnement_critere: z.string().optional().or(z.literal("")),
+  declencheur: z.string().trim().min(10, "Décris ce qui t'amène (10 caractères min.)").max(2000),
   budget: z.string().min(1, "Sélectionne ton budget"),
   origin_source: z.string().trim().max(500).optional().or(z.literal("")),
   follower_since: z.string().optional().or(z.literal("")),
@@ -82,9 +99,11 @@ export default function ReserverUnAppel() {
       last_name: "",
       email: "",
       tiktok_username: "",
-      current_level: "",
-      blockers: [],
-      goals: "",
+      profil: "",
+      motivation: "",
+      accompagnement_type: "",
+      accompagnement_critere: "",
+      declencheur: "",
       budget: "",
       origin_source: getStoredUtmSource(),
       follower_since: "",
@@ -109,22 +128,24 @@ export default function ReserverUnAppel() {
     }
 
     setIsSubmitting(true);
-    trackEvent("reserverunappel_submit", { level: data.current_level });
+    trackEvent("reserverunappel_submit", { profil: data.profil });
     identifyUser(data.email, { first_name: data.first_name, last_name: data.last_name });
     try {
-      const blockersText = data.blockers
-        .map((v) => blockerOptions.find((o) => o.value === v)?.label ?? v)
-        .join(" • ");
-
-      // Full payload sent to the notification (email + Discord) — always includes budget
+      // Full payload sent to the notification (email + Discord) — always includes budget.
+      // Single-choice answers are stored as readable labels so email/Discord/admin need no mapping.
+      // Q5 (declencheur) reuses the existing `goals` column.
       const notifyPayload = {
         first_name: data.first_name,
         last_name: data.last_name,
         email: data.email,
         tiktok_username: data.tiktok_username || null,
-        current_level: levels.find((l) => l.value === data.current_level)?.label ?? data.current_level,
-        blockers: blockersText,
-        goals: data.goals,
+        profil: profilOptions.find((o) => o.value === data.profil)?.label ?? data.profil,
+        motivation: motivationOptions.find((o) => o.value === data.motivation)?.label ?? data.motivation,
+        accompagnement_type: accompagnementOptions.find((o) => o.value === data.accompagnement_type)?.label ?? data.accompagnement_type,
+        accompagnement_critere: data.accompagnement_critere
+          ? (critereOptions.find((o) => o.value === data.accompagnement_critere)?.label ?? data.accompagnement_critere)
+          : null,
+        goals: data.declencheur,
         budget: data.budget || null,
         origin_source: data.origin_source || null,
         follower_since: data.follower_since || null,
@@ -279,7 +300,7 @@ export default function ReserverUnAppel() {
       <Section variant="default" size="lg">
         <div className="max-w-2xl mx-auto">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit, (errors) => trackPostHogEvent("reserverunappel_form_error", { fields: Object.keys(errors).join(",") }))} onFocus={handleFormFocus} className="space-y-8">
+            <form onSubmit={form.handleSubmit(onSubmit, (errors) => trackPostHogEvent("reserverunappel_form_error", { fields: Object.keys(errors).join(",") }))} onFocus={handleFormFocus} className="space-y-10 [&_label[for$='-form-item']]:text-lg [&_label[for$='-form-item']]:font-semibold [&_label[for$='-form-item']]:leading-snug">
               {/* Identity */}
               <div className="grid sm:grid-cols-2 gap-4">
                 <FormField
@@ -338,26 +359,33 @@ export default function ReserverUnAppel() {
                 )}
               />
 
-              {/* Current Level */}
+              {/* Q1 — Profil */}
               <FormField
                 control={form.control}
-                name="current_level"
+                name="profil"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Où en es-tu aujourd'hui sur TikTok ? *</FormLabel>
+                    <FormLabel>Tu te reconnais le plus dans quel profil ? *</FormLabel>
                     <FormControl>
                       <RadioGroup
                         onValueChange={field.onChange}
                         value={field.value}
-                        className="space-y-3 mt-2"
+                        className="space-y-3 mt-3"
                       >
-                        {levels.map((level) => (
-                          <div key={level.value} className="flex items-center space-x-3">
-                            <RadioGroupItem value={level.value} id={level.value} />
-                            <Label htmlFor={level.value} className="font-normal cursor-pointer">
-                              {level.label}
-                            </Label>
-                          </div>
+                        {profilOptions.map((opt) => (
+                          <Label
+                            key={opt.value}
+                            htmlFor={`profil-${opt.value}`}
+                            className={cn(
+                              "flex items-start gap-3 rounded-xl border p-4 cursor-pointer font-normal leading-snug transition-colors",
+                              field.value === opt.value
+                                ? "border-primary bg-primary/5"
+                                : "border-border hover:bg-accent/50"
+                            )}
+                          >
+                            <RadioGroupItem value={opt.value} id={`profil-${opt.value}`} className="mt-0.5" />
+                            <span>{opt.label}</span>
+                          </Label>
                         ))}
                       </RadioGroup>
                     </FormControl>
@@ -366,61 +394,122 @@ export default function ReserverUnAppel() {
                 )}
               />
 
-              {/* Blockers — multi-select */}
+              {/* Q2 — Motivation (détecteur) */}
               <FormField
                 control={form.control}
-                name="blockers"
-                render={() => (
+                name="motivation"
+                render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Quels sont tes principaux points de blocage ? *</FormLabel>
-                    <div className="space-y-3 mt-2">
-                      {blockerOptions.map((opt) => (
-                        <FormField
-                          key={opt.value}
-                          control={form.control}
-                          name="blockers"
-                          render={({ field }) => (
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value?.includes(opt.value)}
-                                  onCheckedChange={(checked) => {
-                                    const current = field.value || [];
-                                    if (checked) {
-                                      field.onChange([...current, opt.value]);
-                                    } else {
-                                      field.onChange(current.filter((v: string) => v !== opt.value));
-                                    }
-                                  }}
-                                  id={`blocker-${opt.value}`}
-                                />
-                              </FormControl>
-                              <Label
-                                htmlFor={`blocker-${opt.value}`}
-                                className="font-normal cursor-pointer"
-                              >
-                                {opt.label}
-                              </Label>
-                            </FormItem>
-                          )}
-                        />
-                      ))}
-                    </div>
+                    <FormLabel>Qu'est-ce que tu attends concrètement de ta présence sur TikTok ? *</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        className="space-y-3 mt-3"
+                      >
+                        {motivationOptions.map((opt) => (
+                          <Label
+                            key={opt.value}
+                            htmlFor={`motivation-${opt.value}`}
+                            className={cn(
+                              "flex items-start gap-3 rounded-xl border p-4 cursor-pointer font-normal leading-snug transition-colors",
+                              field.value === opt.value
+                                ? "border-primary bg-primary/5"
+                                : "border-border hover:bg-accent/50"
+                            )}
+                          >
+                            <RadioGroupItem value={opt.value} id={`motivation-${opt.value}`} className="mt-0.5" />
+                            <span>{opt.label}</span>
+                          </Label>
+                        ))}
+                      </RadioGroup>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
+              {/* Q3 — Type d'accompagnement souhaité */}
               <FormField
                 control={form.control}
-                name="goals"
+                name="accompagnement_type"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Quels sont tes objectifs ? *</FormLabel>
+                    <FormLabel>Comment tu aimerais être accompagné ? *</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        className="space-y-3 mt-3"
+                      >
+                        {accompagnementOptions.map((opt) => (
+                          <Label
+                            key={opt.value}
+                            htmlFor={`accompagnement-${opt.value}`}
+                            className={cn(
+                              "flex items-start gap-3 rounded-xl border p-4 cursor-pointer font-normal leading-snug transition-colors",
+                              field.value === opt.value
+                                ? "border-primary bg-primary/5"
+                                : "border-border hover:bg-accent/50"
+                            )}
+                          >
+                            <RadioGroupItem value={opt.value} id={`accompagnement-${opt.value}`} className="mt-0.5" />
+                            <span>{opt.label}</span>
+                          </Label>
+                        ))}
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Q4 — Ce qui compte dans un accompagnement (facultatif) */}
+              <FormField
+                control={form.control}
+                name="accompagnement_critere"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Qu'est-ce qui compte le plus pour toi ?</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        className="space-y-3 mt-3"
+                      >
+                        {critereOptions.map((opt) => (
+                          <Label
+                            key={opt.value}
+                            htmlFor={`critere-${opt.value}`}
+                            className={cn(
+                              "flex items-start gap-3 rounded-xl border p-4 cursor-pointer font-normal leading-snug transition-colors",
+                              field.value === opt.value
+                                ? "border-primary bg-primary/5"
+                                : "border-border hover:bg-accent/50"
+                            )}
+                          >
+                            <RadioGroupItem value={opt.value} id={`critere-${opt.value}`} className="mt-0.5" />
+                            <span>{opt.label}</span>
+                          </Label>
+                        ))}
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Q5 — Le déclencheur (champ libre obligatoire, stocké dans la colonne `goals`) */}
+              <FormField
+                control={form.control}
+                name="declencheur"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Qu'est-ce qui t'amène à réserver cet appel aujourd'hui ? *</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Ex : gagner en visibilité, convertir mon audience en clients, construire une stratégie claire..."
-                        rows={4}
+                        placeholder="Ce qui te bloque, ce que tu as essayé, ce que tu vises… dis-le avec tes mots."
+                        rows={5}
                         {...field}
                       />
                     </FormControl>

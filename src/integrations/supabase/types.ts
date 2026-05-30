@@ -418,63 +418,51 @@ export type Database = {
       }
       wav_premium_applications: {
         Row: {
-          accompagnement_critere: string | null
-          accompagnement_type: string | null
-          blockers: string | null
+          blockers: string
           budget: string | null
           conversion_trigger: string | null
           created_at: string
-          current_level: string | null
+          current_level: string
           email: string
           first_name: string
           follower_since: string | null
           goals: string
           id: string
           last_name: string
-          motivation: string | null
           origin_source: string | null
           posthog_id: string | null
-          profil: string | null
           tiktok_username: string | null
         }
         Insert: {
-          accompagnement_critere?: string | null
-          accompagnement_type?: string | null
-          blockers?: string | null
+          blockers: string
           budget?: string | null
           conversion_trigger?: string | null
           created_at?: string
-          current_level?: string | null
+          current_level: string
           email: string
           first_name: string
           follower_since?: string | null
           goals: string
           id?: string
           last_name: string
-          motivation?: string | null
           origin_source?: string | null
           posthog_id?: string | null
-          profil?: string | null
           tiktok_username?: string | null
         }
         Update: {
-          accompagnement_critere?: string | null
-          accompagnement_type?: string | null
-          blockers?: string | null
+          blockers?: string
           budget?: string | null
           conversion_trigger?: string | null
           created_at?: string
-          current_level?: string | null
+          current_level?: string
           email?: string
           first_name?: string
           follower_since?: string | null
           goals?: string
           id?: string
           last_name?: string
-          motivation?: string | null
           origin_source?: string | null
           posthog_id?: string | null
-          profil?: string | null
           tiktok_username?: string | null
         }
         Relationships: []

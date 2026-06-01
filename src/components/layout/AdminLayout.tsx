@@ -11,6 +11,7 @@ import {
   ClipboardList,
   BarChart3,
   Star,
+  ShieldCheck,
   Link as LinkIcon,
 } from "lucide-react";
 import { useState } from "react";
@@ -26,6 +27,7 @@ const navItems = [
   { label: "Marketing", href: "/admin/marketing", icon: BarChart3 },
   { label: "Deep Links", href: "/admin/deep-links", icon: LinkIcon },
   { label: "Témoignages", href: "/admin/testimonials", icon: Star },
+  { label: "Consentements WA", href: "/admin/wavacademy-consents", icon: ShieldCheck },
   { label: "Paramètres", href: "/admin/settings", icon: Settings },
 ];
 

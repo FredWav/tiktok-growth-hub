@@ -82,6 +82,7 @@ serve(async (req) => {
       let discordRoleEnv: string | null = null;
       let email: string | null = null;
       let consentId: string | null = null;
+      let accessMonths: number | null = null;
 
       if (metadata?.type?.startsWith("wavacademy_")) {
         plan = (metadata.plan as string) ?? null;
@@ -90,13 +91,14 @@ serve(async (req) => {
       } else if (session.client_reference_id) {
         const { data: consent } = await supabase
           .from("wavacademy_consents")
-          .select("id, email, plan_type, consent_cgv, consent_renonciation")
+          .select("id, email, plan_type, access_months, consent_cgv, consent_renonciation")
           .eq("id", session.client_reference_id)
           .maybeSingle();
 
         if (consent && consent.consent_cgv && consent.consent_renonciation) {
           consentId = consent.id;
           plan = consent.plan_type;
+          accessMonths = consent.access_months ?? null;
           discordRoleEnv = ROLE_ENV_BY_PLAN[consent.plan_type] ?? null;
           email = consent.email || session.customer_details?.email || null;
 
@@ -116,7 +118,19 @@ serve(async (req) => {
       }
 
       const stripeSubscriptionId = session.subscription as string | null;
-      console.log(`WavAcademy checkout completed: plan=${plan}, email=${email}, consent=${consentId ?? "n/a"}`);
+
+      // Paiement unique prépayé (3/6 mois) : pas d'abonnement Stripe → on fixe une date
+      // d'expiration que le cron revoke-expired-wavacademy utilisera pour retirer l'accès.
+      // 1 mois récurrent : stripe_subscription_id renseigné → access_expires_at reste null
+      // (la fin d'accès est pilotée par customer.subscription.deleted).
+      let accessExpiresAt: string | null = null;
+      if (!stripeSubscriptionId && accessMonths) {
+        const exp = new Date();
+        exp.setMonth(exp.getMonth() + accessMonths);
+        accessExpiresAt = exp.toISOString();
+      }
+
+      console.log(`WavAcademy checkout completed: plan=${plan}, months=${accessMonths ?? "n/a"}, recurring=${!!stripeSubscriptionId}, email=${email}, consent=${consentId ?? "n/a"}`);
 
       const { data: subRow, error: insertError } = await supabase
         .from("wavacademy_subscriptions")
@@ -127,6 +141,8 @@ serve(async (req) => {
           discord_user_id: null,
           discord_role_env: discordRoleEnv,
           plan_type: plan,
+          access_months: accessMonths,
+          access_expires_at: accessExpiresAt,
           status: "active",
           discord_role_granted: false,
         })

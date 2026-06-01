@@ -14,7 +14,7 @@
 ## Offres et services
 
 - [Analyse Express](/analyse-express): Audit TikTok automatisé (score de santé, meilleures heures, hashtags, régularité) basé sur ton profil.
-- [Wav Academy](/wavacademy): Programme de formation TikTok avec 3 niveaux (Accès, Live, Elite) incluant accès Discord et coaching.
+- [Wav Academy](/wavacademy): Programme de diagnostic continu pour créateurs (WavSocialScan + contenu stratégique quotidien + Discord + coaching), proposé en 3 formules de durée : 1 mois (159 €/mois, abonnement), 3 mois (387 €, prépayé) et 6 mois (594 €, prépayé).
 - [Offres](/offres): Redirection vers les différentes offres d'accompagnement.
 - [45 Jours](/45-jours): Redirection vers la page de réservation pour l'offre d'accompagnement Wav Premium.
 - [One Shot](/one-shot): Redirection vers la page de réservation pour le coaching One Shot.

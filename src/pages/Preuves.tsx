@@ -9,6 +9,8 @@ import { SEOHead } from "@/components/SEOHead";
 import { ScreenshotWall } from "@/components/ScreenshotWall";
 
 const videoTestimonials = [
+  { id: "LOi7RTx12nE", alt: "Témoignage client - Retour d'expérience récent" },
+  { id: "Hgkn3ifjSS0", alt: "Témoignage client - Retour d'expérience récent" },
   { id: "Bzw7nwqB2rQ", alt: "Témoignage client - Nouveau retour d'expérience" },
   { id: "XMMmmLLKue4", alt: "Témoignage client - Nouveau retour d'expérience" },
   { id: "Jh5yrsotoHM", alt: "Témoignage client - Retour d'expérience récent" },

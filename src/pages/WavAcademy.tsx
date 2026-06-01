@@ -140,6 +140,46 @@ const frameworks = [
   { num: "07", title: "Le Pipeline Formats Courts → Clients", desc: "Passer de «j'ai des vues» à «j'ai des clients» en 4 étapes claires." },
 ];
 
+// ── Formules (grille d'ancrage cash-flow) ──────────────────────────────────
+// Accès identique partout — seuls le prix, la durée et le mode de facturation changent.
+// 1 mois = abonnement récurrent (leurre d'ancrage) ; 3 & 6 mois = paiement unique prépayé.
+type Plan = {
+  term: string;
+  months: number;
+  monthly: number;
+  total: number;
+  save: string | null;
+  label: string;
+  recurring: boolean;
+  note: string;
+  highlight?: boolean;
+  badge?: string;
+};
+
+const PLANS: Plan[] = [
+  {
+    term: "1m", months: 1, monthly: 159, total: 159, save: null, label: "1 mois",
+    recurring: true, note: "Sans engagement · résiliable en 1 clic",
+  },
+  {
+    term: "3m", months: 3, monthly: 129, total: 387, save: "-19 %", label: "3 mois",
+    recurring: false, note: "Paiement unique · accès 3 mois",
+  },
+  {
+    term: "6m", months: 6, monthly: 99, total: 594, save: "-38 %", label: "6 mois",
+    recurring: false, note: "Paiement unique · accès 6 mois",
+    highlight: true, badge: "Meilleure offre",
+  },
+];
+
+// Avantages communs à toutes les formules.
+const PLAN_FEATURES = [
+  "Contenu stratégique quotidien (Tapis Roulant)",
+  "15 contenus en rotation permanente",
+  "Live hebdomadaire avec Fred",
+  "Discord premium (canaux avancés)",
+];
+
 // ── Main component ─────────────────────────────────────────────────────────
 export default function WavAcademy() {
   const [searchParams] = useSearchParams();
@@ -147,6 +187,9 @@ export default function WavAcademy() {
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedTerm, setSelectedTerm] = useState<string>("6m");
+
+  const selectedPlan = PLANS.find((p) => p.term === selectedTerm) ?? PLANS[2];
 
   const form = useForm<CheckoutForm>({
     resolver: zodResolver(checkoutSchema),
@@ -158,19 +201,24 @@ export default function WavAcademy() {
     mode: "onChange",
   });
 
-  const openCheckoutDialog = () => {
+  const scrollToPlans = () => {
+    document.getElementById("plans")?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const selectPlan = (term: string) => {
+    setSelectedTerm(term);
     form.reset();
     setDialogOpen(true);
-    trackPostHogEvent("wavclub_checkout_open", { plan: "live" });
+    trackPostHogEvent("wavclub_checkout_open", { term });
   };
 
   const onCheckout = async (data: CheckoutForm) => {
     setIsSubmitting(true);
-    trackPostHogEvent("wavclub_checkout_submit", { plan: "live" });
+    trackPostHogEvent("wavclub_checkout_submit", { term: selectedTerm });
     try {
       const { data: result, error } = await supabase.functions.invoke("record-wavacademy-consent", {
         body: {
-          plan: "live",
+          term: selectedTerm,
           email: data.email,
           consent_cgv: data.consent_cgv,
           consent_renonciation: data.consent_renonciation,
@@ -248,8 +296,8 @@ export default function WavAcademy() {
             />
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="hero" size="xl" onClick={openCheckoutDialog}>
-              Rejoindre Wav Academy — 97€/mois
+            <Button variant="hero" size="xl" onClick={scrollToPlans}>
+              Rejoindre Wav Academy — dès 99€/mois
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -445,8 +493,7 @@ export default function WavAcademy() {
             <div className="p-4 bg-primary/5 rounded-xl border border-primary/20 space-y-2">
               <p className="text-sm text-foreground">
                 Normalement à partir de <strong>14,90€/mois</strong> en Standard et <strong>39,90€/mois</strong> en Premium.
-                En tant que membre du Wav Academy, tu bénéficies de <strong>3 000 crédits gratuits chaque mois</strong>, et de{" "}
-                <strong>-50% sur tous les abonnements WavSocialScan</strong> si tu veux aller plus loin.
+                En tant que membre du Wav Academy, tu bénéficies de <strong>3 000 crédits gratuits chaque mois</strong>.
               </p>
               <p className="text-xs text-muted-foreground">
                 💡 <strong>100 crédits = 1 analyse de vidéo</strong> · <strong>300 crédits = 1 analyse de compte complet</strong>
@@ -485,65 +532,84 @@ export default function WavAcademy() {
         </div>
       </Section>
 
-      {/* ── PLAN ─────────────────────────────────────────────────────────── */}
+      {/* ── PLANS (grille d'ancrage) ─────────────────────────────────────── */}
       <Section variant="default" size="xl" id="plans">
         <SectionHeader
-          title="Rejoins le Wav Academy."
-          subtitle="97€/mois. Sans engagement. Résiliation en 1 clic."
+          title="Choisis ta formule Wav Academy."
+          subtitle="Le même accès complet. Plus tu t'engages longtemps, moins c'est cher au mois."
         />
 
-        <div className="max-w-md mx-auto">
-          <div className="rounded-2xl border-2 border-primary bg-background p-8 flex flex-col relative shadow-lg shadow-primary/10">
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-              <span className="bg-primary text-primary-foreground text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wide">
-                Populaire
-              </span>
-            </div>
-            <div className="mb-6">
-              <p className="text-xs font-bold tracking-widest text-primary uppercase mb-3">🎙 WAV ACADEMY</p>
-              <div className="flex items-baseline gap-1 mb-1">
-                <span className="font-display text-5xl font-bold">97€</span>
-                <span className="text-muted-foreground">/mois</span>
-              </div>
-              <p className="text-sm text-muted-foreground">Le diagnostic quasi quotidien et le feedback humain en direct.</p>
-            </div>
-            <ul className="space-y-3 mb-8 flex-1">
-              <li className="flex items-start gap-3 text-sm">
-                <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-semibold">3 000 crédits WavSocialScan/mois</span>
-                  <p className="text-xs text-muted-foreground mt-0.5">≈ 30 analyses de vidéo ou 10 analyses de compte</p>
-                </div>
-              </li>
-              {[
-                "-50% sur tous les abonnements WavSocialScan",
-                "Contenu stratégique quotidien (Tapis Roulant)",
-                "15 contenus en rotation permanente",
-                "Live hebdomadaire avec Fred",
-                "Discord premium (canaux avancés)",
-                "30 min de coaching individuel/mois",
-                "Packs thématiques (à l'achat)",
-              ].map((f) => (
-                <li key={f} className="flex items-start gap-3 text-sm">
-                  <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                  <span>{f}</span>
-                </li>
-              ))}
-            </ul>
-            <Button
-              variant="hero"
-              size="lg"
-              className="w-full"
-              onClick={openCheckoutDialog}
+        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto items-stretch">
+          {PLANS.map((plan) => (
+            <div
+              key={plan.term}
+              className={`rounded-2xl bg-background p-6 flex flex-col relative ${
+                plan.highlight
+                  ? "border-2 border-primary shadow-lg shadow-primary/10 md:scale-105"
+                  : "border border-border"
+              }`}
             >
-              Rejoindre — 97€/mois
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
+              {plan.badge && (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                  <span className="bg-primary text-primary-foreground text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wide whitespace-nowrap">
+                    {plan.badge}
+                  </span>
+                </div>
+              )}
+              <div className="mb-5">
+                <div className="flex items-center justify-between mb-3 min-h-[1.5rem]">
+                  <p className="text-xs font-bold tracking-widest text-primary uppercase">{plan.label}</p>
+                  {plan.save && (
+                    <span className="text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-0.5">
+                      {plan.save}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-baseline gap-1 mb-1">
+                  <span className="font-display text-5xl font-bold">{plan.monthly}€</span>
+                  <span className="text-muted-foreground">/mois</span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {plan.recurring ? "Facturé chaque mois" : `soit ${plan.total}€ une seule fois`}
+                </p>
+              </div>
+              <p className="text-xs text-muted-foreground mb-6 min-h-[2rem]">{plan.note}</p>
+              <Button
+                variant={plan.highlight ? "hero" : "outline"}
+                size="lg"
+                className="w-full mt-auto"
+                onClick={() => selectPlan(plan.term)}
+              >
+                Choisir {plan.label}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          ))}
         </div>
 
-        <p className="text-center text-sm text-muted-foreground mt-8">
-          Aucun engagement longue durée. Tu restes tant que tu progresses. Tu pars quand tu veux.
+        {/* Avantages communs à toutes les formules */}
+        <div className="max-w-2xl mx-auto mt-10 p-6 rounded-2xl bg-accent/30 border border-border">
+          <p className="text-sm font-semibold text-center mb-5">🎙 Inclus dans toutes les formules</p>
+          <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-3">
+            <li className="flex items-start gap-3 text-sm sm:col-span-2">
+              <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+              <div>
+                <span className="font-semibold">3 000 crédits WavSocialScan/mois</span>
+                <p className="text-xs text-muted-foreground mt-0.5">≈ 30 analyses de vidéo ou 10 analyses de compte</p>
+              </div>
+            </li>
+            {PLAN_FEATURES.map((f) => (
+              <li key={f} className="flex items-start gap-3 text-sm">
+                <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                <span>{f}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <p className="text-center text-sm text-muted-foreground mt-8 max-w-2xl mx-auto">
+          Le <strong>1 mois</strong> est sans engagement, résiliable en 1 clic. Les formules{" "}
+          <strong>3 et 6 mois</strong> sont des paiements uniques&nbsp;: tu bloques un tarif mensuel plus bas, sans reconduction.
         </p>
       </Section>
 
@@ -624,14 +690,14 @@ export default function WavAcademy() {
             <Button
               variant="hero"
               size="xl"
-              onClick={openCheckoutDialog}
+              onClick={scrollToPlans}
             >
-              Rejoindre Wav Academy — 97€/mois
+              Rejoindre Wav Academy — dès 99€/mois
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
           <p className="text-cream/40 text-sm">
-            Aucun engagement. Résiliation en 1 clic. Le Tapis Roulant, lui, continue de tourner.
+            Dès 99€/mois. Le 1 mois est sans engagement. Le Tapis Roulant, lui, continue de tourner.
           </p>
         </div>
       </Section>
@@ -641,10 +707,13 @@ export default function WavAcademy() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="font-display text-2xl">
-              WAV ACADEMY — 97€/mois
+              WAV ACADEMY — {selectedPlan.label} ·{" "}
+              {selectedPlan.recurring ? `${selectedPlan.monthly}€/mois` : `${selectedPlan.total}€`}
             </DialogTitle>
             <DialogDescription>
-              Complète ces informations pour finaliser ton inscription. Tu seras redirigé vers le paiement sécurisé.
+              {selectedPlan.recurring
+                ? "Abonnement mensuel, sans engagement — résiliable à tout moment. Complète ces informations, tu seras redirigé vers le paiement sécurisé."
+                : `Accès ${selectedPlan.months} mois · soit ${selectedPlan.monthly}€/mois · paiement unique, sans reconduction. Complète ces informations, tu seras redirigé vers le paiement sécurisé.`}
             </DialogDescription>
           </DialogHeader>
 
@@ -735,7 +804,10 @@ export default function WavAcademy() {
                   )}
                 </Button>
                 <p className="text-xs text-muted-foreground text-center mt-3">
-                  Paiement sécurisé par Stripe · Sans engagement · Résiliation en 1 clic
+                  Paiement sécurisé par Stripe ·{" "}
+                  {selectedPlan.recurring
+                    ? "Sans engagement · Résiliation en 1 clic"
+                    : "Paiement unique · Sans reconduction"}
                 </p>
               </div>
             </form>

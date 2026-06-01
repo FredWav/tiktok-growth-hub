@@ -62,9 +62,9 @@ export default function CGV() {
             Analyse automatisée d'un compte TikTok via outil d'analyse. Le client reçoit un rapport détaillé (PDF + dashboard). Prestation de contenu numérique délivrée immédiatement après paiement.
           </p>
 
-          <h3 className="font-display text-lg font-medium mt-4 mb-2">5.3 Wav Academy (abonnement)</h3>
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">5.3 Wav Academy</h3>
           <p className="text-muted-foreground mb-4">
-            Abonnement mensuel donnant accès à la communauté Discord Wav Academy, aux ressources documentaires (cours, replays, checklists, méthodes, templates), aux lives hebdomadaires avec Fred, aux canaux Discord premium, et à une session de coaching individuel de 30 minutes par mois.
+            Accès à la communauté Discord Wav Academy, aux ressources documentaires (cours, replays, checklists, méthodes, templates), aux lives hebdomadaires avec Fred, et aux canaux Discord premium. La Wav Academy est proposée en plusieurs formules (1, 3 ou 6 mois) dont les modalités de durée et de facturation sont précisées à l'Article 12.
           </p>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">5.4 Évolution du contenu</h3>
@@ -126,7 +126,10 @@ export default function CGV() {
             <strong>Accompagnements individuels (Wav Premium) :</strong> les sessions et ressources déjà délivrées sont définitivement dues. Les sessions non encore consommées restent acquises au Client et disponibles dans la limite de la durée de validité prévue à l'article 8.2 ci-dessous, sans pouvoir donner lieu à un remboursement en numéraire.
           </p>
           <p className="text-muted-foreground mb-4">
-            <strong>Abonnements (Wav Academy, toutes formules) :</strong> toute période d'abonnement (mensuelle ou annuelle) commencée est intégralement et définitivement due, sans remboursement, même partiel ou au prorata, quel que soit le niveau d'utilisation effective. Les modalités de résiliation pour l'avenir sont prévues à l'Article 12.
+            <strong>Wav Academy — formule mensuelle (1 mois) :</strong> abonnement à reconduction automatique ; toute période mensuelle commencée est intégralement et définitivement due, sans remboursement, même partiel ou au prorata, quel que soit le niveau d'utilisation effective. Les modalités de résiliation pour l'avenir sont prévues à l'Article 12.
+          </p>
+          <p className="text-muted-foreground mb-4">
+            <strong>Wav Academy — formules à durée déterminée (3 et 6 mois) :</strong> formules prépayées, payées intégralement et d'avance pour la totalité de la durée choisie. Le prix est définitivement dû dès la commande, sans remboursement, même partiel ou au prorata, quel que soit le niveau d'utilisation effective. Ces formules ne sont pas reconduites automatiquement : l'accès cesse de plein droit au terme de la durée souscrite, sauf souscription d'une nouvelle formule.
           </p>
           <p className="text-muted-foreground mb-4">
             <strong>Prestations à livraison numérique immédiate (Analyse Express) :</strong> le rapport et les contenus délivrés sont définitivement dus dès leur mise à disposition, le Client ayant expressément demandé l'exécution immédiate et renoncé à son droit de rétractation dans les conditions de l'article 9.2.
@@ -194,7 +197,7 @@ export default function CGV() {
             <li>et qu'il a expressément reconnu perdre son droit de rétractation du fait de ce démarrage.</li>
           </ul>
           <p className="text-muted-foreground mb-4">
-            Le Client conserve néanmoins la faculté de résilier son abonnement pour l'avenir dans les conditions de l'Article 12, les périodes commencées restant dues conformément à l'article 8.1.
+            Pour la formule mensuelle (1 mois), le Client conserve néanmoins la faculté de résilier son abonnement pour l'avenir dans les conditions de l'Article 12, les périodes commencées restant dues conformément à l'article 8.1. Pour les formules à durée déterminée (3 et 6 mois), l'accès court jusqu'au terme souscrit puis cesse automatiquement, sans reconduction ni remboursement.
           </p>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">9.4 Confirmation sur support durable</h3>
@@ -221,21 +224,32 @@ export default function CGV() {
           </p>
 
           {/* ARTICLE 12 */}
-          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 12 — Abonnement Wav Academy (renouvellement, résiliation, suspension)</h2>
+          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 12 — Wav Academy (formules, reconduction, résiliation, suspension)</h2>
 
-          <h3 className="font-display text-lg font-medium mt-4 mb-2">12.1 Renouvellement</h3>
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">12.1 Formules disponibles</h3>
+          <p className="text-muted-foreground mb-2">
+            La Wav Academy est proposée en trois formules donnant accès à des contenus et services identiques, seules la durée et les modalités de paiement variant :
+          </p>
+          <ul className="text-muted-foreground mb-4 space-y-1">
+            <li><strong>1 mois</strong> — abonnement mensuel à reconduction automatique (159 €/mois) ;</li>
+            <li><strong>3 mois</strong> — formule prépayée à durée déterminée (387 €, soit 129 €/mois), sans reconduction ;</li>
+            <li><strong>6 mois</strong> — formule prépayée à durée déterminée (594 €, soit 99 €/mois), sans reconduction.</li>
+          </ul>
+
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">12.2 Reconduction</h3>
           <p className="text-muted-foreground mb-4">
-            La Wav Academy est un abonnement à reconduction automatique (mensuel) jusqu'à résiliation par le client.
+            La formule mensuelle (1 mois) est un abonnement à reconduction automatique jusqu'à résiliation par le client. Les formules à durée déterminée (3 et 6 mois) ne sont pas reconduites : l'accès cesse de plein droit au terme de la durée souscrite, sauf souscription volontaire d'une nouvelle formule.
           </p>
 
-          <h3 className="font-display text-lg font-medium mt-4 mb-2">12.2 Résiliation</h3>
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">12.3 Résiliation</h3>
           <p className="text-muted-foreground mb-4">
-            Le client peut résilier à tout moment via le lien de gestion d'abonnement communiqué lors de l'achat ou depuis son espace Stripe.
-            Pour éviter le prélèvement suivant, la résiliation doit être effectuée au plus tard 24h avant l'échéance de renouvellement.
-            Toute période commencée est due. L'accès est maintenu jusqu'à la fin de la période payée.
+            <strong>Formule mensuelle (1 mois) :</strong> le client peut résilier à tout moment via le lien de gestion d'abonnement communiqué lors de l'achat ou depuis son espace Stripe. La résiliation ne vaut que pour l'avenir : pour éviter le prélèvement suivant, elle doit être effectuée au plus tard 24h avant l'échéance de renouvellement. <strong>Tout mois entamé est intégralement dû</strong> et n'est ni remboursé ni proratisé, y compris en cas de non-utilisation du service ou d'oubli de résiliation avant l'échéance ; l'accès est maintenu jusqu'à la fin du mois payé.
+          </p>
+          <p className="text-muted-foreground mb-4">
+            <strong>Formules à durée déterminée (3 et 6 mois) :</strong> payées intégralement d'avance, elles ne donnent lieu à aucune résiliation anticipée ni remboursement, même partiel ou au prorata (article 8.1). L'accès reste ouvert jusqu'au terme souscrit puis prend fin automatiquement, sans reconduction.
           </p>
 
-          <h3 className="font-display text-lg font-medium mt-4 mb-2">12.3 Suspension</h3>
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">12.4 Suspension</h3>
           <p className="text-muted-foreground mb-4">
             En cas d'impayé, de rejet de paiement, de rétrofacturation, ou de violation des règles de communauté (harcèlement, spam, diffusion de contenus réservés, comportements abusifs), l'accès peut être suspendu ou résilié sans remboursement.
           </p>

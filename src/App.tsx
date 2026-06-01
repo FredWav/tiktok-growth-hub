@@ -57,6 +57,7 @@ const AdminApplications = lazy(() => import("./pages/admin/Applications"));
 const AdminMarketing = lazy(() => import("./pages/admin/Marketing"));
 const AdminDeepLinks = lazy(() => import("./pages/admin/DeepLinks"));
 const AdminTestimonials = lazy(() => import("./pages/admin/Testimonials"));
+const AdminWavAcademyConsents = lazy(() => import("./pages/admin/WavAcademyConsents"));
 const GoRedirect = lazy(() => import("./pages/GoRedirect"));
 
 const queryClient = new QueryClient();
@@ -156,6 +157,14 @@ const App = () => (
               element={
                 <ProtectedRoute requiredRole="admin">
                   <AdminTestimonials />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/wavacademy-consents"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AdminWavAcademyConsents />
                 </ProtectedRoute>
               }
             />

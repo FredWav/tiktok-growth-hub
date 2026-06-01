@@ -8,14 +8,19 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Stripe Payment Link URLs — public, fine to ship in code.
-// If you ever rotate them, just edit here.
+// Stripe Payment Link URLs par formule — public, fine to ship in code.
+// 1m = abonnement récurrent (159€/mois) ; 3m & 6m = paiement unique prépayé.
+// TODO: remplacer par les vrais liens créés dans Stripe (sinon le bouton ne paie pas).
 const PAYMENT_LINKS: Record<string, string> = {
-  live: "https://buy.stripe.com/bJe14m2OMd1v3eO2HecMM0x",
+  "1m": "https://buy.stripe.com/7sYfZg1KI2mR4iSbdKcMM0z", // abonnement récurrent 159€/mois
+  "3m": "https://buy.stripe.com/5kQeVc8964uZdTs4PmcMM0A", // paiement unique 387€
+  "6m": "https://buy.stripe.com/14A9ASdtq8Lf7v4gy4cMM0B", // paiement unique 594€
 };
 
-const CGV_VERSION = "v1"; // bump if /cgv text materially changes
-//bump
+// Durée d'accès (en mois) par formule — capturée au consentement pour le calcul d'expiration.
+const ACCESS_MONTHS: Record<string, number> = { "1m": 1, "3m": 3, "6m": 6 };
+
+const CGV_VERSION = "v2"; // bump if /cgv text materially changes
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -24,11 +29,11 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { plan, email, consent_cgv, consent_renonciation } = body ?? {};
+    const { term, email, consent_cgv, consent_renonciation } = body ?? {};
 
-    if (!plan || !(plan in PAYMENT_LINKS)) {
+    if (!term || !(term in PAYMENT_LINKS)) {
       return new Response(
-        JSON.stringify({ error: "Plan invalide (live attendu)" }),
+        JSON.stringify({ error: "Formule invalide (1m, 3m ou 6m attendu)" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -65,7 +70,8 @@ serve(async (req) => {
       .from("wavacademy_consents")
       .insert({
         email: email.trim().toLowerCase(),
-        plan_type: plan,
+        plan_type: "live", // accès identique pour toutes les formules
+        access_months: ACCESS_MONTHS[term],
         consent_cgv: true,
         consent_renonciation: true,
         cgv_version: CGV_VERSION,
@@ -85,7 +91,7 @@ serve(async (req) => {
     }
 
     const consentId = data.id as string;
-    const baseUrl = PAYMENT_LINKS[plan];
+    const baseUrl = PAYMENT_LINKS[term];
     const params = new URLSearchParams({
       client_reference_id: consentId,
       prefilled_email: email.trim(),

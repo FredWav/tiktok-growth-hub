@@ -1,21 +1,39 @@
-## Diagnostic
+## Déploiement Wav Academy prépayé (1/3/6 mois)
 
-Le bouton fonctionne et le backend reçoit bien les soumissions (dernière reçue ce matin à 09:41). Le problème est purement visuel : quand un champ obligatoire est vide ou invalide, `react-hook-form` se contente d'afficher un message rouge sous le champ. **Aucun toast, aucun scroll automatique.** Sur mobile (viewport actuel 393px), si l'erreur est au-dessus de l'écran, l'utilisateur clique sur "Envoyer ma demande" et a l'impression que le bouton est cassé.
+Les deux migrations et les trois edge functions sont déjà sur `main`, il reste à les appliquer sur Supabase.
 
-Cas typiques : email mal formaté, profil/motivation/accompagnement non cochés, budget non sélectionné, déclencheur < 10 caractères.
+### 1. Migrations à appliquer
 
-## Correctif
+**`20260601000000_wavacademy_prepaid_terms.sql`**
+- Ajoute `access_months` (int) sur `wavacademy_consents`
+- Ajoute `access_months` (int) et `access_expires_at` (timestamptz) sur `wavacademy_subscriptions`
+- Crée l'index partiel `idx_wavacademy_subscriptions_expiry` sur les abonnements actifs
 
-Dans `src/pages/ReserverUnAppel.tsx`, modifier le callback d'erreur de `form.handleSubmit` (ligne 303) pour :
+**`20260601000001_schedule_revoke_expired_wavacademy.sql`**
+- Active `pg_cron` et `pg_net`
+- Planifie le job `revoke-expired-wavacademy-daily` à 03:00 UTC qui appelle l'edge function de révocation
 
-1. Afficher un `toast.error` clair : "Vérifie les champs en rouge avant d'envoyer." (sonner déjà importé).
-2. Scroller automatiquement vers le premier champ en erreur (`document.querySelector` sur l'id du premier champ retourné par `errors`, ou utiliser `form.setFocus(firstErrorField)` qui scrolle + focus en une fois).
-3. Conserver le tracking PostHog existant (`reserverunappel_form_error`).
+Les deux migrations sont rejouables (IF NOT EXISTS, unschedule avant reschedule).
 
-Aucune autre modification (pas de touche au schéma Zod, au payload, à l'edge function, ni à la migration). Seul le handler d'erreur change.
+### 2. Edge functions à redéployer
 
-## Validation après build
+- `record-wavacademy-consent` — capture `access_months` (1/3/6) au consentement
+- `stripe-webhook` — calcule `access_expires_at` pour les paiements uniques 3/6 mois, laisse NULL pour le récurrent 1 mois
+- `revoke-expired-wavacademy` — cron quotidien qui retire le rôle Discord et passe les abonnements expirés en `status='expired'`
 
-- Recharger `/reserverunappel`, cliquer "Envoyer" sans rien remplir → toast rouge + scroll/focus sur le champ Prénom.
-- Remplir tout sauf le budget → toast + scroll sur le select Budget.
-- Remplir correctement → soumission OK comme aujourd'hui.
+### 3. Régénération des types
+
+Après l'exécution des migrations, `src/integrations/supabase/types.ts` est régénéré automatiquement pour exposer les nouvelles colonnes (`access_months`, `access_expires_at`). Le hook `useWavAcademyConsents` les utilise déjà en optional.
+
+### Ordre d'exécution
+
+1. Migration `20260601000000` (colonnes) — bloquante
+2. Migration `20260601000001` (cron) — dépend de l'edge function déployée pour fonctionner réellement
+3. Déploiement des 3 edge functions
+4. Régénération auto des types
+
+### Vérifications post-déploiement
+
+- Colonnes `access_months` / `access_expires_at` visibles dans le schéma
+- Job `revoke-expired-wavacademy-daily` listé dans `cron.job`
+- Les 3 edge functions répondent (logs sans erreur au démarrage)

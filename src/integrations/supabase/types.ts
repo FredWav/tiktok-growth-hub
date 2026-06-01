@@ -525,6 +525,7 @@ export type Database = {
       }
       wavacademy_consents: {
         Row: {
+          access_months: number | null
           cgv_version: string
           consent_cgv: boolean
           consent_renonciation: boolean
@@ -537,6 +538,7 @@ export type Database = {
           user_agent: string | null
         }
         Insert: {
+          access_months?: number | null
           cgv_version?: string
           consent_cgv: boolean
           consent_renonciation: boolean
@@ -549,6 +551,7 @@ export type Database = {
           user_agent?: string | null
         }
         Update: {
+          access_months?: number | null
           cgv_version?: string
           consent_cgv?: boolean
           consent_renonciation?: boolean
@@ -564,6 +567,8 @@ export type Database = {
       }
       wavacademy_subscriptions: {
         Row: {
+          access_expires_at: string | null
+          access_months: number | null
           created_at: string
           discord_role_env: string | null
           discord_role_granted: boolean
@@ -576,6 +581,8 @@ export type Database = {
           stripe_subscription_id: string | null
         }
         Insert: {
+          access_expires_at?: string | null
+          access_months?: number | null
           created_at?: string
           discord_role_env?: string | null
           discord_role_granted?: boolean
@@ -588,6 +595,8 @@ export type Database = {
           stripe_subscription_id?: string | null
         }
         Update: {
+          access_expires_at?: string | null
+          access_months?: number | null
           created_at?: string
           discord_role_env?: string | null
           discord_role_granted?: boolean

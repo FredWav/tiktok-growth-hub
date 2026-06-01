@@ -242,7 +242,7 @@ export default function WavAcademy() {
           </h1>
           <div className="max-w-3xl mx-auto mb-10">
             <VideoCard
-              id="MfqFnAi-wfg"
+              id="TbKmQOXUt8s"
               alt="Wav Academy — Présentation par Fred Wav"
               location="wavacademy_vsl"
             />

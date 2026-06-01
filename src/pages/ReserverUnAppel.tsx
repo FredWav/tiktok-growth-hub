@@ -300,7 +300,23 @@ export default function ReserverUnAppel() {
       <Section variant="default" size="lg">
         <div className="max-w-2xl mx-auto">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit, (errors) => trackPostHogEvent("reserverunappel_form_error", { fields: Object.keys(errors).join(",") }))} onFocus={handleFormFocus} className="space-y-10 [&_label[for$='-form-item']]:text-lg [&_label[for$='-form-item']]:font-semibold [&_label[for$='-form-item']]:leading-snug">
+            <form onSubmit={form.handleSubmit(onSubmit, (errors) => {
+              const fields = Object.keys(errors);
+              trackPostHogEvent("reserverunappel_form_error", { fields: fields.join(",") });
+              toast.error("Vérifie les champs en rouge avant d'envoyer.");
+              const first = fields[0] as keyof ContactForm | undefined;
+              if (first) {
+                try {
+                  form.setFocus(first);
+                } catch {
+                  // RadioGroup/Select may not be focusable — fallback to scroll
+                }
+                requestAnimationFrame(() => {
+                  const el = document.querySelector(`[name="${first}"]`) as HTMLElement | null;
+                  (el ?? document.getElementById(`${first}-form-item`))?.scrollIntoView({ behavior: "smooth", block: "center" });
+                });
+              }
+            })} onFocus={handleFormFocus} className="space-y-10 [&_label[for$='-form-item']]:text-lg [&_label[for$='-form-item']]:font-semibold [&_label[for$='-form-item']]:leading-snug">
               {/* Identity */}
               <div className="grid sm:grid-cols-2 gap-4">
                 <FormField

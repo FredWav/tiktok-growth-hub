@@ -119,13 +119,7 @@ export default function ReserverUnAppel() {
   };
 
   const onSubmit = async (data: ContactForm) => {
-    // Budget trop bas pour un accompagnement personnalisé : on redirige vers Wav Academy.
-    if (data.budget === "10_a_100") {
-      trackPostHogEvent("reserverunappel_redirect_academy", { budget: data.budget });
-      identifyUser(data.email, { first_name: data.first_name, last_name: data.last_name });
-      setRedirectToAcademy(true);
-      return;
-    }
+    const lowBudget = data.budget === "10_a_100";
 
     setIsSubmitting(true);
     trackEvent("reserverunappel_submit", { profil: data.profil });
@@ -146,7 +140,7 @@ export default function ReserverUnAppel() {
           ? (critereOptions.find((o) => o.value === data.accompagnement_critere)?.label ?? data.accompagnement_critere)
           : null,
         goals: data.declencheur,
-        budget: data.budget || null,
+        budget: data.budget ? `${data.budget}${lowBudget ? " (redirigé Wav Academy)" : ""}` : null,
         origin_source: data.origin_source || null,
         follower_since: data.follower_since || null,
         conversion_trigger: data.conversion_trigger || null,
@@ -163,7 +157,13 @@ export default function ReserverUnAppel() {
         .from("wav_premium_applications")
         .insert(notifyPayload);
 
-      await notifyPromise.catch((err) => console.error("Notification error:", err));
+      const notifyResult = await notifyPromise.catch((err) => {
+        console.error("Notification error:", err);
+        return { error: err } as { error: unknown };
+      });
+      if (notifyResult && "error" in notifyResult && notifyResult.error) {
+        toast.error("L'envoi a partiellement échoué. Réessaie ou contacte-nous directement.");
+      }
 
       if (dbError) {
         // The admin was still notified (email + Discord), so the lead isn't lost.
@@ -171,7 +171,12 @@ export default function ReserverUnAppel() {
         console.error("DB insert error (non-blocking):", dbError);
       }
 
-      setSubmitted(true);
+      if (lowBudget) {
+        trackPostHogEvent("reserverunappel_redirect_academy", { budget: data.budget });
+        setRedirectToAcademy(true);
+      } else {
+        setSubmitted(true);
+      }
     } catch (err) {
       console.error("Submission error:", err);
       toast.error("Une erreur est survenue. Réessaie ou contacte-nous directement.");

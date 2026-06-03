@@ -1,39 +1,42 @@
-## Déploiement Wav Academy prépayé (1/3/6 mois)
+## Ce que j'ai trouvé
 
-Les deux migrations et les trois edge functions sont déjà sur `main`, il reste à les appliquer sur Supabase.
+- 0 nouvelle ligne dans `wav_premium_applications` aujourd'hui (3 juin). Dernière entrée : Arnaud Laplace le 2 juin à 17:29.
+- 0 log côté edge function `notify-application` aujourd'hui.
+- Conclusion : le formulaire n'a **jamais** déclenché ni l'email/Discord, ni l'insert DB pour cette personne.
 
-### 1. Migrations à appliquer
+## Cause la plus probable
 
-**`20260601000000_wavacademy_prepaid_terms.sql`**
-- Ajoute `access_months` (int) sur `wavacademy_consents`
-- Ajoute `access_months` (int) et `access_expires_at` (timestamptz) sur `wavacademy_subscriptions`
-- Crée l'index partiel `idx_wavacademy_subscriptions_expiry` sur les abonnements actifs
+Dans `src/pages/ReserverUnAppel.tsx` (lignes 121-128), si l'utilisateur choisit le budget **« De 10€ à 100€ »** (`10_a_100`), le `onSubmit` fait un early-return :
 
-**`20260601000001_schedule_revoke_expired_wavacademy.sql`**
-- Active `pg_cron` et `pg_net`
-- Planifie le job `revoke-expired-wavacademy-daily` à 03:00 UTC qui appelle l'edge function de révocation
+```ts
+if (data.budget === "10_a_100") {
+  setRedirectToAcademy(true);
+  return;   // <-- aucune notification, aucun insert DB
+}
+```
 
-Les deux migrations sont rejouables (IF NOT EXISTS, unschedule avant reschedule).
+→ Le lead est **perdu silencieusement**. Aucun email, aucun Discord, aucune trace en base. Si la personne avait un petit budget (cas courant sur mobile), c'est exactement ce qui s'est passé deux fois.
 
-### 2. Edge functions à redéployer
+Hypothèse secondaire écartée : RLS / schéma OK, la function `notify-application` n'a juste pas été appelée.
 
-- `record-wavacademy-consent` — capture `access_months` (1/3/6) au consentement
-- `stripe-webhook` — calcule `access_expires_at` pour les paiements uniques 3/6 mois, laisse NULL pour le récurrent 1 mois
-- `revoke-expired-wavacademy` — cron quotidien qui retire le rôle Discord et passe les abonnements expirés en `status='expired'`
+## Correctif proposé
 
-### 3. Régénération des types
+1. **Toujours notifier + insérer avant de rediriger vers Wav Academy.**
+   Dans `onSubmit`, déplacer le bloc « invoke notify-application + insert DB » avant le check `budget === "10_a_100"`, puis seulement ensuite faire `setRedirectToAcademy(true)`. Comme ça :
+   - Tu reçois l'email + Discord même pour les budgets bas
+   - La personne est quand même redirigée vers Wav Academy
+   - On peut tagger la notif (ex: `recommended_offer: "wav_academy"`) pour que tu voies d'un coup d'œil que c'est un lead « petit budget »
 
-Après l'exécution des migrations, `src/integrations/supabase/types.ts` est régénéré automatiquement pour exposer les nouvelles colonnes (`access_months`, `access_expires_at`). Le hook `useWavAcademyConsents` les utilise déjà en optional.
+2. **Ajouter un toast d'erreur visible** si l'invoke échoue, pour éviter qu'un futur problème réseau passe inaperçu côté utilisateur.
 
-### Ordre d'exécution
+3. **(Optionnel) Logguer côté edge function** le start de chaque requête pour qu'on ait une trace même quand le payload est rejeté par Zod/CORS.
 
-1. Migration `20260601000000` (colonnes) — bloquante
-2. Migration `20260601000001` (cron) — dépend de l'edge function déployée pour fonctionner réellement
-3. Déploiement des 3 edge functions
-4. Régénération auto des types
+## Fichiers touchés
 
-### Vérifications post-déploiement
+- `src/pages/ReserverUnAppel.tsx` — réordonner `onSubmit` + ajouter le tag `recommended_offer`.
 
-- Colonnes `access_months` / `access_expires_at` visibles dans le schéma
-- Job `revoke-expired-wavacademy-daily` listé dans `cron.job`
-- Les 3 edge functions répondent (logs sans erreur au démarrage)
+Aucune migration, aucun changement d'edge function nécessaire (sauf le point 3 si tu le veux).
+
+## À confirmer
+
+Veux-tu que j'applique le correctif (points 1 + 2) ? Et est-ce que tu veux aussi le log côté edge function (point 3) ?

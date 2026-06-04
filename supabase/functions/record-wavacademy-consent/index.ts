@@ -17,10 +17,19 @@ const PAYMENT_LINKS: Record<string, string> = {
   "6m": "https://buy.stripe.com/14A9ASdtq8Lf7v4gy4cMM0B", // paiement unique 594€
 };
 
+// Liens Stripe en mode TEST (sandbox) — utilisés uniquement quand mode==='test' (déclencheur ?test=1).
+// Invisibles pour les vrais visiteurs. TODO: remplacer par les 3 liens sandbox fournis par Fred.
+const TEST_PAYMENT_LINKS: Record<string, string> = {
+  "1m": "TODO_STRIPE_TEST_LINK_1M_RECURRING",
+  "3m": "TODO_STRIPE_TEST_LINK_3M_ONESHOT",
+  "6m": "TODO_STRIPE_TEST_LINK_6M_ONESHOT",
+};
+
 // Durée d'accès (en mois) par formule — capturée au consentement pour le calcul d'expiration.
 const ACCESS_MONTHS: Record<string, number> = { "1m": 1, "3m": 3, "6m": 6 };
 
 const CGV_VERSION = "v2"; // bump if /cgv text materially changes
+const CGV_VERSION_TEST = "TEST"; // marqueur pour les consentements de test (exclus de l'export légal)
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -31,7 +40,12 @@ serve(async (req) => {
     const body = await req.json();
     const { term, email, consent_cgv, consent_renonciation } = body ?? {};
 
-    if (!term || !(term in PAYMENT_LINKS)) {
+    // Mode test (sandbox) : déclenché uniquement par le front via ?test=1. Les vrais visiteurs
+    // n'envoient jamais mode==='test' → ils gardent les liens live.
+    const isTest = body?.mode === "test";
+    const links = isTest ? TEST_PAYMENT_LINKS : PAYMENT_LINKS;
+
+    if (!term || !(term in links)) {
       return new Response(
         JSON.stringify({ error: "Formule invalide (1m, 3m ou 6m attendu)" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -74,7 +88,7 @@ serve(async (req) => {
         access_months: ACCESS_MONTHS[term],
         consent_cgv: true,
         consent_renonciation: true,
-        cgv_version: CGV_VERSION,
+        cgv_version: isTest ? CGV_VERSION_TEST : CGV_VERSION,
         ip_address: ip,
         user_agent: userAgent,
       })
@@ -91,7 +105,7 @@ serve(async (req) => {
     }
 
     const consentId = data.id as string;
-    const baseUrl = PAYMENT_LINKS[term];
+    const baseUrl = links[term];
     const params = new URLSearchParams({
       client_reference_id: consentId,
       prefilled_email: email.trim(),

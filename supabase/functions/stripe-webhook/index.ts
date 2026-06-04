@@ -56,10 +56,25 @@ serve(async (req) => {
     const body = await req.text();
     const sig = req.headers.get("stripe-signature");
     const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
+    const webhookSecretTest = Deno.env.get("STRIPE_WEBHOOK_SECRET_TEST");
     let event: Stripe.Event;
 
-    if (webhookSecret && sig) {
-      event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
+    if (sig && (webhookSecret || webhookSecretTest)) {
+      // Vérifie d'abord avec le secret live ; en cas d'échec, tente le secret test (sandbox).
+      // Permet de valider le tunnel en mode test sans rien changer au flux live.
+      let verified: Stripe.Event | null = null;
+      let lastErr: unknown = null;
+      for (const secret of [webhookSecret, webhookSecretTest]) {
+        if (!secret) continue;
+        try {
+          verified = stripe.webhooks.constructEvent(body, sig, secret);
+          break;
+        } catch (err) {
+          lastErr = err;
+        }
+      }
+      if (!verified) throw lastErr ?? new Error("Invalid Stripe signature");
+      event = verified;
     } else {
       event = JSON.parse(body) as Stripe.Event;
     }

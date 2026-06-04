@@ -41,6 +41,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
 
 const checkoutSchema = z.object({
   email: z.string().trim().email("Email invalide"),
@@ -180,10 +186,52 @@ const PLAN_FEATURES = [
   "Discord premium (canaux avancés)",
 ];
 
-// ── Main component ─────────────────────────────────────────────────────────
+// ── Témoignages vidéo ───────────────────────────────────────────────────────
+// 6 témoignages sélectionnés par Fred, ordre validé.
+const VIDEO_TESTIMONIALS = [
+  { id: "XMMmmLLKue4", alt: "Témoignage client Wav Academy — retour d'expérience" },
+  { id: "Bzw7nwqB2rQ", alt: "Témoignage client Wav Academy — retour d'expérience" },
+  { id: "hwTyjA6BORY", alt: "Témoignage client Wav Academy — transformation de présence en ligne" },
+  { id: "FrMFqiAqAkU", alt: "Témoignage client Wav Academy — impact sur la stratégie de contenu" },
+  { id: "s-VaJvfFqbM", alt: "Témoignage client Wav Academy — croissance après accompagnement" },
+  { id: "cc1cRfCEJGE", alt: "Témoignage client Wav Academy — résultats après coaching" },
+];
+
+// ── FAQ ─────────────────────────────────────────────────────────────────────
+const FAQ = [
+  {
+    q: "Je débute totalement, c'est pour moi ?",
+    a: "Oui. Le principe du Wav Academy, c'est justement de ne plus poster à l'aveugle. Tu diagnostiques chaque vidéo avec le WavSocialScan et tu corriges au fur et à mesure — que tu en sois à ta 3e ou à ta 300e vidéo. Tu avances avec une méthode, pas en devinant.",
+  },
+  {
+    q: "Concrètement, qu'est-ce que je reçois une fois inscrit ?",
+    a: "Un accès au Discord premium du Wav Academy (canaux avancés), 3 000 crédits WavSocialScan chaque mois (≈ 30 analyses de vidéo ou 10 analyses de compte), le Tapis Roulant (un contenu stratégique frais chaque jour, 15 en rotation permanente) et le live hebdomadaire avec Fred.",
+  },
+  {
+    q: "Combien de temps ça me prend par semaine ?",
+    a: "Le système est fait pour les créateurs déjà occupés. Une analyse de vidéo prend quelques minutes, et le Tapis Roulant te donne une action concrète applicable le jour même. Tu peux en faire autant ou aussi peu que tu veux — mais plus tu diagnostiques, plus vite tu trouves ton Format Signature.",
+  },
+  {
+    q: "Le WavSocialScan est-il vraiment inclus ?",
+    a: "Oui. Il coûte normalement de 14,90€/mois (Standard) à 39,90€/mois (Premium). En tant que membre, tu reçois 3 000 crédits gratuits chaque mois, inclus dans ta formule.",
+  },
+  {
+    q: "Je peux annuler ?",
+    a: "La formule 1 mois est sans engagement et résiliable en 1 clic, à tout moment. Les formules 3 et 6 mois sont des paiements uniques, sans reconduction : tu bloques un tarif mensuel plus bas et l'accès s'arrête simplement à la fin de la période, sans rien à résilier.",
+  },
+  {
+    q: "Comment je reçois mes accès après le paiement ?",
+    a: "Juste après le paiement, tu reçois un email avec ton lien d'activation Discord (valable 7 jours). Tu te connectes avec ton compte Discord et ton rôle est attribué automatiquement. Pense à vérifier tes spams.",
+  },
+];
+
+// ── Main component ───────────────────────────────────────────────────────────
 export default function WavAcademy() {
   const [searchParams] = useSearchParams();
   const isSuccess = searchParams.get("success") === "true";
+  // Mode test : ?test=1 fait passer le checkout sur les liens Stripe sandbox (cartes 4242).
+  // Invisible pour les visiteurs normaux ; aucun impact sur le tunnel live.
+  const testMode = searchParams.get("test") === "1";
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -222,6 +270,7 @@ export default function WavAcademy() {
           email: data.email,
           consent_cgv: data.consent_cgv,
           consent_renonciation: data.consent_renonciation,
+          ...(testMode ? { mode: "test" } : {}),
         },
       });
 
@@ -278,6 +327,12 @@ export default function WavAcademy() {
         keywords="wav academy, diagnostic tiktok, wavsocialscan, contenu stratégique, formats courts"
       />
 
+      {testMode && (
+        <div className="bg-amber-500 text-black text-center text-sm font-semibold py-2 px-4">
+          🧪 MODE TEST — paiements en sandbox Stripe (carte 4242 4242 4242 4242). Aucun argent réel.
+        </div>
+      )}
+
       {/* ── HERO (VSL) ───────────────────────────────────────────────────── */}
       <Section variant="cream" size="xl">
         <div className="max-w-4xl mx-auto text-center">
@@ -285,9 +340,13 @@ export default function WavAcademy() {
             <Radio className="h-3.5 w-3.5" />
             Wav Academy — Accès ouvert maintenant
           </div>
-          <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight mb-8">
-            <span className="text-gold-gradient">Wav Academy</span>
+          <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight mb-6">
+            Diagnostique chaque vidéo, corrige en temps réel,{" "}
+            <span className="text-gold-gradient">signe des clients depuis ton téléphone.</span>
           </h1>
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+            Le Wav Academy : contenu stratégique quotidien + WavSocialScan pour transformer tes formats courts en canal d'acquisition prévisible.
+          </p>
           <div className="max-w-3xl mx-auto mb-10">
             <VideoCard
               id="TbKmQOXUt8s"
@@ -297,10 +356,13 @@ export default function WavAcademy() {
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="hero" size="xl" onClick={scrollToPlans}>
-              Rejoindre Wav Academy — dès 99€/mois
+              Rejoindre Wav Academy
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
+          <p className="text-sm text-muted-foreground mt-4">
+            À partir de 159€/mois sans engagement · ou 99€/mois en formule 6 mois
+          </p>
         </div>
       </Section>
 
@@ -532,8 +594,26 @@ export default function WavAcademy() {
         </div>
       </Section>
 
+      {/* ── TÉMOIGNAGES VIDÉO ────────────────────────────────────────────── */}
+      <Section variant="default" size="lg">
+        <SectionHeader
+          title="Ils sont passés de l'aveuglement aux résultats."
+          subtitle="Des retours authentiques, face caméra. Pas des promesses — des créateurs qui ont appliqué la méthode."
+        />
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          {VIDEO_TESTIMONIALS.map((video) => (
+            <VideoCard
+              key={video.id}
+              id={video.id}
+              alt={video.alt}
+              location="wavacademy_testimonials"
+            />
+          ))}
+        </div>
+      </Section>
+
       {/* ── PLANS (grille d'ancrage) ─────────────────────────────────────── */}
-      <Section variant="default" size="xl" id="plans">
+      <Section variant="cream" size="xl" id="plans">
         <SectionHeader
           title="Choisis ta formule Wav Academy."
           subtitle="Le même accès complet. Plus tu t'engages longtemps, moins c'est cher au mois."
@@ -545,8 +625,8 @@ export default function WavAcademy() {
               key={plan.term}
               className={`rounded-2xl bg-background p-6 flex flex-col relative ${
                 plan.highlight
-                  ? "border-2 border-primary shadow-lg shadow-primary/10 md:scale-105"
-                  : "border border-border"
+                  ? "border-2 border-primary shadow-lg shadow-primary/10 md:scale-105 order-first md:order-none"
+                  : "border border-border shadow-sm"
               }`}
             >
               {plan.badge && (
@@ -611,10 +691,26 @@ export default function WavAcademy() {
           Le <strong>1 mois</strong> est sans engagement, résiliable en 1 clic. Les formules{" "}
           <strong>3 et 6 mois</strong> sont des paiements uniques&nbsp;: tu bloques un tarif mensuel plus bas, sans reconduction.
         </p>
+
+        {/* Réassurance */}
+        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 mt-8 text-sm text-muted-foreground">
+          <span className="flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0" />
+            Paiement sécurisé par Stripe
+          </span>
+          <span className="flex items-center gap-2">
+            <RefreshCw className="h-4 w-4 text-primary flex-shrink-0" />
+            Formule 1 mois résiliable en 1 clic
+          </span>
+          <span className="flex items-center gap-2">
+            <Zap className="h-4 w-4 text-primary flex-shrink-0" />
+            Accès immédiat après paiement
+          </span>
+        </div>
       </Section>
 
       {/* ── TIMELINE ─────────────────────────────────────────────────────── */}
-      <Section variant="cream" size="lg">
+      <Section variant="default" size="lg">
         <SectionHeader
           title="Ce qui se passe dès que tu rejoins."
           subtitle="Des résultats concrets, semaine après semaine."
@@ -636,7 +732,7 @@ export default function WavAcademy() {
       </Section>
 
       {/* ── 7 FRAMEWORKS ─────────────────────────────────────────────────── */}
-      <Section variant="default" size="lg">
+      <Section variant="cream" size="lg">
         <SectionHeader
           title="Ce que tu vas maîtriser."
           subtitle="7 systèmes. Des résultats mesurables à chaque étape."
@@ -655,7 +751,7 @@ export default function WavAcademy() {
       </Section>
 
       {/* ── FUTURE VISUALIZATION ─────────────────────────────────────────── */}
-      <Section variant="cream" size="lg">
+      <Section variant="default" size="lg">
         <div className="max-w-3xl mx-auto">
           <p className="text-primary font-semibold uppercase tracking-widest text-sm mb-4 text-center">Imagine.</p>
           <SectionHeader title="C'est un vendredi après-midi. Ton téléphone vibre." />
@@ -670,6 +766,25 @@ export default function WavAcademy() {
             <p className="font-semibold text-foreground text-lg">Tu préfères 500 vues avec un client que 5 000 vues avec zéro.</p>
             <p>Les réseaux ne sont plus une corvée. C'est ton meilleur commercial. Il bosse 24h/24, il ne demande pas de salaire, et il ramène des prospects qualifiés pendant que tu dors.</p>
           </div>
+        </div>
+      </Section>
+
+      {/* ── FAQ ──────────────────────────────────────────────────────────── */}
+      <Section variant="cream" size="lg">
+        <div className="max-w-3xl mx-auto">
+          <SectionHeader title="Les questions que tu te poses." />
+          <Accordion type="single" collapsible className="w-full">
+            {FAQ.map((item, i) => (
+              <AccordionItem key={i} value={`faq-${i}`}>
+                <AccordionTrigger className="text-left font-semibold">
+                  {item.q}
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground leading-relaxed">
+                  {item.a}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </div>
       </Section>
 
@@ -692,12 +807,12 @@ export default function WavAcademy() {
               size="xl"
               onClick={scrollToPlans}
             >
-              Rejoindre Wav Academy — dès 99€/mois
+              Rejoindre Wav Academy
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
           <p className="text-cream/40 text-sm">
-            Dès 99€/mois. Le 1 mois est sans engagement. Le Tapis Roulant, lui, continue de tourner.
+            À partir de 159€/mois sans engagement, ou 99€/mois en formule 6 mois. Le Tapis Roulant, lui, continue de tourner.
           </p>
         </div>
       </Section>
@@ -814,6 +929,18 @@ export default function WavAcademy() {
           </Form>
         </DialogContent>
       </Dialog>
+
+      {/* ── CTA flottant mobile ──────────────────────────────────────────── */}
+      <div className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-background/95 backdrop-blur border-t border-border px-4 py-3 flex items-center justify-between gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+        <div className="leading-tight">
+          <p className="text-xs text-muted-foreground">Wav Academy</p>
+          <p className="text-sm font-semibold">dès 99€/mois</p>
+        </div>
+        <Button variant="hero" size="lg" className="flex-shrink-0" onClick={scrollToPlans}>
+          Rejoindre
+          <ArrowRight className="ml-1.5 h-4 w-4" />
+        </Button>
+      </div>
     </Layout>
   );
 }

@@ -24,6 +24,8 @@ export function useWavAcademyConsents() {
       const { data, error } = await supabase
         .from("wavacademy_consents")
         .select("*")
+        // Exclut les consentements de test (cgv_version='TEST') de la preuve légale.
+        .neq("cgv_version", "TEST")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as unknown as WavAcademyConsent[];

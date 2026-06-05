@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BarChart3, Target, FileText, Lightbulb } from "lucide-react";
+import { ArrowRight, BarChart3, Target, FileText, Lightbulb, X } from "lucide-react";
 import { trackPostHogEvent } from "@/lib/posthog";
 
 const SESSION_KEY = "exit_intent_shown";
@@ -58,7 +58,13 @@ export function ExitIntentPopup() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogClose
+          aria-label="Fermer"
+          className="absolute right-3 top-3 z-10 rounded-full bg-background/90 border border-border p-2 shadow-sm hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
+        >
+          <X className="h-4 w-4" />
+        </DialogClose>
         <DialogHeader>
           <DialogTitle className="font-display text-xl">
             Obtiens un diagnostic complet de ton compte TikTok

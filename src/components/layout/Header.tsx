@@ -14,9 +14,25 @@ const navItems = [
   { label: "Newsletter", href: "/newsletter" },
 ];
 
-export function Header() {
+export function Header({ minimal = false }: { minimal?: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+
+  // Landing page : logo seul, aucun lien sortant (on évite que le visiteur quitte la page).
+  if (minimal) {
+    return (
+      <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-center h-16 md:h-20">
+            <span className="font-display text-xl md:text-2xl font-semibold tracking-tight">
+              <span className="text-foreground">Fred</span>
+              <span className="text-primary">Wav</span>
+            </span>
+          </div>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">

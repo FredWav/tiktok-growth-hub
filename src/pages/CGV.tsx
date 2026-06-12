@@ -9,7 +9,7 @@ export default function CGV() {
       <Section variant="default" size="lg">
         <div className="max-w-3xl mx-auto prose prose-neutral">
           <h1 className="font-display text-3xl md:text-4xl font-semibold mb-2">Conditions Générales de Vente (CGV) — Fred Wav</h1>
-          <p className="text-sm text-muted-foreground mb-10">Dernière mise à jour : 17 mai 2026</p>
+          <p className="text-sm text-muted-foreground mb-10">Dernière mise à jour : 12 juin 2026</p>
 
           {/* ARTICLE 1 */}
           <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 1 — Identification du vendeur</h2>
@@ -44,7 +44,7 @@ export default function CGV() {
           {/* ARTICLE 4 */}
           <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 4 — Définitions</h2>
           <ul className="text-muted-foreground mb-4 space-y-1">
-            <li><strong>Prestations :</strong> Wav Premium (accompagnement 45 jours), Wav Academy (abonnement communauté Discord) et Analyse Express (rapport d'analyse automatisé).</li>
+            <li><strong>Prestations :</strong> Wav Premium (accompagnement 30 jours), Wav Academy (accès communauté Discord + contenus numériques) et Analyse Express (rapport d'analyse automatisé).</li>
             <li><strong>Contenus numériques :</strong> rapports PDF, ressources, checklists et templates éventuellement remis dans le cadre de la prestation.</li>
             <li><strong>Plateformes tierces :</strong> TikTok, Instagram, YouTube, Discord, WhatsApp, Stripe, PayPal, Klarna. Fred Wav n'est pas responsable de leurs pannes, interruptions, changements de conditions d'utilisation, ni des conséquences pouvant en découler.</li>
           </ul>
@@ -52,7 +52,7 @@ export default function CGV() {
           {/* ARTICLE 5 */}
           <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 5 — Description des offres</h2>
 
-          <h3 className="font-display text-lg font-medium mt-4 mb-2">5.1 Wav Premium (45 jours)</h3>
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">5.1 Wav Premium (30 jours)</h3>
           <p className="text-muted-foreground mb-4">
             Accompagnement intensif sur candidature validée par Fred Wav. Inclut 4 RDV visio minimum, suivi WhatsApp 5j/7 (réponse sous 24h ouvrées du lundi au vendredi), et ressources personnalisées. Prestation de service sans garantie de résultat.
           </p>
@@ -64,12 +64,12 @@ export default function CGV() {
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">5.3 Wav Academy</h3>
           <p className="text-muted-foreground mb-4">
-            Accès à la communauté Discord Wav Academy, aux ressources documentaires (cours, replays, checklists, méthodes, templates), aux lives hebdomadaires avec Fred, et aux canaux Discord premium. La Wav Academy est proposée en plusieurs formules (1, 3 ou 6 mois) dont les modalités de durée et de facturation sont précisées à l'Article 12.
+            Accès à la communauté Discord Wav Academy, aux ressources documentaires (cours, replays, checklists, méthodes, templates), aux lives hebdomadaires avec Fred, et aux canaux Discord premium. La Wav Academy est proposée en trois formules prépayées (3, 6 ou 12 mois), dont les modalités de durée et de prix sont précisées à l'Article 12.
           </p>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">5.4 Évolution du contenu</h3>
           <p className="text-muted-foreground mb-4">
-            Le contenu exact des offres (ressources, formats, modalités) est celui présenté au moment de l'achat. Le contenu de la Wav Academy peut évoluer pour s'adapter et s'améliorer (formats, ressources, organisation), sans diminution substantielle de la valeur globale. Les prix peuvent être modifiés pour l'avenir ; le nouveau prix s'applique aux renouvellements futurs, et le client peut résilier avant l'échéance.
+            Le contenu exact des offres (ressources, formats, modalités) est celui présenté au moment de l'achat. Le contenu de la Wav Academy peut évoluer pour s'adapter et s'améliorer (formats, ressources, organisation), sans diminution substantielle de la valeur globale. Les prix peuvent être modifiés pour l'avenir ; le tarif applicable est celui affiché au moment de la commande et reste acquis pour toute la durée de la formule prépayée souscrite.
           </p>
 
           {/* ARTICLE 6 */}
@@ -112,12 +112,12 @@ export default function CGV() {
             <strong>No-show (absence non justifiée) :</strong> la session est considérée comme due et consommée.
           </p>
           <p className="text-muted-foreground mb-4">
-            <strong>Wav Premium :</strong> la durée d'accompagnement est de 45 jours calendaires. Les reports ne prolongent pas automatiquement la durée, sauf accord écrit.
+            <strong>Wav Premium :</strong> la durée d'accompagnement est de 30 jours calendaires. Les reports ne prolongent pas automatiquement la durée, sauf accord écrit.
           </p>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">8.1 Caractère forfaitaire et non-remboursement</h3>
           <p className="text-muted-foreground mb-4">
-            Toute prestation payée auprès du Vendeur — qu'il s'agisse de Wav Premium, des l'abonnement Wav Academy ou de l'Analyse Express — constitue un forfait global et indivisible, correspondant à un dispositif construit, réservé et planifié dans son ensemble. Le prix n'est pas décomposable par session, par ressource, par fonctionnalité, par semaine ou par période d'abonnement entamée.
+            Toute prestation payée auprès du Vendeur — qu'il s'agisse de Wav Premium, de la Wav Academy ou de l'Analyse Express — constitue un forfait global et indivisible, correspondant à un dispositif construit, réservé et planifié dans son ensemble. Le prix n'est pas décomposable par session, par ressource, par fonctionnalité, par semaine ou par période entamée.
           </p>
           <p className="text-muted-foreground mb-4">
             Après l'expiration du délai de rétractation, ou après sa renonciation valable dans les conditions de l'Article 9, toute interruption, suspension ou arrêt de la prestation à la seule initiative du Client, pour convenance personnelle, ne donne lieu à aucun remboursement, total ou partiel.
@@ -126,10 +126,7 @@ export default function CGV() {
             <strong>Accompagnements individuels (Wav Premium) :</strong> les sessions et ressources déjà délivrées sont définitivement dues. Les sessions non encore consommées restent acquises au Client et disponibles dans la limite de la durée de validité prévue à l'article 8.2 ci-dessous, sans pouvoir donner lieu à un remboursement en numéraire.
           </p>
           <p className="text-muted-foreground mb-4">
-            <strong>Wav Academy — formule mensuelle (1 mois) :</strong> abonnement à reconduction automatique ; toute période mensuelle commencée est intégralement et définitivement due, sans remboursement, même partiel ou au prorata, quel que soit le niveau d'utilisation effective. Les modalités de résiliation pour l'avenir sont prévues à l'Article 12.
-          </p>
-          <p className="text-muted-foreground mb-4">
-            <strong>Wav Academy — formules à durée déterminée (3 et 6 mois) :</strong> formules prépayées, payées intégralement et d'avance pour la totalité de la durée choisie. Le prix est définitivement dû dès la commande, sans remboursement, même partiel ou au prorata, quel que soit le niveau d'utilisation effective. Ces formules ne sont pas reconduites automatiquement : l'accès cesse de plein droit au terme de la durée souscrite, sauf souscription d'une nouvelle formule.
+            <strong>Wav Academy — formules prépayées (3, 6 et 12 mois) :</strong> formules payées intégralement et d'avance pour la totalité de la durée choisie. Le prix est définitivement dû dès la commande, sans remboursement, même partiel ou au prorata, quel que soit le niveau d'utilisation effective. Ces formules ne sont pas des abonnements et ne sont pas reconduites automatiquement : l'accès cesse de plein droit au terme de la durée souscrite, sauf souscription d'une nouvelle formule.
           </p>
           <p className="text-muted-foreground mb-4">
             <strong>Prestations à livraison numérique immédiate (Analyse Express) :</strong> le rapport et les contenus délivrés sont définitivement dus dès leur mise à disposition, le Client ayant expressément demandé l'exécution immédiate et renoncé à son droit de rétractation dans les conditions de l'article 9.2.
@@ -140,7 +137,7 @@ export default function CGV() {
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">8.2 Durée de validité (accompagnements individuels à durée déterminée)</h3>
           <p className="text-muted-foreground mb-4">
-            L'accompagnement individuel à durée déterminée (notamment Wav Premium), y compris en cas de suspension prévue à l'article 8.3, doit être pleinement réalisé dans un délai maximum de 45 jours calendaires à compter de la date du premier rendez-vous. Passé ce délai, les sessions non consommées sont caduques et ne peuvent donner lieu ni à exécution ni à remboursement.
+            L'accompagnement individuel à durée déterminée (notamment Wav Premium), y compris en cas de suspension prévue à l'article 8.3, doit être pleinement réalisé dans un délai maximum de 30 jours calendaires à compter de la date du premier rendez-vous. Passé ce délai, les sessions non consommées sont caduques et ne peuvent donner lieu ni à exécution ni à remboursement.
           </p>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">8.3 Suspension à la demande du Client (accompagnements individuels)</h3>
@@ -148,13 +145,13 @@ export default function CGV() {
             À titre exceptionnel, le Client peut demander la suspension temporaire de son accompagnement individuel à durée déterminée. Cette suspension est soumise à l'accord écrit préalable du Vendeur.
           </p>
           <p className="text-muted-foreground mb-4">
-            La demande s'effectue par écrit. Le Client peut bénéficier d'une seule suspension, d'une durée maximale de 30 jours. Pendant la suspension, le décompte des 45 jours calendaires prévu à l'article 8.2 est gelé et reprend à la date de reprise convenue.
+            La demande s'effectue par écrit. Le Client peut bénéficier d'une seule suspension, d'une durée maximale de 30 jours. Pendant la suspension, le décompte des 30 jours calendaires prévu à l'article 8.2 est gelé et reprend à la date de reprise convenue.
           </p>
           <p className="text-muted-foreground mb-4">
             La suspension est formalisée par email valant support durable, précisant la date de début de suspension et la nouvelle date de fin d'accompagnement. La suspension ne donne lieu à aucun remboursement et ne modifie pas la durée de validité maximale prévue à l'article 8.2.
           </p>
           <p className="text-muted-foreground mb-4">
-            Pour la suspension d'un abonnement Wav Academy, se reporter à l'Article 12.
+            Pour la suspension d'une formule Wav Academy, se reporter à l'Article 12.
           </p>
 
           {/* ARTICLE 9 */}
@@ -188,16 +185,16 @@ export default function CGV() {
             <li>et qu'il a reconnu perdre son droit de rétractation du fait de ce démarrage.</li>
           </ul>
 
-          <h3 className="font-display text-lg font-medium mt-4 mb-2">9.3 Contenus numériques (Wav Academy)</h3>
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">9.3 Contenu numérique et service (Wav Academy)</h3>
           <p className="text-muted-foreground mb-2">
-            La Wav Academy donne accès, dès la commande, à un espace de contenus numériques (Discord, ressources, replays, lives). Conformément à l'article L221-28, 13° du Code de la consommation, le droit de rétractation ne s'applique pas dès lors que :
+            La Wav Academy combine un <strong>contenu numérique</strong> (accès dès la commande à un espace Discord, ressources, replays) et une <strong>prestation de service</strong> exécutée pendant la durée souscrite (lives, accompagnement, animation de la communauté). Au moment de l'achat, le Client demande l'exécution immédiate du service et l'accès immédiat au contenu numérique avant l'expiration du délai de 14 jours. En conséquence, conformément aux articles L221-28, 1° et 13° du Code de la consommation :
           </p>
           <ul className="text-muted-foreground mb-4 space-y-1">
-            <li>le Client a donné son accord préalable et exprès pour le démarrage immédiat de la fourniture des contenus numériques avant l'expiration du délai de 14 jours,</li>
-            <li>et qu'il a expressément reconnu perdre son droit de rétractation du fait de ce démarrage.</li>
+            <li>pour la part de <strong>contenu numérique</strong>, le Client perd son droit de rétractation dès le début de l'accès, qu'il a expressément demandé et accepté ;</li>
+            <li>pour la part de <strong>service</strong>, en cas de rétractation dans le délai de 14 jours, le Client reste redevable du prix au prorata du service déjà fourni à la date de sa demande.</li>
           </ul>
           <p className="text-muted-foreground mb-4">
-            Pour la formule mensuelle (1 mois), le Client conserve néanmoins la faculté de résilier son abonnement pour l'avenir dans les conditions de l'Article 12, les périodes commencées restant dues conformément à l'article 8.1. Pour les formules à durée déterminée (3 et 6 mois), l'accès court jusqu'au terme souscrit puis cesse automatiquement, sans reconduction ni remboursement.
+            Les formules Wav Academy étant des paiements uniques prépayés (3, 6 ou 12 mois), elles ne sont pas reconduites : l'accès court jusqu'au terme souscrit puis cesse automatiquement, sans reconduction ni remboursement (article 8.1).
           </p>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">9.4 Confirmation sur support durable</h3>
@@ -228,25 +225,22 @@ export default function CGV() {
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">12.1 Formules disponibles</h3>
           <p className="text-muted-foreground mb-2">
-            La Wav Academy est proposée en trois formules donnant accès à des contenus et services identiques, seules la durée et les modalités de paiement variant :
+            La Wav Academy est proposée en trois formules prépayées donnant accès à des contenus et services identiques, seules la durée et le prix variant. Chaque formule est un <strong>paiement unique</strong>, sans abonnement ni reconduction :
           </p>
           <ul className="text-muted-foreground mb-4 space-y-1">
-            <li><strong>1 mois</strong> — abonnement mensuel à reconduction automatique (159 €/mois) ;</li>
-            <li><strong>3 mois</strong> — formule prépayée à durée déterminée (387 €, soit 129 €/mois), sans reconduction ;</li>
-            <li><strong>6 mois</strong> — formule prépayée à durée déterminée (594 €, soit 99 €/mois), sans reconduction.</li>
+            <li><strong>Fondation — 3 mois</strong> : formule prépayée à durée déterminée (297 €), sans reconduction ;</li>
+            <li><strong>Accélération — 6 mois</strong> : formule prépayée à durée déterminée (499 €), sans reconduction ;</li>
+            <li><strong>Maîtrise — 12 mois</strong> : formule prépayée à durée déterminée (899 €), sans reconduction.</li>
           </ul>
 
-          <h3 className="font-display text-lg font-medium mt-4 mb-2">12.2 Reconduction</h3>
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">12.2 Absence de reconduction</h3>
           <p className="text-muted-foreground mb-4">
-            La formule mensuelle (1 mois) est un abonnement à reconduction automatique jusqu'à résiliation par le client. Les formules à durée déterminée (3 et 6 mois) ne sont pas reconduites : l'accès cesse de plein droit au terme de la durée souscrite, sauf souscription volontaire d'une nouvelle formule.
+            Aucune formule Wav Academy n'est un abonnement : les trois formules (3, 6 et 12 mois) sont des paiements uniques prépayés et ne sont pas reconduites automatiquement. L'accès cesse de plein droit au terme de la durée souscrite, sauf souscription volontaire d'une nouvelle formule.
           </p>
 
-          <h3 className="font-display text-lg font-medium mt-4 mb-2">12.3 Résiliation</h3>
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">12.3 Fin de l'accès</h3>
           <p className="text-muted-foreground mb-4">
-            <strong>Formule mensuelle (1 mois) :</strong> le client peut résilier à tout moment via le lien de gestion d'abonnement communiqué lors de l'achat ou depuis son espace Stripe. La résiliation ne vaut que pour l'avenir : pour éviter le prélèvement suivant, elle doit être effectuée au plus tard 24h avant l'échéance de renouvellement. <strong>Tout mois entamé est intégralement dû</strong> et n'est ni remboursé ni proratisé, y compris en cas de non-utilisation du service ou d'oubli de résiliation avant l'échéance ; l'accès est maintenu jusqu'à la fin du mois payé.
-          </p>
-          <p className="text-muted-foreground mb-4">
-            <strong>Formules à durée déterminée (3 et 6 mois) :</strong> payées intégralement d'avance, elles ne donnent lieu à aucune résiliation anticipée ni remboursement, même partiel ou au prorata (article 8.1). L'accès reste ouvert jusqu'au terme souscrit puis prend fin automatiquement, sans reconduction.
+            Les trois formules (3, 6 et 12 mois) sont payées intégralement d'avance. Elles ne donnent lieu à aucune résiliation anticipée ni remboursement, même partiel ou au prorata (article 8.1). L'accès reste ouvert jusqu'au terme souscrit, puis prend fin automatiquement — il n'y a aucune démarche de résiliation à effectuer.
           </p>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">12.4 Suspension</h3>
@@ -304,7 +298,7 @@ export default function CGV() {
             <p>☐ Je reconnais avoir lu et accepté les CGV.</p>
             <p>☐ (Wav Premium) Je demande l'exécution immédiate de la prestation avant la fin du délai légal de rétractation de 14 jours et je reconnais que l'Audit Stratégique Initial, les frais administratifs et les frais de transaction resteront acquis au Vendeur en cas de rétractation.</p>
             <p>☐ (Analyse Express) Je demande l'accès immédiat au rapport numérique et je reconnais perdre mon droit de rétractation dès le démarrage de la fourniture du contenu numérique.</p>
-            <p>☐ (Wav Academy) Je demande l'accès immédiat aux contenus numériques et je reconnais perdre mon droit de rétractation dès le démarrage de la fourniture du contenu numérique.</p>
+            <p>☐ (Wav Academy) Je demande l'exécution immédiate du service et l'accès immédiat au contenu numérique avant l'expiration du délai de rétractation de 14 jours. Je reconnais que pour le contenu numérique, je perds mon droit de rétractation dès l'accès ; pour la partie service, en cas de rétractation, je reste redevable du prix au prorata du service déjà fourni.</p>
           </div>
         </div>
       </Section>

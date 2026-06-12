@@ -8,13 +8,14 @@ import { trackEvent, getStoredUtmSource } from "@/lib/tracking";
 import { trackPostHogEvent, identifyUser, getPostHogId } from "@/lib/posthog";
 import { cn } from "@/lib/utils";
 import { Layout } from "@/components/layout/Layout";
-import { Section } from "@/components/ui/section";
+import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { SEOHead } from "@/components/SEOHead";
+import { ClientResults } from "@/components/ClientResults";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
@@ -185,7 +186,7 @@ export default function ReserverUnAppel() {
       <Layout>
         <SEOHead
           title="La Wav Academy est faite pour toi | Fred Wav"
-          description="Ton budget colle parfaitement avec la Wav Academy : la méthode complète et la communauté à partir de 39€/mois."
+          description="Ton budget colle parfaitement avec la Wav Academy : la méthode complète et la communauté à partir de 297 € (paiement unique, accès 3 mois)."
           path="/reserverunappel"
         />
         <Section variant="cream" size="lg">
@@ -200,7 +201,7 @@ export default function ReserverUnAppel() {
               Avec ton budget, un accompagnement personnalisé avec moi n'est pas la bonne option — ce serait te survendre quelque chose qui ne te correspond pas.
             </p>
             <p className="text-lg text-muted-foreground mb-8">
-              Mais la <strong>Wav Academy</strong> te donne accès à toute ma méthode, au diagnostic continu et à la communauté à partir de <strong>39€/mois</strong>. C'est exactement ce qu'il te faut pour démarrer.
+              Mais la <strong>Wav Academy</strong> te donne accès à toute ma méthode, au diagnostic continu et à la communauté à partir de <strong>297 €</strong> (paiement unique, accès 3 mois). C'est exactement ce qu'il te faut pour démarrer.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="hero" size="xl" asChild>
@@ -294,6 +295,27 @@ export default function ReserverUnAppel() {
           <p className="text-muted-foreground text-lg">
             C'est notre premier contact. Plus j'ai d'infos sur ta situation, plus je peux répondre efficacement à ta demande.
           </p>
+        </div>
+      </Section>
+
+      <Section variant="cream" size="md" className="pt-0">
+        <SectionHeader
+          title="Ils sont passés par là."
+          subtitle="Des résultats documentés, pas des promesses."
+        />
+        <ClientResults limit={4} />
+        <div className="text-center mt-8">
+          <Button
+            variant="premium"
+            size="lg"
+            asChild
+            onClick={() => trackEvent("cta_more_testimonials", { location: "reserverunappel" })}
+          >
+            <Link to="/preuves">
+              Plus de témoignages
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
         </div>
       </Section>
 

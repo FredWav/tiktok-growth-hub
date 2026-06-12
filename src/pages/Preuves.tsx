@@ -1,13 +1,16 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
-import { ArrowRight, TrendingUp, Users, Eye, Play, Check, X, Target, Zap, Crown } from "lucide-react";
+import { ArrowRight, TrendingUp, Users, Eye, Check, X, Target, Zap, Crown } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/tracking";
 import { SEOHead } from "@/components/SEOHead";
 import { ScreenshotWall } from "@/components/ScreenshotWall";
+import { ClientResults } from "@/components/ClientResults";
+import { VideoCard } from "@/components/VideoCard";
 
+// Les légendes (nom + niche + résultat) viennent de src/data/videoTestimonials.ts,
+// indexées par ID YouTube. Une vidéo sans fiche reste affichée sans légende.
 const videoTestimonials = [
   { id: "LOi7RTx12nE", alt: "Témoignage client - Retour d'expérience récent" },
   { id: "Hgkn3ifjSS0", alt: "Témoignage client - Retour d'expérience récent" },
@@ -16,52 +19,12 @@ const videoTestimonials = [
   { id: "Jh5yrsotoHM", alt: "Témoignage client - Retour d'expérience récent" },
   { id: "p3nCwuBZRGI", alt: "Témoignage client - Nouveau retour d'expérience" },
   { id: "g9QYqO-xiqw", alt: "Témoignage client - Retour d'expérience Wav Premium" },
-  { id: "97xyXqwszrM", alt: "Témoignage client - Retour d'expérience sur l'accompagnement" },
   { id: "cc1cRfCEJGE", alt: "Témoignage client - Résultats après coaching stratégie de contenu" },
   { id: "hwTyjA6BORY", alt: "Témoignage client - Transformation de présence en ligne" },
   { id: "FrMFqiAqAkU", alt: "Témoignage client - Impact du One Shot sur la stratégie de contenu" },
   { id: "s-VaJvfFqbM", alt: "Témoignage client - Croissance après accompagnement" },
   { id: "wu2CPcqp-yU", alt: "Témoignage client - Avis sur le Wav Premium de Fred Wav" },
 ];
-
-function VideoCard({ id, alt }: { id: string; alt: string }) {
-  const [playing, setPlaying] = useState(false);
-
-  if (playing) {
-    return (
-      <div className="aspect-video rounded-xl overflow-hidden shadow-lg">
-        <iframe
-          src={`https://www.youtube.com/embed/${id}?autoplay=1`}
-          title={alt}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          className="w-full h-full"
-        />
-      </div>
-    );
-  }
-
-  return (
-    <button
-      onClick={() => { trackEvent("click_video_play", { video_id: id, location: "preuves" }); setPlaying(true); }}
-      className="group relative aspect-video rounded-xl overflow-hidden shadow-lg cursor-pointer w-full"
-    >
-      <img
-        src={`https://img.youtube.com/vi/${id}/hqdefault.jpg`}
-        alt={alt}
-        width={480}
-        height={360}
-        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-        loading="lazy"
-      />
-      <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-        <div className="w-16 h-16 rounded-full bg-primary/90 flex items-center justify-center group-hover:scale-110 transition-transform shadow-xl">
-          <Play className="h-7 w-7 text-primary-foreground ml-1" fill="currentColor" />
-        </div>
-      </div>
-    </button>
-  );
-}
 
 const caseStudies = [
   {
@@ -100,7 +63,7 @@ const chooseOffers = [
   {
     icon: Target,
     title: "Wav Premium",
-    description: "Transformation encadrée sur 45 jours",
+    description: "Transformation encadrée sur 30 jours",
     cta: "Contacter Fred",
     href: "/reserverunappel",
     trackEvent: "cta_contact_click",
@@ -136,6 +99,15 @@ export default function Preuves() {
         </div>
       </Section>
 
+      {/* Résultats clients documentés */}
+      <Section variant="cream" size="md" className="pt-0">
+        <SectionHeader
+          title="Des résultats documentés."
+          subtitle="Des créateurs réels, des chiffres réels."
+        />
+        <ClientResults />
+      </Section>
+
       {/* Video Testimonials */}
       <Section variant="cream" size="lg">
         <SectionHeader
@@ -145,14 +117,14 @@ export default function Preuves() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {videoTestimonials.map((video) => (
-            <VideoCard key={video.id} id={video.id} alt={video.alt} />
+            <VideoCard key={video.id} id={video.id} alt={video.alt} location="preuves" />
           ))}
         </div>
       </Section>
 
       {/* Screenshot Wall */}
       <Section variant="cream" size="lg">
-        <ScreenshotWall location="preuves" title="Ce qu'ils en disent" subtitle="Retours directs de clients après leur accompagnement." />
+        <ScreenshotWall location="preuves" title="Ce qu'ils en disent" subtitle="Retours directs de clients après leur accompagnement." cols={2} />
       </Section>
 
       {/* CTA after videos */}

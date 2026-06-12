@@ -18,8 +18,9 @@ import { Loader2, Download, Check, X, Search } from "lucide-react";
 const formuleLabel = (c: WavAcademyConsent): string => {
   switch (c.access_months) {
     case 1: return "1 mois";
-    case 3: return "3 mois";
+    case 3: return "3 mois"; // historique : anciens consentements pré-refonte (formule 3 mois retirée)
     case 6: return "6 mois";
+    case 12: return "1 an";
     default: return c.access_months ? `${c.access_months} mois` : "—";
   }
 };

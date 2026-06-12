@@ -46,7 +46,32 @@ const legalLinks = [
   { label: "CGV", href: "/cgv" },
 ];
 
-export function Footer() {
+export function Footer({ minimal = false }: { minimal?: boolean }) {
+  // Landing page : on ne garde que les liens légaux (CGV obligatoire pour le paiement) + copyright.
+  if (minimal) {
+    return (
+      <footer className="bg-noir text-muted-foreground">
+        <div className="container mx-auto px-4 py-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-xs text-muted-foreground">
+            © {new Date().getFullYear()} Fred Wav. Tous droits réservés.
+          </p>
+          <nav aria-label="Mentions légales" className="flex gap-6 text-xs">
+            {legalLinks.map((link) => (
+              <Link
+                key={link.href}
+                to={link.href}
+                className="hover:text-primary transition-colors"
+                onClick={() => trackPostHogEvent("click_footer_link", { item: link.label, section: "legal" })}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+      </footer>
+    );
+  }
+
   return (
     <footer className="bg-noir text-muted-foreground">
       <div className="container mx-auto px-4 py-12 md:py-16">

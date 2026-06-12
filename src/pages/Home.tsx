@@ -70,7 +70,7 @@ const method = [
 
 const forYou = [
   "Tu as une offre validée et tu veux faire des formats courts un vrai levier pour transformer tes abonnés en clients",
-  "Tu es prêt à itérer rapidement sur la structure de tes vidéos pendant 45 jours",
+  "Tu es prêt à itérer rapidement sur la structure de tes vidéos pendant 30 jours",
   "Tu exiges des résultats mesurables, pas des conseils génériques",
 ];
 
@@ -85,7 +85,7 @@ const premiumDeliverables = [
   "Script Doctoring : corrections ligne par ligne de tes contenus",
   "Frameworks de production (structures de rétention, bibliothèques de hooks)",
   "Optimisation de ta bio et de ton parcours abonné",
-  "Plan d'action pour maintenir ta croissance post-45 jours",
+  "Plan d'action pour maintenir ta croissance post-30 jours",
   "Replays de toutes les sessions d'analyse",
 ];
 
@@ -145,7 +145,7 @@ export default function Home() {
     <Layout>
       <WavSocialScanPopup />
       <ExitIntentPopup />
-      <SEOHead title="Fred Wav — Expert Stratégie Formats Courts" description="Transforme tes réseaux en machine à clients. Stratégie de contenu, coaching intensif 45 jours et plan d'action avec Fred Wav, expert formats courts." path="/" keywords="stratégie formats courts, coaching réseaux sociaux, expert formats courts, wav premium, Fred Wav, monétiser contenu, accompagnement créateur" schema={[
+      <SEOHead title="Fred Wav — Expert Stratégie Formats Courts" description="Tu plafonnes en vues ? J'analyse tes vraies stats pour te montrer pourquoi — et comment en sortir. Diagnostic data-driven et accompagnement avec Fred Wav, expert formats courts." path="/" keywords="stratégie formats courts, coaching réseaux sociaux, expert formats courts, wav premium, Fred Wav, plafond de vues, diagnostic tiktok, accompagnement créateur" schema={[
         {
           "@context": "https://schema.org",
           "@type": "FAQPage",
@@ -170,8 +170,8 @@ export default function Home() {
         {
           "@context": "https://schema.org",
           "@type": "Service",
-          "name": "Wav Premium - Transformation 45 Jours",
-          "description": "45 jours d'itération intensive pour transformer ton compte en actif business.",
+          "name": "Wav Premium - Transformation 30 Jours",
+          "description": "30 jours d'itération intensive et data-driven pour casser ton plafond de vues.",
           "provider": { "@type": "Person", "name": "Fred Wav", "url": "https://fredwav.com" },
           "offers": { "@type": "Offer", "priceCurrency": "EUR" },
         },
@@ -183,12 +183,12 @@ export default function Home() {
 
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 animate-fade-in">
-            Arrête de naviguer à vue.{" "}
-            <span className="text-gold-gradient">Structure ta stratégie TikTok et explose tes conversions.</span>
+            Arrête de poster à l'aveugle.{" "}
+            <span className="text-gold-gradient">Tes stats disent déjà pourquoi tu plafonnes en vues.</span>
           </h1>
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-            Ta visibilité stagne et ton audience ne convertit pas. Remplace le ressenti par un diagnostic précis et une architecture de contenu pensée pour l'acquisition. <Link to="/a-propos" className="text-primary underline hover:no-underline">Découvre mon approche</Link>.
+            Pas d'astuces d'algorithme, pas de promesses. J'analyse tes vraies données pour te montrer ce qui bloque ta visibilité — et on corrige, preuves à l'appui. <Link to="/a-propos" className="text-primary underline hover:no-underline">Découvre mon approche</Link>.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{ animationDelay: "0.2s" }}>
@@ -241,8 +241,8 @@ export default function Home() {
       {/* ===== Wav Premium : la solution ===== */}
       <Section variant="cream" size="lg">
         <SectionHeader
-          title="Wav Premium : 45 jours pour transformer ton audience en revenus"
-          subtitle="Un accompagnement intensif avec feedback chirurgical pour que chaque vidéo ait un objectif clair et chaque semaine produise un résultat mesurable."
+          title="Wav Premium : 30 jours pour casser ton plafond de vues"
+          subtitle="Un accompagnement intensif et data-driven pour que chaque vidéo ait un objectif clair et chaque semaine produise un résultat mesurable. Et, derrière, transformer cette visibilité en clients."
         />
 
         {/* Méthode - 4 piliers */}
@@ -412,10 +412,10 @@ export default function Home() {
       <Section variant="dark" size="lg">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="font-display text-3xl md:text-4xl font-semibold mb-4 text-cream">
-            Prêt à transformer ton audience en revenus ?
+            Prêt à casser ton plafond de vues ?
           </h2>
           <p className="text-cream/70 text-lg mb-8">
-            Le Wav Premium : 45 jours pour structurer une stratégie qui transforme tes abonnés en clients.
+            Le Wav Premium : 30 jours pour reprendre le contrôle de ta visibilité — et transformer cette attention en clients.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="hero" size="xl" asChild onClick={() => trackEvent("cta_contact_click", { location: "bottom" })}>

@@ -8,6 +8,7 @@ interface ScreenshotWallProps {
   title?: string;
   subtitle?: string;
   className?: string;
+  cols?: 2 | 3;
 }
 
 export const ScreenshotWall = ({
@@ -15,6 +16,7 @@ export const ScreenshotWall = ({
   title = "Leurs messages",
   subtitle = "Des retours authentiques, sans filtre.",
   className = "",
+  cols = 3,
 }: ScreenshotWallProps) => {
   const { data: screenshots, isLoading } = useClientScreenshots(location);
   const [selected, setSelected] = useState<string | null>(null);
@@ -25,7 +27,7 @@ export const ScreenshotWall = ({
     <div className={className}>
       <SectionHeader title={title} subtitle={subtitle} />
 
-      <div className="columns-2 md:columns-3 gap-5 max-w-4xl mx-auto">
+      <div className={`columns-2 ${cols === 2 ? "md:columns-2" : "md:columns-3"} gap-5 max-w-4xl mx-auto`}>
         {screenshots.map((s) => (
           <div
             key={s.id}
@@ -54,13 +56,17 @@ export const ScreenshotWall = ({
         ))}
       </div>
 
+      <p className="text-center text-xs text-muted-foreground mt-4">
+        Clique sur un message pour l'agrandir.
+      </p>
+
       <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
-        <DialogContent className="max-w-3xl p-2 bg-transparent border-none shadow-none">
+        <DialogContent className="max-w-2xl p-2 bg-transparent border-none shadow-none">
           {selected && (
             <img
               src={selected}
               alt="Capture client"
-              className="w-full h-auto rounded-xl"
+              className="w-auto max-h-[85vh] mx-auto rounded-xl"
             />
           )}
         </DialogContent>

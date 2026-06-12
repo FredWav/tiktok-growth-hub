@@ -83,7 +83,7 @@ const DiagnosticResult = () => {
     if (data.temps === "2-5h") return "Tu as un temps limité. L'enjeu est d'arrêter de le gaspiller sur des tâches à faible valeur ajoutée et de tout concentrer sur ce qui apporte des résultats : l'angle et le script.";
     if (data.temps === "5-10h") return "C'est un investissement sérieux. Le but maintenant est de s'assurer que chaque heure passée génère un impact direct et mesurable sur la croissance de ton audience ou de tes revenus.";
     if (data.temps === "+10h") {
-      if (data.audience === "50k+") return "Tu passes plus de 10h par semaine sur ton contenu. À ce stade de ton développement, ton enjeu n'est plus de travailler plus, mais de structurer un système et de déléguer pour scaler sans t'épuiser.";
+      if (data.audience === "50k+") return "Tu passes plus de 10h par semaine sur ton contenu. À ce stade de ton développement, ton enjeu n'est plus de travailler plus, mais de structurer un système et de déléguer pour grandir sans t'épuiser.";
       return "Tu passes plus de 10h par semaine sur TikTok. Si ta croissance ou tes revenus ne sont pas proportionnels à cet effort massif, c'est que ton énergie est placée sur les mauvaises actions. Il faut restructurer.";
     }
     return "";

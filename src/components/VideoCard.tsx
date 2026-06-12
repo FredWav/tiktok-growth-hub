@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Play } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
+import { VIDEO_META } from "@/data/videoTestimonials";
 
 interface VideoCardProps {
   id: string;
@@ -10,6 +11,8 @@ interface VideoCardProps {
 
 export function VideoCard({ id, alt, location = "home" }: VideoCardProps) {
   const [playing, setPlaying] = useState(false);
+  const meta = VIDEO_META[id];
+  const sub = meta ? [meta.niche, meta.result].filter(Boolean).join(" · ") : "";
 
   if (playing) {
     return (
@@ -41,6 +44,12 @@ export function VideoCard({ id, alt, location = "home" }: VideoCardProps) {
           <Play className="h-6 w-6 text-primary-foreground ml-0.5" fill="currentColor" />
         </div>
       </div>
+      {meta?.name && (
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/85 to-transparent p-3 text-left pointer-events-none">
+          <p className="text-white text-sm font-semibold leading-tight">{meta.name}</p>
+          {sub && <p className="text-white/85 text-xs mt-0.5">{sub}</p>}
+        </div>
+      )}
     </button>
   );
 }

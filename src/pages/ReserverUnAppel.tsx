@@ -186,7 +186,7 @@ export default function ReserverUnAppel() {
       <Layout>
         <SEOHead
           title="La Wav Academy est faite pour toi | Fred Wav"
-          description="Ton budget colle parfaitement avec la Wav Academy : la méthode complète et la communauté à partir de 297 € (paiement unique, accès 3 mois)."
+          description="Ton budget colle parfaitement avec la Wav Academy : la méthode complète et la communauté à partir de 299 € (paiement unique, accès 3 mois)."
           path="/reserverunappel"
         />
         <Section variant="cream" size="lg">
@@ -201,7 +201,7 @@ export default function ReserverUnAppel() {
               Avec ton budget, un accompagnement personnalisé avec moi n'est pas la bonne option — ce serait te survendre quelque chose qui ne te correspond pas.
             </p>
             <p className="text-lg text-muted-foreground mb-8">
-              Mais la <strong>Wav Academy</strong> te donne accès à toute ma méthode, au diagnostic continu et à la communauté à partir de <strong>297 €</strong> (paiement unique, accès 3 mois). C'est exactement ce qu'il te faut pour démarrer.
+              Mais la <strong>Wav Academy</strong> te donne accès à toute ma méthode, au diagnostic continu et à la communauté à partir de <strong>299 €</strong> (paiement unique, accès 3 mois). C'est exactement ce qu'il te faut pour démarrer.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="hero" size="xl" asChild>

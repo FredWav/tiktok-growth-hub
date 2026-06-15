@@ -9,19 +9,20 @@ const corsHeaders = {
 };
 
 // Stripe Payment Link URLs par formule — public, fine to ship in code.
-// Les 3 formules sont des paiements uniques prépayés : 3m = 297€, 6m = 499€, 12m = 899€.
+// Les 3 formules sont des paiements uniques prépayés : 3m = 299€, 6m = 499€, 12m = 899€.
 // TODO (Fred) : coller les 3 Payment Links LIVE créés dans Stripe (paiement unique, sans
 // échelonnement — sinon le bouton ne paie pas).
 const PAYMENT_LINKS: Record<string, string> = {
-  "3m": "TODO_STRIPE_LIVE_LINK_3M_297", // paiement unique 297€ (Fondation, 3 mois)
-  "6m": "TODO_STRIPE_LIVE_LINK_6M_499", // paiement unique 499€ (Accélération, 6 mois)
-  "12m": "TODO_STRIPE_LIVE_LINK_12M_899", // paiement unique 899€ (Maîtrise, 12 mois)
+  "3m": "https://buy.stripe.com/fZu8wObli9Pjg1A5TqcMM0C", // paiement unique 299€ (Fondation, 3 mois)
+  "6m": "https://buy.stripe.com/7sYeVccpm1iNbLkchOcMM0D", // paiement unique 499€ (Accélération, 6 mois)
+  "12m": "https://buy.stripe.com/4gMfZgahe5z3cPogy4cMM0E", // paiement unique 899€ (Maîtrise, 12 mois)
 };
 
 // Liens Stripe en mode TEST (sandbox) — utilisés uniquement quand mode==='test' (déclencheur ?test=1).
-// Invisibles pour les vrais visiteurs. TODO (Fred) : coller les 3 liens sandbox.
+// Invisibles pour les vrais visiteurs. Non utilisés : aucun lien sandbox n'a été créé (les liens
+// live sont en place). Le flux ?test=1 ne paie donc pas tant que ces placeholders restent.
 const TEST_PAYMENT_LINKS: Record<string, string> = {
-  "3m": "TODO_STRIPE_TEST_LINK_3M_297",
+  "3m": "TODO_STRIPE_TEST_LINK_3M_299",
   "6m": "TODO_STRIPE_TEST_LINK_6M_499",
   "12m": "TODO_STRIPE_TEST_LINK_12M_899",
 };
@@ -29,7 +30,7 @@ const TEST_PAYMENT_LINKS: Record<string, string> = {
 // Durée d'accès (en mois) par formule — capturée au consentement pour le calcul d'expiration.
 const ACCESS_MONTHS: Record<string, number> = { "3m": 3, "6m": 6, "12m": 12 };
 
-const CGV_VERSION = "v4"; // bump if /cgv text materially changes
+const CGV_VERSION = "v5"; // bump if /cgv text materially changes
 const CGV_VERSION_TEST = "TEST"; // marqueur pour les consentements de test (exclus de l'export légal)
 
 serve(async (req) => {

@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { VideoCard } from "@/components/VideoCard";
-import { ScreenshotWall } from "@/components/ScreenshotWall";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -424,12 +423,6 @@ export default function WavAcademy() {
             />
           ))}
         </div>
-        <ScreenshotWall
-          location="preuves"
-          title="Leurs messages"
-          subtitle="Retours directs de clients, sans filtre."
-          cols={2}
-        />
       </Section>
 
       {/* ── FORMULES ─────────────────────────────────────────────────────── */}

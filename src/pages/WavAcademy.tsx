@@ -278,6 +278,20 @@ export default function WavAcademy() {
         description="Diagnostique chaque vidéo, corrige en temps réel, casse ton plafond de vues. Le Wav Academy : diagnostic data (WavSocialScan) + contenu stratégique quotidien."
         path="/wavacademy"
         keywords="wav academy, diagnostic tiktok, wavsocialscan, contenu stratégique, formats courts"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "Service",
+          "name": "Wav Academy",
+          "serviceType": "Coaching stratégie formats courts (TikTok, Reels, Shorts)",
+          "description": "Système de diagnostic continu pour créateurs : analyse data de chaque vidéo via WavSocialScan, contenu stratégique quotidien et lives hebdomadaires avec Fred Wav.",
+          "provider": {
+            "@type": "Person",
+            "name": "Fred Wav",
+            "url": "https://fredwav.com"
+          },
+          "areaServed": "FR",
+          "url": "https://fredwav.com/wavacademy"
+        }}
       />
 
       {testMode && (

@@ -7,5 +7,8 @@ Disallow: /app
 Disallow: /app/
 Disallow: /auth
 Disallow: /auth/
+Disallow: /mail
+Disallow: /analyse-express/result
+Disallow: /one-shot/success
 
 Sitemap: https://fredwav.com/sitemap.xml

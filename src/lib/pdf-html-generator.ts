@@ -76,7 +76,10 @@ function markdownToHtml(md: string): string {
     }
   }
   closeLists();
-  return result.join("\n");
+  return DOMPurify.sanitize(result.join("\n"), {
+    ALLOWED_TAGS: ["h2", "h3", "ul", "ol", "li", "p", "strong", "em", "br"],
+    ALLOWED_ATTR: [],
+  });
 }
 
 const DAY_NAMES = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];

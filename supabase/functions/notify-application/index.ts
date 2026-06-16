@@ -9,6 +9,32 @@ const corsHeaders = {
 
 const DISCORD_WEBHOOK_URL = Deno.env.get("DISCORD_WEBHOOK_URL") ?? "";
 
+// Rate-limit anti-spam : max 3 soumissions / 10 min / IP. En mémoire (par instance),
+// suffisant pour bloquer un spam basique sans dépendance externe.
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const RATE_LIMIT_MAX = 3;
+const rateLimitStore = new Map<string, number[]>();
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const recent = (rateLimitStore.get(ip) ?? []).filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+  if (recent.length >= RATE_LIMIT_MAX) {
+    rateLimitStore.set(ip, recent);
+    return false;
+  }
+  recent.push(now);
+  rateLimitStore.set(ip, recent);
+  // Nettoyage opportuniste pour éviter une croissance illimitée.
+  if (rateLimitStore.size > 5000) {
+    for (const [key, times] of rateLimitStore) {
+      const kept = times.filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+      if (kept.length === 0) rateLimitStore.delete(key);
+      else rateLimitStore.set(key, kept);
+    }
+  }
+  return true;
+}
+
 function escapeHtml(str: string): string {
   return str
     .replace(/&/g, "&amp;")
@@ -23,6 +49,19 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const ip =
+    req.headers.get("cf-connecting-ip") ||
+    req.headers.get("x-real-ip") ||
+    (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() ||
+    "unknown";
+
+  if (!checkRateLimit(ip)) {
+    return new Response(
+      JSON.stringify({ error: "Trop de demandes. Réessaie dans quelques minutes." }),
+      { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
   try {
     const { first_name, last_name, email, tiktok_username, profil, motivation, accompagnement_type, accompagnement_critere, goals, budget, origin_source, follower_since, conversion_trigger, posthog_id } =
       await req.json();
@@ -30,6 +69,14 @@ Deno.serve(async (req) => {
     if (!first_name || !last_name || !email || !profil || !motivation || !accompagnement_type || !goals) {
       await notifyError("Demande de contact", "Champs obligatoires manquants");
       return new Response(JSON.stringify({ error: "Champs obligatoires manquants" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Validation simple du format email pour éviter l'open relay.
+    if (typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
+      return new Response(JSON.stringify({ error: "Email invalide" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

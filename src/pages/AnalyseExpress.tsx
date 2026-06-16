@@ -77,7 +77,7 @@ export default function AnalyseExpress() {
   return (
     <Layout>
       <SEOHead
-        title="Analyse Express – Diagnostic complet en 5 minutes | FredWav"
+        title="Analyse Express - Diagnostic TikTok en 5 min | FredWav"
         description="Obtiens un diagnostic complet de ton compte : health score, métriques, persona et recommandations. Rapport PDF téléchargeable pour 11,90€."
         path="/analyse-express"
         keywords="analyse compte, diagnostic réseaux sociaux, health score, rapport compte, audit compte, métriques"

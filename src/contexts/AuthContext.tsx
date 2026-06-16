@@ -9,6 +9,7 @@ interface AuthContextType {
   session: Session | null;
   role: AppRole | null;
   isLoading: boolean;
+  isRoleLoading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
@@ -29,6 +30,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<AppRole | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRoleLoading, setIsRoleLoading] = useState(true);
 
   const fetchUserRole = async (userId: string) => {
     const { data, error } = await supabase
@@ -53,11 +55,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         // Defer role fetching with setTimeout to avoid deadlock
         if (session?.user) {
+          setIsRoleLoading(true);
           setTimeout(() => {
-            fetchUserRole(session.user.id).then(setRole);
+            fetchUserRole(session.user.id).then((r) => {
+              setRole(r);
+              setIsRoleLoading(false);
+            });
           }, 0);
         } else {
           setRole(null);
+          setIsRoleLoading(false);
         }
       }
     );
@@ -68,11 +75,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(session?.user ?? null);
 
       if (session?.user) {
+        setIsRoleLoading(true);
         fetchUserRole(session.user.id).then((role) => {
           setRole(role);
+          setIsRoleLoading(false);
           setIsLoading(false);
         });
       } else {
+        setIsRoleLoading(false);
         setIsLoading(false);
       }
     });
@@ -109,6 +119,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
     setSession(null);
     setRole(null);
+    setIsRoleLoading(false);
   };
 
   return (
@@ -118,6 +129,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         session,
         role,
         isLoading,
+        isRoleLoading,
         signIn,
         signUp,
         signOut,

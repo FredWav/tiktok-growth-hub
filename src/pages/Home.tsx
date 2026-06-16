@@ -145,7 +145,7 @@ export default function Home() {
     <Layout>
       <WavSocialScanPopup />
       <ExitIntentPopup />
-      <SEOHead title="Fred Wav — Expert Stratégie Formats Courts" description="Tu plafonnes en vues ? J'analyse tes vraies stats pour te montrer pourquoi — et comment en sortir. Diagnostic data-driven et accompagnement avec Fred Wav, expert formats courts." path="/" keywords="stratégie formats courts, coaching réseaux sociaux, expert formats courts, wav premium, Fred Wav, plafond de vues, diagnostic tiktok, accompagnement créateur" schema={[
+      <SEOHead title="Fred Wav — Expert Stratégie Formats Courts" description="Tu plafonnes en vues ? J'analyse tes vraies stats pour te montrer pourquoi — et comment en sortir. Diagnostic data-driven avec Fred Wav." path="/" keywords="stratégie formats courts, coaching réseaux sociaux, expert formats courts, wav premium, Fred Wav, plafond de vues, diagnostic tiktok, accompagnement créateur" schema={[
         {
           "@context": "https://schema.org",
           "@type": "FAQPage",

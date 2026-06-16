@@ -22,7 +22,6 @@ export const TrustedBy = ({ filter, className = "" }: TrustedByProps) => {
             rel="noopener noreferrer"
             className="relative group"
             title={client.name}
-            aria-label={`Visiter le profil TikTok de ${client.name}`}
           >
             <Avatar className="h-16 w-16 border-2 border-background ring-2 ring-primary/20 transition-transform group-hover:scale-125 group-hover:z-10">
               {client.avatar_url ? (

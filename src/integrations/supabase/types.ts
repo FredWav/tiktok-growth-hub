@@ -615,53 +615,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_express_analysis_by_session: {
-        Args: { p_session_id: string }
-        Returns: {
-          completed_at: string | null
-          created_at: string
-          email: string | null
-          error_message: string | null
-          health_score: number | null
-          id: string
-          job_id: string | null
-          newsletter_requested: boolean | null
-          newsletter_subscribed: boolean | null
-          result_data: Json | null
-          status: string
-          stripe_session_id: string | null
-          tiktok_username: string
-        }
-        SetofOptions: {
-          from: "*"
-          to: "express_analyses"
-          isOneToOne: true
-          isSetofReturn: false
-        }
-      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
-      }
-      increment_deep_link_clicks: {
-        Args: { p_slug: string }
-        Returns: undefined
-      }
-      update_page_view_duration: {
-        Args: { p_duration: number; p_id: string }
-        Returns: undefined
-      }
-      upsert_diagnostic_lead: {
-        Args: {
-          p_completed: boolean
-          p_current_step: number
-          p_fields: Json
-          p_id: string
-        }
-        Returns: string
       }
     }
     Enums: {

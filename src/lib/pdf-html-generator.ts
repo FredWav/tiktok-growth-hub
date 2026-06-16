@@ -4,6 +4,7 @@
  */
 
 import { PDFDataFormat, BestTime } from "./pdf-data-mapper";
+import DOMPurify from "dompurify";
 
 function formatNumber(num: number | null | undefined): string {
   if (num === null || num === undefined) return "0";
@@ -30,7 +31,13 @@ function markdownToHtml(md: string): string {
   }
 
   function inlineFormat(text: string): string {
-    return text.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/(?<!\*)\*([^*]+?)\*(?!\*)/g, "<em>$1</em>");
+    const escaped = text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+    return escaped
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/(?<!\*)\*([^*]+?)\*(?!\*)/g, "<em>$1</em>");
   }
 
   for (const raw of lines) {

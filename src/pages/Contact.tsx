@@ -94,7 +94,7 @@ export default function Contact() {
                 <Mail className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold mb-1">Email</h3>
+                <h2 className="font-semibold mb-1 text-base">Email</h2>
                 <a href="mailto:contact@fredwav.com" className="text-muted-foreground text-sm hover:text-primary transition-colors" onClick={() => trackEvent("click_email_link", { location: "contact" })}>contact@fredwav.com</a>
               </div>
             </div>
@@ -103,7 +103,7 @@ export default function Contact() {
                 <Clock className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold mb-1">Délai de réponse</h3>
+                <h2 className="font-semibold mb-1 text-base">Délai de réponse</h2>
                 <p className="text-muted-foreground text-sm">24-48h en semaine</p>
               </div>
             </div>
@@ -111,7 +111,7 @@ export default function Contact() {
 
           {/* CTA */}
           <div className="bg-muted/50 rounded-xl p-8 text-center">
-            <h3 className="font-semibold text-lg mb-3">Tu veux passer à l'action ?</h3>
+            <h2 className="font-semibold text-lg mb-3">Tu veux passer à l'action ?</h2>
             <p className="text-muted-foreground text-sm mb-6">
               Pas besoin d'attendre. Envoie-moi un message via les réseaux ci-dessus ou par email et on en parle directement.
             </p>

@@ -12,8 +12,7 @@ const corsHeaders = {
 };
 
 const API_BASE = "https://hesozoobtehszosdlnrn.supabase.co/functions/v1/api-gateway";
-const DISCORD_WEBHOOK_URL =
-  "https://discord.com/api/webhooks/1476936142149390498/PWhNWcdB4iqoFrfF7dFAdhpeMDwuLPNjvGiuZxp_0ubpjdxncA2UFTHcXMZzPiXtT6Bg";
+const DISCORD_WEBHOOK_URL = Deno.env.get("DISCORD_WEBHOOK_URL") ?? "";
 
 async function notifyDiscordMissingAI(username: string, sessionId: string) {
   try {

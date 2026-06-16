@@ -59,25 +59,36 @@ serve(async (req) => {
     const webhookSecretTest = Deno.env.get("STRIPE_WEBHOOK_SECRET_TEST");
     let event: Stripe.Event;
 
-    if (sig && (webhookSecret || webhookSecretTest)) {
-      // Vérifie d'abord avec le secret live ; en cas d'échec, tente le secret test (sandbox).
-      // Permet de valider le tunnel en mode test sans rien changer au flux live.
-      let verified: Stripe.Event | null = null;
-      let lastErr: unknown = null;
-      for (const secret of [webhookSecret, webhookSecretTest]) {
-        if (!secret) continue;
-        try {
-          verified = stripe.webhooks.constructEvent(body, sig, secret);
-          break;
-        } catch (err) {
-          lastErr = err;
-        }
-      }
-      if (!verified) throw lastErr ?? new Error("Invalid Stripe signature");
-      event = verified;
-    } else {
-      event = JSON.parse(body) as Stripe.Event;
+    if (!sig) {
+      return new Response(JSON.stringify({ error: "Missing stripe-signature header" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
+    if (!webhookSecret && !webhookSecretTest) {
+      console.error("Stripe webhook secret not configured");
+      return new Response(JSON.stringify({ error: "Webhook not configured" }), {
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    // Verify with live secret first; fall back to test secret for sandbox tunnels.
+    let verified: Stripe.Event | null = null;
+    let lastErr: unknown = null;
+    for (const secret of [webhookSecret, webhookSecretTest]) {
+      if (!secret) continue;
+      try {
+        verified = stripe.webhooks.constructEvent(body, sig, secret);
+        break;
+      } catch (err) {
+        lastErr = err;
+      }
+    }
+    if (!verified) {
+      console.error("Stripe signature verification failed", lastErr);
+      return new Response(JSON.stringify({ error: "Invalid signature" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    event = verified;
 
     // ── checkout.session.completed ────────────────────────────────────────
     if (event.type === "checkout.session.completed") {

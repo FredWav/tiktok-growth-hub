@@ -7,8 +7,20 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const DISCORD_WEBHOOK_URL =
-  "https://discord.com/api/webhooks/1476936142149390498/PWhNWcdB4iqoFrfF7dFAdhpeMDwuLPNjvGiuZxp_0ubpjdxncA2UFTHcXMZzPiXtT6Bg";
+const DISCORD_WEBHOOK_URL = Deno.env.get("DISCORD_WEBHOOK_URL") ?? "";
+
+const ALLOWED_ORIGINS = new Set([
+  "https://fredwav.com",
+  "https://www.fredwav.com",
+  "https://fredwav.lovable.app",
+]);
+
+function isValidEmail(s: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s) && s.length <= 254;
+}
+function clamp(s: unknown, max: number): string {
+  return (typeof s === "string" ? s : "").slice(0, max);
+}
 
 function escapeHtml(str: string): string {
   return str
@@ -24,15 +36,41 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Basic anti-abuse: require a known browser Origin so the function isn't a generic email relay.
+  const origin = req.headers.get("origin") ?? "";
+  if (origin && !ALLOWED_ORIGINS.has(origin) && !origin.endsWith(".lovable.app")) {
+    return new Response(JSON.stringify({ error: "Forbidden origin" }), {
+      status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   try {
-    const { first_name, last_name, email, tiktok_username, profil, motivation, accompagnement_type, accompagnement_critere, goals, budget, origin_source, follower_since, conversion_trigger, posthog_id } =
-      await req.json();
+    const raw = await req.json();
+    const first_name = clamp(raw.first_name, 80);
+    const last_name = clamp(raw.last_name, 80);
+    const email = clamp(raw.email, 254).trim();
+    const tiktok_username = clamp(raw.tiktok_username, 80);
+    const profil = clamp(raw.profil, 200);
+    const motivation = clamp(raw.motivation, 200);
+    const accompagnement_type = clamp(raw.accompagnement_type, 200);
+    const accompagnement_critere = clamp(raw.accompagnement_critere, 200);
+    const goals = clamp(raw.goals, 2000);
+    const budget = clamp(raw.budget, 80);
+    const origin_source = clamp(raw.origin_source, 200);
+    const follower_since = clamp(raw.follower_since, 80);
+    const conversion_trigger = clamp(raw.conversion_trigger, 1000);
+    const posthog_id = clamp(raw.posthog_id, 200);
 
     if (!first_name || !last_name || !email || !profil || !motivation || !accompagnement_type || !goals) {
       await notifyError("Demande de contact", "Champs obligatoires manquants");
       return new Response(JSON.stringify({ error: "Champs obligatoires manquants" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (!isValidEmail(email)) {
+      return new Response(JSON.stringify({ error: "Email invalide" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
@@ -60,18 +98,21 @@ Deno.serve(async (req) => {
       }],
     };
 
-    const res = await fetch(DISCORD_WEBHOOK_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      const text = await res.text();
-      console.error("Discord webhook error:", res.status, text);
-      await notifyError("Demande de contact Discord", `Webhook échoué (${res.status}) • ${first_name} ${last_name}`);
+    if (DISCORD_WEBHOOK_URL) {
+      const res = await fetch(DISCORD_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("Discord webhook error:", res.status, text);
+        await notifyError("Demande de contact Discord", `Webhook échoué (${res.status}) • ${first_name} ${last_name}`);
+      } else {
+        console.log(`Discord notification sent for ${first_name} ${last_name}`);
+      }
     } else {
-      console.log(`Discord notification sent for ${first_name} ${last_name}`);
+      console.warn("DISCORD_WEBHOOK_URL not configured");
     }
 
     // ── 2. SMTP email to admin ──

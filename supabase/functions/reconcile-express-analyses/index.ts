@@ -10,12 +10,12 @@ const corsHeaders = {
 };
 
 const API_BASE = "https://hesozoobtehszosdlnrn.supabase.co/functions/v1/api-gateway";
-const DISCORD_WEBHOOK_URL =
-  "https://discord.com/api/webhooks/1476936142149390498/PWhNWcdB4iqoFrfF7dFAdhpeMDwuLPNjvGiuZxp_0ubpjdxncA2UFTHcXMZzPiXtT6Bg";
+const DISCORD_WEBHOOK_URL = Deno.env.get("DISCORD_WEBHOOK_URL") ?? "";
 
 const TIMEOUT_MINUTES = 30;
 
 async function notifyDiscordMissingAI(username: string, sessionId: string) {
+  if (!DISCORD_WEBHOOK_URL) return;
   try {
     await fetch(DISCORD_WEBHOOK_URL, {
       method: "POST",
@@ -68,6 +68,15 @@ async function sendResultEmail(email: string, username: string, sessionId: strin
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Require service-role auth (cron scheduler must pass SERVICE_ROLE_KEY).
+  const authHeader = req.headers.get("Authorization") ?? "";
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+  if (!serviceKey || !authHeader.includes(serviceKey)) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 
   const supabase = createClient(

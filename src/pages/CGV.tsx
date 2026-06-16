@@ -228,7 +228,7 @@ export default function CGV() {
             La Wav Academy est proposée en trois formules prépayées donnant accès à des contenus et services identiques, seules la durée et le prix variant. Chaque formule est un <strong>paiement unique</strong>, sans abonnement ni reconduction :
           </p>
           <ul className="text-muted-foreground mb-4 space-y-1">
-            <li><strong>Fondation — 3 mois</strong> : formule prépayée à durée déterminée (297 €), sans reconduction ;</li>
+            <li><strong>Fondation — 3 mois</strong> : formule prépayée à durée déterminée (299 €), sans reconduction ;</li>
             <li><strong>Accélération — 6 mois</strong> : formule prépayée à durée déterminée (499 €), sans reconduction ;</li>
             <li><strong>Maîtrise — 12 mois</strong> : formule prépayée à durée déterminée (899 €), sans reconduction.</li>
           </ul>

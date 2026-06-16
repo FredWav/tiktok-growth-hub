@@ -12,10 +12,10 @@ import {
   RefreshCw,
   MessageSquare,
   Loader2,
+  CreditCard,
 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { VideoCard } from "@/components/VideoCard";
-import { ScreenshotWall } from "@/components/ScreenshotWall";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -119,7 +119,7 @@ type Plan = {
 
 const PLANS: Plan[] = [
   {
-    term: "3m", months: 3, total: 297, monthly: 99, label: "Fondation", duration: "3 mois",
+    term: "3m", months: 3, total: 299, monthly: 100, label: "Fondation", duration: "3 mois",
     save: null, note: "Pour poser des bases solides et trouver ton Format Signature.",
   },
   {
@@ -314,7 +314,7 @@ export default function WavAcademy() {
             </Button>
           </div>
           <p className="text-sm text-muted-foreground mt-4">
-            Trois Pass prépayés, de 297 € à 899 €. Paiement unique, sans abonnement.
+            Trois Pass prépayés, de 299 € à 899 €. Paiement unique, sans abonnement.
           </p>
         </div>
       </Section>
@@ -423,12 +423,6 @@ export default function WavAcademy() {
             />
           ))}
         </div>
-        <ScreenshotWall
-          location="preuves"
-          title="Leurs messages"
-          subtitle="Retours directs de clients, sans filtre."
-          cols={2}
-        />
       </Section>
 
       {/* ── FORMULES ─────────────────────────────────────────────────────── */}
@@ -526,7 +520,15 @@ export default function WavAcademy() {
             <Zap className="h-4 w-4 text-primary flex-shrink-0" />
             Accès immédiat après paiement
           </span>
+          <span className="flex items-center gap-2">
+            <CreditCard className="h-4 w-4 text-primary flex-shrink-0" />
+            Paiement en plusieurs fois sans frais
+          </span>
         </div>
+
+        <p className="text-center text-sm text-muted-foreground mt-3 max-w-2xl mx-auto">
+          Au moment du paiement : jusqu'à <strong>4× sans frais avec PayPal</strong> et <strong>3× sans frais avec Klarna</strong>.
+        </p>
       </Section>
 
       {/* ── FAQ ──────────────────────────────────────────────────────────── */}
@@ -562,7 +564,7 @@ export default function WavAcademy() {
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
           <p className="text-cream/40 text-sm mt-4">
-            Dès 297 € · paiement unique · accès immédiat.
+            Dès 299 € · paiement unique · accès immédiat.
           </p>
         </div>
       </Section>
@@ -678,7 +680,7 @@ export default function WavAcademy() {
       <div className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-background/95 backdrop-blur border-t border-border px-4 py-3 flex items-center justify-between gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
         <div className="leading-tight">
           <p className="text-xs text-muted-foreground">Wav Academy</p>
-          <p className="text-sm font-semibold">dès 297 €</p>
+          <p className="text-sm font-semibold">dès 299 €</p>
         </div>
         <Button variant="hero" size="lg" className="flex-shrink-0" onClick={scrollToPlans}>
           Rejoindre

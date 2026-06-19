@@ -1,12 +1,13 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import { normalizeWavStatsResult, extractHealthScoreNumber, hasAiInsights } from "../_shared/wavstats-normalizer.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const API_BASE = "https://hesozoobtehszosdlnrn.supabase.co/functions/v1/api-gateway";
+const API_BASE = "https://wavstats.com/api/v1";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -83,15 +84,14 @@ serve(async (req) => {
     const job = await jobRes.json();
 
     if (job.status === "completed" && job.result) {
-      const aiInsights = job.result?.account?.ai_insights;
-      const missingAi = !aiInsights || (typeof aiInsights === "string" && aiInsights.trim() === "");
-      const hs = job.result?.health_score ?? job.result?.account?.health_score;
-      const healthScore = typeof hs === "object" && hs !== null ? hs.total : (typeof hs === "number" ? hs : null);
+      const normalized = normalizeWavStatsResult(job.result);
+      const missingAi = !hasAiInsights(normalized);
+      const healthScore = extractHealthScoreNumber(job.result);
 
       await supabaseAdmin.from("express_analyses").update({
         status: "complete",
         health_score: typeof healthScore === "number" ? healthScore : null,
-        result_data: job.result,
+        result_data: normalized,
         completed_at: new Date().toISOString(),
         error_message: missingAi ? "Analyse IA (ai_insights) absente" : null,
       }).eq("id", analysis_id);

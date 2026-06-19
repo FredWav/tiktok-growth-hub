@@ -4,6 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 import nodemailer from "https://esm.sh/nodemailer@6.9.16";
 import { getStripeSecretKey } from "../_shared/stripe-config.ts";
 import { notifySuccess, notifyError } from "../_shared/itpush.ts";
+import { normalizeWavStatsResult, extractHealthScoreNumber, hasAiInsights } from "../_shared/wavstats-normalizer.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,7 +12,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const API_BASE = "https://hesozoobtehszosdlnrn.supabase.co/functions/v1/api-gateway";
+const API_BASE = "https://wavstats.com/api/v1";
 const DISCORD_WEBHOOK_URL = Deno.env.get("DISCORD_WEBHOOK_URL") ?? "";
 
 async function notifyDiscordMissingAI(username: string, sessionId: string) {
@@ -143,8 +144,9 @@ serve(async (req) => {
     console.log(job);
 
     if (job.status === "completed" && job.result) {
-      const aiInsights = job.result?.account?.ai_insights;
-      const missingAiInsights = !aiInsights || (typeof aiInsights === "string" && aiInsights.trim() === "");
+      const normalized = normalizeWavStatsResult(job.result);
+      const missingAiInsights = !hasAiInsights(normalized);
+      const healthScore = extractHealthScoreNumber(job.result);
 
       // Get email from express_analyses record
       let customerEmail: string | null = null;
@@ -160,14 +162,12 @@ serve(async (req) => {
       }
 
       try {
-        const hs = job.result?.health_score ?? job.result?.account?.health_score;
-        const healthScore = typeof hs === "object" && hs !== null ? hs.total : typeof hs === "number" ? hs : null;
         await supabase
           .from("express_analyses")
           .update({
             status: "complete",
             health_score: typeof healthScore === "number" ? healthScore : null,
-            result_data: job.result,
+            result_data: normalized,
             completed_at: new Date().toISOString(),
             ...(missingAiInsights ? { error_message: "Analyse IA (ai_insights) absente du résultat" } : {}),
           })
@@ -180,7 +180,7 @@ serve(async (req) => {
         await notifyDiscordMissingAI(username, session_id);
         await notifyError("Analyse Status", `AI insights manquants • @${username}`);
       } else {
-        await notifySuccess("Analyse Terminée", `@${username} • score ${job.result?.health_score ?? "N/A"}`);
+        await notifySuccess("Analyse Terminée", `@${username} • score ${healthScore ?? "N/A"}`);
       }
 
       // Send result email
@@ -191,7 +191,7 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({
           status: "complete",
-          data: job.result,
+          data: normalized,
           username,
           missing_ai_insights: missingAiInsights,
         }),

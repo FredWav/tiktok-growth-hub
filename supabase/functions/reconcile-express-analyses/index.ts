@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 import nodemailer from "https://esm.sh/nodemailer@6.9.16";
 import { notifySuccess, notifyError } from "../_shared/itpush.ts";
+import { normalizeWavStatsResult, extractHealthScoreNumber, hasAiInsights } from "../_shared/wavstats-normalizer.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -9,7 +10,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-const API_BASE = "https://hesozoobtehszosdlnrn.supabase.co/functions/v1/api-gateway";
+const API_BASE = "https://wavstats.com/api/v1";
 const DISCORD_WEBHOOK_URL = Deno.env.get("DISCORD_WEBHOOK_URL") ?? "";
 
 const TIMEOUT_MINUTES = 30;
@@ -147,15 +148,14 @@ serve(async (req) => {
         const job = await jobRes.json();
 
         if (job.status === "completed" && job.result) {
-          const aiInsights = job.result?.account?.ai_insights;
-          const missingAi = !aiInsights || (typeof aiInsights === "string" && aiInsights.trim() === "");
-          const hs = job.result?.health_score ?? job.result?.account?.health_score;
-          const healthScore = typeof hs === "object" && hs !== null ? hs.total : typeof hs === "number" ? hs : null;
+          const normalized = normalizeWavStatsResult(job.result);
+          const missingAi = !hasAiInsights(normalized);
+          const healthScore = extractHealthScoreNumber(job.result);
 
           await supabase.from("express_analyses").update({
             status: "complete",
             health_score: typeof healthScore === "number" ? healthScore : null,
-            result_data: job.result,
+            result_data: normalized,
             completed_at: new Date().toISOString(),
             ...(missingAi ? { error_message: "Analyse IA (ai_insights) absente du résultat" } : {}),
           }).eq("id", row.id);

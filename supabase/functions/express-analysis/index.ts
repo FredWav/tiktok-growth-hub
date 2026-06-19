@@ -9,7 +9,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const API_BASE = "https://hesozoobtehszosdlnrn.supabase.co/functions/v1/api-gateway";
+const API_BASE = "https://wavstats.com/api/v1";
 
 /**
  * Fire-and-forget call to mailerlite-subscribe.
@@ -154,7 +154,7 @@ serve(async (req) => {
     }
 
     const analyzeData = await analyzeRes.json();
-    const jobId = analyzeData.job_id;
+    const jobId = analyzeData.jobId ?? analyzeData.job_id;
 
     if (!jobId) {
       console.error("No job_id in response:", analyzeData);

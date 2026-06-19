@@ -2,7 +2,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { trackEvent } from "@/lib/tracking";
 import { trackPostHogEvent } from "@/lib/posthog";
-import { Download, Loader2, AlertCircle, RefreshCw, Target, ArrowRight } from "lucide-react";
+import { Download, Loader2, AlertCircle, RefreshCw, ArrowRight } from "lucide-react";
 // @ts-ignore - html2pdf.js doesn't have proper types
 import html2pdf from "html2pdf.js";
 import { SEOHead } from "@/components/SEOHead";
@@ -18,9 +18,10 @@ import { ProfileHeader } from "@/components/express-result/ProfileHeader";
 import { MetricsGrids } from "@/components/express-result/MetricsGrids";
 import { HealthScoreSection } from "@/components/express-result/HealthScoreSection";
 import { HashtagsSection } from "@/components/express-result/HashtagsSection";
-import { BestTimesSection } from "@/components/express-result/BestTimesSection";
-import { RegularityBreakdown } from "@/components/express-result/RegularityBreakdown";
-import { MarkdownRenderer } from "@/components/express-result/MarkdownRenderer";
+import { PublicationPatternSection } from "@/components/express-result/PublicationPatternSection";
+import { AIAnalysisSection } from "@/components/express-result/AIAnalysisSection";
+import { TopVideosSection } from "@/components/express-result/TopVideosSection";
+import { ShadowbanSection } from "@/components/express-result/ShadowbanSection";
 import { mapAccountDataForPDF } from "@/lib/pdf-data-mapper";
 import { generateCompletePDFHTML } from "@/lib/pdf-html-generator";
 
@@ -193,7 +194,7 @@ export default function AnalyseExpressResult() {
     trackEvent("express_pdf_download", { username });
     trackPostHogEvent("click_pdf_download", { username });
     try {
-      const pdfData = mapAccountDataForPDF(data.account, persona, pubPattern);
+      const pdfData = mapAccountDataForPDF(data.account, undefined, pubPattern);
       const htmlContent = generateCompletePDFHTML(
         pdfData,
         data.account.ai_insights || "",
@@ -227,9 +228,11 @@ export default function AnalyseExpressResult() {
   };
 
   const account = data?.account;
-  const persona = data?.persona;
-  const pubPattern = persona?.style_contenu?.publication_pattern;
+  const aiAnalysis = data?.ai_analysis;
+  const pubPattern = data?.publication_pattern;
   const healthScore = data?.health_score || account?.health_score;
+  const topVideos = data?.top_videos || account?.recent_videos;
+  const shadowban = data?.shadowban_analysis || account?.shadowban_analysis;
 
   return (
     <Layout>
@@ -304,20 +307,11 @@ export default function AnalyseExpressResult() {
               {/* Hashtags */}
               <HashtagsSection hashtags={account?.top_hashtags} />
 
-              {/* Best posting times */}
-              {pubPattern?.best_times?.length > 0 && (
-                <BestTimesSection
-                  bestTimes={pubPattern.best_times}
-                  recommendations={pubPattern.recommendations}
-                  consistencyScore={pubPattern.consistency_score}
-                  publicationFrequency={pubPattern.publication_frequency}
-                />
-              )}
+              {/* Publication pattern */}
+              {pubPattern && <PublicationPatternSection pp={pubPattern} />}
 
-              {/* Regularity breakdown */}
-              {pubPattern?.regularity_details?.tiktok_breakdown && (
-                <RegularityBreakdown breakdown={pubPattern.regularity_details.tiktok_breakdown} />
-              )}
+              {/* Shadowban */}
+              {shadowban && <ShadowbanSection sb={shadowban} />}
 
               {/* Regularity alert CTA */}
               {pubPattern?.consistency_score != null && pubPattern.consistency_score < 60 && (
@@ -339,52 +333,13 @@ export default function AnalyseExpressResult() {
                 </div>
               )}
 
-              {/* Persona */}
-              {persona && (
-                <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-                  <h3 className="font-semibold flex items-center gap-2">
-                    <Target className="h-5 w-5 text-primary" />
-                    Persona identifié
-                  </h3>
-                  {persona.niche_principale && (
-                    <p className="text-muted-foreground">
-                      <span className="font-medium text-foreground">Niche :</span> {persona.niche_principale}
-                    </p>
-                  )}
-                  {persona.forces?.length > 0 && (
-                    <div>
-                      <span className="font-medium text-sm">Forces</span>
-                      <ul className="mt-1 space-y-1">
-                        {persona.forces.map((f: string, i: number) => (
-                          <li key={i} className="flex gap-2 text-muted-foreground text-sm">
-                            <span className="text-green-500 font-bold">✓</span> {f}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  {persona.faiblesses?.length > 0 && (
-                    <div>
-                      <span className="font-medium text-sm">Points d'amélioration</span>
-                      <ul className="mt-1 space-y-1">
-                        {persona.faiblesses.map((f: string, i: number) => (
-                          <li key={i} className="flex gap-2 text-muted-foreground text-sm">
-                            <span className="text-yellow-500 font-bold">!</span> {f}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              )}
+              {/* Top videos */}
+              {topVideos?.length ? <TopVideosSection videos={topVideos} /> : null}
 
-              {/* AI Insights */}
-              {account?.ai_insights ? (
-                <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-                  <h3 className="font-semibold">📊 Analyse détaillée (IA)</h3>
-                  <MarkdownRenderer content={account.ai_insights} />
-                </div>
-              ) : (
+              {/* Structured AI Analysis */}
+              {aiAnalysis ? (
+                <AIAnalysisSection ai={aiAnalysis} />
+              ) : !account?.ai_insights ? (
                 <div className="bg-destructive/10 border border-destructive/30 rounded-xl p-6 space-y-3">
                   <div className="flex items-center gap-3">
                     <AlertCircle className="h-6 w-6 text-destructive flex-shrink-0" />
@@ -394,7 +349,7 @@ export default function AnalyseExpressResult() {
                     Nous sommes sincèrement désolés pour ce désagrément. Notre équipe a été automatiquement informée et travaille à corriger votre rapport. Nous vous recontacterons rapidement avec votre analyse complète et corrigée.
                   </p>
                 </div>
-              )}
+              ) : null}
 
               {/* Download */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">

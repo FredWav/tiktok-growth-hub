@@ -1,32 +1,70 @@
-## Diagnostic
+# Migration Analyse Express - WavStats API v2.0.0
 
-Ton compte Gabizoc a bien `role = 'admin'` en base et tu te connectes correctement (les logs auth le confirment). Le symptôme "redirigé vers `/app`" vient donc d'une **race condition côté front** dans `AuthContext` + `ProtectedRoute` :
+L'API source change : nouveau base URL `https://wavstats.com/api/v1` et nouveau format de payload (`account`, `averages`, `healthScore`, `aiAnalysis`, `topVideos`, `publicationPattern`, `shadowbanAnalysis`, `hashtags`). Plus de `ai_insights` markdown ni de `persona` legacy : à la place une structure `aiAnalysis` riche (summary, strengths, improvements, actionPlan, strategy3_6, hashtagStrategy, bioOptimized, profilePhoto, gridVisual).
 
-- `AuthContext` initialise `isLoading = true` et ne le repasse à `false` que dans la branche `getSession().then(...)`.
-- Mais le `role` peut être réinitialisé/non encore résolu à plusieurs moments (event `SIGNED_IN` après login, `TOKEN_REFRESHED` après reload, navigation directe vers `/admin/marketing`) — pendant ces fenêtres, `user` est défini, `isLoading` est `false`, mais `role` est encore `null`.
-- `ProtectedRoute` ne distingue pas "role en cours de chargement" de "role différent" → il déclenche `Navigate to="/app"`. Une fois sur `/app`, plus aucun lien ne ramène vers `/admin`, d'où le sentiment de "plus du tout accès".
+## Stratégie
 
-## Correctif (2 fichiers, pas de migration)
+Pour minimiser la casse, on **normalise côté Edge Function** vers une forme `result_data` enrichie (compatible avec l'ancien rendu + nouveaux champs). L'écran de résultat est mis à jour pour afficher les nouveaux blocs (forces / améliorations / plan d'action structuré, top vidéos, shadowban, bio optimisée, stratégie 3-6 mois).
 
-### 1. `src/contexts/AuthContext.tsx`
+## Changements
 
-- Ajouter un état `isRoleLoading` (true tant qu'on a un `user` mais pas encore résolu son `role`).
-- Le mettre à `true` à chaque event `onAuthStateChange` où une session existe, et à `false` une fois `fetchUserRole` résolu.
-- Exposer `isRoleLoading` dans le contexte.
-- Garder `isLoading` pour le boot initial uniquement.
+### 1. Edge Functions - base URL + auth
+Remplacer dans les 6 fonctions :
+- `express-analysis`
+- `express-analysis-status`
+- `manual-express-analysis`
+- `retry-express-analysis`
+- `check-express-job`
+- `reconcile-express-analyses`
 
-### 2. `src/components/auth/ProtectedRoute.tsx`
+```
+const API_BASE = "https://wavstats.com/api/v1";
+```
+(header `X-API-Key` inchangé, `WAV_SOCIAL_SCAN_API_KEY` reste le nom du secret côté Lovable)
 
-- Lire `isRoleLoading` en plus de `isLoading`.
-- Tant que `user` existe et que `isRoleLoading` est `true` → afficher le loader (ne pas rediriger).
-- Ne vérifier `role !== requiredRole` qu'après que `role` soit résolu.
+### 2. Normalisation dans `express-analysis-status`
+Quand `job.status === "completed"`, mapper `job.result` (nouveau format) vers `result_data` :
+- `account.username/display_name/avatar_url/bio/verified/detected_niche` ← `result.account.*`
+- `account.follower_count/video_count/like_count/engagement_rate/save_rate` ← `result.account.*`
+- `account.avg_views/avg_likes/...` ← `result.averages.*`
+- `account.median_views/...` ← `result.averages.median*`
+- `account.top_hashtags` ← `result.hashtags`
+- `account.recent_videos` ← `result.topVideos` (mappés id/description/views/likes/comments/shares/saves/cover_url)
+- `account.shadowban_analysis` ← `result.shadowbanAnalysis` (snake_cased)
+- `health_score` ← `result.healthScore` (avec components convertis en `{score,label,status}`)
+- `ai_analysis` (nouveau) ← `result.aiAnalysis` (gardé structuré)
+- `ai_insights` (legacy markdown) ← généré depuis `aiAnalysis.summary + strengths + improvements + actionPlan` pour conserver le rendu existant et le PDF
+- `publication_pattern` ← `result.publicationPattern` (best_days/best_hours/frequency/consistency_score)
 
-Cette double garde supprime la fenêtre pendant laquelle un admin authentifié est rejeté vers `/app`.
+Stocker en DB sous `result_data` et renvoyer tel quel au front. `healthScore` extrait pour la colonne `health_score`.
 
-## Vérification
+### 3. Frontend - `AnalyseExpressResult.tsx`
+- Lire `data.ai_analysis` (nouveau) et `data.health_score`
+- Garder le rendu legacy (Profile, HealthScore, Metrics, Hashtags, AI markdown, PDF) pour compat
+- Ajouter 4 nouveaux blocs si `ai_analysis` présent :
+  - **Forces / Axes d'amélioration** (cartes avec title + description)
+  - **Plan d'action 30 jours** (text + metric + impact/effort badges)
+  - **Stratégie 3-6 mois** (text + metric + timeline)
+  - **Bio optimisée** (3 propositions sélectionnables/copiables) + **Stratégie hashtags** (current vs suggested)
+- Ajouter section **Top vidéos** (carte horizontale avec cover + stats)
+- Ajouter **Shadowban analysis** (badge risk_level + diagnosis)
 
-- Reload direct sur `/admin/marketing` en étant connecté → la page admin s'affiche.
-- Login depuis `/auth` avec le compte admin → redirection vers `/admin/marketing`.
-- Login avec un compte client → toujours redirigé vers `/app` (comportement conservé).
+### 4. Composants
+Nouveaux fichiers (petits, focalisés) :
+- `src/components/express-result/AIAnalysisSection.tsx` (forces/améliorations/plan/stratégie/bio/hashtags)
+- `src/components/express-result/TopVideosSection.tsx`
+- `src/components/express-result/ShadowbanSection.tsx`
 
-Aucun changement sur les policies RLS, la table `user_roles`, ni les autres routes.
+### 5. PDF
+Le PDF actuel consomme `ai_insights` markdown : il continue de fonctionner grâce au markdown généré depuis `aiAnalysis`. Pas de changement nécessaire dans `pdf-html-generator.ts` / `pdf-data-mapper.ts`.
+
+### 6. Hors scope
+- Pas de migration DB (la colonne `result_data` est `jsonb` et accepte la nouvelle forme)
+- Pas de changement des webhooks Discord / emails / Stripe
+- `_rawMarkdown` ignoré (debug uniquement)
+
+## Fichiers touchés
+- 6 edge functions (URL)
+- `supabase/functions/express-analysis-status/index.ts` (+ normalizer)
+- `src/pages/AnalyseExpressResult.tsx`
+- 3 nouveaux composants `src/components/express-result/*`

@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@18.5.0";
-import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import Stripe from "https://esm.sh/stripe@18.5.0?target=deno";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { getStripeSecretKey } from "../_shared/stripe-config.ts";
 import { notifySuccess, notifyError } from "../_shared/itpush.ts";
 
@@ -8,6 +8,33 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
+
+function jsonResponse(body: Record<string, unknown>, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+async function safeNotifyError(title: string, message: string): Promise<void> {
+  try {
+    await notifyError(title, message);
+  } catch (notifyErr) {
+    console.error(`Failed to send error notification for ${title}:`, notifyErr);
+  }
+}
+
+async function safeNotifySuccess(title: string, message: string): Promise<void> {
+  try {
+    await notifySuccess(title, message);
+  } catch (notifyErr) {
+    console.error(`Failed to send success notification for ${title}:`, notifyErr);
+  }
+}
 
 /** Call the discord-role Edge Function to grant or revoke a role. */
 async function assignDiscordRole(
@@ -45,45 +72,60 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const stripe = new Stripe(getStripeSecretKey(), { apiVersion: "2025-08-27.basil" });
-  const supabase = createClient(
-    Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-    { auth: { persistSession: false } }
-  );
-
   try {
     const body = await req.text();
     const sig = req.headers.get("stripe-signature");
     const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
     const webhookSecretTest = Deno.env.get("STRIPE_WEBHOOK_SECRET_TEST");
+    const webhookSecrets = [webhookSecret, webhookSecretTest].filter(Boolean) as string[];
+    const stripeSecretKey = getStripeSecretKey();
     let event: Stripe.Event;
 
-    if (!sig || (!webhookSecret && !webhookSecretTest)) {
-      // Refuse toute requête non signée — pas de fallback non vérifié.
-      return new Response(
-        JSON.stringify({ error: "Stripe signature or webhook secret missing" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    if (!sig) {
+      return jsonResponse({ error: "Stripe signature missing" }, 400);
     }
+
+    if (!stripeSecretKey) {
+      console.error("Stripe secret key missing. Webhook event ignored.");
+      await safeNotifyError("Stripe Webhook", "Clé Stripe manquante - événement ignoré");
+      return jsonResponse({ received: true, ignored: true, reason: "stripe_secret_key_missing" });
+    }
+
+    if (webhookSecrets.length === 0) {
+      console.error("Stripe webhook signing secret missing. Webhook event ignored, but acknowledged to avoid retry storms.");
+      await safeNotifyError("Stripe Webhook", "Secret de signature webhook manquant - événement ignoré");
+      return jsonResponse({ received: true, ignored: true, reason: "webhook_secret_missing" });
+    }
+
+    const stripe = new Stripe(stripeSecretKey, {
+      apiVersion: "2025-08-27.basil",
+      httpClient: Stripe.createFetchHttpClient(),
+    });
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+    if (!supabaseUrl || !serviceRoleKey) {
+      console.error("Backend service credentials missing. Webhook event ignored.");
+      await safeNotifyError("Stripe Webhook", "Credentials backend manquants - événement ignoré");
+      return jsonResponse({ received: true, ignored: true, reason: "backend_credentials_missing" });
+    }
+
+    const supabase = createClient(supabaseUrl, serviceRoleKey, {
+      auth: { persistSession: false },
+    });
 
     // Vérifie d'abord avec le secret live ; en cas d'échec, tente le secret test (sandbox).
     let verified: Stripe.Event | null = null;
-    let lastErr: unknown = null;
-    for (const secret of [webhookSecret, webhookSecretTest]) {
-      if (!secret) continue;
+    for (const secret of webhookSecrets) {
       try {
         verified = stripe.webhooks.constructEvent(body, sig, secret);
         break;
       } catch (err) {
-        lastErr = err;
+        console.warn("Stripe signature verification failed with one configured secret:", getErrorMessage(err));
       }
     }
     if (!verified) {
-      return new Response(
-        JSON.stringify({ error: "Invalid Stripe signature" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return jsonResponse({ error: "Invalid Stripe signature" }, 400);
     }
     event = verified;
 
@@ -135,9 +177,7 @@ serve(async (req) => {
 
       if (!plan || !discordRoleEnv || !email) {
         console.log("Checkout session is not a Wav Academy purchase, skipping");
-        return new Response(JSON.stringify({ received: true }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        return jsonResponse({ received: true });
       }
 
       const stripeSubscriptionId = session.subscription as string | null;
@@ -174,7 +214,7 @@ serve(async (req) => {
 
       if (insertError) {
         console.error("Error inserting wavacademy_subscription:", insertError);
-        await notifyError("WavAcademy Webhook", `Échec insert DB • plan=${plan} • ${email}`);
+        await safeNotifyError("WavAcademy Webhook", `Échec insert DB • plan=${plan} • ${email}`);
       }
 
       let claimToken: string | null = null;
@@ -192,7 +232,7 @@ serve(async (req) => {
 
         if (claimErr) {
           console.error("Error creating wavacademy_claim:", claimErr);
-          await notifyError("WavAcademy Webhook", `Échec création claim • ${email} • ${claimErr.message}`);
+          await safeNotifyError("WavAcademy Webhook", `Échec création claim • ${email} • ${claimErr.message}`);
         } else {
           claimToken = claimRow.token as string;
         }
@@ -212,15 +252,13 @@ serve(async (req) => {
           });
         } catch (mailErr) {
           console.error("Failed to invoke send-claim-email:", mailErr);
-          await notifyError("WavAcademy Webhook", `Échec envoi email claim • ${email}`);
+          await safeNotifyError("WavAcademy Webhook", `Échec envoi email claim • ${email}`);
         }
       }
 
-      await notifySuccess("WavAcademy", `Nouveau membre • ${plan} • ${email} • claim envoyé`);
+      await safeNotifySuccess("WavAcademy", `Nouveau membre • ${plan} • ${email} • claim envoyé`);
 
-      return new Response(JSON.stringify({ received: true }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return jsonResponse({ received: true });
     }
 
     // ── customer.subscription.deleted (WavAcademy cancellation) ─────────────
@@ -248,19 +286,14 @@ serve(async (req) => {
           await assignDiscordRole(subRow.discord_user_id, subRow.discord_role_env, "revoke");
         }
 
-        await notifySuccess("WavAcademy", `Résiliation abonnement • ${subscription.id}`);
+        await safeNotifySuccess("WavAcademy", `Résiliation abonnement • ${subscription.id}`);
       }
     }
 
-    return new Response(JSON.stringify({ received: true }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return jsonResponse({ received: true });
   } catch (error) {
     console.error("Webhook error:", error);
-    await notifyError("Stripe Webhook", `${error.message}`);
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 400,
-    });
+    await safeNotifyError("Stripe Webhook", getErrorMessage(error));
+    return jsonResponse({ received: true, processing_error: true });
   }
 });

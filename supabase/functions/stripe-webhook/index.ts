@@ -115,10 +115,12 @@ serve(async (req) => {
     });
 
     // Vérifie d'abord avec le secret live ; en cas d'échec, tente le secret test (sandbox).
+    // En Edge Function, Stripe doit utiliser la version async, sinon la crypto Web
+    // déclenche "SubtleCryptoProvider cannot be used in a synchronous context".
     let verified: Stripe.Event | null = null;
     for (const secret of webhookSecrets) {
       try {
-        verified = stripe.webhooks.constructEvent(body, sig, secret);
+        verified = await stripe.webhooks.constructEventAsync(body, sig, secret);
         break;
       } catch (err) {
         console.warn("Stripe signature verification failed with one configured secret:", getErrorMessage(err));

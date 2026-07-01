@@ -6,8 +6,12 @@
 import { parseAIInsightsToSections, ParsedSections } from './pdf-markdown-parser';
 
 export interface BestTime {
-  day: number;
-  hour: number;
+  /** Numeric day 0-6 (Sunday=0). Optional when the API returns labels. */
+  day?: number;
+  /** Numeric hour 0-23. Optional when the API returns labels. */
+  hour?: number;
+  /** Optional pre-formatted label (e.g. "Lundi 07h-08h"). Used when day/hour unknown. */
+  label?: string;
   avg_views: number;
 }
 
@@ -63,6 +67,12 @@ export interface PDFDataFormat {
   popular_hashtags: string[];
   sections: ParsedSections;
   health_score?: number;
+  /** Full health score object (total + components + priority_actions) used by the detail section. */
+  health_score_detail?: {
+    total?: number;
+    components?: Record<string, number>;
+    priority_actions?: string[];
+  };
   shadowban_status?: string;
   niche?: string;
   best_times?: BestTime[];
@@ -120,10 +130,76 @@ function extractShadowbanStatus(accountData: any): string {
   return analysis.diagnosis || 'Statut inconnu';
 }
 
+function derivePersonaFromAi(ai: any, detectedNiche?: string | null): PersonaData | undefined {
+  if (!ai) return detectedNiche ? { niche_principale: detectedNiche } : undefined;
+  const forces = Array.isArray(ai.strengths)
+    ? ai.strengths.slice(0, 4).map((s: any) => s?.title).filter(Boolean)
+    : [];
+  const faiblesses = Array.isArray(ai.improvements)
+    ? ai.improvements.slice(0, 4).map((s: any) => s?.title).filter(Boolean)
+    : [];
+  if (!detectedNiche && !forces.length && !faiblesses.length) return undefined;
+  return {
+    niche_principale: detectedNiche || undefined,
+    forces: forces.length ? forces : undefined,
+    faiblesses: faiblesses.length ? faiblesses : undefined,
+  };
+}
+
+function flattenHealthComponents(hs: any): Record<string, number> | undefined {
+  const comps = hs?.components;
+  if (!comps || typeof comps !== "object") return undefined;
+  const out: Record<string, number> = {};
+  for (const [k, v] of Object.entries(comps)) {
+    if (typeof v === "number") out[k] = v;
+    else if (v && typeof v === "object" && typeof (v as any).score === "number") out[k] = (v as any).score;
+  }
+  return Object.keys(out).length ? out : undefined;
+}
+
+function parseWeeklyFrequency(freq?: string | null): number | undefined {
+  if (!freq || typeof freq !== "string") return undefined;
+  // Matches "3 vidéos / semaine", "3-5 / semaine", "0.5 vidéo/jour"
+  const m = freq.match(/(\d+(?:[.,]\d+)?)(?:\s*[-à]\s*(\d+(?:[.,]\d+)?))?\s*(?:vid[eé]os?)?\s*\/\s*(jour|semaine|week|day)/i);
+  if (!m) return undefined;
+  const low = parseFloat(m[1].replace(",", "."));
+  const high = m[2] ? parseFloat(m[2].replace(",", ".")) : low;
+  const avg = (low + high) / 2;
+  const unit = m[3].toLowerCase();
+  return unit.startsWith("j") || unit.startsWith("d") ? avg : avg / 7;
+}
+
+function buildBestTimesFromLabels(pp: any): BestTime[] | undefined {
+  if (!pp) return undefined;
+  const days: string[] = Array.isArray(pp.best_days) ? pp.best_days : [];
+  const hours: string[] = Array.isArray(pp.best_hours) ? pp.best_hours : [];
+  if (!days.length && !hours.length) return undefined;
+
+  // Case A: strings (v2 API) → build labels
+  const allStrings = [...days, ...hours].every((v) => typeof v === "string");
+  if (allStrings) {
+    const items: BestTime[] = [];
+    if (days.length && hours.length) {
+      for (const d of days.slice(0, 3)) for (const h of hours.slice(0, 3)) items.push({ label: `${d} · ${h}`, avg_views: 0 });
+    } else if (days.length) {
+      for (const d of days.slice(0, 5)) items.push({ label: d, avg_views: 0 });
+    } else {
+      for (const h of hours.slice(0, 5)) items.push({ label: h, avg_views: 0 });
+    }
+    return items.slice(0, 5);
+  }
+
+  // Case B: already structured (legacy)
+  if (Array.isArray(pp.best_times)) return pp.best_times;
+  return undefined;
+}
+
 export function mapAccountDataForPDF(
   accountData: any,
   persona?: any,
-  pubPattern?: any
+  pubPattern?: any,
+  aiAnalysis?: any,
+  healthScoreDetail?: any
 ): PDFDataFormat {
   const parsedSections = parseAIInsightsToSections(accountData.ai_insights || '');
   const popularHashtags = extractPopularHashtags(accountData);
@@ -131,6 +207,48 @@ export function mapAccountDataForPDF(
     (accountData.avg_likes && accountData.video_count 
       ? Math.round(accountData.avg_likes * accountData.video_count) 
       : 0);
+
+  // Health score: expose a plain number for the cover, and a flat detail object for the section.
+  const hsSource = healthScoreDetail ?? accountData.health_score;
+  const healthScoreNumber = extractHealthScore(accountData) ?? (typeof hsSource === "object" ? hsSource?.total : undefined);
+  const flatComponents = flattenHealthComponents(hsSource);
+  const healthDetail = hsSource && typeof hsSource === "object"
+    ? {
+        total: hsSource.total,
+        components: flatComponents,
+        priority_actions: hsSource.priority_actions || hsSource.priorityActions || [],
+      }
+    : undefined;
+
+  // Derive persona from AI analysis when not supplied by caller.
+  const finalPersona: PersonaData | undefined = persona
+    ? {
+        niche_principale: persona.niche_principale,
+        forces: persona.forces,
+        faiblesses: persona.faiblesses,
+      }
+    : derivePersonaFromAi(aiAnalysis, accountData.detected_niche || accountData.niche);
+
+  // Best times: adapt v2 label format when needed
+  const bestTimes = (Array.isArray(pubPattern?.best_times) && pubPattern.best_times.length)
+    ? pubPattern.best_times
+    : buildBestTimesFromLabels(pubPattern);
+
+  // Publication frequency: derive from v2 `frequency` string when missing
+  let pubFreq = pubPattern?.publication_frequency;
+  if (!pubFreq && pubPattern?.frequency) {
+    const dailyAvg = parseWeeklyFrequency(pubPattern.frequency);
+    pubFreq = {
+      weekly_pattern: pubPattern.frequency,
+      ...(dailyAvg !== undefined ? { daily_avg: dailyAvg } : {}),
+    };
+  }
+
+  // Recommendations fallback: use AI action plan when publication pattern has none
+  let recommendations: string[] = Array.isArray(pubPattern?.recommendations) ? pubPattern.recommendations : [];
+  if (!recommendations.length && Array.isArray(aiAnalysis?.actionPlan)) {
+    recommendations = aiAnalysis.actionPlan.slice(0, 3).map((a: any) => a?.text).filter(Boolean);
+  }
 
   return {
     platform: 'tiktok',
@@ -172,18 +290,15 @@ export function mapAccountDataForPDF(
     },
     popular_hashtags: popularHashtags,
     sections: parsedSections,
-    health_score: extractHealthScore(accountData),
+    health_score: healthScoreNumber,
+    health_score_detail: healthDetail,
     shadowban_status: extractShadowbanStatus(accountData),
     niche: accountData.detected_niche || accountData.niche || undefined,
-    best_times: pubPattern?.best_times || [],
+    best_times: bestTimes || [],
     regularity_breakdown: pubPattern?.regularity_details?.tiktok_breakdown || undefined,
     consistency_score: pubPattern?.consistency_score,
-    publication_frequency: pubPattern?.publication_frequency,
-    recommendations: pubPattern?.recommendations || [],
-    persona: persona ? {
-      niche_principale: persona.niche_principale,
-      forces: persona.forces,
-      faiblesses: persona.faiblesses,
-    } : undefined,
+    publication_frequency: pubFreq,
+    recommendations,
+    persona: finalPersona,
   };
 }

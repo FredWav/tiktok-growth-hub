@@ -13,6 +13,26 @@ function formatNumber(num: number | null | undefined): string {
   return num.toString();
 }
 
+function toNumber(value: unknown): number {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string") {
+    const parsed = Number(value.replace(/\s/g, "").replace(",", "."));
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+  return 0;
+}
+
+function pickVideoMetric(video: any, keys: string[]): number {
+  const buckets = [video, video?.metrics, video?.stats, video?.statistics, video?.analytics];
+  for (const bucket of buckets) {
+    if (!bucket || typeof bucket !== "object") continue;
+    for (const key of keys) {
+      if (bucket[key] !== undefined && bucket[key] !== null) return toNumber(bucket[key]);
+    }
+  }
+  return 0;
+}
+
 function markdownToHtml(md: string): string {
   const lines = md.split("\n");
   const result: string[] = [];
@@ -1628,7 +1648,14 @@ body {
             <h2 class="section-title">&#127916; Top Vid&eacute;os R&eacute;centes</h2>
             ${topVideos
           .map(
-            (video, i) => `
+            (video, i) => {
+              const views = pickVideoMetric(video, ["views", "view_count", "viewCount", "playCount", "play_count", "plays"]);
+              const likes = pickVideoMetric(video, ["likes", "like_count", "likeCount", "diggCount", "digg_count"]);
+              const comments = pickVideoMetric(video, ["comments", "comment_count", "commentCount", "commentaryCount"]);
+              const shares = pickVideoMetric(video, ["shares", "share_count", "shareCount"]);
+              const saves = pickVideoMetric(video, ["saves", "save_count", "saveCount", "collectCount", "collect_count", "favorites", "favouriteCount"]);
+              const engagementRate = toNumber(video.engagement_rate ?? video.engagementRate ?? video.metrics?.engagement_rate ?? video.metrics?.engagementRate);
+              return `
               <div class="video-item avoid-break">
                 <div class="video-header">
                   <span class="video-index">#${i + 1}</span>
@@ -1637,31 +1664,32 @@ body {
                 <div class="video-stats">
                   <div>
                     <div class="video-stat-label">Vues</div>
-                    <div class="video-stat-value">${formatNumber(video.views ?? video.view_count)}</div>
+                    <div class="video-stat-value">${formatNumber(views)}</div>
                   </div>
                   <div>
                     <div class="video-stat-label">Likes</div>
-                    <div class="video-stat-value">${formatNumber(video.likes ?? video.like_count)}</div>
+                    <div class="video-stat-value">${formatNumber(likes)}</div>
                   </div>
                   <div>
                     <div class="video-stat-label">Commentaires</div>
-                    <div class="video-stat-value">${formatNumber(video.comments ?? video.comment_count)}</div>
+                    <div class="video-stat-value">${formatNumber(comments)}</div>
                   </div>
                   <div>
                     <div class="video-stat-label">Partages</div>
-                    <div class="video-stat-value">${formatNumber(video.shares ?? video.share_count)}</div>
+                    <div class="video-stat-value">${formatNumber(shares)}</div>
                   </div>
                   <div>
                     <div class="video-stat-label">Sauvegardes</div>
-                    <div class="video-stat-value">${formatNumber(video.saves ?? video.save_count)}</div>
+                    <div class="video-stat-value">${formatNumber(saves)}</div>
                   </div>
                   <div>
                     <div class="video-stat-label">Engagement</div>
-                    <div class="video-stat-value">${(video.engagement_rate || 0).toFixed(2)}%</div>
+                    <div class="video-stat-value">${engagementRate.toFixed(2)}%</div>
                   </div>
                 </div>
               </div>
-            `,
+            `;
+            },
           )
           .join("")}
           </div>

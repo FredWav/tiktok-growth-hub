@@ -164,7 +164,7 @@ function normalizeVideos(videos: Any[]) {
   return videos.map((v) => ({
     id: v.id ?? v.videoId ?? v.video_id ?? v.awemeId ?? v.aweme_id,
     description: v.description ?? v.caption ?? v.title ?? "",
-    views: pickMetric(v, ["views", "view_count", "viewCount", "playCount", "play_count", "plays", "diggCount"]),
+    views: pickMetric(v, ["views", "view_count", "viewCount", "playCount", "play_count", "plays"]),
     likes: pickMetric(v, ["likes", "like_count", "likeCount", "diggCount", "digg_count"]),
     comments: pickMetric(v, ["comments", "comment_count", "commentCount", "commentaryCount"]),
     shares: pickMetric(v, ["shares", "share_count", "shareCount"]),
@@ -233,7 +233,14 @@ export function normalizeWavStatsResult(result: Any): Any {
   const ai = result.aiAnalysis ?? null;
   const hashtags: string[] = Array.isArray(result.hashtags) ? result.hashtags.map(cleanTag) : [];
   const aiInsightsMd = buildAiInsightsMarkdown(ai);
-  const videos = normalizeVideos(result.topVideos ?? []);
+  const videos = normalizeVideos(
+    result.topVideos ??
+    result.top_videos ??
+    result.videos ??
+    result.account?.recentVideos ??
+    result.account?.recent_videos ??
+    []
+  );
   const shadowban = normalizeShadowban(result.shadowbanAnalysis);
   const healthScore = normalizeHealthScore(result.healthScore);
   const publicationPattern = normalizePublicationPattern(result.publicationPattern);

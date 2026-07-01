@@ -1581,7 +1581,7 @@ body {
           </div>
 
           <!-- HEALTH SCORE DETAIL -->
-          ${generateHealthScoreDetailHTML(healthScoreData)}
+          ${generateHealthScoreDetailHTML(pdfData.health_score_detail || healthScoreData)}
 
           <!-- HASHTAGS -->
           ${
@@ -1627,28 +1627,28 @@ body {
               <div class="video-item avoid-break">
                 <div class="video-header">
                   <span class="video-index">#${i + 1}</span>
-                  <span class="video-title">${video.title || video.description || "Video"}</span>
+                  <span class="video-title">${(video.title || video.description || "Vidéo").toString().slice(0, 140)}</span>
                 </div>
                 <div class="video-stats">
                   <div>
                     <div class="video-stat-label">Vues</div>
-                    <div class="video-stat-value">${formatNumber(video.view_count)}</div>
+                    <div class="video-stat-value">${formatNumber(video.views ?? video.view_count)}</div>
                   </div>
                   <div>
                     <div class="video-stat-label">Likes</div>
-                    <div class="video-stat-value">${formatNumber(video.like_count)}</div>
+                    <div class="video-stat-value">${formatNumber(video.likes ?? video.like_count)}</div>
                   </div>
                   <div>
                     <div class="video-stat-label">Commentaires</div>
-                    <div class="video-stat-value">${formatNumber(video.comment_count)}</div>
+                    <div class="video-stat-value">${formatNumber(video.comments ?? video.comment_count)}</div>
                   </div>
                   <div>
                     <div class="video-stat-label">Partages</div>
-                    <div class="video-stat-value">${formatNumber(video.share_count)}</div>
+                    <div class="video-stat-value">${formatNumber(video.shares ?? video.share_count)}</div>
                   </div>
                   <div>
                     <div class="video-stat-label">Sauvegardes</div>
-                    <div class="video-stat-value">${formatNumber(video.save_count)}</div>
+                    <div class="video-stat-value">${formatNumber(video.saves ?? video.save_count)}</div>
                   </div>
                   <div>
                     <div class="video-stat-label">Engagement</div>

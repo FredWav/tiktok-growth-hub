@@ -33,10 +33,17 @@ async function downloadPDF(analysis: any) {
     const result = analysis.result_data;
     const account = result?.account || result;
     const persona = result?.persona;
-    const pubPattern = persona?.style_contenu?.publication_pattern;
+    const pubPattern = result?.publication_pattern || persona?.style_contenu?.publication_pattern;
+    const aiAnalysis = result?.ai_analysis;
+    const healthScore = result?.health_score || account?.health_score;
 
-    const pdfData = mapAccountDataForPDF(account, persona, pubPattern);
-    const htmlContent = generateCompletePDFHTML(pdfData, account.ai_insights || '', account.recent_videos || []);
+    const pdfData = mapAccountDataForPDF(account, persona, pubPattern, aiAnalysis, healthScore);
+    const htmlContent = generateCompletePDFHTML(
+      pdfData,
+      account.ai_insights || '',
+      account.recent_videos || [],
+      healthScore
+    );
 
     const element = document.createElement("div");
     element.innerHTML = htmlContent;

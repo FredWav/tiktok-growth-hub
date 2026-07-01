@@ -110,6 +110,11 @@ const HEALTH_COMPONENT_LABELS: Record<string, string> = {
   content_quality: "Qualit\u00e9 du contenu",
   growth_potential: "Potentiel de croissance",
   technical_seo: "SEO technique",
+  save_quality: "Qualit\u00e9 des sauvegardes",
+  saveQuality: "Qualit\u00e9 des sauvegardes",
+  contentQuality: "Qualit\u00e9 du contenu",
+  growthPotential: "Potentiel de croissance",
+  technicalSeo: "SEO technique",
 };
 
 function generateDonutSVG(score: number): string {
@@ -240,7 +245,13 @@ function generateExecutiveSummary(
 function generateHealthScoreDetailHTML(healthScoreData?: any): string {
   if (!healthScoreData || typeof healthScoreData !== "object") return "";
 
-  const components: Record<string, number> = healthScoreData.components || {};
+  const rawComponents: Record<string, any> = healthScoreData.components || {};
+  // Normaliser : accepter soit un nombre, soit { score: N }
+  const components: Record<string, number> = {};
+  for (const [k, v] of Object.entries(rawComponents)) {
+    if (typeof v === "number") components[k] = v;
+    else if (v && typeof v === "object" && typeof (v as any).score === "number") components[k] = (v as any).score;
+  }
   const priorityActions: string[] = healthScoreData.priority_actions || [];
 
   const hasComponents = Object.keys(components).length > 0;
@@ -283,7 +294,8 @@ function generateHealthScoreDetailHTML(healthScoreData?: any): string {
 function generateBestTimesHTML(bestTimes: BestTime[]): string {
   if (!bestTimes?.length) return "";
   const top5 = bestTimes.slice(0, 5);
-  const maxViews = Math.max(...top5.map((t) => t.avg_views));
+  const maxViews = Math.max(0, ...top5.map((t) => t.avg_views || 0));
+  const hasViews = maxViews > 0;
 
   return `
     <div class="section best-times-section avoid-break">
@@ -291,13 +303,25 @@ function generateBestTimesHTML(bestTimes: BestTime[]): string {
       <div class="best-times-list">
         ${top5
       .map((t, i) => {
-        const pct = maxViews > 0 ? (t.avg_views / maxViews) * 100 : 0;
         const medals = ["#1", "#2", "#3", "#4", "#5"];
+        const label = t.label
+          ? t.label
+          : `${DAY_NAMES[t.day ?? 0] || "Jour " + t.day} a ${String(t.hour ?? 0).padStart(2, "0")}h00`;
+        if (!hasViews) {
+          return `
+          <div class="best-time-item avoid-break">
+            <div class="best-time-rank">${medals[i]}</div>
+            <div class="best-time-info">
+              <div class="best-time-label">${label}</div>
+            </div>
+          </div>`;
+        }
+        const pct = (t.avg_views || 0) / maxViews * 100;
         return `
           <div class="best-time-item avoid-break">
             <div class="best-time-rank">${medals[i]}</div>
             <div class="best-time-info">
-              <div class="best-time-label">${DAY_NAMES[t.day] || "Jour " + t.day} a ${String(t.hour).padStart(2, "0")}h00</div>
+              <div class="best-time-label">${label}</div>
               <div class="best-time-bar-bg">
                 <div class="best-time-bar" style="width: ${pct}%"></div>
               </div>
@@ -1562,7 +1586,7 @@ body {
           </div>
 
           <!-- HEALTH SCORE DETAIL -->
-          ${generateHealthScoreDetailHTML(healthScoreData)}
+          ${generateHealthScoreDetailHTML(pdfData.health_score_detail || healthScoreData)}
 
           <!-- HASHTAGS -->
           ${
@@ -1608,28 +1632,28 @@ body {
               <div class="video-item avoid-break">
                 <div class="video-header">
                   <span class="video-index">#${i + 1}</span>
-                  <span class="video-title">${video.title || video.description || "Video"}</span>
+                  <span class="video-title">${(video.title || video.description || "Vidéo").toString().slice(0, 140)}</span>
                 </div>
                 <div class="video-stats">
                   <div>
                     <div class="video-stat-label">Vues</div>
-                    <div class="video-stat-value">${formatNumber(video.view_count)}</div>
+                    <div class="video-stat-value">${formatNumber(video.views ?? video.view_count)}</div>
                   </div>
                   <div>
                     <div class="video-stat-label">Likes</div>
-                    <div class="video-stat-value">${formatNumber(video.like_count)}</div>
+                    <div class="video-stat-value">${formatNumber(video.likes ?? video.like_count)}</div>
                   </div>
                   <div>
                     <div class="video-stat-label">Commentaires</div>
-                    <div class="video-stat-value">${formatNumber(video.comment_count)}</div>
+                    <div class="video-stat-value">${formatNumber(video.comments ?? video.comment_count)}</div>
                   </div>
                   <div>
                     <div class="video-stat-label">Partages</div>
-                    <div class="video-stat-value">${formatNumber(video.share_count)}</div>
+                    <div class="video-stat-value">${formatNumber(video.shares ?? video.share_count)}</div>
                   </div>
                   <div>
                     <div class="video-stat-label">Sauvegardes</div>
-                    <div class="video-stat-value">${formatNumber(video.save_count)}</div>
+                    <div class="video-stat-value">${formatNumber(video.saves ?? video.save_count)}</div>
                   </div>
                   <div>
                     <div class="video-stat-label">Engagement</div>

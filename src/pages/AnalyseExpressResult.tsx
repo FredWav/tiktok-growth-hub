@@ -194,7 +194,13 @@ export default function AnalyseExpressResult() {
     trackEvent("express_pdf_download", { username });
     trackPostHogEvent("click_pdf_download", { username });
     try {
-      const pdfData = mapAccountDataForPDF(data.account, undefined, pubPattern);
+      const pdfData = mapAccountDataForPDF(
+        data.account,
+        undefined,
+        pubPattern,
+        data?.ai_analysis,
+        healthScore
+      );
       const htmlContent = generateCompletePDFHTML(
         pdfData,
         data.account.ai_insights || "",

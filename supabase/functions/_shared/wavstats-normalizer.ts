@@ -33,6 +33,34 @@ function cleanTag(t: string): string {
   return t.startsWith("#") ? t : `#${t}`;
 }
 
+function toNumber(value: Any): number {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string") {
+    const parsed = Number(value.replace(/\s/g, "").replace(",", "."));
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+  return 0;
+}
+
+function pickMetric(source: Any, keys: string[]): number {
+  const buckets = [
+    source,
+    source?.metrics,
+    source?.stats,
+    source?.statistics,
+    source?.analytics,
+  ];
+
+  for (const bucket of buckets) {
+    if (!bucket || typeof bucket !== "object") continue;
+    for (const key of keys) {
+      if (bucket[key] !== undefined && bucket[key] !== null) return toNumber(bucket[key]);
+    }
+  }
+
+  return 0;
+}
+
 function buildAiInsightsMarkdown(ai: Any): string {
   if (!ai) return "";
   const lines: string[] = [];
@@ -134,17 +162,17 @@ function normalizeShadowban(sb: Any) {
 function normalizeVideos(videos: Any[]) {
   if (!Array.isArray(videos)) return [];
   return videos.map((v) => ({
-    id: v.id,
-    description: v.description ?? "",
-    views: v.views ?? v.playCount ?? 0,
-    likes: v.likes ?? v.likeCount ?? 0,
-    comments: v.comments ?? v.commentCount ?? 0,
-    shares: v.shares ?? v.shareCount ?? 0,
-    saves: v.saves ?? v.collectCount ?? 0,
-    engagement_rate: v.engagementRate ?? v.engagement_rate ?? null,
-    save_rate: v.saveRate ?? v.save_rate ?? null,
-    date: v.date ?? null,
-    cover_url: v.coverUrl ?? v.cover_url ?? null,
+    id: v.id ?? v.videoId ?? v.video_id ?? v.awemeId ?? v.aweme_id,
+    description: v.description ?? v.caption ?? v.title ?? "",
+    views: pickMetric(v, ["views", "view_count", "viewCount", "playCount", "play_count", "plays"]),
+    likes: pickMetric(v, ["likes", "like_count", "likeCount", "diggCount", "digg_count"]),
+    comments: pickMetric(v, ["comments", "comment_count", "commentCount", "commentaryCount"]),
+    shares: pickMetric(v, ["shares", "share_count", "shareCount"]),
+    saves: pickMetric(v, ["saves", "save_count", "saveCount", "collectCount", "collect_count", "favorites", "favouriteCount"]),
+    engagement_rate: v.engagementRate ?? v.engagement_rate ?? v.metrics?.engagementRate ?? v.metrics?.engagement_rate ?? null,
+    save_rate: v.saveRate ?? v.save_rate ?? v.metrics?.saveRate ?? v.metrics?.save_rate ?? null,
+    date: v.date ?? v.createdAt ?? v.created_at ?? v.publishedAt ?? v.published_at ?? null,
+    cover_url: v.coverUrl ?? v.cover_url ?? v.cover ?? v.thumbnail ?? v.thumbnailUrl ?? v.thumbnail_url ?? null,
   }));
 }
 
@@ -205,7 +233,14 @@ export function normalizeWavStatsResult(result: Any): Any {
   const ai = result.aiAnalysis ?? null;
   const hashtags: string[] = Array.isArray(result.hashtags) ? result.hashtags.map(cleanTag) : [];
   const aiInsightsMd = buildAiInsightsMarkdown(ai);
-  const videos = normalizeVideos(result.topVideos ?? []);
+  const videos = normalizeVideos(
+    result.topVideos ??
+    result.top_videos ??
+    result.videos ??
+    result.account?.recentVideos ??
+    result.account?.recent_videos ??
+    []
+  );
   const shadowban = normalizeShadowban(result.shadowbanAnalysis);
   const healthScore = normalizeHealthScore(result.healthScore);
   const publicationPattern = normalizePublicationPattern(result.publicationPattern);

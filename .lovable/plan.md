@@ -1,70 +1,69 @@
-# Migration Analyse Express - WavStats API v2.0.0
+## Objectif
+Lancer une analyse réelle sur @fredwav via l'API WavStats v2, capturer le payload brut complet, puis corriger les écarts entre ce payload et ce qu'attend le générateur PDF (`pdf-html-generator.ts` + `pdf-data-mapper.ts`).
 
-L'API source change : nouveau base URL `https://wavstats.com/api/v1` et nouveau format de payload (`account`, `averages`, `healthScore`, `aiAnalysis`, `topVideos`, `publicationPattern`, `shadowbanAnalysis`, `hashtags`). Plus de `ai_insights` markdown ni de `persona` legacy : à la place une structure `aiAnalysis` riche (summary, strengths, improvements, actionPlan, strategy3_6, hashtagStrategy, bioOptimized, profilePhoto, gridVisual).
+## Étapes
 
-## Stratégie
+### 1. Lancer l'analyse et capturer le payload brut
+- Appeler `POST https://wavstats.com/api/v1/accounts/fredwav/analyze` avec `WAV_SOCIAL_SCAN_API_KEY` (via un script curl côté sandbox pour éviter d'écrire en DB).
+- Poller `GET /jobs/{jobId}` jusqu'à `status=completed`.
+- Sauvegarder la réponse complète dans `/mnt/documents/wavstats-fredwav-raw.json`.
+- Passer cette réponse dans `normalizeWavStatsResult()` (via un petit runner Deno local) pour produire aussi le `result_data` normalisé → `/mnt/documents/wavstats-fredwav-normalized.json`.
 
-Pour minimiser la casse, on **normalise côté Edge Function** vers une forme `result_data` enrichie (compatible avec l'ancien rendu + nouveaux champs). L'écran de résultat est mis à jour pour afficher les nouveaux blocs (forces / améliorations / plan d'action structuré, top vidéos, shadowban, bio optimisée, stratégie 3-6 mois).
+Note : si l'API renvoie 403 `API_PLAN_REQUIRED` (comme récemment sur d'autres comptes), on s'arrête ici et on remonte le blocage plan Agency — pas de contournement possible côté code.
 
-## Changements
+### 2. Auditer le mapping PDF avec le vrai payload
+Comparer le JSON normalisé à ce que `mapAccountDataForPDF()` puis `pdf-html-generator.ts` consomment. Points connus à vérifier :
 
-### 1. Edge Functions - base URL + auth
-Remplacer dans les 6 fonctions :
-- `express-analysis`
-- `express-analysis-status`
-- `manual-express-analysis`
-- `retry-express-analysis`
-- `check-express-job`
-- `reconcile-express-analyses`
+| Zone PDF | Source attendue | Écart possible v2 |
+|---|---|---|
+| Cover / score global | `pdfData.health_score` (number) | Normalizer renvoie `{ total, components }` — `health_score` reste un objet, `extractHealthScore` gère les deux mais `pdfData.health_score` est typé `number` |
+| Résumé exécutif — persona | `pdfData.persona.{niche_principale,forces,faiblesses}` | Rien ne peuple `persona` : à dériver de `ai_analysis.strengths[].title` / `improvements[].title` + `account.detected_niche` |
+| Meilleurs créneaux | `pdfData.best_times[{day,hour,avg_views}]` | v2 fournit `publication_pattern.best_hours` / `best_days` sans `avg_views` — mapping absent |
+| Régularité détaillée | `pdfData.regularity_breakdown` | v2 ne fournit pas ce breakdown — soit dériver de `publication_pattern` (consistency + max_gap), soit masquer la section |
+| Fréquence publi | `pdfData.publication_frequency.{daily_avg, weekly_pattern}` | v2 fournit `frequency` (string ex. "3-5/semaine") — mapping absent |
+| Shadowban | `pdfData.shadowban_status` (string FR) | v2 : `shadowban_analysis.{risk_level,diagnosis,percentage}` — `extractShadowbanStatus` en tient compte, à valider |
+| Top hashtags | `pdfData.popular_hashtags` | OK via `top_hashtags` |
+| AI insights (markdown) | `account.ai_insights` | Généré par `buildAiInsightsMarkdown` — vérifier rendu markdown → HTML |
+| Recent videos (top vidéos) | `accountData.recent_videos` pour hashtag extraction | OK |
+| Métriques | `stats.*` | OK (moyennes + médianes déjà mappées) |
 
-```
-const API_BASE = "https://wavstats.com/api/v1";
-```
-(header `X-API-Key` inchangé, `WAV_SOCIAL_SCAN_API_KEY` reste le nom du secret côté Lovable)
+### 3. Patcher les 2 fichiers pour combler les manques
 
-### 2. Normalisation dans `express-analysis-status`
-Quand `job.status === "completed"`, mapper `job.result` (nouveau format) vers `result_data` :
-- `account.username/display_name/avatar_url/bio/verified/detected_niche` ← `result.account.*`
-- `account.follower_count/video_count/like_count/engagement_rate/save_rate` ← `result.account.*`
-- `account.avg_views/avg_likes/...` ← `result.averages.*`
-- `account.median_views/...` ← `result.averages.median*`
-- `account.top_hashtags` ← `result.hashtags`
-- `account.recent_videos` ← `result.topVideos` (mappés id/description/views/likes/comments/shares/saves/cover_url)
-- `account.shadowban_analysis` ← `result.shadowbanAnalysis` (snake_cased)
-- `health_score` ← `result.healthScore` (avec components convertis en `{score,label,status}`)
-- `ai_analysis` (nouveau) ← `result.aiAnalysis` (gardé structuré)
-- `ai_insights` (legacy markdown) ← généré depuis `aiAnalysis.summary + strengths + improvements + actionPlan` pour conserver le rendu existant et le PDF
-- `publication_pattern` ← `result.publicationPattern` (best_days/best_hours/frequency/consistency_score)
+**`src/lib/pdf-data-mapper.ts`** — enrichir `mapAccountDataForPDF` :
+- Accepter en argument le payload normalisé complet (`normalized`), pas juste `accountData`, pour lire `health_score`, `publication_pattern`, `ai_analysis`.
+- Construire `persona` à partir de :
+  - `niche_principale` ← `account.detected_niche`
+  - `forces` ← `ai_analysis.strengths[].title` (top 4)
+  - `faiblesses` ← `ai_analysis.improvements[].title` (top 4)
+- Construire `best_times` à partir de `publication_pattern.best_hours` en croisant avec `weekly_distribution` pour estimer `avg_views` (ou fallback : masquer la barre et n'afficher que jour+heure).
+- Construire `publication_frequency` :
+  - `weekly_pattern` ← `publication_pattern.frequency`
+  - `daily_avg` ← estimé depuis `weekly_distribution` si présent, sinon undefined
+- `consistency_score` ← `publication_pattern.consistency_score`
+- `recommendations` ← `ai_analysis.actionPlan[].text` (top 3) si `publication_pattern.recommendations` absent
+- `regularity_breakdown` : si absent côté v2, ne rien fournir (le générateur masque déjà la section quand null)
+- Corriger `pdfData.health_score` : exposer le **nombre** (`.total`) pour la cover, garder l'objet pour `generateHealthScoreDetailHTML` via un nouveau champ `health_score_detail`.
 
-Stocker en DB sous `result_data` et renvoyer tel quel au front. `healthScore` extrait pour la colonne `health_score`.
+**`src/lib/pdf-html-generator.ts`** — ajustements légers :
+- Passer `pdfData.health_score_detail` (nouveau) à `generateHealthScoreDetailHTML` au lieu de `pdfData.health_score`.
+- Dans `generateBestTimesHTML`, gérer le cas `avg_views = 0` (masquer la barre au lieu d'afficher barre vide).
+- Rien d'autre à toucher visuellement.
 
-### 3. Frontend - `AnalyseExpressResult.tsx`
-- Lire `data.ai_analysis` (nouveau) et `data.health_score`
-- Garder le rendu legacy (Profile, HealthScore, Metrics, Hashtags, AI markdown, PDF) pour compat
-- Ajouter 4 nouveaux blocs si `ai_analysis` présent :
-  - **Forces / Axes d'amélioration** (cartes avec title + description)
-  - **Plan d'action 30 jours** (text + metric + impact/effort badges)
-  - **Stratégie 3-6 mois** (text + metric + timeline)
-  - **Bio optimisée** (3 propositions sélectionnables/copiables) + **Stratégie hashtags** (current vs suggested)
-- Ajouter section **Top vidéos** (carte horizontale avec cover + stats)
-- Ajouter **Shadowban analysis** (badge risk_level + diagnosis)
+### 4. Trouver les call sites de `mapAccountDataForPDF`
+Chercher qui appelle le mapper aujourd'hui et adapter la signature pour lui passer le payload normalisé complet (une seule fois, côté résultat Analyse Express).
 
-### 4. Composants
-Nouveaux fichiers (petits, focalisés) :
-- `src/components/express-result/AIAnalysisSection.tsx` (forces/améliorations/plan/stratégie/bio/hashtags)
-- `src/components/express-result/TopVideosSection.tsx`
-- `src/components/express-result/ShadowbanSection.tsx`
+### 5. Vérifier
+- Re-générer un PDF de test avec le payload fredwav capturé (via un petit script Node qui appelle le mapper + un moteur HTML→PDF simulé, ou en rechargeant `/analyse-express/result?session_id=…` sur un vrai enregistrement).
+- Contrôler visuellement les sections : cover score, résumé exécutif, persona, best times, fréquence, shadowban, IA.
+- Sauvegarder le PDF final dans `/mnt/documents/` pour inspection.
 
-### 5. PDF
-Le PDF actuel consomme `ai_insights` markdown : il continue de fonctionner grâce au markdown généré depuis `aiAnalysis`. Pas de changement nécessaire dans `pdf-html-generator.ts` / `pdf-data-mapper.ts`.
+## Livrables
+- `/mnt/documents/wavstats-fredwav-raw.json` (payload API brut)
+- `/mnt/documents/wavstats-fredwav-normalized.json` (après `normalizeWavStatsResult`)
+- Diff sur `src/lib/pdf-data-mapper.ts` et `src/lib/pdf-html-generator.ts`
+- PDF de test rendu
 
-### 6. Hors scope
-- Pas de migration DB (la colonne `result_data` est `jsonb` et accepte la nouvelle forme)
-- Pas de changement des webhooks Discord / emails / Stripe
-- `_rawMarkdown` ignoré (debug uniquement)
-
-## Fichiers touchés
-- 6 edge functions (URL)
-- `supabase/functions/express-analysis-status/index.ts` (+ normalizer)
-- `src/pages/AnalyseExpressResult.tsx`
-- 3 nouveaux composants `src/components/express-result/*`
+## Hors scope
+- Pas de changement du normalizer edge (`_shared/wavstats-normalizer.ts`) — contrat déjà stable.
+- Pas de refonte visuelle du PDF, uniquement combler les données manquantes.
+- Pas de modification des composants React d'affichage (`src/components/express-result/*`).

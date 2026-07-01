@@ -110,6 +110,11 @@ const HEALTH_COMPONENT_LABELS: Record<string, string> = {
   content_quality: "Qualit\u00e9 du contenu",
   growth_potential: "Potentiel de croissance",
   technical_seo: "SEO technique",
+  save_quality: "Qualit\u00e9 des sauvegardes",
+  saveQuality: "Qualit\u00e9 des sauvegardes",
+  contentQuality: "Qualit\u00e9 du contenu",
+  growthPotential: "Potentiel de croissance",
+  technicalSeo: "SEO technique",
 };
 
 function generateDonutSVG(score: number): string {

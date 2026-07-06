@@ -89,7 +89,7 @@ type ContactForm = z.infer<typeof contactSchema>;
 
 export default function ReserverUnAppel() {
   const [submitted, setSubmitted] = useState(false);
-  const [redirectToAcademy, setRedirectToAcademy] = useState(false);
+  const [redirect, setRedirect] = useState<"academy" | "express" | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formStarted, setFormStarted] = useState(false);
 
@@ -120,7 +120,10 @@ export default function ReserverUnAppel() {
   };
 
   const onSubmit = async (data: ContactForm) => {
-    const lowBudget = data.budget === "10_a_100";
+    // Redirection selon le budget : pas de budget -> Analyse Express (11,90 €),
+    // 15-100 € -> Wav Academy, au-delà -> réservation d'appel classique.
+    const redirectTarget: "academy" | "express" | null =
+      data.budget === "no_budget" ? "express" : data.budget === "15_a_100" ? "academy" : null;
 
     setIsSubmitting(true);
     trackEvent("reserverunappel_submit", { profil: data.profil });
@@ -141,7 +144,9 @@ export default function ReserverUnAppel() {
           ? (critereOptions.find((o) => o.value === data.accompagnement_critere)?.label ?? data.accompagnement_critere)
           : null,
         goals: data.declencheur,
-        budget: data.budget ? `${data.budget}${lowBudget ? " (redirigé Wav Academy)" : ""}` : null,
+        budget: data.budget
+          ? `${data.budget}${redirectTarget === "academy" ? " (redirigé Wav Academy)" : redirectTarget === "express" ? " (redirigé Analyse Express)" : ""}`
+          : null,
         origin_source: data.origin_source || null,
         follower_since: data.follower_since || null,
         conversion_trigger: data.conversion_trigger || null,
@@ -172,9 +177,12 @@ export default function ReserverUnAppel() {
         console.error("DB insert error (non-blocking):", dbError);
       }
 
-      if (lowBudget) {
-        trackPostHogEvent("reserverunappel_redirect_academy", { budget: data.budget });
-        setRedirectToAcademy(true);
+      if (redirectTarget) {
+        trackPostHogEvent(
+          redirectTarget === "express" ? "reserverunappel_redirect_express" : "reserverunappel_redirect_academy",
+          { budget: data.budget },
+        );
+        setRedirect(redirectTarget);
       } else {
         setSubmitted(true);
       }
@@ -186,7 +194,51 @@ export default function ReserverUnAppel() {
     }
   };
 
-  if (redirectToAcademy) {
+  if (redirect === "express") {
+    return (
+      <Layout>
+        <SEOHead
+          title="L'Analyse Express est faite pour toi | Fred Wav"
+          description="Commence par un état des lieux complet de ton compte TikTok pour 11,90 € : score de santé, analyse IA et plan d'action."
+          path="/reserverunappel"
+        />
+        <Section variant="cream" size="lg">
+          <div className="max-w-xl mx-auto text-center">
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
+              <Sparkles className="h-8 w-8 text-primary" />
+            </div>
+            <h2 className="font-display text-3xl md:text-4xl font-semibold mb-4">
+              Commence par l'<span className="text-gold-gradient">Analyse Express</span>.
+            </h2>
+            <p className="text-lg text-muted-foreground mb-4">
+              Sans budget d'accompagnement, te vendre un appel n'aurait aucun sens. Ce qu'il te faut d'abord, c'est un état des lieux honnête de ton compte.
+            </p>
+            <p className="text-lg text-muted-foreground mb-8">
+              L'<strong>Analyse Express</strong> te donne pour <strong>11,90 €</strong> un diagnostic complet : score de santé, analyse IA détaillée et plan d'action concret. Tu sauras exactement où tu en es et quoi corriger.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button variant="hero" size="xl" asChild>
+                <Link
+                  to="/analyse-express"
+                  onClick={() => trackPostHogEvent("reserverunappel_click_express_cta")}
+                >
+                  Analyser mon compte
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button variant="outline" size="xl" asChild>
+                <Link to="/" onClick={() => trackPostHogEvent("click_home_post_redirect_express")}>
+                  Retour à l'accueil
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </Section>
+      </Layout>
+    );
+  }
+
+  if (redirect === "academy") {
     return (
       <Layout>
         <SEOHead
@@ -575,9 +627,10 @@ export default function ReserverUnAppel() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="10_a_100">De 10€ à 100€</SelectItem>
-                        <SelectItem value="100_a_300">De 100€ à 300€</SelectItem>
-                        <SelectItem value="1000_plus">1000€ et +</SelectItem>
+                        <SelectItem value="no_budget">Je n'ai pas de budget pour me faire accompagner</SelectItem>
+                        <SelectItem value="15_a_100">Entre 15€ et 100€</SelectItem>
+                        <SelectItem value="300_a_900">De 300€ à 900€</SelectItem>
+                        <SelectItem value="900_plus">900€ et +</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

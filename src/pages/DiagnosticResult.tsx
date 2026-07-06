@@ -45,14 +45,13 @@ const DiagnosticResult = () => {
   // ── Score calculation ──
   const audiencePoints: Record<string, number> = { "0-5k": 10, "5k-50k": 25, "50k+": 40 };
   const objectifPoints: Record<string, number> = { "Visibilité": 10, "Audience": 15, "Vendre": 25, "Monétiser": 30 };
-  const budgetPoints: Record<string, number> = { "0": 0, "1-200": 10, "200-500": 20, "500+": 30 };
+  const budgetPoints: Record<string, number> = { no_budget: 0, "15_a_100": 10, "300_a_900": 20, "900_plus": 30 };
   const score = (audiencePoints[data.audience] || 0) + (objectifPoints[data.objectif] || 0) + (budgetPoints[data.budget] || 0);
   const scoreLabel = score < 40 ? "Compte instable" : score <= 70 ? "Potentiel non exploité" : "Compte structuré";
 
-  // ── Offer routing ──
-  // Budget 0 → Analyse Express (self-serve paid scan)
-  // Everything else → Wav Premium via direct contact form
-  const offer: "EXPRESS" | "WAV_PREMIUM" = data.budget === "0" ? "EXPRESS" : "WAV_PREMIUM";
+  // ── Offer routing (aligné sur la grille : Express 11,90 € · Academy 299/499/899 € · Premium 1 499 €) ──
+  const offer: "EXPRESS" | "ACADEMY" | "WAV_PREMIUM" =
+    data.budget === "no_budget" ? "EXPRESS" : data.budget === "900_plus" ? "WAV_PREMIUM" : "ACADEMY";
 
   useEffect(() => {
     if (!isComplete) {
@@ -167,6 +166,39 @@ const DiagnosticResult = () => {
                   }}
                 >
                   <Link to="/analyse-express">Lancer le scan de mon compte</Link>
+                </Button>
+                <TrustedBy className="mt-4" />
+                <MailFooter />
+              </CardContent>
+            </Card>
+          )}
+
+          {offer === "ACADEMY" && (
+            <Card>
+              <CardHeader><CardTitle className="font-display text-xl">Wav Academy</CardTitle></CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-muted-foreground">
+                  Avec ton budget, la Wav Academy est l'option la plus rentable : toute la méthode de Fred,
+                  le diagnostic continu de ton compte et la communauté, à partir de 299 € en paiement unique (accès 3 mois).
+                </p>
+                <ul className="space-y-2 text-muted-foreground">
+                  <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Contenu stratégique quotidien sur Discord</li>
+                  <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Diagnostics IA de ton compte inclus</li>
+                  <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Communauté de créateurs qui avancent</li>
+                </ul>
+                <Button
+                  variant="hero"
+                  size="lg"
+                  asChild
+                  className="w-full"
+                  onClick={() => {
+                    trackEvent("diagnostic_cta_click", { offer });
+                    trackPostHogEvent("cta_clicked", { offer_type: "ACADEMY", destination: "/wavacademy" });
+                  }}
+                >
+                  <Link to="/wavacademy">
+                    Découvrir la Wav Academy <ArrowRight className="w-4 h-4 ml-2" />
+                  </Link>
                 </Button>
                 <TrustedBy className="mt-4" />
                 <MailFooter />

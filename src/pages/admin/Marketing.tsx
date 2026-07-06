@@ -31,6 +31,12 @@ interface Lead {
 }
 
 const budgetLabels: Record<string, string> = {
+  // Grille actuelle
+  no_budget: "Pas de budget",
+  "15_a_100": "Entre 15€ et 100€",
+  "300_a_900": "De 300€ à 900€",
+  "900_plus": "900€ et +",
+  // Anciennes valeurs (candidatures historiques)
   "10_a_100": "De 10€ à 100€",
   "100_a_300": "De 100€ à 300€",
   "1000_plus": "1000€ et +",

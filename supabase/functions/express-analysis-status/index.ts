@@ -202,13 +202,14 @@ serve(async (req) => {
       );
     }
 
-    if (job.status === "failed") {
+    if (job.status === "failed" || job.status === "cancelled") {
+      const jobError = job.errorMessage ?? job.error;
       try {
         await supabase
           .from("express_analyses")
           .update({
             status: "failed",
-            error_message: job.error || "L'analyse a échoué",
+            error_message: jobError || "L'analyse a échoué",
             completed_at: new Date().toISOString(),
           })
           .eq("job_id", job_id);
@@ -216,12 +217,12 @@ serve(async (req) => {
         console.warn("Failed to update express_analyses:", dbErr);
       }
 
-      await notifyError("Analyse Échouée", `@${username} • ${job.error || "Erreur inconnue"}`);
+      await notifyError("Analyse Échouée", `@${username} • ${jobError || "Erreur inconnue"}`);
 
       return new Response(
         JSON.stringify({
           status: "failed",
-          error: job.error || "L'analyse a échoué",
+          error: jobError || "L'analyse a échoué",
           username,
         }),
         {
@@ -235,7 +236,7 @@ serve(async (req) => {
       JSON.stringify({
         status: "processing",
         progress: job.progress || 0,
-        current_step: job.current_step || null,
+        current_step: job.progressMessage ?? job.current_step ?? null,
         username,
       }),
       {

@@ -103,10 +103,11 @@ const DiagnosticStart = () => {
 
   const getRecommendedOffer = () => {
     const { budget } = data;
-    // Budget 0€ → Analyse Express (entry-level paid scan)
-    // Everything else → Wav Premium via direct contact
-    if (budget === "0") return "express";
-    return "wav_premium";
+    // Routage aligné sur la grille : Express 11,90 € · Academy 299/499/899 € · Premium 1 499 €.
+    if (budget === "no_budget") return "express";
+    if (budget === "900_plus") return "wav_premium";
+    // 15-100 € et 300-900 € → Wav Academy (pass 3/6/12 mois)
+    return "wav_academy";
   };
 
   const handleIdentityNext = () => {
@@ -315,10 +316,10 @@ const DiagnosticStart = () => {
                 <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">Quel budget es-tu prêt à investir ?</h2>
               </div>
               <div className="space-y-3 max-w-lg mx-auto">
-                <OptionCard icon={Eye} label="0 €" description="Je veux juste un état des lieux" selected={data.budget === "0"} onClick={() => selectOption("budget", "0", "budget", 4)} />
-                <OptionCard icon={Zap} label="1 – 200 €" selected={data.budget === "1-200"} onClick={() => selectOption("budget", "1-200", "budget", 4)} />
-                <OptionCard icon={Rocket} label="200 – 500 €" selected={data.budget === "200-500"} onClick={() => selectOption("budget", "200-500", "budget", 4)} />
-                <OptionCard icon={DollarSign} label="500 € +" selected={data.budget === "500+"} onClick={() => selectOption("budget", "500+", "budget", 4)} />
+                <OptionCard icon={Eye} label="Je n'ai pas de budget pour ça" description="Je veux juste un état des lieux" selected={data.budget === "no_budget"} onClick={() => selectOption("budget", "no_budget", "budget", 4)} />
+                <OptionCard icon={Zap} label="Entre 15 € et 100 €" selected={data.budget === "15_a_100"} onClick={() => selectOption("budget", "15_a_100", "budget", 4)} />
+                <OptionCard icon={Rocket} label="De 300 € à 900 €" selected={data.budget === "300_a_900"} onClick={() => selectOption("budget", "300_a_900", "budget", 4)} />
+                <OptionCard icon={DollarSign} label="900 € et +" selected={data.budget === "900_plus"} onClick={() => selectOption("budget", "900_plus", "budget", 4)} />
               </div>
             </div>
           )}

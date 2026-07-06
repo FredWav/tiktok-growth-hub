@@ -1,4 +1,4 @@
-import { Heart, RefreshCw, Star, TrendingUp, Shield, AlertTriangle } from "lucide-react";
+import { Heart, RefreshCw, Star, TrendingUp, Shield, Bookmark, AlertTriangle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 const SCORE_ICONS: Record<string, any> = {
@@ -7,6 +7,7 @@ const SCORE_ICONS: Record<string, any> = {
   content_quality: Star,
   growth_potential: TrendingUp,
   technical_seo: Shield,
+  save_quality: Bookmark,
 };
 
 const SCORE_LABELS: Record<string, string> = {
@@ -15,6 +16,7 @@ const SCORE_LABELS: Record<string, string> = {
   content_quality: "Qualité du contenu",
   growth_potential: "Potentiel de croissance",
   technical_seo: "SEO technique",
+  save_quality: "Qualité des sauvegardes",
 };
 
 function getScoreColor(score: number) {

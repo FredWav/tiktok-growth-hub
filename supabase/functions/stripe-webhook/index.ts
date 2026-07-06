@@ -250,7 +250,7 @@ serve(async (req) => {
               "Content-Type": "application/json",
               Authorization: `Bearer ${serviceKey}`,
             },
-            body: JSON.stringify({ email, token: claimToken, plan_type: plan }),
+            body: JSON.stringify({ email, token: claimToken, plan_type: plan, access_months: accessMonths }),
           });
         } catch (mailErr) {
           console.error("Failed to invoke send-claim-email:", mailErr);
@@ -258,7 +258,30 @@ serve(async (req) => {
         }
       }
 
-      await safeNotifySuccess("WavAcademy", `Nouveau membre • ${plan} • ${email} • claim envoyé`);
+      // ── Provisioning WavStats (crédits WavSocialScan inclus dans l'offre) ──
+      // Si WAVSTATS_PROVISION_URL est configurée, on crédite automatiquement le
+      // compte du membre via l'API WavStats. Sinon, alerte admin pour créditer
+      // manuellement (l'email de claim annonce une activation sous 24h).
+      const provisionUrl = Deno.env.get("WAVSTATS_PROVISION_URL");
+      const wavstatsKey = Deno.env.get("WAV_SOCIAL_SCAN_API_KEY");
+      if (provisionUrl && wavstatsKey) {
+        try {
+          const provRes = await fetch(provisionUrl, {
+            method: "POST",
+            headers: { "X-API-Key": wavstatsKey, "Content-Type": "application/json" },
+            body: JSON.stringify({ email, source: "wav_academy", plan_type: plan, access_months: accessMonths }),
+          });
+          if (!provRes.ok) throw new Error(`HTTP ${provRes.status}: ${(await provRes.text()).slice(0, 200)}`);
+          console.log(`WavStats provisioning OK for ${email}`);
+        } catch (provErr) {
+          console.error("WavStats provisioning failed:", provErr);
+          await safeNotifyError("WavAcademy Webhook", `⚠️ Provisioning WavStats ÉCHOUÉ • ${email} • créditer manuellement`);
+        }
+      } else {
+        await safeNotifyError("WavAcademy Webhook", `⚠️ Provisioning WavStats non configuré • créditer manuellement ${email} (${accessMonths ?? "?"} mois)`);
+      }
+
+      await safeNotifySuccess("WavAcademy", `Nouveau membre • ${plan} • ${accessMonths ?? "?"} mois • ${email} • claim envoyé`);
 
       return jsonResponse({ received: true });
     }

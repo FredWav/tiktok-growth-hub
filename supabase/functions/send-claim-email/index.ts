@@ -29,7 +29,7 @@ serve(async (req) => {
   }
 
   try {
-    const { email, token, plan_type } = await req.json();
+    const { email, token, plan_type, access_months } = await req.json();
     if (!email || !token) throw new Error("Missing email or token");
 
     const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD") || "";
@@ -38,15 +38,17 @@ serve(async (req) => {
     const siteUrl = Deno.env.get("SITE_URL") || "https://fredwav.com";
     const claimUrl = `${siteUrl}/claim/${token}`;
     const planLabel = PLAN_LABELS[plan_type] || "Wav Academy";
+    const months = typeof access_months === "number" && access_months > 0 ? access_months : null;
+    const durationLabel = months ? ` (accès ${months} mois)` : "";
 
     const htmlBody = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #0a0a0a; color: #f5f0e8;">
         <div style="text-align: center; padding: 30px 0; border-bottom: 2px solid #c8a97e;">
-          <h1 style="color: #c8a97e; margin: 0; font-size: 24px;">🎉 Bienvenue dans le ${planLabel}</h1>
+          <h1 style="color: #c8a97e; margin: 0; font-size: 24px;">🎉 Bienvenue dans le ${planLabel}${durationLabel}</h1>
         </div>
         <div style="padding: 30px 0;">
           <p style="color: #f5f0e8; font-size: 16px; line-height: 1.6;">
-            Ton paiement est confirmé. Il ne te reste qu'<strong style="color: #c8a97e;">une étape</strong> pour activer ton accès Discord.
+            Ton paiement est confirmé${months ? ` — tu as accès à la Wav Academy pendant <strong style="color: #c8a97e;">${months} mois</strong>` : ""}. Il ne te reste qu'<strong style="color: #c8a97e;">une étape</strong> pour activer ton accès Discord.
           </p>
           <p style="color: #f5f0e8; font-size: 16px; line-height: 1.6;">
             Clique sur le bouton ci-dessous, connecte-toi avec ton compte Discord, et ton rôle ${planLabel} sera attribué automatiquement.
@@ -63,6 +65,14 @@ serve(async (req) => {
             Si le bouton ne fonctionne pas, copie ce lien dans ton navigateur :<br/>
             <a href="${claimUrl}" style="color: #c8a97e; word-break: break-all;">${claimUrl}</a>
           </p>
+          <div style="margin-top: 24px; padding: 20px; background: rgba(200,169,126,0.08); border: 1px solid rgba(200,169,126,0.3); border-radius: 8px;">
+            <p style="color: #c8a97e; font-size: 15px; font-weight: bold; margin: 0 0 8px 0;">📊 Tes crédits WavSocialScan</p>
+            <p style="color: #f5f0e8; font-size: 14px; line-height: 1.6; margin: 0;">
+              Ton abonnement inclut <strong style="color: #c8a97e;">3 000 crédits WavSocialScan par mois</strong> pour analyser tes vidéos et ton compte.
+              Ils sont activés sur le compte lié à cet email (<strong>${email}</strong>) sous 24h.
+              Rendez-vous sur <a href="https://wavstats.com" style="color: #c8a97e;">wavstats.com</a> pour en profiter.
+            </p>
+          </div>
         </div>
         <div style="border-top: 1px solid #333; padding-top: 20px; text-align: center;">
           <p style="color: #666; font-size: 12px;">FredWav · Coaching TikTok · noreply@fredwav.com</p>
@@ -79,7 +89,7 @@ serve(async (req) => {
     await transporter.sendMail({
       from: "FredWav <noreply@fredwav.com>",
       to: email,
-      subject: `🎉 Active ton accès ${planLabel}`,
+      subject: `🎉 Active ton accès ${planLabel}${durationLabel}`,
       html: htmlBody,
     });
 

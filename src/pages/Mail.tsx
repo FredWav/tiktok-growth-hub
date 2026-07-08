@@ -32,6 +32,19 @@ export default function MailPage() {
       .catch(() => {/* silently fail — fallback text shown */});
   }, []);
 
+  // Traduit le message brut renvoyé par la fonction (venant de MailerLite)
+  // en message lisible pour l'utilisateur.
+  const friendlyMessage = (raw: string): string => {
+    if (/valid email|email.*invalid|email.*format/i.test(raw)) {
+      return "Cet email ne semble pas valide. Vérifie-le et réessaie !";
+    }
+    // MailerLite renvoie un 413 quand le compte a atteint sa limite d'abonnés.
+    if (/subscriber limit|exceed/i.test(raw)) {
+      return "Les inscriptions sont momentanément saturées. Réessaie un peu plus tard, ou écris-moi à contact@fredwav.com et je t'envoie le guide directement.";
+    }
+    return "Une erreur est survenue. Réessaie !";
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!accepted) {
@@ -47,18 +60,33 @@ export default function MailPage() {
         { body: { email, firstName } }
       );
 
-      if (fnError) throw fnError;
-      if (data?.error) throw new Error(data.error);
+      // Sur une réponse non-2xx, supabase-js remplit `fnError` (FunctionsHttpError)
+      // et laisse `data` à null : le vrai message est dans le corps de la réponse,
+      // qu'il faut relire depuis `fnError.context`.
+      let apiError: string | null = data?.error ?? null;
+      if (fnError) {
+        const ctx = (fnError as { context?: Response }).context;
+        if (ctx && typeof ctx.json === "function") {
+          try {
+            const body = await ctx.json();
+            apiError = body?.error || body?.message || fnError.message;
+          } catch {
+            apiError = fnError.message;
+          }
+        } else {
+          apiError = fnError.message;
+        }
+      }
+
+      if (apiError) {
+        setError(friendlyMessage(apiError));
+        return;
+      }
 
       setSuccess(true);
     } catch (err: unknown) {
-      // Show a friendly message when MailerLite rejects the email (invalid format, banned domain, etc.)
       const message = err instanceof Error ? err.message : "";
-      if (/valid email|email.*invalid|email.*format/i.test(message)) {
-        setError("Cet email ne semble pas valide. Vérifie-le et réessaie !");
-      } else {
-        setError("Une erreur est survenue. Réessaie !");
-      }
+      setError(friendlyMessage(message));
     } finally {
       setLoading(false);
     }

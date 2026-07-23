@@ -4,6 +4,7 @@ import { Zap, BarChart3, FileText, TrendingUp, Search } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
 import { trackPostHogEvent } from "@/lib/posthog";
 import { SEOHead } from "@/components/SEOHead";
+import { seoFor } from "@/config/seo";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -76,24 +77,7 @@ export default function AnalyseExpress() {
 
   return (
     <Layout>
-      <SEOHead
-        title="Analyse Express – Diagnostic complet en 5 minutes | FredWav"
-        description="Obtiens un diagnostic complet de ton compte : health score, métriques, persona et recommandations. Rapport PDF téléchargeable pour 11,90€."
-        path="/analyse-express"
-        keywords="analyse compte, diagnostic réseaux sociaux, health score, rapport compte, audit compte, métriques"
-        schema={{
-          "@context": "https://schema.org",
-          "@type": "Product",
-          "name": "Analyse Express",
-          "description": "Diagnostic complet de ton compte avec health score, métriques clés, analyse de persona et rapport PDF téléchargeable.",
-          "offers": {
-            "@type": "Offer",
-            "price": "11.90",
-            "priceCurrency": "EUR",
-            "availability": "https://schema.org/InStock",
-          },
-        }}
-      />
+      <SEOHead {...seoFor("/analyse-express")} />
 
       {/* Hero */}
       <Section className="pt-32 pb-16 md:pt-40 md:pb-20">
@@ -104,7 +88,7 @@ export default function AnalyseExpress() {
           </div>
 
           <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">
-            <span className="text-gold-gradient">Analyse Express</span>
+            <span className="text-gold-gradient">Analyse Express</span> — l'audit TikTok automatisé de ton compte
           </h1>
 
           <p className="text-lg text-muted-foreground max-w-xl mx-auto mb-4">

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { SEOHead } from "@/components/SEOHead";
+import { seoFor } from "@/config/seo";
 import { z } from "zod";
 import { Mail } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
@@ -103,7 +104,7 @@ const DiagnosticStart = () => {
 
   const getRecommendedOffer = () => {
     const { budget } = data;
-    // Routage aligné sur la grille : Express 11,90 € · Academy 299/499/899 € · Premium 1 499 €.
+    // Routage aligné sur src/config/offers.ts : Express 11,90 € · Academy 299/499/899 € · Premium sur candidature.
     if (budget === "no_budget") return "express";
     if (budget === "900_plus") return "wav_premium";
     // 15-100 € et 300-900 € → Wav Academy (pass 3/6/12 mois)
@@ -204,12 +205,7 @@ const DiagnosticStart = () => {
 
   return (
     <Layout>
-      <SEOHead
-        title="Diagnostic Stratégique TikTok Gratuit | Fred Wav"
-        description="Identifie ton point de blocage exact sur TikTok en 2 minutes. Diagnostic gratuit pour t'orienter vers la bonne stratégie."
-        path="/start"
-        keywords="diagnostic TikTok gratuit, audit TikTok, stratégie TikTok, blocage TikTok, Fred Wav"
-      />
+      <SEOHead {...seoFor("/start")} />
 
       {step > 0 && step <= TOTAL_STEPS && (
         <div className="fixed top-16 md:top-20 left-0 right-0 z-40">

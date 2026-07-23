@@ -1,15 +1,18 @@
 import { useEffect } from "react";
+import { BASE_URL, OG_IMAGE, type RouteSeo } from "@/config/seo";
 
-interface SEOHeadProps {
+/**
+ * Les pages passent `{...seoFor("/wavacademy")}` : les champs qui ne servent
+ * qu'au build (noscript, sitemap, llms) sont acceptés puis ignorés ici.
+ * title / description / path restent surchargeables pour les états dynamiques
+ * (succès de paiement, branches du formulaire de candidature…).
+ */
+type SEOHeadProps = Partial<Omit<RouteSeo, "path" | "title" | "description">> & {
   title: string;
   description: string;
   path: string;
-  keywords?: string;
   noindex?: boolean;
-  schema?: Record<string, unknown> | Record<string, unknown>[];
-}
-
-const BASE_URL = "https://fredwav.com";
+};
 
 export function SEOHead({ title, description, path, keywords, noindex, schema }: SEOHeadProps) {
   useEffect(() => {
@@ -34,13 +37,13 @@ export function SEOHead({ title, description, path, keywords, noindex, schema }:
     setMeta("og:type", "website", "property");
     setMeta("og:locale", "fr_FR", "property");
     setMeta("og:site_name", "Fred Wav", "property");
-    setMeta("og:image", "https://fredwav.com/og-image.png", "property");
+    setMeta("og:image", OG_IMAGE, "property");
     setMeta("og:image:alt", "Fred Wav - Expert Stratégie TikTok", "property");
     setMeta("twitter:card", "summary_large_image");
     setMeta("twitter:title", title);
     setMeta("twitter:description", description);
     setMeta("twitter:site", "@FredWav");
-    setMeta("twitter:image", "https://fredwav.com/og-image.png");
+    setMeta("twitter:image", OG_IMAGE);
 
     // Canonical
     let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
@@ -79,7 +82,7 @@ export function SEOHead({ title, description, path, keywords, noindex, schema }:
         if (s.parentNode) s.parentNode.removeChild(s);
       });
     };
-  }, [title, description, path, keywords, schema]);
+  }, [title, description, path, keywords, schema, noindex]);
 
   return null;
 }

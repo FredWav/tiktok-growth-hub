@@ -7,11 +7,11 @@ import { trackPostHogEvent } from "@/lib/posthog";
 const navItems = [
   { label: "Accueil", href: "/" },
   { label: "Wav Academy", href: "/wavacademy" },
+  { label: "Accompagnement", href: "/accompagnement-reseaux-sociaux" },
   { label: "Analyse Express", href: "/analyse-express" },
   { label: "Témoignages", href: "/preuves" },
   { label: "À propos", href: "/a-propos" },
   { label: "Contact", href: "/contact" },
-  { label: "Newsletter", href: "/newsletter" },
 ];
 
 export function Header({ minimal = false }: { minimal?: boolean }) {
@@ -69,7 +69,7 @@ export function Header({ minimal = false }: { minimal?: boolean }) {
           {/* CTA Button */}
           <div className="hidden lg:block">
             <Button asChild>
-              <Link to="/reserverunappel" onClick={() => trackPostHogEvent("click_nav_cta", { location: "header" })}>Réserve ton appel</Link>
+              <Link to="/wavacademy" onClick={() => trackPostHogEvent("click_nav_cta", { location: "header" })}>Rejoindre l'Academy</Link>
             </Button>
           </div>
 
@@ -105,8 +105,8 @@ export function Header({ minimal = false }: { minimal?: boolean }) {
                 </Link>
               ))}
               <Button asChild className="mt-2">
-                <Link to="/reserverunappel" onClick={() => { trackPostHogEvent("click_nav_cta", { location: "header_mobile" }); setIsOpen(false); }}>
-                  Réserve ton appel
+                <Link to="/wavacademy" onClick={() => { trackPostHogEvent("click_nav_cta", { location: "header_mobile" }); setIsOpen(false); }}>
+                  Rejoindre l'Academy
                 </Link>
               </Button>
             </div>

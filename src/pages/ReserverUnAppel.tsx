@@ -15,6 +15,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { SEOHead } from "@/components/SEOHead";
+import { seoFor } from "@/config/seo";
+import { ACADEMY_FROM, EXPRESS_PRICE_LABEL } from "@/config/offers";
 import { ClientResults } from "@/components/ClientResults";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -120,10 +122,15 @@ export default function ReserverUnAppel() {
   };
 
   const onSubmit = async (data: ContactForm) => {
-    // Redirection selon le budget : pas de budget -> Analyse Express (11,90 €),
-    // 15-100 € -> Wav Academy, au-delà -> réservation d'appel classique.
+    // Redirection alignée sur la grille réelle : Express 11,90 € · Academy 299–899 € · Premium sur candidature.
+    // Sans budget ou sous 300 € -> Analyse Express ; 300–900 € -> Wav Academy (c'est exactement
+    // sa fourchette) ; au-delà -> réservation d'appel Wav Premium.
     const redirectTarget: "academy" | "express" | null =
-      data.budget === "no_budget" ? "express" : data.budget === "15_a_100" ? "academy" : null;
+      data.budget === "no_budget" || data.budget === "moins_de_300"
+        ? "express"
+        : data.budget === "300_a_900"
+          ? "academy"
+          : null;
 
     setIsSubmitting(true);
     trackEvent("reserverunappel_submit", { profil: data.profil });
@@ -198,9 +205,10 @@ export default function ReserverUnAppel() {
     return (
       <Layout>
         <SEOHead
+          {...seoFor("/reserverunappel")}
           title="L'Analyse Express est faite pour toi | Fred Wav"
-          description="Commence par un état des lieux complet de ton compte TikTok pour 11,90 € : score de santé, analyse IA et plan d'action."
-          path="/reserverunappel"
+          description={`Commence par un état des lieux complet de ton compte TikTok pour ${EXPRESS_PRICE_LABEL} : score de santé, analyse IA et plan d'action.`}
+          noindex
         />
         <Section variant="cream" size="lg">
           <div className="max-w-xl mx-auto text-center">
@@ -211,10 +219,10 @@ export default function ReserverUnAppel() {
               Commence par l'<span className="text-gold-gradient">Analyse Express</span>.
             </h2>
             <p className="text-lg text-muted-foreground mb-4">
-              Sans budget d'accompagnement, te vendre un appel n'aurait aucun sens. Ce qu'il te faut d'abord, c'est un état des lieux honnête de ton compte.
+              Avec ce budget, te vendre un appel n'aurait aucun sens. Ce qu'il te faut d'abord, c'est un état des lieux honnête de ton compte.
             </p>
             <p className="text-lg text-muted-foreground mb-8">
-              L'<strong>Analyse Express</strong> te donne pour <strong>11,90 €</strong> un diagnostic complet : score de santé, analyse IA détaillée et plan d'action concret. Tu sauras exactement où tu en es et quoi corriger.
+              L'<strong>Analyse Express</strong> te donne pour <strong>{EXPRESS_PRICE_LABEL}</strong> un diagnostic complet : score de santé, analyse IA détaillée et plan d'action concret. Tu sauras exactement où tu en es et quoi corriger. Ensuite, la <Link to="/wavacademy" className="text-primary underline hover:no-underline">Wav Academy</Link> prend le relais dès {ACADEMY_FROM} €.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="hero" size="xl" asChild>
@@ -242,9 +250,10 @@ export default function ReserverUnAppel() {
     return (
       <Layout>
         <SEOHead
+          {...seoFor("/reserverunappel")}
           title="La Wav Academy est faite pour toi | Fred Wav"
-          description="Ton budget colle parfaitement avec la Wav Academy : la méthode complète et la communauté à partir de 299 € (paiement unique, accès 3 mois)."
-          path="/reserverunappel"
+          description={`Ton budget colle parfaitement avec la Wav Academy : la méthode complète et la communauté à partir de ${ACADEMY_FROM} € (paiement unique, accès 3 mois).`}
+          noindex
         />
         <Section variant="cream" size="lg">
           <div className="max-w-xl mx-auto text-center">
@@ -255,10 +264,10 @@ export default function ReserverUnAppel() {
               La <span className="text-gold-gradient">Wav Academy</span> est faite pour toi.
             </h2>
             <p className="text-lg text-muted-foreground mb-4">
-              Avec ton budget, un accompagnement personnalisé avec moi n'est pas la bonne option — ce serait te survendre quelque chose qui ne te correspond pas.
+              Avec ton budget, un accompagnement individuel n'est pas la bonne option — ce serait te survendre quelque chose qui ne te correspond pas.
             </p>
             <p className="text-lg text-muted-foreground mb-8">
-              Mais la <strong>Wav Academy</strong> te donne accès à toute ma méthode, au diagnostic continu et à la communauté à partir de <strong>299 €</strong> (paiement unique, accès 3 mois). C'est exactement ce qu'il te faut pour démarrer.
+              La <strong>Wav Academy</strong> te donne accès à toute ma méthode, au diagnostic continu et à la communauté à partir de <strong>{ACADEMY_FROM} €</strong> (paiement unique, accès 3 mois). C'est exactement ce qu'il te faut pour démarrer.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="hero" size="xl" asChild>
@@ -286,9 +295,10 @@ export default function ReserverUnAppel() {
     return (
       <Layout>
         <SEOHead
+          {...seoFor("/reserverunappel")}
           title="Demande envoyée - Réserver un appel | Fred Wav"
           description="Ta demande a bien été envoyée. Fred te recontacte par email sous 48h jours ouvrés."
-          path="/reserverunappel"
+          noindex
         />
         <Section variant="cream" size="lg">
           <div className="max-w-xl mx-auto text-center">
@@ -339,15 +349,12 @@ export default function ReserverUnAppel() {
   return (
     <Layout>
       <SEOHead
-        title="Réserver un appel | Fred Wav"
-        description="Premier contact avec Fred Wav : remplis le formulaire pour qu'on puisse échanger par écrit avant un éventuel appel."
-        path="/reserverunappel"
-        keywords="réserver un appel, contact fred wav, premier contact tiktok, coaching formats courts"
+        {...seoFor("/reserverunappel")}
       />
       <Section variant="cream" size="lg">
         <div className="max-w-2xl mx-auto text-center mb-10">
           <h1 className="font-display text-3xl md:text-4xl font-semibold tracking-tight mb-4">
-            Réserver un <span className="text-gold-gradient">appel</span>
+            <span className="text-gold-gradient">Wav Premium</span> — 30 jours d'accompagnement individuel
           </h1>
           <p className="text-muted-foreground text-lg">
             C'est notre premier contact. Plus j'ai d'infos sur ta situation, plus je peux répondre efficacement à ta demande.
@@ -628,9 +635,9 @@ export default function ReserverUnAppel() {
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="no_budget">Je n'ai pas de budget pour me faire accompagner</SelectItem>
-                        <SelectItem value="15_a_100">Entre 15€ et 100€</SelectItem>
-                        <SelectItem value="300_a_900">De 300€ à 900€</SelectItem>
-                        <SelectItem value="900_plus">900€ et +</SelectItem>
+                        <SelectItem value="moins_de_300">Moins de 300 €</SelectItem>
+                        <SelectItem value="300_a_900">De 300 € à 900 €</SelectItem>
+                        <SelectItem value="900_plus">Plus de 900 €</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

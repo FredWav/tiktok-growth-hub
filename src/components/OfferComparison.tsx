@@ -1,0 +1,58 @@
+import { Link } from "react-router-dom";
+import { ArrowRight, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { trackEvent } from "@/lib/tracking";
+import { OFFER_TIERS } from "@/config/offers";
+
+/**
+ * Comparateur des 3 niveaux d'offre.
+ *
+ * Il existe parce que la home n'exposait que l'Analyse Express et le Wav Premium :
+ * un visiteur situé entre les deux n'avait aucun chemin. Prix et libellés viennent
+ * de src/config/offers.ts pour rester alignés partout.
+ */
+export function OfferComparison({ location = "home" }: { location?: string }) {
+  return (
+    <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto items-stretch">
+      {OFFER_TIERS.map((tier) => (
+        <div
+          key={tier.name}
+          className={`rounded-2xl p-6 flex flex-col relative bg-background ${
+            tier.featured
+              ? "border-2 border-primary shadow-lg shadow-primary/10 md:scale-105 order-first md:order-none"
+              : "border border-border shadow-sm"
+          }`}
+        >
+          {tier.featured && (
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+              <span className="bg-primary text-primary-foreground text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wide whitespace-nowrap">
+                Le plus choisi
+              </span>
+            </div>
+          )}
+
+          <p className="text-sm text-muted-foreground italic mb-4 min-h-[3rem] flex items-start gap-2">
+            <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+            <span>« {tier.need} »</span>
+          </p>
+
+          <h3 className="font-display text-xl font-semibold mb-1">{tier.name}</h3>
+          <p className="font-display text-2xl font-bold text-primary mb-6">{tier.price}</p>
+
+          <Button
+            variant={tier.featured ? "hero" : "outline"}
+            size="lg"
+            className="w-full mt-auto"
+            asChild
+            onClick={() => trackEvent("click_offer_compare", { offer: tier.name, location })}
+          >
+            <Link to={tier.href}>
+              {tier.cta}
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
+      ))}
+    </div>
+  );
+}

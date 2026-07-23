@@ -87,10 +87,16 @@
           {
             "@type": "Offer",
             "itemOffered": {
-              "@type": "Service",
-              "name": "Wav Premium",
-              "description": "30 jours d'accompagnement intensif : audit algorithmique, sprints hebdomadaires, feedback chirurgical, résultats mesurables.",
-              "url": "https://fredwav.com/reserverunappel"
+              "@type": "Course",
+              "name": "Wav Academy",
+              "description": "Programme de diagnostic continu pour créateurs : analyse de chaque vidéo, contenu stratégique quotidien, live hebdomadaire et communauté privée. Pass 3, 6 ou 12 mois en paiement unique.",
+              "url": "https://fredwav.com/wavacademy"
+            },
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "minPrice": "299",
+              "maxPrice": "899",
+              "priceCurrency": "EUR"
             }
           },
           {
@@ -103,6 +109,15 @@
             },
             "price": "11.90",
             "priceCurrency": "EUR"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Wav Premium",
+              "description": "30 jours d'accompagnement individuel : analyse complète du compte, un point stratégique par semaine, correction des scripts et objectifs chiffrés. Sur candidature.",
+              "url": "https://fredwav.com/reserverunappel"
+            }
           }
         ]
       },
@@ -138,18 +153,27 @@
 
   <body>
     <div id="root"></div>
+    <!--
+      Ce bloc est remplacé par une version propre à chaque route au build,
+      par le plugin seo-prerender de vite.config.ts (source : src/config/seo.ts).
+      Il ne sert donc qu'en développement et pour la racine avant réécriture.
+    -->
     <noscript>
       <div style="max-width:800px;margin:0 auto;padding:40px 20px;font-family:system-ui,sans-serif">
-        <h1>Fred Wav - Expert Stratégie Formats Courts | Coaching TikTok</h1>
-        <p>Tu plafonnes en vues ? J'analyse tes vraies stats pour te montrer pourquoi — et comment en sortir. Stratégie de contenu et diagnostic data-driven avec Fred Wav, expert en formats courts et croissance TikTok.</p>
+        <h1>Arrête de poster à l'aveugle. Tes stats disent déjà pourquoi tu plafonnes en vues.</h1>
+        <p>Pas d'astuces d'algorithme, pas de promesses. J'analyse tes vraies données pour te montrer ce qui bloque ta visibilité — et on corrige, preuves à l'appui.</p>
 
-        <h2>Wav Premium — 30 jours pour casser ton plafond de vues</h2>
-        <p>Un accompagnement intensif avec feedback chirurgical : audit algorithmique, sprints hebdomadaires, accès asynchrone direct et KPIs structurés. Chaque vidéo a un objectif clair, chaque semaine produit un résultat mesurable.</p>
-        <p><a href="/reserverunappel">Candidater au Wav Premium</a></p>
+        <h2>Wav Academy — l'offre principale, dès 299 €</h2>
+        <p>Un outil qui analyse tes vidéos et te dit quoi corriger, du contenu stratégique chaque jour, un live hebdomadaire avec Fred et une communauté privée. Trois Pass prépayés : 3 mois (299 €), 6 mois (499 €), 12 mois (899 €). Paiement unique, sans abonnement ni reconduction.</p>
+        <p><a href="/wavacademy">Découvrir la Wav Academy</a></p>
 
-        <h2>Analyse Express</h2>
+        <h2>Analyse Express — 11,90 €</h2>
         <p>Diagnostic automatique de ton compte TikTok en 2 minutes : health score, métriques clés, analyse persona et rapport PDF.</p>
         <p><a href="/analyse-express">Lancer mon Analyse Express</a></p>
+
+        <h2>Wav Premium — 30 jours en individuel, sur candidature</h2>
+        <p>Analyse complète de ton compte, un point stratégique chaque semaine, correction de tes scripts et objectifs chiffrés.</p>
+        <p><a href="/reserverunappel">Candidater au Wav Premium</a></p>
 
         <h2>Témoignages et résultats</h2>
         <p>Des retours authentiques de créateurs et entrepreneurs qui ont structuré leur stratégie avec Fred Wav. <a href="/preuves">Voir tous les témoignages</a>.</p>
@@ -158,26 +182,15 @@
         <nav>
           <ul>
             <li><a href="/">Accueil</a></li>
-            <li><a href="/reserverunappel">Wav Premium — Candidature</a></li>
+            <li><a href="/wavacademy">Wav Academy</a></li>
             <li><a href="/analyse-express">Analyse Express</a></li>
+            <li><a href="/reserverunappel">Wav Premium — Candidature</a></li>
             <li><a href="/preuves">Témoignages et résultats</a></li>
             <li><a href="/a-propos">À propos de Fred Wav</a></li>
             <li><a href="/contact">Contact</a></li>
             <li><a href="/newsletter">Newsletter</a></li>
           </ul>
         </nav>
-
-        <h2>Questions fréquentes</h2>
-        <dl>
-          <dt>Comment se passe la sélection des candidatures ?</dt>
-          <dd>Tu remplis un court formulaire, puis on fait un appel de 15 minutes. Si ton profil correspond, on démarre.</dd>
-          <dt>Est-ce que ça marche dans ma niche ?</dt>
-          <dd>La méthode est data-driven et s'adapte à tous les secteurs : coaching, e-commerce, artisanat, services, formation.</dd>
-          <dt>Quelle est la charge de travail hebdomadaire ?</dt>
-          <dd>Environ 3 à 5 heures par semaine pour créer du contenu et appliquer les recommandations.</dd>
-          <dt>Je débute, c'est trop tôt ?</dt>
-          <dd>Non. Mieux vaut commencer avec une bonne stratégie que de poster 6 mois dans le vide.</dd>
-        </dl>
 
         <h2>Contact</h2>
         <p>Email : <a href="mailto:contact@fredwav.com">contact@fredwav.com</a></p>

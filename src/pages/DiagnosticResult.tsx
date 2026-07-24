@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useDiagnostic } from "@/contexts/DiagnosticContext";
 import { SEOHead } from "@/components/SEOHead";
-import { ACADEMY_FROM } from "@/config/offers";
+import { ACADEMY_FROM, recommendedOfferForBudget } from "@/config/offers";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Mail } from "lucide-react";
@@ -50,9 +50,12 @@ const DiagnosticResult = () => {
   const score = (audiencePoints[data.audience] || 0) + (objectifPoints[data.objectif] || 0) + (budgetPoints[data.budget] || 0);
   const scoreLabel = score < 40 ? "Compte instable" : score <= 70 ? "Potentiel non exploité" : "Compte structuré";
 
-  // ── Offer routing (aligné sur src/config/offers.ts : Express 11,90 € · Academy 299/499/899 € · Premium sur candidature) ──
+  // ── Offre recommandée : source unique dans config/offers.ts, partagée avec
+  // /reserverunappel et /start. Les libellés majuscules restent inchangés car ils
+  // partent dans PostHog (`recommended_offer`) — ne pas casser l'historique.
+  const recommended = recommendedOfferForBudget(data.budget);
   const offer: "EXPRESS" | "ACADEMY" | "WAV_PREMIUM" =
-    data.budget === "no_budget" ? "EXPRESS" : data.budget === "900_plus" ? "WAV_PREMIUM" : "ACADEMY";
+    recommended === "premium" ? "WAV_PREMIUM" : recommended === "academy" ? "ACADEMY" : "EXPRESS";
 
   useEffect(() => {
     if (!isComplete) {

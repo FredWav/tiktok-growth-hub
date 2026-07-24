@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { SEOHead } from "@/components/SEOHead";
 import { seoFor } from "@/config/seo";
-import { ACADEMY_FROM, EXPRESS_PRICE_LABEL } from "@/config/offers";
+import { ACADEMY_FROM, EXPRESS_PRICE_LABEL, BUDGET_TIERS, recommendedOfferForBudget } from "@/config/offers";
 import { ClientResults } from "@/components/ClientResults";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -122,14 +122,12 @@ export default function ReserverUnAppel() {
   };
 
   const onSubmit = async (data: ContactForm) => {
-    // Redirection selon le budget : pas de budget -> Analyse Express (11,90 €),
-    // 15-100 € et 100-300 € -> Wav Academy (pass 299 €), au-delà -> appel classique.
-    const redirectTarget: "academy" | "express" | null =
-      data.budget === "no_budget"
-        ? "express"
-        : data.budget === "15_a_100" || data.budget === "100_a_300"
-          ? "academy"
-          : null;
+    // Offre recommandée : source unique dans config/offers.ts, partagée avec le
+    // tunnel diagnostic pour qu'un même prospect ne reçoive pas deux réponses
+    // différentes selon sa porte d'entrée.
+    // `null` = aucune redirection, la candidature Wav Premium suit son cours.
+    const offer = recommendedOfferForBudget(data.budget);
+    const redirectTarget: "academy" | "express" | null = offer === "premium" ? null : offer;
 
     setIsSubmitting(true);
     trackEvent("reserverunappel_submit", { profil: data.profil });
@@ -633,11 +631,11 @@ export default function ReserverUnAppel() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="no_budget">Je n'ai pas de budget pour me faire accompagner</SelectItem>
-                        <SelectItem value="15_a_100">Entre 15€ et 100€</SelectItem>
-                        <SelectItem value="100_a_300">De 100€ à 300€</SelectItem>
-                        <SelectItem value="300_a_900">De 300€ à 900€</SelectItem>
-                        <SelectItem value="900_plus">900€ et +</SelectItem>
+                        {BUDGET_TIERS.map((tier) => (
+                          <SelectItem key={tier.value} value={tier.value}>
+                            {tier.label}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />

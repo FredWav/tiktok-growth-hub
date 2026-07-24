@@ -70,6 +70,57 @@ export const ACADEMY_FEATURES = [
   "Discord premium (canaux avancés)",
 ];
 
+// ── Budget déclaré → offre recommandée ──────────────────────────────────────
+// Ces cinq codes sont le vocabulaire PARTAGÉ de toute l'app : formulaire de
+// candidature, tunnel diagnostic et panneaux admin. Ne jamais en renommer un
+// sans migrer les leads déjà enregistrés en base.
+
+export const BUDGET_TIERS = [
+  { value: "no_budget", label: "Je n'ai pas de budget pour me faire accompagner", short: "Pas de budget" },
+  { value: "15_a_100", label: "Entre 15 € et 100 €", short: "Entre 15 € et 100 €" },
+  { value: "100_a_300", label: "De 100 € à 300 €", short: "De 100 € à 300 €" },
+  { value: "300_a_900", label: "De 300 € à 900 €", short: "De 300 € à 900 €" },
+  { value: "900_plus", label: "900 € et +", short: "900 € et +" },
+] as const;
+
+export type BudgetTier = (typeof BUDGET_TIERS)[number]["value"];
+
+/** Libellés des tranches courantes, pour l'admin. */
+export const BUDGET_LABELS: Record<string, string> = Object.fromEntries(
+  BUDGET_TIERS.map((t) => [t.value, t.short]),
+);
+
+export type RecommendedOffer = "express" | "academy" | "premium";
+
+/**
+ * Offre recommandée à partir du budget déclaré. **Source unique** — le formulaire
+ * de candidature et le tunnel diagnostic doivent l'appeler tous les deux, sinon
+ * un même prospect reçoit deux réponses différentes selon sa porte d'entrée
+ * (c'est exactement le bug qui existait avant centralisation).
+ *
+ * La règle suit la grille réelle, sans jamais envoyer quelqu'un vers une offre
+ * qu'il ne peut pas s'offrir :
+ *  - jusqu'à 100 € → Analyse Express, car l'Academy démarre à 299 €
+ *  - 100 à 900 €   → Wav Academy (299 € à l'entrée, 899 € au plafond)
+ *  - au-delà       → candidature Wav Premium
+ */
+export function recommendedOfferForBudget(budget: string | null | undefined): RecommendedOffer {
+  switch (budget) {
+    case "no_budget":
+    case "15_a_100":
+      return "express";
+    case "100_a_300":
+    case "300_a_900":
+      return "academy";
+    case "900_plus":
+      return "premium";
+    default:
+      // Valeur inconnue (ancien lead, tranche supprimée) : on propose l'entrée
+      // de gamme plutôt que de survendre.
+      return "express";
+  }
+}
+
 /** Comparateur des 3 niveaux — consommé par OfferComparison.tsx. */
 export type OfferTier = {
   need: string;

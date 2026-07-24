@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { BUDGET_LABELS } from "@/config/offers";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid,
   PieChart as RechartsPie, Pie, Cell, Tooltip as RechartsTooltip,
@@ -31,14 +32,11 @@ interface Lead {
 }
 
 const budgetLabels: Record<string, string> = {
-  // Grille actuelle
-  no_budget: "Pas de budget",
-  "15_a_100": "Entre 15€ et 100€",
-  "300_a_900": "De 300€ à 900€",
-  "900_plus": "900€ et +",
+  // Grille actuelle — dérivée de config/offers.ts pour qu'aucune tranche ne
+  // s'affiche jamais en code brut dans l'admin.
+  ...BUDGET_LABELS,
   // Anciennes valeurs (candidatures historiques)
   "10_a_100": "De 10€ à 100€",
-  "100_a_300": "De 100€ à 300€",
   "1000_plus": "1000€ et +",
 };
 

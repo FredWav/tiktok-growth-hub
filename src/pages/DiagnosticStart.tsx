@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { SEOHead } from "@/components/SEOHead";
 import { seoFor } from "@/config/seo";
+import { recommendedOfferForBudget } from "@/config/offers";
 import { z } from "zod";
 import { Mail } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
@@ -103,12 +104,11 @@ const DiagnosticStart = () => {
   };
 
   const getRecommendedOffer = () => {
-    const { budget } = data;
-    // Routage aligné sur src/config/offers.ts : Express 11,90 € · Academy 299/499/899 € · Premium sur candidature.
-    if (budget === "no_budget") return "express";
-    if (budget === "900_plus") return "wav_premium";
-    // 15-100 € et 300-900 € → Wav Academy (pass 3/6/12 mois)
-    return "wav_academy";
+    // Source unique : recommendedOfferForBudget() dans config/offers.ts, partagée
+    // avec /reserverunappel. Les libellés persistés en base et envoyés à PostHog
+    // (`recommended_offer`) restent inchangés pour ne pas casser l'historique.
+    const offer = recommendedOfferForBudget(data.budget);
+    return offer === "premium" ? "wav_premium" : offer === "academy" ? "wav_academy" : "express";
   };
 
   const handleIdentityNext = () => {

@@ -133,10 +133,10 @@ export default function ReserverUnAppel() {
     trackEvent("reserverunappel_submit", { profil: data.profil });
     identifyUser(data.email, { first_name: data.first_name, last_name: data.last_name });
     try {
-      // Full payload sent to the notification (email + Discord) — always includes budget.
-      // Single-choice answers are stored as readable labels so email/Discord/admin need no mapping.
-      // Q5 (declencheur) reuses the existing `goals` column.
-      const notifyPayload = {
+      // Ce qui part en base. Les réponses à choix unique sont stockées en libellés
+      // lisibles pour que l'email/Discord/admin n'aient rien à traduire.
+      // Q5 (declencheur) réutilise la colonne `goals` existante.
+      const dbPayload = {
         first_name: data.first_name,
         last_name: data.last_name,
         email: data.email,
@@ -148,13 +148,23 @@ export default function ReserverUnAppel() {
           ? (critereOptions.find((o) => o.value === data.accompagnement_critere)?.label ?? data.accompagnement_critere)
           : null,
         goals: data.declencheur,
-        budget: data.budget
-          ? `${data.budget}${redirectTarget === "academy" ? " (redirigé Wav Academy)" : redirectTarget === "express" ? " (redirigé Analyse Express)" : ""}`
-          : null,
+        // Code de tranche NU. Le suffixe « (redirigé …) » ne doit jamais atterrir
+        // ici : la colonne est relue par l'admin via BUDGET_LABELS, et une valeur
+        // concaténée y casse la traduction et s'affiche en code brut.
+        budget: data.budget || null,
         origin_source: data.origin_source || null,
         follower_since: data.follower_since || null,
         conversion_trigger: data.conversion_trigger || null,
         posthog_id: getPostHogId(),
+      };
+
+      // L'email et le Discord gardent le budget suffixé, comme avant — c'est de
+      // l'affichage, pas de la donnée.
+      const notifyPayload = {
+        ...dbPayload,
+        budget: data.budget
+          ? `${data.budget}${redirectTarget === "academy" ? " (redirigé Wav Academy)" : redirectTarget === "express" ? " (redirigé Analyse Express)" : ""}`
+          : null,
       };
 
       // Fire notification FIRST so the lead is always captured (email to admin + Discord),
@@ -165,7 +175,7 @@ export default function ReserverUnAppel() {
 
       const { error: dbError } = await supabase
         .from("wav_premium_applications")
-        .insert(notifyPayload);
+        .insert(dbPayload);
 
       const notifyResult = await notifyPromise.catch((err) => {
         console.error("Notification error:", err);
@@ -265,6 +275,9 @@ export default function ReserverUnAppel() {
             </p>
             <p className="text-lg text-muted-foreground mb-8">
               La <strong>Wav Academy</strong> te donne accès à toute ma méthode, au diagnostic continu et à la communauté à partir de <strong>{ACADEMY_FROM} €</strong> (paiement unique, accès 3 mois). C'est exactement ce qu'il te faut pour démarrer.
+            </p>
+            <p className="text-sm text-muted-foreground mb-8">
+              Et si {ACADEMY_FROM} € d'un coup, c'est trop : jusqu'à <strong>4× sans frais avec PayPal</strong>, soit {(ACADEMY_FROM / 4).toFixed(2).replace(".", ",")} € par mois.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="hero" size="xl" asChild>

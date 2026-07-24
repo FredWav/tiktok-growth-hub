@@ -93,32 +93,41 @@ export const BUDGET_LABELS: Record<string, string> = Object.fromEntries(
 export type RecommendedOffer = "express" | "academy" | "premium";
 
 /**
- * Offre recommandée à partir du budget déclaré. **Source unique** — le formulaire
- * de candidature et le tunnel diagnostic doivent l'appeler tous les deux, sinon
- * un même prospect reçoit deux réponses différentes selon sa porte d'entrée
- * (c'est exactement le bug qui existait avant centralisation).
+ * Table de routage budget → offre. Typée `Record<BudgetTier, …>` : ajouter ou
+ * renommer une tranche dans BUDGET_TIERS casse la compilation tant que cette
+ * table n'est pas mise à jour. C'est le garde-fou qui survit à `strict: false`
+ * dans tsconfig (contrairement à un switch, où un cas manquant passe en silence).
  *
- * La règle suit la grille réelle, sans jamais envoyer quelqu'un vers une offre
- * qu'il ne peut pas s'offrir :
- *  - jusqu'à 100 € → Analyse Express, car l'Academy démarre à 299 €
- *  - 100 à 900 €   → Wav Academy (299 € à l'entrée, 899 € au plafond)
- *  - au-delà       → candidature Wav Premium
+ * ⚠️ La tranche 15-100 € pointe vers l'Academy parce que le paiement en 4× sans
+ * frais met le pass Fondation à 74,75 €/mois — donc dans la tranche. Ce choix
+ * dépend de l'unité de la question « Quel est ton budget ? », qui n'est
+ * aujourd'hui précisée nulle part (au total ? par mois ?). À trancher avec Fred.
+ */
+const OFFER_BY_BUDGET: Record<BudgetTier, RecommendedOffer> = {
+  no_budget: "express",
+  "15_a_100": "academy",
+  "100_a_300": "academy",
+  "300_a_900": "academy",
+  "900_plus": "premium",
+};
+
+/** Tranches disparues, encore présentes sur des candidatures historiques. */
+const LEGACY_OFFER_BY_BUDGET: Record<string, RecommendedOffer> = {
+  "10_a_100": "express",
+  "1000_plus": "premium",
+};
+
+/**
+ * Offre recommandée à partir du budget déclaré. **Source unique** — le formulaire
+ * de candidature et le tunnel diagnostic l'appellent tous les deux, sinon un même
+ * prospect reçoit deux réponses différentes selon sa porte d'entrée (c'est
+ * exactement le bug qui existait avant centralisation).
  */
 export function recommendedOfferForBudget(budget: string | null | undefined): RecommendedOffer {
-  switch (budget) {
-    case "no_budget":
-    case "15_a_100":
-      return "express";
-    case "100_a_300":
-    case "300_a_900":
-      return "academy";
-    case "900_plus":
-      return "premium";
-    default:
-      // Valeur inconnue (ancien lead, tranche supprimée) : on propose l'entrée
-      // de gamme plutôt que de survendre.
-      return "express";
-  }
+  if (budget && budget in OFFER_BY_BUDGET) return OFFER_BY_BUDGET[budget as BudgetTier];
+  if (budget && budget in LEGACY_OFFER_BY_BUDGET) return LEGACY_OFFER_BY_BUDGET[budget];
+  // Valeur vraiment inconnue : entrée de gamme plutôt que survente.
+  return "express";
 }
 
 /** Comparateur des 3 niveaux — consommé par OfferComparison.tsx. */

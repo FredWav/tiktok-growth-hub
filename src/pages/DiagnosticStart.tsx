@@ -314,6 +314,7 @@ const DiagnosticStart = () => {
               <div className="space-y-3 max-w-lg mx-auto">
                 <OptionCard icon={Eye} label="Je n'ai pas de budget pour ça" description="Je veux juste un état des lieux" selected={data.budget === "no_budget"} onClick={() => selectOption("budget", "no_budget", "budget", 4)} />
                 <OptionCard icon={Zap} label="Entre 15 € et 100 €" selected={data.budget === "15_a_100"} onClick={() => selectOption("budget", "15_a_100", "budget", 4)} />
+                <OptionCard icon={Rocket} label="De 100 € à 300 €" selected={data.budget === "100_a_300"} onClick={() => selectOption("budget", "100_a_300", "budget", 4)} />
                 <OptionCard icon={Rocket} label="De 300 € à 900 €" selected={data.budget === "300_a_900"} onClick={() => selectOption("budget", "300_a_900", "budget", 4)} />
                 <OptionCard icon={DollarSign} label="900 € et +" selected={data.budget === "900_plus"} onClick={() => selectOption("budget", "900_plus", "budget", 4)} />
               </div>

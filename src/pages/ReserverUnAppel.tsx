@@ -122,13 +122,12 @@ export default function ReserverUnAppel() {
   };
 
   const onSubmit = async (data: ContactForm) => {
-    // Redirection alignée sur la grille réelle : Express 11,90 € · Academy 299–899 € · Premium sur candidature.
-    // Sans budget ou sous 300 € -> Analyse Express ; 300–900 € -> Wav Academy (c'est exactement
-    // sa fourchette) ; au-delà -> réservation d'appel Wav Premium.
+    // Redirection selon le budget : pas de budget -> Analyse Express (11,90 €),
+    // 15-100 € et 100-300 € -> Wav Academy (pass 299 €), au-delà -> appel classique.
     const redirectTarget: "academy" | "express" | null =
-      data.budget === "no_budget" || data.budget === "moins_de_300"
+      data.budget === "no_budget"
         ? "express"
-        : data.budget === "300_a_900"
+        : data.budget === "15_a_100" || data.budget === "100_a_300"
           ? "academy"
           : null;
 
@@ -219,10 +218,10 @@ export default function ReserverUnAppel() {
               Commence par l'<span className="text-gold-gradient">Analyse Express</span>.
             </h2>
             <p className="text-lg text-muted-foreground mb-4">
-              Avec ce budget, te vendre un appel n'aurait aucun sens. Ce qu'il te faut d'abord, c'est un état des lieux honnête de ton compte.
+              Sans budget d'accompagnement, te vendre un appel n'aurait aucun sens. Ce qu'il te faut d'abord, c'est un état des lieux honnête de ton compte.
             </p>
             <p className="text-lg text-muted-foreground mb-8">
-              L'<strong>Analyse Express</strong> te donne pour <strong>{EXPRESS_PRICE_LABEL}</strong> un diagnostic complet : score de santé, analyse IA détaillée et plan d'action concret. Tu sauras exactement où tu en es et quoi corriger. Ensuite, la <Link to="/wavacademy" className="text-primary underline hover:no-underline">Wav Academy</Link> prend le relais dès {ACADEMY_FROM} €.
+              L'<strong>Analyse Express</strong> te donne pour <strong>{EXPRESS_PRICE_LABEL}</strong> un diagnostic complet : score de santé, analyse IA détaillée et plan d'action concret. Tu sauras exactement où tu en es et quoi corriger.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="hero" size="xl" asChild>
@@ -635,9 +634,10 @@ export default function ReserverUnAppel() {
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="no_budget">Je n'ai pas de budget pour me faire accompagner</SelectItem>
-                        <SelectItem value="moins_de_300">Moins de 300 €</SelectItem>
-                        <SelectItem value="300_a_900">De 300 € à 900 €</SelectItem>
-                        <SelectItem value="900_plus">Plus de 900 €</SelectItem>
+                        <SelectItem value="15_a_100">Entre 15€ et 100€</SelectItem>
+                        <SelectItem value="100_a_300">De 100€ à 300€</SelectItem>
+                        <SelectItem value="300_a_900">De 300€ à 900€</SelectItem>
+                        <SelectItem value="900_plus">900€ et +</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

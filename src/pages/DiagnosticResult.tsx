@@ -46,7 +46,7 @@ const DiagnosticResult = () => {
   // ── Score calculation ──
   const audiencePoints: Record<string, number> = { "0-5k": 10, "5k-50k": 25, "50k+": 40 };
   const objectifPoints: Record<string, number> = { "Visibilité": 10, "Audience": 15, "Vendre": 25, "Monétiser": 30 };
-  const budgetPoints: Record<string, number> = { no_budget: 0, "15_a_100": 10, "300_a_900": 20, "900_plus": 30 };
+  const budgetPoints: Record<string, number> = { no_budget: 0, "15_a_100": 10, "100_a_300": 15, "300_a_900": 20, "900_plus": 30 };
   const score = (audiencePoints[data.audience] || 0) + (objectifPoints[data.objectif] || 0) + (budgetPoints[data.budget] || 0);
   const scoreLabel = score < 40 ? "Compte instable" : score <= 70 ? "Potentiel non exploité" : "Compte structuré";
 

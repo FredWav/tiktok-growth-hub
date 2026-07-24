@@ -121,9 +121,13 @@ export default function ReserverUnAppel() {
 
   const onSubmit = async (data: ContactForm) => {
     // Redirection selon le budget : pas de budget -> Analyse Express (11,90 €),
-    // 15-100 € -> Wav Academy, au-delà -> réservation d'appel classique.
+    // 15-100 € et 100-300 € -> Wav Academy (pass 299 €), au-delà -> appel classique.
     const redirectTarget: "academy" | "express" | null =
-      data.budget === "no_budget" ? "express" : data.budget === "15_a_100" ? "academy" : null;
+      data.budget === "no_budget"
+        ? "express"
+        : data.budget === "15_a_100" || data.budget === "100_a_300"
+          ? "academy"
+          : null;
 
     setIsSubmitting(true);
     trackEvent("reserverunappel_submit", { profil: data.profil });
@@ -629,6 +633,7 @@ export default function ReserverUnAppel() {
                       <SelectContent>
                         <SelectItem value="no_budget">Je n'ai pas de budget pour me faire accompagner</SelectItem>
                         <SelectItem value="15_a_100">Entre 15€ et 100€</SelectItem>
+                        <SelectItem value="100_a_300">De 100€ à 300€</SelectItem>
                         <SelectItem value="300_a_900">De 300€ à 900€</SelectItem>
                         <SelectItem value="900_plus">900€ et +</SelectItem>
                       </SelectContent>

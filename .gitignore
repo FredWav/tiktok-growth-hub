@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Caches de build TypeScript et temporaires Supabase
+*.tsbuildinfo
+supabase/.temp/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

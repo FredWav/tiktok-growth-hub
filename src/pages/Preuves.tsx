@@ -5,6 +5,8 @@ import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/tracking";
 import { SEOHead } from "@/components/SEOHead";
+import { seoFor } from "@/config/seo";
+import { CREATORS_COUNT } from "@/config/offers";
 import { ScreenshotWall } from "@/components/ScreenshotWall";
 import { ClientResults } from "@/components/ClientResults";
 import { VideoCard } from "@/components/VideoCard";
@@ -54,7 +56,7 @@ const caseStudies = [
 ];
 
 const stats = [
-  { icon: Users, value: "300+", label: "Clients accompagnés" },
+  { icon: Users, value: CREATORS_COUNT, label: "Clients accompagnés" },
   { icon: Eye, value: "10M+", label: "Vues générées" },
   { icon: TrendingUp, value: "95%", label: "Taux de satisfaction" },
 ];
@@ -64,7 +66,7 @@ const chooseOffers = [
     icon: Target,
     title: "Wav Premium",
     description: "Transformation encadrée sur 30 jours",
-    cta: "Contacter Fred",
+    cta: "Voir si ça me correspond",
     href: "/reserverunappel",
     trackEvent: "cta_contact_click",
   },
@@ -81,12 +83,7 @@ const chooseOffers = [
 export default function Preuves() {
   return (
     <Layout>
-      <SEOHead title="Témoignages et Résultats Clients | Fred Wav" description="Découvre les résultats concrets de nos clients : témoignages vidéo, études de cas et retours d'expérience." path="/preuves" keywords="témoignages formats courts, résultats clients, études de cas, retours expérience, preuves" schema={{
-        "@context": "https://schema.org",
-        "@type": "Service",
-        "name": "Accompagnement Formats Courts - Fred Wav",
-        "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.8", "reviewCount": "300", "bestRating": "5" },
-      }} />
+      <SEOHead {...seoFor("/preuves")} />
       <Section variant="cream" size="lg">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">
@@ -142,7 +139,7 @@ export default function Preuves() {
                 onClick={() => trackEvent("cta_contact_click", { location: "preuves_mid" })}
               >
                 <Link to="/reserverunappel">
-                  Contacter Fred
+                  Voir si le Wav Premium me correspond
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>

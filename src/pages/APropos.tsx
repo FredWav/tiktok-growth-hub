@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Lightbulb, BarChart3, TrendingUp, Shield, RefreshCw } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
 import { SEOHead } from "@/components/SEOHead";
+import { seoFor } from "@/config/seo";
+import { CREATORS_COUNT } from "@/config/offers";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -65,7 +67,7 @@ const cumulatedSubsLabel = () => {
 };
 
 const stats = [
-  { value: "300+", label: "Créateurs accompagnés" },
+  { value: CREATORS_COUNT, label: "Créateurs accompagnés" },
   { value: "10M+", label: "Vues générées via stratégies déployées" },
   { value: `${yearsSince(VIDEO_START_YEAR)} ans`, label: "D'expérience en création vidéo" },
   { value: `${yearsSince(MUSIC_START_YEAR)} ans`, label: "Dans la musique et la création artistique" },
@@ -78,16 +80,7 @@ const stats = [
 export default function APropos() {
   return (
     <Layout>
-      <SEOHead title="À propos de Fred Wav | Expert Stratégie Formats Courts" description={`${yearsSince(VIDEO_START_YEAR)} ans d'expérience vidéo, 300+ créateurs accompagnés, 10M+ vues générées. Découvre le parcours et la méthode.`} path="/a-propos" keywords="Fred Wav, expert formats courts, parcours, méthode data-driven, accompagnement créateur" schema={{
-        "@context": "https://schema.org",
-        "@type": "Person",
-        "name": "Fred Wav",
-        "jobTitle": "Expert Stratégie Formats Courts",
-        "url": "https://fredwav.com/a-propos",
-        "description": `Stratégiste en contenu et formats courts. ${yearsSince(VIDEO_START_YEAR)} ans d'expérience vidéo, 300+ créateurs accompagnés, 10M+ vues générées.`,
-        "knowsAbout": ["Stratégie formats courts", "Marketing vidéo", "Hook engineering", "Réseaux sociaux", "Croissance organique"],
-        "sameAs": ["https://www.tiktok.com/@fredwav", "https://www.instagram.com/levraifredwav/", "https://www.youtube.com/@Fredwavconseils"],
-      }} />
+      <SEOHead {...seoFor("/a-propos")} />
       <Section variant="cream" size="lg">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
@@ -96,7 +89,7 @@ export default function APropos() {
             </h1>
             <p className="text-lg text-muted-foreground mb-6">
               Stratégiste en contenu et formats courts, j'accompagne entrepreneurs et créateurs
-              à construire une présence qui génère des clients, pas juste des likes. Découvre les <Link to="/preuves" className="text-primary underline hover:no-underline">résultats concrets</Link> de mes accompagnements.
+              à construire une présence qui sert vraiment leurs objectifs — des clients, ou la visibilité qui attire les marques — pas juste des vues sans lendemain. Découvre les <Link to="/preuves" className="text-primary underline hover:no-underline">résultats concrets</Link> de mes accompagnements.
             </p>
             <p className="text-muted-foreground">
               Mon approche est simple : stratégie, analyse, performance mesurable.
@@ -243,7 +236,7 @@ export default function APropos() {
           </p>
           <Button variant="hero" size="lg" asChild onClick={() => trackEvent("cta_contact_click", { location: "apropos" })}>
             <Link to="/reserverunappel">
-              Contacter Fred
+              Voir si le Wav Premium me correspond
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>

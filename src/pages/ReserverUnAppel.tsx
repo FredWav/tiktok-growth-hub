@@ -15,6 +15,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { SEOHead } from "@/components/SEOHead";
+import { seoFor } from "@/config/seo";
+import { ACADEMY_FROM, EXPRESS_PRICE_LABEL, BUDGET_TIERS, recommendedOfferForBudget } from "@/config/offers";
 import { ClientResults } from "@/components/ClientResults";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -120,23 +122,21 @@ export default function ReserverUnAppel() {
   };
 
   const onSubmit = async (data: ContactForm) => {
-    // Redirection selon le budget : pas de budget -> Analyse Express (11,90 €),
-    // 15-100 € et 100-300 € -> Wav Academy (pass 299 €), au-delà -> appel classique.
-    const redirectTarget: "academy" | "express" | null =
-      data.budget === "no_budget"
-        ? "express"
-        : data.budget === "15_a_100" || data.budget === "100_a_300"
-          ? "academy"
-          : null;
+    // Offre recommandée : source unique dans config/offers.ts, partagée avec le
+    // tunnel diagnostic pour qu'un même prospect ne reçoive pas deux réponses
+    // différentes selon sa porte d'entrée.
+    // `null` = aucune redirection, la candidature Wav Premium suit son cours.
+    const offer = recommendedOfferForBudget(data.budget);
+    const redirectTarget: "academy" | "express" | null = offer === "premium" ? null : offer;
 
     setIsSubmitting(true);
     trackEvent("reserverunappel_submit", { profil: data.profil });
     identifyUser(data.email, { first_name: data.first_name, last_name: data.last_name });
     try {
-      // Full payload sent to the notification (email + Discord) — always includes budget.
-      // Single-choice answers are stored as readable labels so email/Discord/admin need no mapping.
-      // Q5 (declencheur) reuses the existing `goals` column.
-      const notifyPayload = {
+      // Ce qui part en base. Les réponses à choix unique sont stockées en libellés
+      // lisibles pour que l'email/Discord/admin n'aient rien à traduire.
+      // Q5 (declencheur) réutilise la colonne `goals` existante.
+      const dbPayload = {
         first_name: data.first_name,
         last_name: data.last_name,
         email: data.email,
@@ -148,13 +148,23 @@ export default function ReserverUnAppel() {
           ? (critereOptions.find((o) => o.value === data.accompagnement_critere)?.label ?? data.accompagnement_critere)
           : null,
         goals: data.declencheur,
-        budget: data.budget
-          ? `${data.budget}${redirectTarget === "academy" ? " (redirigé Wav Academy)" : redirectTarget === "express" ? " (redirigé Analyse Express)" : ""}`
-          : null,
+        // Code de tranche NU. Le suffixe « (redirigé …) » ne doit jamais atterrir
+        // ici : la colonne est relue par l'admin via BUDGET_LABELS, et une valeur
+        // concaténée y casse la traduction et s'affiche en code brut.
+        budget: data.budget || null,
         origin_source: data.origin_source || null,
         follower_since: data.follower_since || null,
         conversion_trigger: data.conversion_trigger || null,
         posthog_id: getPostHogId(),
+      };
+
+      // L'email et le Discord gardent le budget suffixé, comme avant — c'est de
+      // l'affichage, pas de la donnée.
+      const notifyPayload = {
+        ...dbPayload,
+        budget: data.budget
+          ? `${data.budget}${redirectTarget === "academy" ? " (redirigé Wav Academy)" : redirectTarget === "express" ? " (redirigé Analyse Express)" : ""}`
+          : null,
       };
 
       // Fire notification FIRST so the lead is always captured (email to admin + Discord),
@@ -165,7 +175,7 @@ export default function ReserverUnAppel() {
 
       const { error: dbError } = await supabase
         .from("wav_premium_applications")
-        .insert(notifyPayload);
+        .insert(dbPayload);
 
       const notifyResult = await notifyPromise.catch((err) => {
         console.error("Notification error:", err);
@@ -202,9 +212,10 @@ export default function ReserverUnAppel() {
     return (
       <Layout>
         <SEOHead
+          {...seoFor("/reserverunappel")}
           title="L'Analyse Express est faite pour toi | Fred Wav"
-          description="Commence par un état des lieux complet de ton compte TikTok pour 11,90 € : score de santé, analyse IA et plan d'action."
-          path="/reserverunappel"
+          description={`Commence par un état des lieux complet de ton compte TikTok pour ${EXPRESS_PRICE_LABEL} : score de santé, analyse IA et plan d'action.`}
+          noindex
         />
         <Section variant="cream" size="lg">
           <div className="max-w-xl mx-auto text-center">
@@ -218,7 +229,7 @@ export default function ReserverUnAppel() {
               Sans budget d'accompagnement, te vendre un appel n'aurait aucun sens. Ce qu'il te faut d'abord, c'est un état des lieux honnête de ton compte.
             </p>
             <p className="text-lg text-muted-foreground mb-8">
-              L'<strong>Analyse Express</strong> te donne pour <strong>11,90 €</strong> un diagnostic complet : score de santé, analyse IA détaillée et plan d'action concret. Tu sauras exactement où tu en es et quoi corriger.
+              L'<strong>Analyse Express</strong> te donne pour <strong>{EXPRESS_PRICE_LABEL}</strong> un diagnostic complet : score de santé, analyse IA détaillée et plan d'action concret. Tu sauras exactement où tu en es et quoi corriger.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="hero" size="xl" asChild>
@@ -246,9 +257,10 @@ export default function ReserverUnAppel() {
     return (
       <Layout>
         <SEOHead
+          {...seoFor("/reserverunappel")}
           title="La Wav Academy est faite pour toi | Fred Wav"
-          description="Ton budget colle parfaitement avec la Wav Academy : la méthode complète et la communauté à partir de 299 € (paiement unique, accès 3 mois)."
-          path="/reserverunappel"
+          description={`Ton budget colle parfaitement avec la Wav Academy : la méthode complète et la communauté à partir de ${ACADEMY_FROM} € (paiement unique, accès 3 mois).`}
+          noindex
         />
         <Section variant="cream" size="lg">
           <div className="max-w-xl mx-auto text-center">
@@ -259,10 +271,13 @@ export default function ReserverUnAppel() {
               La <span className="text-gold-gradient">Wav Academy</span> est faite pour toi.
             </h2>
             <p className="text-lg text-muted-foreground mb-4">
-              Avec ton budget, un accompagnement personnalisé avec moi n'est pas la bonne option — ce serait te survendre quelque chose qui ne te correspond pas.
+              Avec ton budget, un accompagnement individuel n'est pas la bonne option — ce serait te survendre quelque chose qui ne te correspond pas.
             </p>
             <p className="text-lg text-muted-foreground mb-8">
-              Mais la <strong>Wav Academy</strong> te donne accès à toute ma méthode, au diagnostic continu et à la communauté à partir de <strong>299 €</strong> (paiement unique, accès 3 mois). C'est exactement ce qu'il te faut pour démarrer.
+              La <strong>Wav Academy</strong> te donne accès à toute ma méthode, au diagnostic continu et à la communauté à partir de <strong>{ACADEMY_FROM} €</strong> (paiement unique, accès 3 mois). C'est exactement ce qu'il te faut pour démarrer.
+            </p>
+            <p className="text-sm text-muted-foreground mb-8">
+              Et si {ACADEMY_FROM} € d'un coup, c'est trop : jusqu'à <strong>4× sans frais avec PayPal</strong>, soit {(ACADEMY_FROM / 4).toFixed(2).replace(".", ",")} € par mois.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="hero" size="xl" asChild>
@@ -290,9 +305,10 @@ export default function ReserverUnAppel() {
     return (
       <Layout>
         <SEOHead
+          {...seoFor("/reserverunappel")}
           title="Demande envoyée - Réserver un appel | Fred Wav"
           description="Ta demande a bien été envoyée. Fred te recontacte par email sous 48h jours ouvrés."
-          path="/reserverunappel"
+          noindex
         />
         <Section variant="cream" size="lg">
           <div className="max-w-xl mx-auto text-center">
@@ -343,15 +359,12 @@ export default function ReserverUnAppel() {
   return (
     <Layout>
       <SEOHead
-        title="Réserver un appel | Fred Wav"
-        description="Premier contact avec Fred Wav : remplis le formulaire pour qu'on puisse échanger par écrit avant un éventuel appel."
-        path="/reserverunappel"
-        keywords="réserver un appel, contact fred wav, premier contact tiktok, coaching formats courts"
+        {...seoFor("/reserverunappel")}
       />
       <Section variant="cream" size="lg">
         <div className="max-w-2xl mx-auto text-center mb-10">
           <h1 className="font-display text-3xl md:text-4xl font-semibold tracking-tight mb-4">
-            Réserver un <span className="text-gold-gradient">appel</span>
+            <span className="text-gold-gradient">Wav Premium</span> — 30 jours d'accompagnement individuel
           </h1>
           <p className="text-muted-foreground text-lg">
             C'est notre premier contact. Plus j'ai d'infos sur ta situation, plus je peux répondre efficacement à ta demande.
@@ -623,7 +636,7 @@ export default function ReserverUnAppel() {
                 name="budget"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Quel est ton budget pour un accompagnement ? *</FormLabel>
+                    <FormLabel>Quel est ton budget mensuel pour un accompagnement ? *</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -631,11 +644,11 @@ export default function ReserverUnAppel() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="no_budget">Je n'ai pas de budget pour me faire accompagner</SelectItem>
-                        <SelectItem value="15_a_100">Entre 15€ et 100€</SelectItem>
-                        <SelectItem value="100_a_300">De 100€ à 300€</SelectItem>
-                        <SelectItem value="300_a_900">De 300€ à 900€</SelectItem>
-                        <SelectItem value="900_plus">900€ et +</SelectItem>
+                        {BUDGET_TIERS.map((tier) => (
+                          <SelectItem key={tier.value} value={tier.value}>
+                            {tier.label}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />

@@ -1,11 +1,12 @@
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { SEOHead } from "@/components/SEOHead";
+import { seoFor } from "@/config/seo";
 
 export default function PolitiqueConfidentialite() {
   return (
     <Layout>
-      <SEOHead title="Politique de Confidentialité | Fred Wav" description="Politique de confidentialité du site fredwav.com - Collecte, utilisation et protection de vos données personnelles conformément au RGPD." path="/politique-de-confidentialite" keywords="politique de confidentialité, RGPD, données personnelles" />
+      <SEOHead {...seoFor("/politique-de-confidentialite")} />
       <Section variant="default" size="lg">
         <div className="max-w-3xl mx-auto prose prose-neutral">
           <h1 className="font-display text-3xl md:text-4xl font-semibold mb-4">Politique de confidentialité</h1>

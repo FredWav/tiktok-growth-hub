@@ -20,6 +20,8 @@ import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SEOHead } from "@/components/SEOHead";
+import { seoFor } from "@/config/seo";
+import { ACADEMY_PLANS, ACADEMY_FEATURES, ACADEMY_FROM, CREATORS_COUNT } from "@/config/offers";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { trackPostHogEvent } from "@/lib/posthog";
@@ -102,44 +104,12 @@ const steps = [
 ];
 
 // ── Formules (3 Pass prépayés) ─────────────────────────────────────────────
+// Prix et libellés viennent de src/config/offers.ts — source unique partagée avec
+// la home, le comparateur, le sitemap et llms.txt.
 // Paiement unique : le « €/mois » affiché est un simple repère qui montre la réduction
-// quand on s'engage plus longtemps (99 → ~83 → ~75). Aucun abonnement, aucun échelonnement.
-type Plan = {
-  term: string;
-  months: number;
-  total: number;
-  monthly: number;
-  label: string;
-  duration: string;
-  save: string | null;
-  note: string;
-  highlight?: boolean;
-  badge?: string;
-};
-
-const PLANS: Plan[] = [
-  {
-    term: "3m", months: 3, total: 299, monthly: 100, label: "Fondation", duration: "3 mois",
-    save: null, note: "Pour poser des bases solides et trouver ton Format Signature.",
-  },
-  {
-    term: "6m", months: 6, total: 499, monthly: 83, label: "Accélération", duration: "6 mois",
-    save: "≈ 1 mois offert", note: "Le temps d'ancrer la méthode et de tenir le rythme.",
-    badge: "Populaire",
-  },
-  {
-    term: "12m", months: 12, total: 899, monthly: 75, label: "Maîtrise", duration: "12 mois",
-    save: "≈ 3 mois offerts", note: "Un an complet pour installer un système d'acquisition durable.",
-    highlight: true, badge: "Meilleure offre",
-  },
-];
-
-const PLAN_FEATURES = [
-  "Contenu stratégique quotidien (Tapis Roulant)",
-  "15 contenus en rotation permanente",
-  "Live hebdomadaire avec Fred",
-  "Discord premium (canaux avancés)",
-];
+// quand on s'engage plus longtemps (100 → ~83 → ~75). Aucun abonnement, aucun échelonnement.
+const PLANS = ACADEMY_PLANS;
+const PLAN_FEATURES = ACADEMY_FEATURES;
 
 // ── Témoignages vidéo (6 sélectionnés par Fred) ─────────────────────────────
 const VIDEO_TESTIMONIALS = [
@@ -244,9 +214,10 @@ export default function WavAcademy() {
     return (
       <Layout variant="landing">
         <SEOHead
-          title="Bienvenue dans le Wav Academy ! | Fred Wav"
+          {...seoFor("/wavacademy")}
+          title="Bienvenue dans la Wav Academy ! | Fred Wav"
           description="Ton accès Wav Academy est confirmé. Rejoins le Discord et commence ton premier diagnostic."
-          path="/wavacademy"
+          noindex
         />
         <Section variant="cream" size="xl">
           <div className="max-w-xl mx-auto text-center">
@@ -273,26 +244,7 @@ export default function WavAcademy() {
 
   return (
     <Layout variant="landing">
-      <SEOHead
-        title="Wav Academy — Le système de diagnostic continu pour créateurs | Fred Wav"
-        description="Diagnostique chaque vidéo, corrige en temps réel, casse ton plafond de vues. Le Wav Academy : diagnostic data (WavSocialScan) + contenu stratégique quotidien."
-        path="/wavacademy"
-        keywords="wav academy, diagnostic tiktok, wavsocialscan, contenu stratégique, formats courts"
-        schema={{
-          "@context": "https://schema.org",
-          "@type": "Service",
-          "name": "Wav Academy",
-          "serviceType": "Coaching stratégie formats courts (TikTok, Reels, Shorts)",
-          "description": "Système de diagnostic continu pour créateurs : analyse data de chaque vidéo via WavSocialScan, contenu stratégique quotidien et lives hebdomadaires avec Fred Wav.",
-          "provider": {
-            "@type": "Person",
-            "name": "Fred Wav",
-            "url": "https://fredwav.com"
-          },
-          "areaServed": "FR",
-          "url": "https://fredwav.com/wavacademy"
-        }}
-      />
+      <SEOHead {...seoFor("/wavacademy")} />
 
       {testMode && (
         <div className="bg-amber-500 text-black text-center text-sm font-semibold py-2 px-4">
@@ -328,7 +280,7 @@ export default function WavAcademy() {
             </Button>
           </div>
           <p className="text-sm text-muted-foreground mt-4">
-            Trois Pass prépayés, de 299 € à 899 €. Paiement unique, sans abonnement.
+            Trois Pass prépayés, de {ACADEMY_FROM} € à {PLANS[PLANS.length - 1].total} €. Paiement unique, sans abonnement.
           </p>
         </div>
       </Section>
@@ -402,7 +354,7 @@ export default function WavAcademy() {
               <p className="text-muted-foreground text-sm">sur les formats courts</p>
             </div>
             <div className="p-6 rounded-2xl bg-accent/40 border border-border">
-              <p className="font-display text-4xl font-bold text-primary mb-2">250+</p>
+              <p className="font-display text-4xl font-bold text-primary mb-2">{CREATORS_COUNT}</p>
               <p className="text-muted-foreground text-sm">créateurs accompagnés</p>
             </div>
             <div className="p-6 rounded-2xl bg-accent/40 border border-border">
@@ -514,6 +466,10 @@ export default function WavAcademy() {
               </li>
             ))}
           </ul>
+          {/* Option payante, volontairement distincte de ce qui est inclus. */}
+          <p className="text-xs text-muted-foreground text-center mt-5 pt-4 border-t border-border/60">
+            <strong className="text-foreground">En option :</strong> une fois membre, tu peux réserver des sessions individuelles avec moi à tarif réduit.
+          </p>
         </div>
 
         <p className="text-center text-sm text-muted-foreground mt-8 max-w-2xl mx-auto">
@@ -578,7 +534,7 @@ export default function WavAcademy() {
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
           <p className="text-cream/40 text-sm mt-4">
-            Dès 299 € · paiement unique · accès immédiat.
+            Dès {ACADEMY_FROM} € · paiement unique · accès immédiat.
           </p>
         </div>
       </Section>
@@ -694,7 +650,7 @@ export default function WavAcademy() {
       <div className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-background/95 backdrop-blur border-t border-border px-4 py-3 flex items-center justify-between gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
         <div className="leading-tight">
           <p className="text-xs text-muted-foreground">Wav Academy</p>
-          <p className="text-sm font-semibold">dès 299 €</p>
+          <p className="text-sm font-semibold">dès {ACADEMY_FROM} €</p>
         </div>
         <Button variant="hero" size="lg" className="flex-shrink-0" onClick={scrollToPlans}>
           Rejoindre

@@ -1,11 +1,12 @@
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { SEOHead } from "@/components/SEOHead";
+import { seoFor } from "@/config/seo";
 
 export default function CGV() {
   return (
     <Layout>
-      <SEOHead title="Conditions Générales de Vente | Fred Wav" description="CGV applicables aux prestations de conseil en stratégie de contenu proposées par Fred Wav." path="/cgv" keywords="conditions générales, cgv, mentions légales" />
+      <SEOHead {...seoFor("/cgv")} />
       <Section variant="default" size="lg">
         <div className="max-w-3xl mx-auto prose prose-neutral">
           <h1 className="font-display text-3xl md:text-4xl font-semibold mb-2">Conditions Générales de Vente (CGV) — Fred Wav</h1>
@@ -19,7 +20,6 @@ export default function CGV() {
             <li><strong>Adresse :</strong> 2 route de Malagué, 86270 Coussay-les-Bois, France</li>
             <li><strong>Contact :</strong> <a href="mailto:contact@fredwav.com" className="text-primary underline">contact@fredwav.com</a></li>
             <li><strong>TVA :</strong> Non applicable, article 293 B du CGI (franchise en base)</li>
-            <li><strong>Assurance :</strong> Responsabilité Civile Professionnelle — <em className="text-destructive font-semibold">[À COMPLÉTER — souscription RC Pro obligatoire]</em></li>
           </ul>
 
           {/* ARTICLE 2 */}

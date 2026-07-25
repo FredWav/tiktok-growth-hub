@@ -332,7 +332,7 @@ export default function AnalyseExpressResult() {
                   </div>
                   <Button asChild variant="hero" size="lg" className="shrink-0">
                     <Link to="/reserverunappel">
-                      Contacter Fred
+                      Candidater au Wav Premium
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>

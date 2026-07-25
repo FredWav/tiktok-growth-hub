@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useDiagnostic } from "@/contexts/DiagnosticContext";
 import { SEOHead } from "@/components/SEOHead";
+import { ACADEMY_FROM, recommendedOfferForBudget } from "@/config/offers";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Mail } from "lucide-react";
@@ -49,9 +50,12 @@ const DiagnosticResult = () => {
   const score = (audiencePoints[data.audience] || 0) + (objectifPoints[data.objectif] || 0) + (budgetPoints[data.budget] || 0);
   const scoreLabel = score < 40 ? "Compte instable" : score <= 70 ? "Potentiel non exploité" : "Compte structuré";
 
-  // ── Offer routing (aligné sur la grille : Express 11,90 € · Academy 299/499/899 € · Premium 1 499 €) ──
+  // ── Offre recommandée : source unique dans config/offers.ts, partagée avec
+  // /reserverunappel et /start. Les libellés majuscules restent inchangés car ils
+  // partent dans PostHog (`recommended_offer`) — ne pas casser l'historique.
+  const recommended = recommendedOfferForBudget(data.budget);
   const offer: "EXPRESS" | "ACADEMY" | "WAV_PREMIUM" =
-    data.budget === "no_budget" ? "EXPRESS" : data.budget === "900_plus" ? "WAV_PREMIUM" : "ACADEMY";
+    recommended === "premium" ? "WAV_PREMIUM" : recommended === "academy" ? "ACADEMY" : "EXPRESS";
 
   useEffect(() => {
     if (!isComplete) {
@@ -179,7 +183,7 @@ const DiagnosticResult = () => {
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground">
                   Avec ton budget, la Wav Academy est l'option la plus rentable : toute la méthode de Fred,
-                  le diagnostic continu de ton compte et la communauté, à partir de 299 € en paiement unique (accès 3 mois).
+                  le diagnostic continu de ton compte et la communauté, à partir de {ACADEMY_FROM} € en paiement unique (accès 3 mois).
                 </p>
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Contenu stratégique quotidien sur Discord</li>
@@ -230,7 +234,7 @@ const DiagnosticResult = () => {
                   }}
                 >
                   <Link to={BOOK_CALL_URL}>
-                    Contacter Fred <ArrowRight className="w-4 h-4 ml-2" />
+                    Candidater au Wav Premium <ArrowRight className="w-4 h-4 ml-2" />
                   </Link>
                 </Button>
                 <TrustedBy filter="premium" className="mt-4" />

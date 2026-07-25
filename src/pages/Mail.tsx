@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SEOHead } from "@/components/SEOHead";
+import { seoFor } from "@/config/seo";
 import { CheckCircle, Loader2, Gift, Zap, FileText, Lightbulb, ShieldAlert } from "lucide-react";
 
 const benefits = [
@@ -94,12 +95,7 @@ export default function MailPage() {
 
   return (
     <Layout>
-      <SEOHead
-        title="Guide des Hooks Gratuit (valeur 27€) — Fred Wav"
-        description="Télécharge gratuitement le guide des 120+ hooks TikTok qui captent l'attention en moins de 2 secondes. Testés sur des millions de vues."
-        path="/newsletter"
-        keywords="guide hooks tiktok, hooks gratuits, accroches tiktok, rétention tiktok, Fred Wav"
-      />
+      <SEOHead {...seoFor("/newsletter")} />
 
       <Section className="bg-background py-20 md:py-32">
         <div className="max-w-lg mx-auto">
@@ -136,7 +132,6 @@ export default function MailPage() {
                     </div>
                     <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight">
                       Reçois le guide Ultime des hooks{" "}
-                      <s className="text-muted-foreground font-normal">d'une valeur de 27€</s>{" "}
                       <span className="text-gold-gradient">gratuitement</span>
                     </h1>
                     <p className="text-sm font-semibold text-primary mt-1">

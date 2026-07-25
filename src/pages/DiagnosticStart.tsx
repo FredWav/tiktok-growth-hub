@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { SEOHead } from "@/components/SEOHead";
+import { seoFor } from "@/config/seo";
+import { recommendedOfferForBudget } from "@/config/offers";
 import { z } from "zod";
 import { Mail } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
@@ -102,12 +104,11 @@ const DiagnosticStart = () => {
   };
 
   const getRecommendedOffer = () => {
-    const { budget } = data;
-    // Routage aligné sur la grille : Express 11,90 € · Academy 299/499/899 € · Premium 1 499 €.
-    if (budget === "no_budget") return "express";
-    if (budget === "900_plus") return "wav_premium";
-    // 15-100 € et 300-900 € → Wav Academy (pass 3/6/12 mois)
-    return "wav_academy";
+    // Source unique : recommendedOfferForBudget() dans config/offers.ts, partagée
+    // avec /reserverunappel. Les libellés persistés en base et envoyés à PostHog
+    // (`recommended_offer`) restent inchangés pour ne pas casser l'historique.
+    const offer = recommendedOfferForBudget(data.budget);
+    return offer === "premium" ? "wav_premium" : offer === "academy" ? "wav_academy" : "express";
   };
 
   const handleIdentityNext = () => {
@@ -204,12 +205,7 @@ const DiagnosticStart = () => {
 
   return (
     <Layout>
-      <SEOHead
-        title="Diagnostic Stratégique TikTok Gratuit | Fred Wav"
-        description="Identifie ton point de blocage exact sur TikTok en 2 minutes. Diagnostic gratuit pour t'orienter vers la bonne stratégie."
-        path="/start"
-        keywords="diagnostic TikTok gratuit, audit TikTok, stratégie TikTok, blocage TikTok, Fred Wav"
-      />
+      <SEOHead {...seoFor("/start")} />
 
       {step > 0 && step <= TOTAL_STEPS && (
         <div className="fixed top-16 md:top-20 left-0 right-0 z-40">
@@ -313,7 +309,7 @@ const DiagnosticStart = () => {
             <div className="animate-fade-in space-y-6">
               <div className="text-center space-y-2 mb-8">
                 <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Étape 4 sur {TOTAL_STEPS}</p>
-                <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">Quel budget es-tu prêt à investir ?</h2>
+                <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">Quel budget mensuel es-tu prêt à investir ?</h2>
               </div>
               <div className="space-y-3 max-w-lg mx-auto">
                 <OptionCard icon={Eye} label="Je n'ai pas de budget pour ça" description="Je veux juste un état des lieux" selected={data.budget === "no_budget"} onClick={() => selectOption("budget", "no_budget", "budget", 4)} />

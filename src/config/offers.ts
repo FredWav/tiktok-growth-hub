@@ -98,16 +98,17 @@ export type RecommendedOffer = "express" | "academy" | "premium";
  * table n'est pas mise à jour. C'est le garde-fou qui survit à `strict: false`
  * dans tsconfig (contrairement à un switch, où un cas manquant passe en silence).
  *
- * ⚠️ La tranche 15-100 € pointe vers l'Academy parce que le paiement en 4× sans
- * frais met le pass Fondation à 74,75 €/mois — donc dans la tranche. Ce choix
- * dépend de l'unité de la question « Quel est ton budget ? », qui n'est
- * aujourd'hui précisée nulle part (au total ? par mois ?). À trancher avec Fred.
+ * Le budget déclaré est un montant MENSUEL (les questions le précisent).
+ *  - jusqu'à 100 €/mois → Academy : le pass Fondation revient à ~75-100 €/mois
+ *    (4× sans frais, ou 299 € en paiement unique)
+ *  - 100-300 €/mois → Academy, éventuellement complétée par des sessions à tarif membre
+ *  - au-delà de 300 €/mois → l'accompagnement individuel Wav Premium devient pertinent
  */
 const OFFER_BY_BUDGET: Record<BudgetTier, RecommendedOffer> = {
   no_budget: "express",
   "15_a_100": "academy",
   "100_a_300": "academy",
-  "300_a_900": "academy",
+  "300_a_900": "premium",
   "900_plus": "premium",
 };
 

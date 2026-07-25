@@ -398,7 +398,7 @@ export const ROUTE_SEO: RouteSeo[] = [
       "Fred Wav, expert formats courts, parcours, méthode data-driven, accompagnement créateur",
     noscript: {
       h1: "Je suis là pour tes résultats, pas pour te vendre du rêve",
-      body: "Stratégiste en contenu et formats courts, j'accompagne entrepreneurs et créateurs à construire une présence qui génère des clients, pas juste des likes. Mon approche : stratégie, analyse, performance mesurable.",
+      body: "Stratégiste en contenu et formats courts, j'accompagne entrepreneurs et créateurs à construire une présence qui sert vraiment leurs objectifs — des clients, ou la visibilité qui attire les marques — pas juste des vues sans lendemain. Mon approche : stratégie, analyse, performance mesurable.",
       links: [{ href: "/preuves", label: "Voir les résultats" }],
     },
     schema: {

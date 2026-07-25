@@ -636,7 +636,7 @@ export default function ReserverUnAppel() {
                 name="budget"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Quel est ton budget pour un accompagnement ? *</FormLabel>
+                    <FormLabel>Quel est ton budget mensuel pour un accompagnement ? *</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>

@@ -89,7 +89,7 @@ export default function APropos() {
             </h1>
             <p className="text-lg text-muted-foreground mb-6">
               Stratégiste en contenu et formats courts, j'accompagne entrepreneurs et créateurs
-              à construire une présence qui génère des clients, pas juste des likes. Découvre les <Link to="/preuves" className="text-primary underline hover:no-underline">résultats concrets</Link> de mes accompagnements.
+              à construire une présence qui sert vraiment leurs objectifs — des clients, ou la visibilité qui attire les marques — pas juste des vues sans lendemain. Découvre les <Link to="/preuves" className="text-primary underline hover:no-underline">résultats concrets</Link> de mes accompagnements.
             </p>
             <p className="text-muted-foreground">
               Mon approche est simple : stratégie, analyse, performance mesurable.

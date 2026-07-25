@@ -309,7 +309,7 @@ const DiagnosticStart = () => {
             <div className="animate-fade-in space-y-6">
               <div className="text-center space-y-2 mb-8">
                 <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Étape 4 sur {TOTAL_STEPS}</p>
-                <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">Quel budget es-tu prêt à investir ?</h2>
+                <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">Quel budget mensuel es-tu prêt à investir ?</h2>
               </div>
               <div className="space-y-3 max-w-lg mx-auto">
                 <OptionCard icon={Eye} label="Je n'ai pas de budget pour ça" description="Je veux juste un état des lieux" selected={data.budget === "no_budget"} onClick={() => selectOption("budget", "no_budget", "budget", 4)} />

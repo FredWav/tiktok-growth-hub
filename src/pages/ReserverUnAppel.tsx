@@ -5,7 +5,7 @@ import { z } from "zod";
 import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle2, Mail, Clock, Sparkles } from "lucide-react";
 import { trackEvent, getStoredUtmSource } from "@/lib/tracking";
-import { trackPostHogEvent, identifyUser, getPostHogId } from "@/lib/posthog";
+import { trackPostHogEvent, setUserProperties, getPostHogId } from "@/lib/posthog";
 import { cn } from "@/lib/utils";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
@@ -131,7 +131,9 @@ export default function ReserverUnAppel() {
 
     setIsSubmitting(true);
     trackEvent("reserverunappel_submit", { profil: data.profil });
-    identifyUser(data.email, { first_name: data.first_name, last_name: data.last_name });
+    // On garde l'identifiant anonyme PostHog : l'email n'est pas la clé d'identité,
+    // juste une propriété de personne (pas de PII comme distinct_id).
+    setUserProperties({ email: data.email, first_name: data.first_name, last_name: data.last_name });
     try {
       // Ce qui part en base. Les réponses à choix unique sont stockées en libellés
       // lisibles pour que l'email/Discord/admin n'aient rien à traduire.

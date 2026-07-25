@@ -27,7 +27,8 @@ export default function AnalyseExpress() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [subscribeToNewsletter, setSubscribeToNewsletter] = useState(true);
+  // Consentement marketing = acte positif (RGPD/CNIL) : décoché par défaut.
+  const [subscribeToNewsletter, setSubscribeToNewsletter] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 

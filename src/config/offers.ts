@@ -41,8 +41,15 @@ export const ACADEMY_PLANS: AcademyPlan[] = [
   },
 ];
 
-/** Prix d'entrée de l'Academy, utilisé partout où on écrit « dès X € ». */
-export const ACADEMY_FROM = Math.min(...ACADEMY_PLANS.map((p) => p.total));
+/**
+ * Formule d'entrée de l'Academy (la moins chère). Toute mention « dès X € »
+ * doit être accompagnée de sa durée : un prix nu ne veut rien dire quand
+ * l'offre est un accès à durée déterminée.
+ */
+export const ACADEMY_ENTRY = ACADEMY_PLANS.reduce((a, b) => (b.total < a.total ? b : a));
+
+/** Prix d'entrée de l'Academy. À toujours afficher avec ACADEMY_ENTRY.duration. */
+export const ACADEMY_FROM = ACADEMY_ENTRY.total;
 
 /**
  * Nombre de créateurs accompagnés — preuve sociale affichée sur plusieurs pages
@@ -152,7 +159,7 @@ export const OFFER_TIERS: OfferTier[] = [
   {
     need: "Je veux apprendre avec un cadre et une communauté",
     name: "Wav Academy",
-    price: `dès ${ACADEMY_FROM} €`,
+    price: `dès ${ACADEMY_FROM} € / ${ACADEMY_ENTRY.duration}`,
     href: "/wavacademy",
     cta: "Rejoindre la Wav Academy",
     featured: true,

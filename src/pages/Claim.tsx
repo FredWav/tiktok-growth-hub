@@ -5,7 +5,6 @@ import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { SEOHead } from "@/components/SEOHead";
-import { supabase } from "@/integrations/supabase/client";
 
 type Status = "loading" | "valid" | "claimed" | "expired" | "invalid" | "error";
 
@@ -32,30 +31,31 @@ export default function Claim() {
     }
 
     const fetchStatus = async () => {
+      // Appel en fetch direct, et NON via supabase.functions.invoke() : `invoke`
+      // n'accepte que { headers, method, body, signal, timeout }. Une option
+      // `query` y était passée pour transmettre le token — elle était
+      // silencieusement ignorée, la fonction recevait une requête sans token et
+      // répondait { status: "invalid" } en HTTP 200. Comme ce n'est pas une
+      // erreur HTTP, rien ne le signalait : TOUS les liens de claim valides
+      // affichaient « Lien invalide » et le bouton Discord n'apparaissait jamais.
+      const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/wavacademy-claim-status?token=${encodeURIComponent(token)}`;
+
       try {
-        const { data, error } = await supabase.functions.invoke("wavacademy-claim-status", {
-          method: "GET" as never,
-          // @ts-expect-error supabase-js doesn't type query for GET
-          query: { token },
+        const res = await fetch(url, {
+          // Les deux en-têtes : `apikey` seul ne suffit pas si la fonction est
+          // déployée avec verify_jwt activé.
+          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` },
         });
-        if (error) throw error;
-        if (data?.plan_label) setPlanLabel(data.plan_label);
-        const s = data?.status as Status | undefined;
+        const body = await res.json();
+        if (!res.ok) throw new Error(body?.error ?? `HTTP ${res.status}`);
+
+        if (body?.plan_label) setPlanLabel(body.plan_label);
+        const s = body?.status as Status | undefined;
         setStatus(s === "valid" || s === "claimed" || s === "expired" || s === "invalid" ? s : "error");
       } catch (e) {
         console.error("Failed to fetch claim status:", e);
-        // Fallback: try a direct fetch
-        try {
-          const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/wavacademy-claim-status?token=${encodeURIComponent(token)}`;
-          const r = await fetch(url, {
-            headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string },
-          });
-          const j = await r.json();
-          if (j?.plan_label) setPlanLabel(j.plan_label);
-          setStatus(j?.status ?? "error");
-        } catch {
-          setStatus("error");
-        }
+        setStatus("error");
       }
     };
     fetchStatus();

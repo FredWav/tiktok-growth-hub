@@ -67,10 +67,14 @@ serve(async (req) => {
           </p>
           <div style="margin-top: 24px; padding: 20px; background: rgba(200,169,126,0.08); border: 1px solid rgba(200,169,126,0.3); border-radius: 8px;">
             <p style="color: #c8a97e; font-size: 15px; font-weight: bold; margin: 0 0 8px 0;">📊 Tes crédits WavSocialScan</p>
+            <p style="color: #f5f0e8; font-size: 14px; line-height: 1.6; margin: 0 0 10px 0;">
+              Ton Pass <strong style="color: #c8a97e;">${planLabel}</strong>${months ? ` (<strong style="color: #c8a97e;">${months} mois</strong>)` : ""} inclut
+              <strong style="color: #c8a97e;">3 000 crédits WavSocialScan par mois</strong> pour analyser tes vidéos et ton compte.
+            </p>
             <p style="color: #f5f0e8; font-size: 14px; line-height: 1.6; margin: 0;">
-              Ton abonnement inclut <strong style="color: #c8a97e;">3 000 crédits WavSocialScan par mois</strong> pour analyser tes vidéos et ton compte.
-              Ils sont activés sur le compte lié à cet email (<strong>${email}</strong>) sous 24h.
-              Rendez-vous sur <a href="https://wavstats.com" style="color: #c8a97e;">wavstats.com</a> pour en profiter.
+              Crée ton compte sur <a href="https://wavstats.com" style="color: #c8a97e;">wavstats.com</a> avec
+              <strong style="color: #c8a97e;">cette adresse email</strong> (${email}) : c'est elle qui sert à rattacher tes crédits.
+              Je les active manuellement sous 48h ouvrées — si tu ne les vois pas passer, réponds simplement à cet email.
             </p>
           </div>
         </div>

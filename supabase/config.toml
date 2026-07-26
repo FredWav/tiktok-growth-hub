@@ -65,3 +65,14 @@ verify_jwt = false
 
 [functions.revoke-expired-wavacademy]
 verify_jwt = false
+
+# Appelée par une redirection navigateur depuis Discord OAuth : aucun header
+# Authorization n'est envoyé. Avec le défaut (verify_jwt = true), la passerelle
+# renvoie 401 avant même d'exécuter la fonction et l'attribution du rôle échoue.
+[functions.wavacademy-claim-callback]
+verify_jwt = false
+
+# Appelée en fetch direct depuis /claim/:token (page publique, visiteur non
+# connecté). La clé anon est bien envoyée, mais ce n'est pas un JWT de session.
+[functions.wavacademy-claim-status]
+verify_jwt = false

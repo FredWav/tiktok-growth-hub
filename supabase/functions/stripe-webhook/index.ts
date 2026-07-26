@@ -240,11 +240,12 @@ serve(async (req) => {
         }
       }
 
+      let claimEmailSent = false;
       if (claimToken) {
         try {
           const supabaseUrl = Deno.env.get("SUPABASE_URL");
           const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-          await fetch(`${supabaseUrl}/functions/v1/send-claim-email`, {
+          const mailRes = await fetch(`${supabaseUrl}/functions/v1/send-claim-email`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -252,10 +253,26 @@ serve(async (req) => {
             },
             body: JSON.stringify({ email, token: claimToken, plan_type: plan, access_months: accessMonths }),
           });
+
+          // `fetch` ne rejette QUE sur erreur réseau : sans ce contrôle, un 4xx/5xx
+          // (mot de passe SMTP invalide, refus OVH…) passait totalement inaperçu —
+          // pas de log, pas d'alerte, et Stripe recevait un 200 donc ne retentait rien.
+          if (!mailRes.ok) {
+            throw new Error(`HTTP ${mailRes.status}: ${(await mailRes.text()).slice(0, 300)}`);
+          }
+          claimEmailSent = true;
         } catch (mailErr) {
           console.error("Failed to invoke send-claim-email:", mailErr);
-          await safeNotifyError("WavAcademy Webhook", `Échec envoi email claim • ${email}`);
+          await safeNotifyError(
+            "WavAcademy Webhook",
+            `🚨 Email d'activation NON ENVOYÉ • ${email} • le client a payé et n'a rien reçu • token=${claimToken}`,
+          );
         }
+      } else {
+        await safeNotifyError(
+          "WavAcademy Webhook",
+          `🚨 Aucun token de claim généré • ${email} • le client a payé sans recevoir d'accès`,
+        );
       }
 
       // ── Provisioning WavStats (crédits WavSocialScan inclus dans l'offre) ──
@@ -281,7 +298,10 @@ serve(async (req) => {
         await safeNotifyError("WavAcademy Webhook", `⚠️ Provisioning WavStats non configuré • créditer manuellement ${email} (${accessMonths ?? "?"} mois)`);
       }
 
-      await safeNotifySuccess("WavAcademy", `Nouveau membre • ${plan} • ${accessMonths ?? "?"} mois • ${email} • claim envoyé`);
+      await safeNotifySuccess(
+        "WavAcademy",
+        `Nouveau membre • ${plan} • ${accessMonths ?? "?"} mois • ${email} • ${claimEmailSent ? "email d'activation envoyé" : "⚠️ EMAIL NON ENVOYÉ, à traiter à la main"}`,
+      );
 
       return jsonResponse({ received: true });
     }

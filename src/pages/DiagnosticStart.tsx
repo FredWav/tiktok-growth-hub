@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
+import { callRpc, isMissingFunction } from "@/lib/rpc";
 import { useDiagnostic } from "@/contexts/DiagnosticContext";
 import { ArrowRight, ArrowLeft, Users, TrendingUp, Crown, Eye, LayoutList, Coins, ShoppingBag, Clock, Zap, Rocket, DollarSign, HelpCircle } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
@@ -80,28 +81,44 @@ const DiagnosticStart = () => {
     const mode = leadIdRef.current ? "UPDATE" : "INSERT";
     devLog(`[Diagnostic] saveLead — mode=${mode}, step=${currentStep}, completed=${completed}, fields=`, fields);
     try {
+      // Une seule fonction serveur pour créer PUIS enrichir la ligne au fil des
+      // étapes. L'ancien code faisait `insert(...).select("id")` : le RETURNING
+      // était filtré par RLS (aucune policy SELECT), l'id n'était donc jamais
+      // récupéré et chaque étape recréait une ligne — un lead éclaté en autant
+      // de lignes orphelines que d'étapes.
+      const { data: id, error } = await callRpc<string>("upsert_diagnostic_lead", {
+        p_id: leadIdRef.current,
+        p_fields: fields,
+        p_step: currentStep,
+        p_completed: completed,
+      });
+
+      if (!error && id) {
+        leadIdRef.current = id;
+        devLog(`[Diagnostic] saveLead OK (${mode}), leadId=`, id);
+        return;
+      }
+
+      if (!isMissingFunction(error)) {
+        console.error("[Diagnostic] saveLead error:", error);
+        return;
+      }
+
+      // Migration pas encore appliquée : ancien chemin, pour ne rien perdre.
       if (!leadIdRef.current) {
-        const { data: row, error } = await supabase
+        const { data: row, error: insErr } = await supabase
           .from("diagnostic_leads" as any)
           .insert({ ...fields, current_step: currentStep, completed } as any)
           .select("id")
           .single();
-        if (error) {
-          console.error("[Diagnostic] INSERT error:", error);
-        } else if (row) {
-          leadIdRef.current = (row as any).id;
-          devLog("[Diagnostic] INSERT success, leadId=", leadIdRef.current);
-        }
+        if (insErr) console.error("[Diagnostic] INSERT error:", insErr);
+        else if (row) leadIdRef.current = (row as any).id;
       } else {
-        const { error } = await supabase
+        const { error: updErr } = await supabase
           .from("diagnostic_leads" as any)
           .update({ ...fields, current_step: currentStep, completed } as any)
           .eq("id", leadIdRef.current);
-        if (error) {
-          console.error("[Diagnostic] UPDATE error:", error);
-        } else {
-          devLog("[Diagnostic] UPDATE success, leadId=", leadIdRef.current);
-        }
+        if (updErr) console.error("[Diagnostic] UPDATE error:", updErr);
       }
     } catch (e) {
       console.error("[Diagnostic] saveLead exception:", e);

@@ -52,8 +52,6 @@ const DiagnosticProcessing = lazy(() => import("./pages/DiagnosticProcessing"));
 const DiagnosticResult = lazy(() => import("./pages/DiagnosticResult"));
 const Mail = lazy(() => import("./pages/Mail"));
 const WavAcademy = lazy(() => import("./pages/WavAcademy"));
-const AccompagnementReseauxSociaux = lazy(() => import("./pages/AccompagnementReseauxSociaux"));
-const AccompagnementTikTok = lazy(() => import("./pages/AccompagnementTikTok"));
 const Claim = lazy(() => import("./pages/Claim"));
 
 // Admin pages - lazy loaded
@@ -105,8 +103,6 @@ const App = () => (
             {/* Legacy URL — kept as redirect for backwards compat (old inbound links, emails, ads) */}
             <Route path="/wav-premium/candidature" element={<Navigate to="/reserverunappel" replace />} />
             <Route path="/wavacademy" element={<WavAcademy />} />
-            <Route path="/accompagnement-reseaux-sociaux" element={<AccompagnementReseauxSociaux />} />
-            <Route path="/accompagnement-tiktok" element={<AccompagnementTikTok />} />
             <Route path="/claim/error" element={<Claim />} />
             <Route path="/claim/:token" element={<Claim />} />
 

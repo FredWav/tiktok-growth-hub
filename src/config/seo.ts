@@ -72,53 +72,6 @@ export const HOME_FAQ = [
   },
 ];
 
-/**
- * FAQ de la page pilier /accompagnement-reseaux-sociaux.
- * Sert à la fois l'accordéon visible et le JSON-LD FAQPage prerendu (même source).
- * ⚠️ Draft à faire relire par Fred — voir les points signalés dans le message.
- */
-export const PILIER_FAQ = [
-  {
-    question: "C'est une formation ou un accompagnement ?",
-    answer: "Un accompagnement. Une formation te donne de l'information et te laisse te débrouiller ; moi je pars de tes vraies vidéos et de tes vraies stats, et on corrige ensemble, à ton rythme. Le mot « formation » revient souvent parce que tu apprends une méthode — mais tu ne la subis pas seul dans un module que tu n'ouvriras jamais.",
-  },
-  {
-    question: "Tu gères mes comptes à ma place ?",
-    answer: "Non, et c'est volontaire. Les agences qui postent à ta place te rendent dépendant : le jour où tu arrêtes de payer, tu es exactement au même point, tu n'as rien appris. Moi je t'apprends à lire tes chiffres et à corriger toi-même. Au bout, tu es autonome — c'est l'inverse d'une agence.",
-  },
-  {
-    question: "Ça marche sur Instagram et YouTube, ou juste TikTok ?",
-    answer: "La méthode est la même partout : accroche, rétention, appel à l'action, lecture des stats. La différence, c'est que TikTok donne les statistiques les plus lisibles et les plus précises — ailleurs, tu lis les grandes lignes plutôt que le détail. Donc oui, ça vaut pour tes Reels et tes Shorts. Une précision : mon outil de diagnostic automatisé (l'Analyse Express) ne couvre que TikTok pour l'instant, le reste passe par l'accompagnement.",
-  },
-  {
-    question: "Par quelle offre je commence ?",
-    answer: `Dans la plupart des cas, la Wav Academy : la méthode, l'outil, le live hebdo et la communauté à partir de ${ACADEMY_FROM} €, en paiement unique. Une fois membre, tu peux aussi réserver des sessions individuelles avec moi à tarif réduit si tu veux qu'on travaille ton compte en direct. Si tu veux d'abord un état des lieux, l'Analyse Express te le donne pour 11,90 € (TikTok). Et pour du suivi individuel intensif, c'est le Wav Premium, sur candidature.`,
-  },
-];
-
-/**
- * FAQ de la page satellite /accompagnement-tiktok.
- * ⚠️ Draft à faire relire par Fred.
- */
-export const SATELLITE_FAQ = [
-  {
-    question: "C'est de l'accompagnement organique ou de la pub ?",
-    answer: "Le cœur du travail, c'est l'organique : des vidéos qui performent sans budget média, parce que tu auras compris ce qui retient ton audience et ce qui la fait réagir — prospects, visibilité ou partenariats avec des marques. TikTok Shop, ce n'est pas mon terrain. La publicité n'est pas le point de départ, mais selon ton profil et ton objectif, on peut en parler.",
-  },
-  {
-    question: "Combien de vidéos avant de voir un changement ?",
-    answer: "Un créateur qui poste à l'aveugle met souvent 6 à 12 mois à trouver son format. En diagnostiquant chaque vidéo et en corrigeant un paramètre à la fois, on vise 15 à 20 vidéos calibrées plutôt que 300 au hasard. Ça se compte en semaines, pas en années — à condition de publier régulièrement.",
-  },
-  {
-    question: "Il me faut déjà une grosse audience ?",
-    answer: "Non. La méthode marche justement mieux quand on part sur des bases saines plutôt que sur six mois de mauvaises habitudes. Que tu en sois à ta 3e ou à ta 300e vidéo, on lit les mêmes signaux.",
-  },
-  {
-    question: "Et mes autres réseaux ?",
-    answer: "TikTok est la porte d'entrée, mais la méthode se transpose à tes Reels et tes Shorts — c'est tout l'objet de l'accompagnement réseaux sociaux, dont cette page n'est qu'une partie.",
-  },
-];
-
 export const ROUTE_SEO: RouteSeo[] = [
   {
     path: "/",
@@ -132,7 +85,6 @@ export const ROUTE_SEO: RouteSeo[] = [
       body: "Pas d'astuces d'algorithme, pas de promesses. J'analyse tes vraies données pour te montrer ce qui bloque ta visibilité — et on corrige, preuves à l'appui. Trois façons de travailler ensemble : la Wav Academy (l'offre principale), l'Analyse Express et le Wav Premium.",
       links: [
         { href: "/wavacademy", label: "Wav Academy — dès 299 €" },
-        { href: "/accompagnement-reseaux-sociaux", label: "Accompagnement réseaux sociaux" },
         { href: "/analyse-express", label: "Analyse Express — 11,90 €" },
         { href: "/reserverunappel", label: "Wav Premium — sur candidature" },
         { href: "/preuves", label: "Témoignages et résultats" },
@@ -164,123 +116,6 @@ export const ROUTE_SEO: RouteSeo[] = [
     sitemap: 1.0,
     llms: "Landing principale : la Wav Academy, l'Analyse Express et le Wav Premium, avec témoignages et preuves.",
     llmsSection: "principales",
-  },
-  {
-    path: "/accompagnement-reseaux-sociaux",
-    title: "Accompagnement réseaux sociaux formats courts | Fred Wav",
-    description:
-      "Un seul accompagnement multi-plateforme pour créateurs : TikTok, Reels, Shorts. Croissance organique, orientée créateur. Tu apprends à lire tes stats et à corriger tes vidéos.",
-    keywords:
-      "accompagnement réseaux sociaux, accompagnement créateur de contenu, coach réseaux sociaux formats courts, accompagnement instagram reels créateur, accompagnement youtube shorts créateur",
-    noscript: {
-      h1: "Accompagnement réseaux sociaux : une méthode formats courts, multi-plateforme, pour créateurs",
-      body: "Un seul accompagnement, pas quatre formations. La logique des formats courts — accroche, rétention, appel à l'action, lecture des stats — est la même sur TikTok, Reels et Shorts. Organique, orienté créateur : je t'apprends à corriger toi-même, je ne gère pas tes comptes à ta place.",
-      links: [
-        { href: "/accompagnement-tiktok", label: "Accompagnement TikTok créateur" },
-        { href: "/wavacademy", label: "Wav Academy — la méthode et la communauté" },
-        { href: "/reserverunappel", label: "Wav Premium — suivi individuel" },
-        { href: "/analyse-express", label: "Analyse Express — audit TikTok" },
-      ],
-    },
-    schema: [
-      {
-        "@context": "https://schema.org",
-        "@type": "Service",
-        name: "Accompagnement réseaux sociaux — formats courts",
-        serviceType: "Accompagnement créateur de contenu multi-plateforme (TikTok, Reels, Shorts)",
-        description:
-          "Accompagnement organique pour créateurs et entrepreneurs sur les formats courts, multi-plateforme (TikTok, Instagram Reels, YouTube Shorts). Apprentissage de la lecture des statistiques et correction des vidéos, sans gestion de compte déléguée.",
-        provider: { "@type": "Person", name: "Fred Wav", url: BASE_URL },
-        areaServed: "FR",
-        url: `${BASE_URL}/accompagnement-reseaux-sociaux`,
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        mainEntity: PILIER_FAQ.map((item) => ({
-          "@type": "Question",
-          name: item.question,
-          acceptedAnswer: { "@type": "Answer", text: item.answer },
-        })),
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Accueil", item: `${BASE_URL}/` },
-          {
-            "@type": "ListItem",
-            position: 2,
-            name: "Accompagnement réseaux sociaux",
-            item: `${BASE_URL}/accompagnement-reseaux-sociaux`,
-          },
-        ],
-      },
-    ],
-    sitemap: 0.85,
-    llms: "Page pilier : l'accompagnement créateur multi-plateforme (TikTok, Reels, Shorts) orienté formats courts, organique. Un seul accompagnement, pas quatre formations ; renvoie vers la Wav Academy, le Wav Premium et l'Analyse Express.",
-    llmsSection: "offres",
-  },
-  {
-    path: "/accompagnement-tiktok",
-    title: "Accompagnement TikTok créateur, organique | Fred Wav",
-    description:
-      "Accompagnement TikTok pour créateurs et entrepreneurs : hooks, rétention, lecture de tes stats. Croissance organique en formats courts, hors TikTok Shop.",
-    keywords:
-      "accompagnement tiktok, accompagnement tiktok créateur, coach tiktok formats courts, accompagnement tiktok organique, croissance tiktok organique",
-    noscript: {
-      h1: "Accompagnement TikTok pour créateurs — organique, en formats courts",
-      body: "Un accompagnement TikTok centré sur la croissance organique : hooks, rétention, lecture de tes analytics, régularité. De la vidéo qui travaille pour toi — prospects, visibilité ou marques — hors TikTok Shop. TikTok n'est qu'une porte d'entrée : la méthode se transpose ensuite à tes Reels et tes Shorts.",
-      links: [
-        { href: "/accompagnement-reseaux-sociaux", label: "L'accompagnement multi-plateforme" },
-        { href: "/wavacademy", label: "Wav Academy — la méthode complète" },
-        { href: "/analyse-express", label: "Lance ton audit TikTok" },
-      ],
-    },
-    schema: [
-      {
-        "@context": "https://schema.org",
-        "@type": "Service",
-        name: "Accompagnement TikTok — créateurs, organique",
-        serviceType: "Accompagnement TikTok créateur (croissance organique, formats courts)",
-        description:
-          "Accompagnement TikTok pour créateurs et entrepreneurs axé sur la croissance organique : hooks, rétention, lecture des analytics et régularité. Hors TikTok Shop.",
-        provider: { "@type": "Person", name: "Fred Wav", url: BASE_URL },
-        areaServed: "FR",
-        url: `${BASE_URL}/accompagnement-tiktok`,
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        mainEntity: SATELLITE_FAQ.map((item) => ({
-          "@type": "Question",
-          name: item.question,
-          acceptedAnswer: { "@type": "Answer", text: item.answer },
-        })),
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Accueil", item: `${BASE_URL}/` },
-          {
-            "@type": "ListItem",
-            position: 2,
-            name: "Accompagnement réseaux sociaux",
-            item: `${BASE_URL}/accompagnement-reseaux-sociaux`,
-          },
-          {
-            "@type": "ListItem",
-            position: 3,
-            name: "Accompagnement TikTok",
-            item: `${BASE_URL}/accompagnement-tiktok`,
-          },
-        ],
-      },
-    ],
-    sitemap: 0.8,
-    llms: "Page satellite : l'accompagnement TikTok créateur, croissance organique en formats courts (hors TikTok Shop). Enfant de la page pilier accompagnement réseaux sociaux.",
-    llmsSection: "offres",
   },
   {
     path: "/wavacademy",

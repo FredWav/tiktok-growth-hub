@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { getStoredUtmForPageView } from "./tracking";
 
 let currentPageViewId: string | null = null;
 let pageEnteredAt: number | null = null;
@@ -34,9 +35,8 @@ export async function trackPageView(path: string) {
   const sessionId = getSessionId();
   const visitorId = getVisitorId();
   const referrer = document.referrer || null;
-  const utmSource = localStorage.getItem("utm_source") || null;
-  const utmMedium = localStorage.getItem("utm_medium") || null;
-  const utmCampaign = localStorage.getItem("utm_campaign") || null;
+  // Last-touch avec expiration (90 j) : une vieille campagne ne crédite plus les visites directes.
+  const { utm_source: utmSource, utm_medium: utmMedium, utm_campaign: utmCampaign } = getStoredUtmForPageView();
 
   pageEnteredAt = Date.now();
 

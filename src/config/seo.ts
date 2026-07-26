@@ -14,7 +14,7 @@
  * Pur data : aucun import React, aucune API navigateur (importé par vite.config.ts).
  */
 
-import { ACADEMY_PLANS, ACADEMY_FROM, EXPRESS_PRICE, PREMIUM_DURATION_DAYS } from "./offers";
+import { ACADEMY_PLANS, ACADEMY_FROM, ACADEMY_ENTRY, EXPRESS_PRICE, PREMIUM_DURATION_DAYS } from "./offers";
 
 export const BASE_URL = "https://fredwav.com";
 export const OG_IMAGE = `${BASE_URL}/og-image.png`;
@@ -44,7 +44,7 @@ const academyPricing = ACADEMY_PLANS.map((p) => `${p.duration} (${p.total} €)`
 export const HOME_FAQ = [
   {
     question: "Par où je commence ?",
-    answer: `La Wav Academy, dans la quasi-totalité des cas : tu accèdes à la méthode, à l'outil de diagnostic, au live hebdo et à la communauté à partir de ${ACADEMY_FROM} €, en paiement unique. Si tu veux d'abord un état des lieux de ton compte, l'Analyse Express te le donne pour 11,90 €.`,
+    answer: `La Wav Academy, dans la quasi-totalité des cas : tu accèdes à la méthode, à l'outil de diagnostic, au live hebdo et à la communauté à partir de ${ACADEMY_FROM} € pour ${ACADEMY_ENTRY.duration} d'accès, en paiement unique. Si tu veux d'abord un état des lieux de ton compte, l'Analyse Express te le donne pour 11,90 €.`,
   },
   {
     question: "Quelle différence entre la Wav Academy et le Wav Premium ?",

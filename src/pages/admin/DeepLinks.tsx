@@ -24,7 +24,7 @@ interface DeepLink {
   created_at: string;
 }
 
-const DOMAIN = "fredwav.lovable.app";
+const DOMAIN = "fredwav.com";
 
 const DeepLinks = () => {
   const [links, setLinks] = useState<DeepLink[]>([]);

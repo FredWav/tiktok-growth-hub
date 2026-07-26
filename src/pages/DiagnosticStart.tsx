@@ -12,12 +12,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
+import { callRpc, isMissingFunction } from "@/lib/rpc";
 import { useDiagnostic } from "@/contexts/DiagnosticContext";
 import { ArrowRight, ArrowLeft, Users, TrendingUp, Crown, Eye, LayoutList, Coins, ShoppingBag, Clock, Zap, Rocket, DollarSign, HelpCircle } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
 import { trackPostHogEvent } from "@/lib/posthog";
 import { TrustedBy } from "@/components/TrustedBy";
 
+
+// Logger de debug gaté sur le dev : ne jamais imprimer email/pseudo/nom en prod.
+const devLog = (...args: unknown[]) => {
+  if (import.meta.env.DEV) console.log(...args);
+};
 
 const TOTAL_STEPS = 7;
 
@@ -73,30 +79,46 @@ const DiagnosticStart = () => {
 
   const saveLead = async (fields: Record<string, any>, currentStep: number, completed = false) => {
     const mode = leadIdRef.current ? "UPDATE" : "INSERT";
-    console.log(`[Diagnostic] saveLead — mode=${mode}, step=${currentStep}, completed=${completed}, fields=`, fields);
+    devLog(`[Diagnostic] saveLead — mode=${mode}, step=${currentStep}, completed=${completed}, fields=`, fields);
     try {
+      // Une seule fonction serveur pour créer PUIS enrichir la ligne au fil des
+      // étapes. L'ancien code faisait `insert(...).select("id")` : le RETURNING
+      // était filtré par RLS (aucune policy SELECT), l'id n'était donc jamais
+      // récupéré et chaque étape recréait une ligne — un lead éclaté en autant
+      // de lignes orphelines que d'étapes.
+      const { data: id, error } = await callRpc<string>("upsert_diagnostic_lead", {
+        p_id: leadIdRef.current,
+        p_fields: fields,
+        p_step: currentStep,
+        p_completed: completed,
+      });
+
+      if (!error && id) {
+        leadIdRef.current = id;
+        devLog(`[Diagnostic] saveLead OK (${mode}), leadId=`, id);
+        return;
+      }
+
+      if (!isMissingFunction(error)) {
+        console.error("[Diagnostic] saveLead error:", error);
+        return;
+      }
+
+      // Migration pas encore appliquée : ancien chemin, pour ne rien perdre.
       if (!leadIdRef.current) {
-        const { data: row, error } = await supabase
+        const { data: row, error: insErr } = await supabase
           .from("diagnostic_leads" as any)
           .insert({ ...fields, current_step: currentStep, completed } as any)
           .select("id")
           .single();
-        if (error) {
-          console.error("[Diagnostic] INSERT error:", error);
-        } else if (row) {
-          leadIdRef.current = (row as any).id;
-          console.log("[Diagnostic] INSERT success, leadId=", leadIdRef.current);
-        }
+        if (insErr) console.error("[Diagnostic] INSERT error:", insErr);
+        else if (row) leadIdRef.current = (row as any).id;
       } else {
-        const { error } = await supabase
+        const { error: updErr } = await supabase
           .from("diagnostic_leads" as any)
           .update({ ...fields, current_step: currentStep, completed } as any)
           .eq("id", leadIdRef.current);
-        if (error) {
-          console.error("[Diagnostic] UPDATE error:", error);
-        } else {
-          console.log("[Diagnostic] UPDATE success, leadId=", leadIdRef.current);
-        }
+        if (updErr) console.error("[Diagnostic] UPDATE error:", updErr);
       }
     } catch (e) {
       console.error("[Diagnostic] saveLead exception:", e);
@@ -114,7 +136,7 @@ const DiagnosticStart = () => {
   const handleIdentityNext = () => {
     // Strip leading @ if user types it
     const handle = data.tiktokUrl.replace(/^@/, "");
-    console.log("[Diagnostic] handleIdentityNext — firstName:", data.firstName, "tiktokHandle:", handle);
+    devLog("[Diagnostic] handleIdentityNext — firstName:", data.firstName, "tiktokHandle:", handle);
     const result = identitySchema.safeParse({ firstName: data.firstName, tiktokHandle: handle });
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
@@ -123,40 +145,42 @@ const DiagnosticStart = () => {
         // Map schema field name to context field name for error display
         fieldErrors[key === "tiktokHandle" ? "tiktokUrl" : key] = e.message;
       });
-      console.log("[Diagnostic] Identity validation failed:", fieldErrors);
+      devLog("[Diagnostic] Identity validation failed:", fieldErrors);
       setErrors(fieldErrors);
       return;
     }
     // Store cleaned handle back
     updateField("tiktokUrl", handle);
     setErrors({});
-    console.log("[Diagnostic] Identity validated → step 2");
-    trackEvent("diagnostic_step_identity", { tiktok: handle });
+    devLog("[Diagnostic] Identity validated → step 2");
+    // Pas de PII dans les events analytics : le pseudo est déjà persisté en base.
+    trackEvent("diagnostic_step_identity");
     trackPostHogEvent("step_completed", { step_name: "Identity", value_selected: "completed" });
     saveLead({ first_name: data.firstName, tiktok: handle }, 1);
     setStep(2);
   };
 
   const handleEmailNext = () => {
-    console.log("[Diagnostic] handleEmailNext — email:", data.email);
+    devLog("[Diagnostic] handleEmailNext — email:", data.email);
     const result = emailSchema.safeParse({ email: data.email });
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
       result.error.errors.forEach((e) => { if (e.path[0]) fieldErrors[e.path[0] as string] = e.message; });
-      console.log("[Diagnostic] Email validation failed:", fieldErrors);
+      devLog("[Diagnostic] Email validation failed:", fieldErrors);
       setErrors(fieldErrors);
       return;
     }
     setErrors({});
-    console.log("[Diagnostic] Email validated → step 7");
-    trackEvent("diagnostic_step_email", { email: data.email });
+    devLog("[Diagnostic] Email validated → step 7");
+    // Pas d'email dans les events analytics (il partait vers GA + PostHog).
+    trackEvent("diagnostic_step_email");
     trackPostHogEvent("step_completed", { step_name: "Email", value_selected: "completed" });
     saveLead({ email: data.email }, 6);
     setStep(7);
   };
 
   const handleBlockerNext = () => {
-    console.log("[Diagnostic] handleBlockerNext — blocage:", data.blocage.trim());
+    devLog("[Diagnostic] handleBlockerNext — blocage:", data.blocage.trim());
     if (!data.blocage.trim()) {
       setErrors({ blocage: "Sélectionne une option" });
       return;
@@ -164,8 +188,8 @@ const DiagnosticStart = () => {
     setErrors({});
     trackPostHogEvent("diagnostic_form_submitted", { audience: data.audience, objectif: data.objectif, budget: data.budget, time_available: data.temps });
     const recommendedOffer = getRecommendedOffer();
-    console.log("[Diagnostic] handleBlockerNext — recommendedOffer:", recommendedOffer);
-    console.log("[Diagnostic] Full context:", {
+    devLog("[Diagnostic] handleBlockerNext — recommendedOffer:", recommendedOffer);
+    devLog("[Diagnostic] Full context:", {
       firstName: data.firstName,
       tiktokUrl: data.tiktokUrl,
       audience: data.audience,
@@ -189,15 +213,16 @@ const DiagnosticStart = () => {
       true
     );
     sessionStorage.setItem("from_diagnostic", "true");
-    console.log("[Diagnostic] Navigating to /processing");
+    devLog("[Diagnostic] Navigating to /processing");
     navigate("/processing");
   };
 
   const selectOption = (field: keyof typeof data, value: string, dbField: string, stepNum: number) => {
-    console.log(`[Diagnostic] selectOption — field=${field}, value=${value}, dbField=${dbField}, step=${stepNum} → ${stepNum + 1}`);
+    devLog(`[Diagnostic] selectOption — field=${field}, value=${value}, dbField=${dbField}, step=${stepNum} → ${stepNum + 1}`);
     const stepNameMap: Record<string, string> = { audience: "Audience", objectif: "Objectif", budget: "Budget", temps: "Temps" };
     updateField(field, value);
-    trackEvent(`diagnostic_step_${field}`, { [field]: value });
+    // Nom d'event FIXE (pas de nom dynamique) : le champ et sa valeur sont des propriétés.
+    trackEvent("diagnostic_step_selected", { step: field, value });
     trackPostHogEvent("step_completed", { step_name: stepNameMap[field] || field, value_selected: value });
     saveLead({ [dbField]: value }, stepNum);
     setTimeout(() => setStep(stepNum + 1), 250);

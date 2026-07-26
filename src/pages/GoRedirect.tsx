@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { callRpc, isMissingFunction } from "@/lib/rpc";
 import { Loader2 } from "lucide-react";
 
 const GoRedirect = () => {
@@ -11,25 +12,33 @@ const GoRedirect = () => {
     if (!slug) return;
 
     const redirect = async () => {
-      const { data, error: fetchError } = await supabase
-        .from("deep_links")
-        .select("youtube_id, clicks_count")
-        .eq("slug", slug)
-        .single();
+      // Résolution du slug ET incrément du compteur en un seul appel serveur.
+      // L'ancien code faisait un UPDATE direct, refusé par RLS (aucune policy
+      // UPDATE publique) : le compteur de clics ne montait jamais.
+      let youtubeId: string | null = null;
 
-      if (fetchError || !data) {
+      const { data: rows, error: rpcError } = await callRpc<{ youtube_id: string }[]>(
+        "increment_deep_link_click",
+        { p_slug: slug },
+      );
+
+      if (!rpcError && rows?.length) {
+        youtubeId = rows[0].youtube_id;
+      } else if (isMissingFunction(rpcError)) {
+        // Migration pas encore appliquée : on redirige quand même (le compteur
+        // reste bloqué, comme aujourd'hui) plutôt que de casser le lien.
+        const { data } = await supabase
+          .from("deep_links")
+          .select("youtube_id")
+          .eq("slug", slug)
+          .single();
+        youtubeId = data?.youtube_id ?? null;
+      }
+
+      if (!youtubeId) {
         setError(true);
         return;
       }
-
-      // Increment clicks (fire and forget)
-      supabase
-        .from("deep_links")
-        .update({ clicks_count: data.clicks_count + 1 })
-        .eq("slug", slug)
-        .then();
-
-      const youtubeId = data.youtube_id;
 
       // Try deep link to YouTube app
       window.location.href = `youtube://www.youtube.com/watch?v=${youtubeId}`;

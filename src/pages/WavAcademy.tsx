@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SEOHead } from "@/components/SEOHead";
 import { seoFor } from "@/config/seo";
-import { ACADEMY_PLANS, ACADEMY_FEATURES, ACADEMY_FROM, CREATORS_COUNT } from "@/config/offers";
+import { ACADEMY_PLANS, ACADEMY_FEATURES, ACADEMY_FROM, ACADEMY_ENTRY, CREATORS_COUNT } from "@/config/offers";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { trackPostHogEvent } from "@/lib/posthog";
@@ -180,12 +180,12 @@ export default function WavAcademy() {
     setSelectedTerm(term);
     form.reset();
     setDialogOpen(true);
-    trackPostHogEvent("wavclub_checkout_open", { term });
+    trackPostHogEvent("academy_checkout_open", { term });
   };
 
   const onCheckout = async (data: CheckoutForm) => {
     setIsSubmitting(true);
-    trackPostHogEvent("wavclub_checkout_submit", { term: selectedTerm });
+    trackPostHogEvent("academy_checkout_submit", { term: selectedTerm });
     try {
       const { data: result, error } = await supabase.functions.invoke("record-wavacademy-consent", {
         body: {
@@ -534,7 +534,7 @@ export default function WavAcademy() {
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
           <p className="text-cream/40 text-sm mt-4">
-            Dès {ACADEMY_FROM} € · paiement unique · accès immédiat.
+            Dès {ACADEMY_FROM} € pour {ACADEMY_ENTRY.duration} d'accès · paiement unique · démarrage immédiat.
           </p>
         </div>
       </Section>
@@ -650,7 +650,7 @@ export default function WavAcademy() {
       <div className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-background/95 backdrop-blur border-t border-border px-4 py-3 flex items-center justify-between gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
         <div className="leading-tight">
           <p className="text-xs text-muted-foreground">Wav Academy</p>
-          <p className="text-sm font-semibold">dès {ACADEMY_FROM} €</p>
+          <p className="text-sm font-semibold">dès {ACADEMY_FROM} € / {ACADEMY_ENTRY.duration}</p>
         </div>
         <Button variant="hero" size="lg" className="flex-shrink-0" onClick={scrollToPlans}>
           Rejoindre

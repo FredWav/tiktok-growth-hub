@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { BUDGET_LABELS } from "@/config/offers";
+import { BUDGET_LABELS, ACADEMY_PLANS, EXPRESS_PRICE } from "@/config/offers";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid,
   PieChart as RechartsPie, Pie, Cell, Tooltip as RechartsTooltip,
@@ -29,6 +29,10 @@ interface Lead {
   budget: string | null;
   posthog_id: string | null;
   email: string | null;
+  /** Nombre de touchpoints de cette personne (dédup par email). */
+  touchpoints?: number;
+  /** Toutes les offres vues par cette personne (parcours multi-produits). */
+  offers?: string[];
 }
 
 const budgetLabels: Record<string, string> = {
@@ -54,15 +58,26 @@ const CHART_COLORS = [
   "hsl(43, 30%, 55%)",
 ];
 
-const FUNNEL_STEPS = [
-  "Démarré",
-  "Identité",
-  "Niveau",
-  "Objectif",
-  "Blocage",
-  "Budget",
-  "Complété",
+// Étapes réelles du tunnel /start, alignées sur les current_step écrits par
+// DiagnosticStart.saveLead : 1 Identité, 2 Niveau, 3 Objectif, 4 Budget, 5 Temps,
+// 6 Email, puis `completed=true` au blocage final. Les anciens libellés étaient
+// décalés (« Blocage » mesurait en fait Budget).
+type DiagStep = { current_step?: number | null; completed?: boolean | null };
+const FUNNEL_STEPS: { label: string; reached: (d: DiagStep) => boolean }[] = [
+  { label: "Démarré", reached: () => true },
+  { label: "Identité", reached: (d) => d.current_step >= 1 },
+  { label: "Niveau", reached: (d) => d.current_step >= 2 },
+  { label: "Objectif", reached: (d) => d.current_step >= 3 },
+  { label: "Budget", reached: (d) => d.current_step >= 4 },
+  { label: "Temps", reached: (d) => d.current_step >= 5 },
+  { label: "Email", reached: (d) => d.current_step >= 6 },
+  { label: "Complété", reached: (d) => d.completed === true },
 ];
+
+// Prix Academy par durée d'accès (access_months), pour dériver le CA.
+const ACADEMY_PRICE_BY_MONTHS: Record<number, number> = Object.fromEntries(
+  ACADEMY_PLANS.map((p) => [p.months, p.total]),
+);
 
 export default function AdminMarketing() {
   // UTM Generator state
@@ -101,7 +116,7 @@ export default function AdminMarketing() {
         .select("*")
         .gte("entered_at", thirtyDaysAgo)
         .order("entered_at", { ascending: false })
-        .limit(1000);
+        .limit(10000);
       if (error) throw error;
       return (data || []) as any[];
     },
@@ -115,34 +130,43 @@ export default function AdminMarketing() {
         .from("diagnostic_leads" as any)
         .select("current_step, completed")
         .order("created_at", { ascending: false })
-        .limit(1000);
+        .limit(10000);
       if (error) throw error;
       return (data || []) as any[];
     },
   });
 
   // ---- Top pages ----
+  // Durée moyenne calculée seulement sur les vues avec durée > 0 (cohérent avec le KPI global),
+  // sinon les vues « just arrived » à 0 s tirent la moyenne vers le bas.
   const topPages = useMemo(() => {
-    const grouped: Record<string, { views: number; totalDuration: number }> = {};
+    const grouped: Record<string, { views: number; totalDuration: number; durationCount: number }> = {};
     pageViews.forEach((pv: any) => {
       const path = pv.path || "/";
-      if (!grouped[path]) grouped[path] = { views: 0, totalDuration: 0 };
+      if (!grouped[path]) grouped[path] = { views: 0, totalDuration: 0, durationCount: 0 };
       grouped[path].views++;
-      grouped[path].totalDuration += pv.duration_seconds || 0;
+      if (pv.duration_seconds > 0) {
+        grouped[path].totalDuration += pv.duration_seconds;
+        grouped[path].durationCount++;
+      }
     });
     return Object.entries(grouped)
-      .map(([path, { views, totalDuration }]) => ({
+      .map(([path, { views, totalDuration, durationCount }]) => ({
         path,
         views,
-        avgDuration: views > 0 ? Math.round(totalDuration / views) : 0,
+        avgDuration: durationCount > 0 ? Math.round(totalDuration / durationCount) : 0,
       }))
       .sort((a, b) => b.views - a.views)
       .slice(0, 10);
   }, [pageViews]);
 
   // ---- Visit sources (from page_views) ----
+  // Comptées en VISITEURS uniques par source (visitor_id distinct), pas en pages vues :
+  // un visiteur qui voit 5 pages ne doit compter qu'une fois. Fallback compteur brut
+  // pour les rares lignes sans visitor_id.
   const visitSources = useMemo(() => {
-    const grouped: Record<string, number> = {};
+    const bySource: Record<string, Set<string>> = {};
+    const anon: Record<string, number> = {};
     pageViews.forEach((pv: any) => {
       let src = pv.utm_source || "";
       if (!src && pv.referrer) {
@@ -153,11 +177,16 @@ export default function AdminMarketing() {
         }
       }
       if (!src) src = "Direct";
-      grouped[src] = (grouped[src] || 0) + 1;
+      if (pv.visitor_id) {
+        (bySource[src] ??= new Set<string>()).add(pv.visitor_id);
+      } else {
+        anon[src] = (anon[src] || 0) + 1;
+      }
     });
-    return Object.entries(grouped)
-      .sort((a, b) => b[1] - a[1])
-      .map(([name, value]) => ({ name, value }));
+    const names = new Set([...Object.keys(bySource), ...Object.keys(anon)]);
+    return [...names]
+      .map((name) => ({ name, value: (bySource[name]?.size || 0) + (anon[name] || 0) }))
+      .sort((a, b) => b.value - a.value);
   }, [pageViews]);
 
   // ---- Average duration KPI ----
@@ -179,12 +208,8 @@ export default function AdminMarketing() {
     const total = diagnosticLeads.length;
     if (!total) return [];
 
-    // Count leads that reached at least step N
-    return FUNNEL_STEPS.map((label, stepIndex) => {
-      const count = diagnosticLeads.filter((d: any) => {
-        if (stepIndex === 6) return d.completed;
-        return d.current_step >= stepIndex;
-      }).length;
+    return FUNNEL_STEPS.map(({ label, reached }) => {
+      const count = diagnosticLeads.filter((d) => reached(d)).length;
       const rate = total > 0 ? Math.round((count / total) * 100) : 0;
       return { step: label, count, rate };
     });
@@ -193,21 +218,24 @@ export default function AdminMarketing() {
   // ---- UTM breakdown: source / medium / campaign ----
   const utmBreakdown = useMemo(() => {
     const aggregate = (key: "utm_source" | "utm_medium" | "utm_campaign") => {
-      const grouped: Record<string, { views: number; visitors: Set<string>; totalDuration: number }> = {};
+      const grouped: Record<string, { views: number; visitors: Set<string>; totalDuration: number; durationCount: number }> = {};
       pageViews.forEach((pv: any) => {
         const val = pv[key];
         if (!val) return;
-        if (!grouped[val]) grouped[val] = { views: 0, visitors: new Set(), totalDuration: 0 };
+        if (!grouped[val]) grouped[val] = { views: 0, visitors: new Set(), totalDuration: 0, durationCount: 0 };
         grouped[val].views++;
         if (pv.visitor_id) grouped[val].visitors.add(pv.visitor_id);
-        grouped[val].totalDuration += pv.duration_seconds || 0;
+        if (pv.duration_seconds > 0) {
+          grouped[val].totalDuration += pv.duration_seconds;
+          grouped[val].durationCount++;
+        }
       });
       return Object.entries(grouped)
-        .map(([name, { views, visitors, totalDuration }]) => ({
+        .map(([name, { views, visitors, totalDuration, durationCount }]) => ({
           name,
           views,
           uniqueVisitors: visitors.size,
-          avgDuration: views > 0 ? Math.round(totalDuration / views) : 0,
+          avgDuration: durationCount > 0 ? Math.round(totalDuration / durationCount) : 0,
         }))
         .sort((a, b) => b.views - a.views);
     };
@@ -218,18 +246,24 @@ export default function AdminMarketing() {
     };
   }, [pageViews]);
 
-  // ---- Real revenue (bookings only) ----
-  const { data: monthlyRevenue = 0 } = useQuery({
+  // ---- CA du mois (dérivé de la base, à recouper avec Stripe) ----
+  // Interim : la vérité financière doit venir de Stripe. En attendant, on additionne
+  //  - bookings payés (legacy)
+  //  - Academy : 1 abonnement actif créé ce mois = 1 achat, prix selon access_months
+  //  - Express confirmés : lignes avec un stripe_session_id (exclut les lancements manuels admin)
+  const { data: revenue = { total: 0, bookings: 0, academy: 0, express: 0 } } = useQuery({
     queryKey: ["marketing-real-revenue"],
     queryFn: async () => {
       const monthStart = startOfMonth(new Date()).toISOString();
-      const { data } = await supabase
-        .from("bookings")
-        .select("amount_cents")
-        .eq("payment_status", "paid")
-        .gte("paid_at", monthStart);
-      const bookingsTotal = (data || []).reduce((sum: number, b: any) => sum + (b.amount_cents || 0), 0);
-      return bookingsTotal / 100;
+      const [bookingsRes, academyRes, expressRes] = await Promise.all([
+        supabase.from("bookings").select("amount_cents").eq("payment_status", "paid").gte("paid_at", monthStart),
+        supabase.from("wavacademy_subscriptions" as any).select("access_months").eq("status", "active").gte("created_at", monthStart),
+        supabase.from("express_analyses").select("id", { count: "exact", head: true }).not("stripe_session_id", "is", null).gte("created_at", monthStart),
+      ]);
+      const bookings = ((bookingsRes.data as unknown as { amount_cents: number | null }[]) || []).reduce((s, b) => s + (b.amount_cents || 0), 0) / 100;
+      const academy = ((academyRes.data as unknown as { access_months: number | null }[]) || []).reduce((s, r) => s + (ACADEMY_PRICE_BY_MONTHS[r.access_months ?? 0] || 0), 0);
+      const express = (expressRes.count || 0) * EXPRESS_PRICE;
+      return { total: bookings + academy + express, bookings, academy, express };
     },
   });
 
@@ -238,9 +272,9 @@ export default function AdminMarketing() {
     queryKey: ["marketing-leads"],
     queryFn: async () => {
       const [appsRes, diagRes, expressRes] = await Promise.all([
-        supabase.from("wav_premium_applications" as any).select("created_at, first_name, last_name, email, origin_source, follower_since, budget, posthog_id").order("created_at", { ascending: false }).limit(200),
-        supabase.from("diagnostic_leads" as any).select("created_at, first_name, last_name, email, origin_source, follower_since, posthog_id").eq("completed", true).order("created_at", { ascending: false }).limit(200),
-        supabase.from("express_analyses").select("created_at, tiktok_username, email, status").order("created_at", { ascending: false }).limit(200),
+        supabase.from("wav_premium_applications" as any).select("created_at, first_name, last_name, email, origin_source, follower_since, budget, posthog_id").order("created_at", { ascending: false }).limit(2000),
+        supabase.from("diagnostic_leads" as any).select("created_at, first_name, last_name, email, origin_source, follower_since, posthog_id").eq("completed", true).order("created_at", { ascending: false }).limit(2000),
+        supabase.from("express_analyses").select("created_at, tiktok_username, email, status").order("created_at", { ascending: false }).limit(2000),
       ]);
 
       const apps: Lead[] = ((appsRes.data as any[]) || []).map((a: any) => ({
@@ -262,11 +296,17 @@ export default function AdminMarketing() {
       const byEmail = new Map<string, Lead>();
       const noEmail: Lead[] = [];
       for (const lead of allLeads) {
-        if (!lead.email) { noEmail.push(lead); continue; }
+        if (!lead.email) { noEmail.push({ ...lead, touchpoints: 1 }); continue; }
         const key = lead.email.toLowerCase().trim();
         const existing = byEmail.get(key);
-        if (!existing || (OFFER_PRIORITY[lead.offer] ?? 99) < (OFFER_PRIORITY[existing.offer] ?? 99)) {
-          byEmail.set(key, lead);
+        if (!existing) {
+          // Personne unique : on garde l'offre la plus haute mais on compte les parcours
+          // et on mémorise les offres vues, pour ne plus masquer les parcours multi-produits.
+          byEmail.set(key, { ...lead, touchpoints: 1, offers: [lead.offer] });
+        } else {
+          const offers = existing.offers?.includes(lead.offer) ? existing.offers : [...(existing.offers ?? []), lead.offer];
+          const keepLead = (OFFER_PRIORITY[lead.offer] ?? 99) < (OFFER_PRIORITY[existing.offer] ?? 99) ? lead : existing;
+          byEmail.set(key, { ...keepLead, touchpoints: (existing.touchpoints ?? 1) + 1, offers });
         }
       }
       return [...byEmail.values(), ...noEmail].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -604,9 +644,14 @@ export default function AdminMarketing() {
                 <div className="bg-noir rounded-lg p-4 border border-primary/10 text-center">
                   <div className="flex items-center justify-center gap-1.5 mb-1">
                     <DollarSign className="h-4 w-4 text-primary" />
-                    <p className="text-2xl font-bold text-primary">{monthlyRevenue > 0 ? `${monthlyRevenue.toLocaleString("fr-FR")} €` : "-"}</p>
+                    <p className="text-2xl font-bold text-primary">{revenue.total > 0 ? `${revenue.total.toLocaleString("fr-FR")} €` : "-"}</p>
                   </div>
-                  <p className="text-xs text-cream/60">CA du mois</p>
+                  <p className="text-xs text-cream/60">CA du mois (à recouper Stripe)</p>
+                  {revenue.total > 0 && (
+                    <p className="text-[10px] text-cream/40 mt-1">
+                      Academy {revenue.academy.toLocaleString("fr-FR")} € · Express {revenue.express.toLocaleString("fr-FR")} € · Bookings {revenue.bookings.toLocaleString("fr-FR")} €
+                    </p>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -738,6 +783,14 @@ export default function AdminMarketing() {
                           >
                             {lead.offer}
                           </Badge>
+                          {lead.touchpoints && lead.touchpoints > 1 && (
+                            <span
+                              className="ml-1.5 text-[10px] text-cream/50"
+                              title={`Parcours multi-produits : ${lead.offers?.join(" → ") ?? ""}`}
+                            >
+                              +{lead.touchpoints - 1}
+                            </span>
+                          )}
                         </TableCell>
                         <TableCell className="text-cream/70 text-sm">{lead.source || "-"}</TableCell>
                         <TableCell className="text-cream/70 text-sm">{lead.follower_since || "-"}</TableCell>

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/tracking";
 import { SEOHead } from "@/components/SEOHead";
 import { seoFor, HOME_FAQ } from "@/config/seo";
-import { ACADEMY_PLANS, ACADEMY_FROM, PREMIUM_DURATION_DAYS } from "@/config/offers";
+import { ACADEMY_PLANS, ACADEMY_FROM, ACADEMY_ENTRY, PREMIUM_DURATION_DAYS } from "@/config/offers";
 import { OfferComparison } from "@/components/OfferComparison";
 import { WavSocialScanPopup } from "@/components/WavSocialScanPopup";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
@@ -156,7 +156,7 @@ export default function Home() {
             </Button>
           </div>
           <p className="text-sm text-muted-foreground mt-4 animate-fade-in" style={{ animationDelay: "0.3s" }}>
-            Dès {ACADEMY_FROM} € · paiement unique, sans abonnement.
+            Dès {ACADEMY_FROM} € pour {ACADEMY_ENTRY.duration} d'accès · paiement unique, sans abonnement.
           </p>
         </div>
       </Section>
@@ -429,7 +429,7 @@ export default function Home() {
               </Link>
             </Button>
           </div>
-          <p className="text-xs text-cream/50 mt-4">Dès {ACADEMY_FROM} € · paiement unique · jusqu'à 4× sans frais avec PayPal.</p>
+          <p className="text-xs text-cream/50 mt-4">Dès {ACADEMY_FROM} € pour {ACADEMY_ENTRY.duration} d'accès · paiement unique · jusqu'à 4× sans frais avec PayPal.</p>
           <p className="text-sm text-cream/50 mt-6">
             Pas encore prêt ? <Link to="/analyse-express" className="text-primary underline hover:no-underline">Commence par une Analyse Express</Link> pour un premier diagnostic de ton compte.
           </p>

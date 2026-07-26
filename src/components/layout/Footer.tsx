@@ -1,6 +1,20 @@
 import { Link } from "react-router-dom";
 import { Instagram, Youtube, Facebook } from "lucide-react";
 import { trackPostHogEvent } from "@/lib/posthog";
+import { openCookieSettings } from "@/lib/cookie-consent";
+
+/** Bouton persistant de gestion du consentement cookies (ré-ouvre le bandeau). */
+function CookieSettingsButton() {
+  return (
+    <button
+      type="button"
+      onClick={openCookieSettings}
+      className="hover:text-primary transition-colors"
+    >
+      Gérer mes cookies
+    </button>
+  );
+}
 
 const navLinks = [
   { label: "Accueil", href: "/", section: "navigation" },
@@ -67,6 +81,7 @@ export function Footer({ minimal = false }: { minimal?: boolean }) {
                 {link.label}
               </Link>
             ))}
+            <CookieSettingsButton />
           </nav>
         </div>
       </footer>
@@ -162,6 +177,7 @@ export function Footer({ minimal = false }: { minimal?: boolean }) {
                 {link.label}
               </Link>
             ))}
+            <CookieSettingsButton />
           </nav>
         </div>
       </div>

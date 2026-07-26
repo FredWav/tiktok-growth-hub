@@ -10,20 +10,24 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import ScrollToTop from "@/components/ScrollToTop";
 import { CookieConsent } from "@/components/CookieConsent";
 import { capturePageview } from "@/lib/posthog";
-import { captureUtmParams } from "@/lib/tracking";
+import { captureUtmParams, syncAttributionToPostHog } from "@/lib/tracking";
 import { trackPageView, setupBeforeUnloadTracking } from "@/lib/page-tracker";
 import { DiagnosticProvider } from "./contexts/DiagnosticContext";
 
 function PostHogPageTracker() {
   const location = useLocation();
+  // 1. Capture l'attribution AVANT tout pageview (effet déclaré en premier = exécuté
+  //    en premier au montage), sinon la 1re page_view d'un lien UTM part avec des UTM nuls.
+  useEffect(() => {
+    captureUtmParams();
+    syncAttributionToPostHog();
+    setupBeforeUnloadTracking();
+  }, []);
+  // 2. Pageview à chaque changement de route.
   useEffect(() => {
     capturePageview();
     trackPageView(location.pathname);
   }, [location.pathname]);
-  useEffect(() => {
-    captureUtmParams();
-    setupBeforeUnloadTracking();
-  }, []);
   return null;
 }
 

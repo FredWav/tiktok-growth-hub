@@ -180,12 +180,12 @@ export default function WavAcademy() {
     setSelectedTerm(term);
     form.reset();
     setDialogOpen(true);
-    trackPostHogEvent("wavclub_checkout_open", { term });
+    trackPostHogEvent("academy_checkout_open", { term });
   };
 
   const onCheckout = async (data: CheckoutForm) => {
     setIsSubmitting(true);
-    trackPostHogEvent("wavclub_checkout_submit", { term: selectedTerm });
+    trackPostHogEvent("academy_checkout_submit", { term: selectedTerm });
     try {
       const { data: result, error } = await supabase.functions.invoke("record-wavacademy-consent", {
         body: {

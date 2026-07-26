@@ -254,10 +254,20 @@ serve(async (req) => {
       // d'abonnement Stripe. On utilise l'id de session comme référence stable —
       // WavStats ne s'en sert que comme clé d'idempotence.
       let activationUrl: string | null = null;
-      const wavstatsFnUrl = Deno.env.get("WAVSTATS_FUNCTIONS_URL");
-      const hmacSecret = Deno.env.get("WAVACADEMY_HMAC_SECRET");
 
-      if (wavstatsFnUrl && hmacSecret && accessExpiresAt) {
+      // URL des edge functions WavStats (projet hesozoobtehszosdlnrn). Surchargeable
+      // par variable d'env, mais la valeur par défaut évite une config de plus.
+      const wavstatsFnUrl =
+        Deno.env.get("WAVSTATS_FUNCTIONS_URL") ?? "https://hesozoobtehszosdlnrn.supabase.co/functions/v1";
+
+      // Secret de signature partagé avec WavStats. On réutilise par défaut la clé
+      // WavStats déjà configurée pour l'Analyse Express — à condition que la variable
+      // WAVACADEMY_HMAC_SECRET côté WavStats contienne bien CETTE valeur. Un secret
+      // dédié, s'il est posé un jour, prend le dessus.
+      const hmacSecret =
+        Deno.env.get("WAVACADEMY_HMAC_SECRET") ?? Deno.env.get("WAV_SOCIAL_SCAN_API_KEY");
+
+      if (hmacSecret && accessExpiresAt) {
         try {
           const payload = JSON.stringify({
             stripeSubscriptionId: stripeSubscriptionId ?? session.id,
@@ -307,7 +317,7 @@ serve(async (req) => {
       } else {
         await safeNotifyError(
           "WavAcademy Webhook",
-          `⚠️ Activation WavSocialScan non configurée (WAVSTATS_FUNCTIONS_URL / WAVACADEMY_HMAC_SECRET) • créditer manuellement ${email} (${accessMonths ?? "?"} mois)`,
+          `⚠️ Activation WavSocialScan impossible (clé WavStats absente) • créditer manuellement ${email} (${accessMonths ?? "?"} mois)`,
         );
       }
 

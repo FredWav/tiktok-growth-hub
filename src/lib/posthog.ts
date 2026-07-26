@@ -36,14 +36,14 @@ export function identifyUser(distinctId: string, properties?: Record<string, any
  * l'identifiant anonyme). Sert à enregistrer email/nom sans faire de l'email
  * la clé d'identité PostHog.
  */
-export function setUserProperties(properties: Record<string, any>) {
+export function setUserProperties(properties: Record<string, unknown>) {
   if (initialized) {
     posthog.setPersonProperties(properties);
   }
 }
 
 /** Super-propriétés attachées à TOUS les events suivants (ex. attribution). */
-export function registerSuperProperties(properties: Record<string, any>) {
+export function registerSuperProperties(properties: Record<string, unknown>) {
   if (initialized) {
     posthog.register(properties);
   }

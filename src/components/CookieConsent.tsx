@@ -31,7 +31,7 @@ function enableGA() {
 
 /** Coupe la collecte GA après un retrait de consentement (déjà chargé ou non). */
 function disableGA() {
-  (window as any)[`ga-disable-${GA_ID}`] = true;
+  (window as unknown as Record<string, boolean>)[`ga-disable-${GA_ID}`] = true;
   if (window.gtag) {
     window.gtag("consent", "update", { analytics_storage: "denied" });
   }

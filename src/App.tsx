@@ -86,6 +86,9 @@ const App = () => (
             <Route path="/offres/45-jours" element={<Navigate to="/reserverunappel" replace />} />
             <Route path="/offres/vip" element={<Navigate to="/wavacademy" replace />} />
             <Route path="/one-shot" element={<Navigate to="/reserverunappel" replace />} />
+            {/* Pages Accompagnement retirées — redirigées vers l'accueil (comparateur d'offres). */}
+            <Route path="/accompagnement-reseaux-sociaux" element={<Navigate to="/" replace />} />
+            <Route path="/accompagnement-tiktok" element={<Navigate to="/" replace />} />
             <Route path="/one-shot/success" element={<Navigate to="/" replace />} />
             <Route path="/a-propos" element={<APropos />} />
             <Route path="/preuves" element={<Preuves />} />

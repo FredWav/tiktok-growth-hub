@@ -261,13 +261,6 @@ export default function Home() {
           subtitle="Choisis selon là où tu en es, pas selon ton budget."
         />
         <OfferComparison location="home" />
-        <p className="text-center text-sm text-muted-foreground mt-8">
-          Une seule méthode, toutes tes plateformes.{" "}
-          <Link to="/accompagnement-reseaux-sociaux" className="text-primary underline hover:no-underline">
-            Découvre l'accompagnement réseaux sociaux
-          </Link>{" "}
-          — TikTok, Reels et Shorts.
-        </p>
       </Section>
 
       {/* ===== Wav Premium : le haut de gamme ===== */}

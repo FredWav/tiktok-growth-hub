@@ -7,10 +7,10 @@ import { trackPostHogEvent } from "@/lib/posthog";
 const navItems = [
   { label: "Accueil", href: "/" },
   { label: "Wav Academy", href: "/wavacademy" },
-  { label: "Accompagnement", href: "/accompagnement-reseaux-sociaux" },
   { label: "Analyse Express", href: "/analyse-express" },
   { label: "Témoignages", href: "/preuves" },
   { label: "À propos", href: "/a-propos" },
+  { label: "Newsletter", href: "/newsletter" },
   { label: "Contact", href: "/contact" },
 ];
 

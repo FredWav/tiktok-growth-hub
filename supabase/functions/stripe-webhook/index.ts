@@ -240,6 +240,77 @@ serve(async (req) => {
         }
       }
 
+      // ── Activation WavSocialScan (crédits inclus dans l'offre) ───────────────
+      // WavStats expose déjà tout le nécessaire : `wavacademy-activation` crée
+      // l'abonnement côté WSS (statut pending_activation) et renvoie une URL
+      // d'activation. Le membre s'y rend, lie son compte, et `monthly-credit-refill`
+      // prend le relais pour les mois suivants. La fonction est idempotente : rejouer
+      // le webhook avec la même référence renvoie le token déjà émis.
+      //
+      // Auth : HMAC-SHA256 sur `<timestamp>.<body>`, secret WAVACADEMY_HMAC_SECRET
+      // partagé avec WavStats (voir _shared/wavacademy-hmac.ts côté WavStats).
+      //
+      // Note : les Pass Academy sont des paiements uniques, il n'y a donc pas
+      // d'abonnement Stripe. On utilise l'id de session comme référence stable —
+      // WavStats ne s'en sert que comme clé d'idempotence.
+      let activationUrl: string | null = null;
+      const wavstatsFnUrl = Deno.env.get("WAVSTATS_FUNCTIONS_URL");
+      const hmacSecret = Deno.env.get("WAVACADEMY_HMAC_SECRET");
+
+      if (wavstatsFnUrl && hmacSecret && accessExpiresAt) {
+        try {
+          const payload = JSON.stringify({
+            stripeSubscriptionId: stripeSubscriptionId ?? session.id,
+            email,
+            plan, // "live" côté Academy → "growth" (3 000 crédits/mois) côté WSS
+            periodEnd: accessExpiresAt,
+          });
+          const timestamp = Math.floor(Date.now() / 1000).toString();
+          const key = await crypto.subtle.importKey(
+            "raw",
+            new TextEncoder().encode(hmacSecret),
+            { name: "HMAC", hash: "SHA-256" },
+            false,
+            ["sign"],
+          );
+          const sigBytes = await crypto.subtle.sign(
+            "HMAC",
+            key,
+            new TextEncoder().encode(`${timestamp}.${payload}`),
+          );
+          const signature = Array.from(new Uint8Array(sigBytes))
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join("");
+
+          const actRes = await fetch(`${wavstatsFnUrl.replace(/\/$/, "")}/wavacademy-activation`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-WavLab-Timestamp": timestamp,
+              "X-WavLab-Signature": signature,
+            },
+            body: payload,
+          });
+          if (!actRes.ok) {
+            throw new Error(`HTTP ${actRes.status}: ${(await actRes.text()).slice(0, 300)}`);
+          }
+          const actBody = await actRes.json();
+          activationUrl = actBody?.activationUrl ?? null;
+          console.log(`WavSocialScan activation OK for ${email}`);
+        } catch (actErr) {
+          console.error("WavSocialScan activation failed:", actErr);
+          await safeNotifyError(
+            "WavAcademy Webhook",
+            `⚠️ Activation WavSocialScan ÉCHOUÉE • ${email} • créditer manuellement`,
+          );
+        }
+      } else {
+        await safeNotifyError(
+          "WavAcademy Webhook",
+          `⚠️ Activation WavSocialScan non configurée (WAVSTATS_FUNCTIONS_URL / WAVACADEMY_HMAC_SECRET) • créditer manuellement ${email} (${accessMonths ?? "?"} mois)`,
+        );
+      }
+
       let claimEmailSent = false;
       if (claimToken) {
         try {
@@ -251,7 +322,13 @@ serve(async (req) => {
               "Content-Type": "application/json",
               Authorization: `Bearer ${serviceKey}`,
             },
-            body: JSON.stringify({ email, token: claimToken, plan_type: plan, access_months: accessMonths }),
+            body: JSON.stringify({
+              email,
+              token: claimToken,
+              plan_type: plan,
+              access_months: accessMonths,
+              wavstats_activation_url: activationUrl,
+            }),
           });
 
           // `fetch` ne rejette QUE sur erreur réseau : sans ce contrôle, un 4xx/5xx
@@ -275,32 +352,9 @@ serve(async (req) => {
         );
       }
 
-      // ── Provisioning WavStats (crédits WavSocialScan inclus dans l'offre) ──
-      // Si WAVSTATS_PROVISION_URL est configurée, on crédite automatiquement le
-      // compte du membre via l'API WavStats. Sinon, alerte admin pour créditer
-      // manuellement (l'email de claim annonce une activation sous 24h).
-      const provisionUrl = Deno.env.get("WAVSTATS_PROVISION_URL");
-      const wavstatsKey = Deno.env.get("WAV_SOCIAL_SCAN_API_KEY");
-      if (provisionUrl && wavstatsKey) {
-        try {
-          const provRes = await fetch(provisionUrl, {
-            method: "POST",
-            headers: { "X-API-Key": wavstatsKey, "Content-Type": "application/json" },
-            body: JSON.stringify({ email, source: "wav_academy", plan_type: plan, access_months: accessMonths }),
-          });
-          if (!provRes.ok) throw new Error(`HTTP ${provRes.status}: ${(await provRes.text()).slice(0, 200)}`);
-          console.log(`WavStats provisioning OK for ${email}`);
-        } catch (provErr) {
-          console.error("WavStats provisioning failed:", provErr);
-          await safeNotifyError("WavAcademy Webhook", `⚠️ Provisioning WavStats ÉCHOUÉ • ${email} • créditer manuellement`);
-        }
-      } else {
-        await safeNotifyError("WavAcademy Webhook", `⚠️ Provisioning WavStats non configuré • créditer manuellement ${email} (${accessMonths ?? "?"} mois)`);
-      }
-
       await safeNotifySuccess(
         "WavAcademy",
-        `Nouveau membre • ${plan} • ${accessMonths ?? "?"} mois • ${email} • ${claimEmailSent ? "email d'activation envoyé" : "⚠️ EMAIL NON ENVOYÉ, à traiter à la main"}`,
+        `Nouveau membre • ${plan} • ${accessMonths ?? "?"} mois • ${email} • ${claimEmailSent ? "email d'activation envoyé" : "⚠️ EMAIL NON ENVOYÉ, à traiter à la main"} • WavSocialScan ${activationUrl ? "activé" : "⚠️ à créditer à la main"}`,
       );
 
       return jsonResponse({ received: true });

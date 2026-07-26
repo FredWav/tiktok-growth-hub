@@ -29,7 +29,7 @@ serve(async (req) => {
   }
 
   try {
-    const { email, token, plan_type, access_months } = await req.json();
+    const { email, token, plan_type, access_months, wavstats_activation_url } = await req.json();
     if (!email || !token) throw new Error("Missing email or token");
 
     const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD") || "";
@@ -71,11 +71,24 @@ serve(async (req) => {
               Ton Pass <strong style="color: #c8a97e;">${planLabel}</strong>${months ? ` (<strong style="color: #c8a97e;">${months} mois</strong>)` : ""} inclut
               <strong style="color: #c8a97e;">3 000 crédits WavSocialScan par mois</strong> pour analyser tes vidéos et ton compte.
             </p>
+            ${wavstats_activation_url ? `
+            <p style="color: #f5f0e8; font-size: 14px; line-height: 1.6; margin: 0 0 16px 0;">
+              Deuxième étape : active ton accès WavSocialScan et lie ton compte.
+            </p>
+            <div style="text-align: center; padding: 6px 0 4px 0;">
+              <a href="${wavstats_activation_url}" style="background: transparent; color: #c8a97e; border: 2px solid #c8a97e; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 15px; display: inline-block;">
+                Activer mes crédits WavSocialScan
+              </a>
+            </div>
+            <p style="color: #999; font-size: 12px; line-height: 1.6; margin: 12px 0 0 0;">
+              Ce lien est valable 7 jours. Si le bouton ne fonctionne pas :<br/>
+              <a href="${wavstats_activation_url}" style="color: #c8a97e; word-break: break-all;">${wavstats_activation_url}</a>
+            </p>` : `
             <p style="color: #f5f0e8; font-size: 14px; line-height: 1.6; margin: 0;">
               Crée ton compte sur <a href="https://wavstats.com" style="color: #c8a97e;">wavstats.com</a> avec
               <strong style="color: #c8a97e;">cette adresse email</strong> (${email}) : c'est elle qui sert à rattacher tes crédits.
               Je les active manuellement sous 48h ouvrées — si tu ne les vois pas passer, réponds simplement à cet email.
-            </p>
+            </p>`}
           </div>
         </div>
         <div style="border-top: 1px solid #333; padding-top: 20px; text-align: center;">

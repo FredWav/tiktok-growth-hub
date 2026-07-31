@@ -65,9 +65,10 @@ serve(async (req) => {
       });
     }
 
-    // Call WavSocialScan API to re-trigger analysis
-    const apiKey = Deno.env.get("WAV_SOCIAL_SCAN_API_KEY");
-    if (!apiKey) throw new Error("Clé API WavSocialScan non configurée");
+    // Call WavStats API to re-trigger analysis
+    // Repli sur l'ancien nom de secret tant que WAVSTATS_API_KEY n'existe pas côté dashboard.
+    const apiKey = Deno.env.get("WAVSTATS_API_KEY") ?? Deno.env.get("WAV_SOCIAL_SCAN_API_KEY");
+    if (!apiKey) throw new Error("Clé API WavStats non configurée");
 
     const analyzeRes = await fetch(
       `${API_BASE}/accounts/${encodeURIComponent(tiktok_username)}/analyze`,

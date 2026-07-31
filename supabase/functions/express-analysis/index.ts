@@ -127,9 +127,10 @@ serve(async (req) => {
       );
     }
 
-    // ── 3. Call WavSocialScan API ──
-    const apiKey = Deno.env.get("WAV_SOCIAL_SCAN_API_KEY");
-    if (!apiKey) throw new Error("Clé API WavSocialScan non configurée");
+    // ── 3. Call WavStats API ──
+    // Repli sur l'ancien nom de secret tant que WAVSTATS_API_KEY n'existe pas côté dashboard.
+    const apiKey = Deno.env.get("WAVSTATS_API_KEY") ?? Deno.env.get("WAV_SOCIAL_SCAN_API_KEY");
+    if (!apiKey) throw new Error("Clé API WavStats non configurée");
 
     const analyzeRes = await fetch(`${API_BASE}/accounts/${encodeURIComponent(username)}/analyze`, {
       method: "POST",

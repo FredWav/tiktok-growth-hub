@@ -4,14 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Zap, X } from "lucide-react";
 import { trackPostHogEvent } from "@/lib/posthog";
 
-export function WavSocialScanPopup() {
+export function WavStatsPopup() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (sessionStorage.getItem("from_diagnostic")) return;
 
-    const lastShown = localStorage.getItem("wavsocialscan_last_shown");
+    const lastShown = localStorage.getItem("wavstats_last_shown");
     if (lastShown) {
       const elapsed = Date.now() - parseInt(lastShown, 10);
       if (elapsed < 24 * 60 * 60 * 1000) return;
@@ -22,9 +22,9 @@ export function WavSocialScanPopup() {
   }, []);
 
   const handleClose = (dismissed = false) => {
-    if (dismissed) trackPostHogEvent("popup_dismissed", { popup: "wavsocialscan" });
+    if (dismissed) trackPostHogEvent("popup_dismissed", { popup: "wavstats" });
     setOpen(false);
-    localStorage.setItem("wavsocialscan_last_shown", Date.now().toString());
+    localStorage.setItem("wavstats_last_shown", Date.now().toString());
   };
 
   const handleGo = () => {
@@ -46,7 +46,7 @@ export function WavSocialScanPopup() {
       </button>
       <p className="font-semibold text-sm mb-1">⚡ Diagnostic complet de ton TikTok</p>
       <p className="text-xs text-muted-foreground mb-3">
-        Audit profil + bio, analyse de tes 30 dernières vidéos, plan d'action 14 jours et rapport PDF. 11,90€.
+        Audit profil + bio, analyse de tes 30 dernières vidéos, plan d'action 30 jours et rapport PDF. 11,90€.
       </p>
       <div className="flex gap-2">
         <Button size="sm" onClick={handleGo} className="flex-1 gap-1.5 text-xs">

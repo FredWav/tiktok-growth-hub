@@ -2,6 +2,7 @@ import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { SEOHead } from "@/components/SEOHead";
 import { seoFor } from "@/config/seo";
+import { ACADEMY_LIVE_SLOT, ACADEMY_SUPPORT_DAYS } from "@/config/offers";
 
 export default function CGV() {
   return (
@@ -10,7 +11,7 @@ export default function CGV() {
       <Section variant="default" size="lg">
         <div className="max-w-3xl mx-auto prose prose-neutral">
           <h1 className="font-display text-3xl md:text-4xl font-semibold mb-2">Conditions Générales de Vente (CGV) — Fred Wav</h1>
-          <p className="text-sm text-muted-foreground mb-10">Dernière mise à jour : 12 juin 2026</p>
+          <p className="text-sm text-muted-foreground mb-10">Dernière mise à jour : 30 juillet 2026</p>
 
           {/* ARTICLE 1 */}
           <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 1 — Identification du vendeur</h2>
@@ -64,7 +65,13 @@ export default function CGV() {
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">5.3 Wav Academy</h3>
           <p className="text-muted-foreground mb-4">
-            Accès à la communauté Discord Wav Academy, aux ressources documentaires (cours, replays, checklists, méthodes, templates), aux lives hebdomadaires avec Fred, et aux canaux Discord premium. La Wav Academy est proposée en trois formules prépayées (3, 6 ou 12 mois), dont les modalités de durée et de prix sont précisées à l'Article 12.
+            Accès à la communauté Discord Wav Academy, aux ressources documentaires (cours, replays, checklists, méthodes, templates), aux canaux Discord premium, et aux crédits mensuels de l'outil d'analyse partenaire inclus dans la formule. La Wav Academy est proposée en trois formules prépayées (3, 6 ou 12 mois), dont les modalités de durée et de prix sont précisées à l'Article 12.
+          </p>
+          <p className="text-muted-foreground mb-4">
+            L'accompagnement comprend un live hebdomadaire animé par Fred Wav, programmé {ACADEMY_LIVE_SLOT} (heure de Paris), un suivi des questions posées sur le Discord {ACADEMY_SUPPORT_DAYS} (réponse sous 24h ouvrées du lundi au vendredi), et des retours individualisés sur les contenus soumis par le membre, à sa demande.
+          </p>
+          <p className="text-muted-foreground mb-4">
+            Le jour et l'horaire du live peuvent être modifiés, et un live peut être exceptionnellement décalé, annulé ou remplacé par un enregistrement, moyennant information préalable des membres sur le Discord. Ces modalités constituent une obligation de moyens : la Wav Academy est une prestation de service sans garantie de résultat, notamment en matière d'audience, de visibilité ou de revenus.
           </p>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">5.4 Évolution du contenu</h3>

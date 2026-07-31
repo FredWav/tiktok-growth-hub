@@ -3,8 +3,6 @@ import { useSearchParams, Link } from "react-router-dom";
 import { trackEvent } from "@/lib/tracking";
 import { trackPostHogEvent } from "@/lib/posthog";
 import { Download, Loader2, AlertCircle, RefreshCw, ArrowRight } from "lucide-react";
-// @ts-ignore - html2pdf.js doesn't have proper types
-import html2pdf from "html2pdf.js";
 import { SEOHead } from "@/components/SEOHead";
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
@@ -22,8 +20,7 @@ import { PublicationPatternSection } from "@/components/express-result/Publicati
 import { AIAnalysisSection } from "@/components/express-result/AIAnalysisSection";
 import { TopVideosSection } from "@/components/express-result/TopVideosSection";
 import { ShadowbanSection } from "@/components/express-result/ShadowbanSection";
-import { mapAccountDataForPDF } from "@/lib/pdf-data-mapper";
-import { generateCompletePDFHTML } from "@/lib/pdf-html-generator";
+import { downloadExpressReport } from "@/lib/pdf";
 
 const POLL_INTERVAL = 5000;
 const MAX_POLL_DURATION = 600_000;
@@ -194,40 +191,12 @@ export default function AnalyseExpressResult() {
     trackEvent("express_pdf_download", { username });
     trackPostHogEvent("click_pdf_download", { username });
     try {
-      const pdfData = mapAccountDataForPDF(
-        data.account,
-        undefined,
-        pubPattern,
-        data?.ai_analysis,
-        healthScore
-      );
-      const htmlContent = generateCompletePDFHTML(
-        pdfData,
-        data.account.ai_insights || "",
-        data.account.recent_videos || [],
-        healthScore
-      );
-
-      // Élément détaché — pas dans le DOM visible
-      const element = document.createElement("div");
-      element.innerHTML = htmlContent;
-
-      await (html2pdf() as any).set({
-        margin: [10, 0, 10, 0],
-        filename: `analyse-${username}.pdf`,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, allowTaint: true },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-        pagebreak: {
-          mode: ["avoid-all", "css", "legacy"],
-          avoid: [".video-item", ".stat-card", ".stats-grid", ".stats-section",
-                  ".bio-section", ".hashtags-section", ".header", ".hashtags-grid"],
-        },
-      }).from(element).save();
-
+      // Le moteur de rendu (~500 ko) n'est téléchargé qu'ici, au clic.
+      await downloadExpressReport(data, username);
       toast.success("Rapport PDF téléchargé !");
-    } catch (err: any) {
-      toast.error(err.message || "Erreur lors du téléchargement");
+    } catch (err) {
+      console.error("PDF generation error:", err);
+      toast.error("Erreur lors de la génération du PDF. Réessaie dans un instant.");
     } finally {
       setPdfLoading(false);
     }

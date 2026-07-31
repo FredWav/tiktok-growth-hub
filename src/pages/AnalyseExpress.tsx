@@ -18,7 +18,7 @@ import tiktokExample from "@/assets/tiktok-username-example.png";
 const features = [
   { icon: BarChart3, title: "Audit profil complet", description: "Photo, bio, positionnement : analyse technique et recommandations concrètes de réécriture" },
   { icon: TrendingUp, title: "Analyse de tes 30 vidéos", description: "Vues, rétention, engagement, hooks — chaque vidéo passée au crible avec métriques" },
-  { icon: Search, title: "Stratégie & hashtags", description: "Hashtags à tester, plan d'action 14 jours et roadmap 3-6 mois personnalisés" },
+  { icon: Search, title: "Stratégie & hashtags", description: "Hashtags à tester, plan d'action 30 jours et stratégie 3-6 mois personnalisés" },
   { icon: FileText, title: "Rapport PDF complet", description: "Résumé exécutif, points forts, axes d'amélioration et actions immédiates en PDF" },
 ];
 
@@ -173,19 +173,19 @@ export default function AnalyseExpress() {
           ))}
         </div>
 
-        {/* Mention Wav Social Scan */}
+        {/* Mention WavStats */}
         <div className="max-w-2xl mx-auto mt-12 bg-card border border-border rounded-xl p-6 text-center">
           <p className="text-muted-foreground">
             Tu veux des analyses encore plus poussées et pouvoir analyser tes propres vidéos ?
             Rendez-vous sur{" "}
             <a
-              href="https://www.wavsocialscan.com"
+              href="https://wavstats.com"
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary font-semibold underline underline-offset-2 hover:text-primary/80"
-              onClick={() => trackPostHogEvent("click_wavsocialscan_link")}
+              onClick={() => trackPostHogEvent("click_wavstats_link")}
             >
-              Wav Social Scan
+              WavStats
             </a>{" "}
             pour accéder à l'outil complet.
           </p>

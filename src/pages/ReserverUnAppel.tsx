@@ -276,10 +276,10 @@ export default function ReserverUnAppel() {
               Avec ton budget, un accompagnement individuel n'est pas la bonne option — ce serait te survendre quelque chose qui ne te correspond pas.
             </p>
             <p className="text-lg text-muted-foreground mb-8">
-              La <strong>Wav Academy</strong> te donne accès à toute ma méthode, au diagnostic continu et à la communauté à partir de <strong>{ACADEMY_FROM} €</strong> (paiement unique, accès 3 mois). C'est exactement ce qu'il te faut pour démarrer.
+              La <strong>Wav Academy</strong> te donne accès à toute ma méthode, à un regard régulier sur ton travail, à un suivi 5 jours sur 7, au live de chaque jeudi et à la communauté à partir de <strong>{ACADEMY_FROM} €</strong> (paiement unique, accès 3 mois). C'est exactement ce qu'il te faut pour démarrer.
             </p>
             <p className="text-sm text-muted-foreground mb-8">
-              Et si {ACADEMY_FROM} € d'un coup, c'est trop : jusqu'à <strong>4× sans frais avec PayPal</strong>, soit {(ACADEMY_FROM / 4).toFixed(2).replace(".", ",")} € par mois.
+              Et si {ACADEMY_FROM} € d'un coup, c'est trop : jusqu'à <strong>4× sans frais avec PayPal</strong>, soit 4 versements de {(ACADEMY_FROM / 4).toFixed(2).replace(".", ",")} €.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="hero" size="xl" asChild>
@@ -330,7 +330,7 @@ export default function ReserverUnAppel() {
                 <div>
                   <p className="font-semibold text-foreground mb-1">Je te recontacte par email</p>
                   <p className="text-sm text-muted-foreground">
-                    Sous <strong>48h (jours ouvrés)</strong> à l'adresse que tu viens de me communiquer.
+                    Sous <strong>48 h ouvrées</strong> à l'adresse que tu viens de me communiquer.
                   </p>
                 </div>
               </div>

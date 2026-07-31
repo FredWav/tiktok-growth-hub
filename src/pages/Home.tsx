@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle, AlertTriangle, BarChart3, RefreshCw, MessageSquare, Target, Check, X, Zap, Radio } from "lucide-react";
+import { ArrowRight, CheckCircle, AlertTriangle, BarChart3, RefreshCw, MessageSquare, Target, Check, X, Zap, Radio, Eye } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { SEOHead } from "@/components/SEOHead";
 import { seoFor, HOME_FAQ } from "@/config/seo";
 import { ACADEMY_PLANS, ACADEMY_FROM, ACADEMY_ENTRY, PREMIUM_DURATION_DAYS } from "@/config/offers";
 import { OfferComparison } from "@/components/OfferComparison";
-import { WavSocialScanPopup } from "@/components/WavSocialScanPopup";
+import { WavStatsPopup } from "@/components/WavStatsPopup";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { TrustedBy } from "@/components/TrustedBy";
 import { ScreenshotWall } from "@/components/ScreenshotWall";
@@ -25,7 +25,7 @@ const proofStrip = [
   "Cas clients concrets",
   "Décisions basées sur tes stats",
   "Feedback créateurs",
-  "Résultats mesurables",
+  "Un regard extérieur sur ton travail",
   "Sans bullshit",
 ];
 
@@ -44,21 +44,16 @@ const problems = [
   },
   {
     icon: AlertTriangle,
-    text: "Tu regardes tes statistiques sans savoir quoi en faire, donc tu répètes les mêmes erreurs.",
+    text: "Tu crées seul : personne ne regarde ton compte, tes vidéos, tes chiffres.",
   },
 ];
 
 // ── Wav Academy : l'offre principale ────────────────────────────────────────
 const academyPillars = [
   {
-    icon: Zap,
-    title: "Un outil qui lit tes vidéos",
-    description: "Tu colles le lien d'une vidéo, tu reçois en quelques secondes ce qui cloche et quoi changer.",
-  },
-  {
-    icon: RefreshCw,
-    title: "Une action concrète chaque jour",
-    description: "Un contenu stratégique applicable le jour même, posté quotidiennement sur le Discord.",
+    icon: Eye,
+    title: "Un regard régulier sur ton travail",
+    description: "Tu montres une vidéo, un compte, une stratégie. Je te dis ce qui va, ce qui ne va pas, et pourquoi.",
   },
   {
     icon: Radio,
@@ -69,6 +64,11 @@ const academyPillars = [
     icon: MessageSquare,
     title: "Une communauté privée",
     description: "Les canaux avancés et les autres membres, pour ne jamais rester bloqué seul.",
+  },
+  {
+    icon: Zap,
+    title: "WavStats inclus",
+    description: "L'outil qui analyse tes vidéos et te dit quoi corriger. 3 000 crédits par mois.",
   },
 ];
 
@@ -91,15 +91,15 @@ const premiumMethod = [
   },
   {
     icon: Target,
-    title: "Des objectifs chiffrés",
-    description: "Chaque semaine a un résultat attendu, écrit noir sur blanc.",
+    title: "Un cap clair chaque semaine",
+    description: "Chaque semaine a un objectif défini, écrit noir sur blanc.",
   },
 ];
 
 const premiumForYou = [
   "Tu veux faire des formats courts un vrai levier — pour vendre ton offre, ou pour gagner la visibilité qui attire les marques",
   `Tu es prêt à corriger tes vidéos semaine après semaine pendant ${PREMIUM_DURATION_DAYS} jours`,
-  "Tu veux des résultats mesurables, pas des conseils génériques",
+  "Tu veux un suivi exigeant sur tes contenus, pas des conseils génériques",
 ];
 
 const premiumNotForYou = [
@@ -113,7 +113,7 @@ const premiumDeliverables = [
   "La correction de tes scripts, ligne par ligne",
   "Des structures réutilisables : accroches, formats qui retiennent",
   "L'optimisation de ta bio et du parcours de tes abonnés",
-  `Un plan pour tenir la croissance après les ${PREMIUM_DURATION_DAYS} jours`,
+  `Un plan pour tenir le rythme après les ${PREMIUM_DURATION_DAYS} jours`,
   "Les rediffusions de toutes les sessions d'analyse",
 ];
 
@@ -126,7 +126,7 @@ const featuredVideos = [
 export default function Home() {
   return (
     <Layout>
-      <WavSocialScanPopup />
+      <WavStatsPopup />
       <ExitIntentPopup />
       <SEOHead {...seoFor("/")} />
 
@@ -137,11 +137,11 @@ export default function Home() {
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 animate-fade-in">
             Arrête de poster à l'aveugle.{" "}
-            <span className="text-gold-gradient">Tes stats disent déjà pourquoi tu plafonnes en vues.</span>
+            <span className="text-gold-gradient">Tes stats disent déjà ce qui bloque.</span>
           </h1>
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-            Pas d'astuces d'algorithme, pas de promesses. Tu apprends à lire tes vraies données, à repérer ce qui bloque et à corriger vidéo après vidéo. <Link to="/a-propos" className="text-primary underline hover:no-underline">Découvre mon approche</Link>.
+            Pas d'astuces d'algorithme, pas de promesses. Tu es accompagné : un regard régulier sur ton travail pour comprendre ce qui fonctionne, ce qui ne fonctionne pas et pourquoi. Tu ne crées plus seul. <Link to="/a-propos" className="text-primary underline hover:no-underline">Découvre mon approche</Link>.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in" style={{ animationDelay: "0.2s" }}>
@@ -179,7 +179,7 @@ export default function Home() {
       <Section variant="default" size="lg">
         <SectionHeader
           title="Tu publies, mais tu ne sais pas pourquoi ça ne décolle pas."
-          subtitle="Le contenu, c'est une partie du résultat. Le reste, c'est savoir lire tes chiffres et corriger le bon paramètre — c'est exactement ce qui ne s'apprend pas tout seul."
+          subtitle="Le contenu, c'est 30 % du résultat. Le reste, c'est savoir lire tes chiffres et corriger le bon paramètre — c'est exactement ce qui ne s'apprend pas tout seul."
         />
 
         <div className="grid md:grid-cols-2 gap-4 lg:gap-6 max-w-3xl mx-auto">
@@ -200,8 +200,8 @@ export default function Home() {
       {/* ===== Wav Academy : l'offre principale ===== */}
       <Section variant="cream" size="lg">
         <SectionHeader
-          title="La Wav Academy : apprends à corriger tes vidéos, sans rester seul"
-          subtitle="Tu veux progresser avec un cadre régulier, sans passer par un accompagnement individuel. Tu diagnostiques chaque vidéo, tu corriges, tu recommences — et tu trouves ton format en quelques semaines au lieu de quelques mois."
+          title="La Wav Academy : ne poste plus seul"
+          subtitle="Tu veux progresser avec un cadre régulier, sans passer par un accompagnement individuel. Un regard extérieur sur ton travail, des retours réguliers, et tu comprends enfin tes résultats."
         />
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto mb-12">
@@ -347,8 +347,8 @@ export default function Home() {
       {/* ===== Témoignages ===== */}
       <Section variant="default" size="lg">
         <SectionHeader
-          title="Basé sur tes données, validé par le terrain."
-          subtitle="Chaque recommandation vient de l'analyse de centaines de vidéos, pas de tendances éphémères."
+          title="Ils sont passés par là."
+          subtitle="Des créateurs et des entrepreneurs que j'ai accompagnés, qui racontent ce que ça a changé dans leur façon de travailler."
         />
 
         <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-12">
@@ -416,10 +416,10 @@ export default function Home() {
       <Section variant="dark" size="lg">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="font-display text-3xl md:text-4xl font-semibold mb-4 text-cream">
-            Prêt à casser ton plafond de vues ?
+            Prêt à ne plus poster seul ?
           </h2>
           <p className="text-cream/70 text-lg mb-8">
-            Rejoins la Wav Academy, diagnostique ta prochaine vidéo dès cette semaine et arrête de poster à l'aveugle.
+            Rejoins la Wav Academy et avance avec un regard régulier sur ton travail.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="hero" size="xl" asChild onClick={() => trackEvent("cta_academy_click", { location: "bottom" })}>

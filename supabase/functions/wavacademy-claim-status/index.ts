@@ -8,8 +8,8 @@ const corsHeaders = {
 };
 
 const PLAN_LABELS: Record<string, string> = {
-  acces: "Wav Academy · Accès",
-  live: "Wav Academy · Live",
+  acces: "Wav Academy",
+  live: "Wav Academy",
 };
 
 serve(async (req) => {

@@ -10,8 +10,6 @@ const corsHeaders = {
 
 // Stripe Payment Link URLs par formule — public, fine to ship in code.
 // Les 3 formules sont des paiements uniques prépayés : 3m = 299€, 6m = 499€, 12m = 899€.
-// TODO (Fred) : coller les 3 Payment Links LIVE créés dans Stripe (paiement unique, sans
-// échelonnement — sinon le bouton ne paie pas).
 const PAYMENT_LINKS: Record<string, string> = {
   "3m": "https://buy.stripe.com/fZu8wObli9Pjg1A5TqcMM0C", // paiement unique 299€ (Fondation, 3 mois)
   "6m": "https://buy.stripe.com/7sYeVccpm1iNbLkchOcMM0D", // paiement unique 499€ (Accélération, 6 mois)
@@ -30,7 +28,7 @@ const TEST_PAYMENT_LINKS: Record<string, string> = {
 // Durée d'accès (en mois) par formule — capturée au consentement pour le calcul d'expiration.
 const ACCESS_MONTHS: Record<string, number> = { "3m": 3, "6m": 6, "12m": 12 };
 
-const CGV_VERSION = "v5"; // bump if /cgv text materially changes
+const CGV_VERSION = "v6"; // bump if /cgv text materially changes
 const CGV_VERSION_TEST = "TEST"; // marqueur pour les consentements de test (exclus de l'export légal)
 
 serve(async (req) => {

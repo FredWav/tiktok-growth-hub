@@ -167,6 +167,11 @@ export default defineConfig(({ mode }) => ({
     },
     dedupe: ["react", "react-dom", "react/jsx-runtime"],
   },
+  // Sans pré-bundling, Vite optimise react-pdf au premier clic sur « Télécharger »
+  // et recharge la page en plein rendu.
+  optimizeDeps: {
+    include: ["@react-pdf/renderer"],
+  },
   build: {
     rollupOptions: {
       output: {

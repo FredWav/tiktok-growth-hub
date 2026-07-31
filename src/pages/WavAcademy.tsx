@@ -34,6 +34,8 @@ import {
   ACADEMY_MODULES_COUNT,
   CREATORS_COUNT,
 } from "@/config/offers";
+import { WAVACADEMY_FAQ } from "@/config/wavacademy-faq";
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { trackPostHogEvent } from "@/lib/posthog";

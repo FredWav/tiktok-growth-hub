@@ -25,6 +25,8 @@ import {
   EXPRESS_PRICE,
   PREMIUM_DURATION_DAYS,
 } from "./offers";
+import { WAVACADEMY_FAQ } from "./wavacademy-faq";
+
 
 export const BASE_URL = "https://fredwav.com";
 export const OG_IMAGE = `${BASE_URL}/og-image.png`;

@@ -366,10 +366,10 @@ export default function ReserverUnAppel() {
       <Section variant="cream" size="lg">
         <div className="max-w-2xl mx-auto text-center mb-10">
           <h1 className="font-display text-3xl md:text-4xl font-semibold tracking-tight mb-4">
-            <span className="text-gold-gradient">Wav Premium</span> — 30 jours d'accompagnement individuel
+            <span className="text-gold-gradient">Premier contact</span> - dis-moi où tu en es
           </h1>
           <p className="text-muted-foreground text-lg">
-            C'est notre premier contact. Plus j'ai d'infos sur ta situation, plus je peux répondre efficacement à ta demande.
+            Pas besoin de savoir ce qu'il te faut. Plus j'ai d'infos sur ta situation, plus je peux t'orienter vers la bonne solution.
           </p>
         </div>
       </Section>

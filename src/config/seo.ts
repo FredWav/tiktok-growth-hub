@@ -85,7 +85,7 @@ export const HOME_FAQ = [
 export const ROUTE_SEO: RouteSeo[] = [
   {
     path: "/",
-    title: "Fred Wav — Expert Stratégie Formats Courts",
+    title: "Fred Wav — Expert stratégie formats courts",
     description:
       "Comprends ce qui fonctionne dans tes contenus, ce qui ne fonctionne pas et pourquoi. Ne crée plus seul : rejoins la Wav Academy.",
     keywords:

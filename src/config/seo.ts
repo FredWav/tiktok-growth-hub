@@ -129,8 +129,9 @@ export const ROUTE_SEO: RouteSeo[] = [
   },
   {
     path: "/wavacademy",
-    title: "Wav Academy — ne poste plus seul, comprends ce qui fonctionne | Fred Wav",
-    description: `Un accompagnement régulier pour ne plus créer seul : live hebdomadaire, suivi ${ACADEMY_SUPPORT_DAYS}, feedback sur tes contenus, ${ACADEMY_MODULES_COUNT} modules et ${ACADEMY_GUIDES_COUNT} guides. Accès ${ACADEMY_PLANS.map((p) => p.duration).join(", ")} — dès ${ACADEMY_FROM} €, paiement unique. Sans promesse de vues.`,
+    title: "Wav Academy — accompagnement créateurs | Fred Wav",
+    description: `Accompagnement régulier pour créateurs : live, feedback, ${ACADEMY_MODULES_COUNT} modules et ${ACADEMY_GUIDES_COUNT} guides. Pass ${ACADEMY_PLANS.map((p) => p.duration).join(", ")} en paiement unique.`,
+
     keywords:
       "wav academy, formation tiktok, accompagnement tiktok, wavstats, accompagnement créateur, formats courts, communauté créateurs",
     noscript: {

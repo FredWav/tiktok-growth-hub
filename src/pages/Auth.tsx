@@ -204,7 +204,7 @@ const Auth: React.FC = () => {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="font-display text-3xl text-primary">Fred Wav</h1>
+          <h1 className="font-display text-3xl text-primary">Fred Wav — Espace Membre</h1>
           <p className="text-cream/60 mt-2">
             {mode === 'login' && "Connectez-vous à votre espace"}
             {mode === 'adminSetup' && "Configuration administrateur"}

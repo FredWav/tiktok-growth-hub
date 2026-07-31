@@ -70,26 +70,31 @@ export default function Contact() {
       <Section variant="default" size="lg">
         <div className="max-w-2xl mx-auto space-y-10">
           {/* Réseaux sociaux */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {socials.map((s) => (
-              <a
-                key={s.name}
-                href={s.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => trackEvent("contact_social_click", { platform: s.name })}
-                className="flex items-center gap-4 p-5 rounded-xl border border-border/50 hover:border-primary/30 hover:shadow-lg transition-all duration-300 group"
-              >
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
-                  <span className="text-primary">{s.icon}</span>
-                </div>
-                <span className="font-semibold">{s.name}</span>
-              </a>
-            ))}
+          <div className="space-y-4">
+            <h2 className="font-display text-2xl font-semibold tracking-tight">Mes réseaux sociaux</h2>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {socials.map((s) => (
+                <a
+                  key={s.name}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackEvent("contact_social_click", { platform: s.name })}
+                  className="flex items-center gap-4 p-5 rounded-xl border border-border/50 hover:border-primary/30 hover:shadow-lg transition-all duration-300 group"
+                >
+                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                    <span className="text-primary">{s.icon}</span>
+                  </div>
+                  <span className="font-semibold">{s.name}</span>
+                </a>
+              ))}
+            </div>
           </div>
 
-          {/* Infos */}
-          <div className="flex flex-col sm:flex-row gap-6">
+          {/* Informations de contact */}
+          <div className="space-y-4">
+            <h2 className="font-display text-2xl font-semibold tracking-tight">Informations de contact</h2>
+            <div className="flex flex-col sm:flex-row gap-6">
             <div className="flex items-start gap-4 flex-1">
               <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
                 <Mail className="h-5 w-5 text-primary" />
@@ -108,6 +113,7 @@ export default function Contact() {
                 <p className="text-muted-foreground text-sm">Sous 48 h ouvrées</p>
               </div>
             </div>
+          </div>
           </div>
 
           {/* CTA */}

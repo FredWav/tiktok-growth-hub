@@ -167,8 +167,9 @@ export const ROUTE_SEO: RouteSeo[] = [
   },
   {
     path: "/analyse-express",
-    title: "Analyse Express — audit TikTok automatisé de ton compte | Fred Wav",
-    description: `Audit TikTok automatisé : health score, métriques, persona et plan d'action. Rapport PDF téléchargeable pour ${EXPRESS_PRICE.toFixed(2).replace(".", ",")} €. TikTok uniquement.`,
+    title: "Analyse Express — audit TikTok | Fred Wav",
+    description: `Audit TikTok automatisé : health score, métriques, persona et plan d'action. Rapport PDF à ${EXPRESS_PRICE.toFixed(2).replace(".", ",")} €.`,
+
     keywords:
       "audit tiktok, audit compte tiktok, diagnostic compte tiktok, health score tiktok, analyse compte tiktok",
     noscript: {

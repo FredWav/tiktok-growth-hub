@@ -15,8 +15,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Download, Loader2, RefreshCw, Search, Mail, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
-import { mapAccountDataForPDF } from "@/lib/pdf-data-mapper";
-import { generateCompletePDFHTML } from "@/lib/pdf-html-generator";
+import { downloadExpressReport } from "@/lib/pdf";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
@@ -30,38 +29,8 @@ const statusConfig: Record<string, { label: string; variant: "default" | "second
 
 async function downloadPDF(analysis: any) {
   try {
-    const result = analysis.result_data;
-    const account = result?.account || result;
-    const persona = result?.persona;
-    const pubPattern = result?.publication_pattern || persona?.style_contenu?.publication_pattern;
-    const aiAnalysis = result?.ai_analysis;
-    const healthScore = result?.health_score || account?.health_score;
-
-    const pdfData = mapAccountDataForPDF(account, persona, pubPattern, aiAnalysis, healthScore);
-    const htmlContent = generateCompletePDFHTML(
-      pdfData,
-      account.ai_insights || '',
-      account.recent_videos || [],
-      healthScore
-    );
-
-    const element = document.createElement("div");
-    element.innerHTML = htmlContent;
-
-    const html2pdf = (await import('html2pdf.js')).default;
-    await (html2pdf().set as any)({
-      margin: [10, 0, 10, 0],
-      filename: `analyse-express-${analysis.tiktok_username}.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, allowTaint: true },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-      pagebreak: {
-        mode: ["avoid-all", "css", "legacy"],
-        avoid: [".video-item", ".stat-card", ".stats-grid", ".stats-section",
-                ".bio-section", ".hashtags-section", ".header", ".hashtags-grid"],
-      },
-    }).from(element).save();
-
+    // buildReportModel tolère les lignes anciennes où result_data EST le compte.
+    await downloadExpressReport(analysis.result_data, analysis.tiktok_username);
     toast.success("PDF téléchargé !");
   } catch (err) {
     console.error("PDF generation error:", err);

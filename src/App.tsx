@@ -64,6 +64,10 @@ const AdminTestimonials = lazy(() => import("./pages/admin/Testimonials"));
 const AdminWavAcademyConsents = lazy(() => import("./pages/admin/WavAcademyConsents"));
 const GoRedirect = lazy(() => import("./pages/GoRedirect"));
 
+// Atelier de mise au point du rapport PDF. `import.meta.env.DEV` est remplacé par
+// une constante au build : la branche est éliminée et le chunk n'est jamais émis.
+const DevPdfPreview = import.meta.env.DEV ? lazy(() => import("./pages/dev/PdfPreview")) : null;
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -175,6 +179,8 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+
+            {DevPdfPreview && <Route path="/dev/pdf" element={<DevPdfPreview />} />}
 
             {/* 404 */}
             <Route path="*" element={<NotFound />} />

@@ -129,8 +129,9 @@ export const ROUTE_SEO: RouteSeo[] = [
   },
   {
     path: "/wavacademy",
-    title: "Wav Academy — ne poste plus seul, comprends ce qui fonctionne | Fred Wav",
-    description: `Un accompagnement régulier pour ne plus créer seul : live hebdomadaire, suivi ${ACADEMY_SUPPORT_DAYS}, feedback sur tes contenus, ${ACADEMY_MODULES_COUNT} modules et ${ACADEMY_GUIDES_COUNT} guides. Accès ${ACADEMY_PLANS.map((p) => p.duration).join(", ")} — dès ${ACADEMY_FROM} €, paiement unique. Sans promesse de vues.`,
+    title: "Wav Academy — accompagnement créateurs | Fred Wav",
+    description: `Accompagnement régulier pour créateurs : live, feedback, ${ACADEMY_MODULES_COUNT} modules et ${ACADEMY_GUIDES_COUNT} guides. Pass ${ACADEMY_PLANS.map((p) => p.duration).join(", ")} en paiement unique.`,
+
     keywords:
       "wav academy, formation tiktok, accompagnement tiktok, wavstats, accompagnement créateur, formats courts, communauté créateurs",
     noscript: {
@@ -166,8 +167,9 @@ export const ROUTE_SEO: RouteSeo[] = [
   },
   {
     path: "/analyse-express",
-    title: "Analyse Express — audit TikTok automatisé de ton compte | Fred Wav",
-    description: `Audit TikTok automatisé : health score, métriques, persona et plan d'action. Rapport PDF téléchargeable pour ${EXPRESS_PRICE.toFixed(2).replace(".", ",")} €. TikTok uniquement.`,
+    title: "Analyse Express — audit TikTok | Fred Wav",
+    description: `Audit TikTok automatisé : health score, métriques, persona et plan d'action. Rapport PDF à ${EXPRESS_PRICE.toFixed(2).replace(".", ",")} €.`,
+
     keywords:
       "audit tiktok, audit compte tiktok, diagnostic compte tiktok, health score tiktok, analyse compte tiktok",
     noscript: {
@@ -195,9 +197,10 @@ export const ROUTE_SEO: RouteSeo[] = [
   },
   {
     path: "/reserverunappel",
-    title: "Contacter Fred Wav - premier échange | Fred Wav",
+    title: "Contacter Fred Wav — premier échange",
     description:
-      "Premier contact avec Fred Wav : décris ta situation en 2 minutes et je t'oriente vers la solution adaptée (audit, session live ou accompagnement). Réponse écrite avant tout appel.",
+      "Premier contact avec Fred Wav : décris ta situation et je t'oriente vers la solution adaptée.",
+
     keywords:
       "contact fred wav, premier contact, réserver un appel, diagnostic contenu, accompagnement formats courts",
     noscript: {
@@ -271,9 +274,10 @@ export const ROUTE_SEO: RouteSeo[] = [
   },
   {
     path: "/newsletter",
-    title: "Guide gratuit : 120+ hooks TikTok classés par objectif | Fred Wav",
+    title: "Guide gratuit : 120+ hooks TikTok | Fred Wav",
     description:
-      "Télécharge gratuitement le guide des 120+ hooks TikTok qui captent l'attention en moins de 2 secondes. Testés sur des millions de vues.",
+      "Télécharge le guide des 120+ hooks TikTok qui captent l'attention en moins de 2 secondes. Testés sur des millions de vues.",
+
     keywords: "guide hooks tiktok, hooks gratuits, accroches tiktok, rétention tiktok, Fred Wav",
     noscript: {
       h1: "Reçois le guide des hooks gratuitement",

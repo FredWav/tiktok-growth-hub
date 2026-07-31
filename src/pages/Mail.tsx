@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SEOHead } from "@/components/SEOHead";
 import { seoFor } from "@/config/seo";
+import { CREATORS_COUNT } from "@/config/offers";
 import { CheckCircle, Loader2, Gift, Zap, FileText, Lightbulb, ShieldAlert } from "lucide-react";
 
 const benefits = [
@@ -220,7 +221,7 @@ export default function MailPage() {
                     <p className="text-center text-xs text-muted-foreground">
                       Déjà{" "}
                       <span className="font-semibold text-foreground">
-                        {subscriberCount != null ? `${subscriberCount}` : "300+"} créateur{subscriberCount !== 1 ? "s" : ""}
+                        {subscriberCount != null ? `${subscriberCount}` : CREATORS_COUNT} créateur{subscriberCount !== 1 ? "s" : ""}
                       </span>{" "}
                       {subscriberCount != null ? "inscrit" + (subscriberCount !== 1 ? "s" : "") : "l'ont téléchargé"}
                     </p>

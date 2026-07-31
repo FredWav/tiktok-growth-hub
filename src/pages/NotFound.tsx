@@ -30,6 +30,12 @@ const NotFound = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">
             <Button asChild>
+              <Link to="/wavacademy">
+                <ArrowRight className="h-4 w-4 mr-2" />
+                Rejoindre la Wav Academy
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
               <Link to="/">
                 <Home className="h-4 w-4 mr-2" />
                 Retour à l'accueil
@@ -45,6 +51,7 @@ const NotFound = () => {
           <nav aria-label="Liens utiles" className="text-sm text-muted-foreground space-y-2">
             <p className="font-medium text-foreground mb-3">Pages populaires :</p>
             <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
+              <Link to="/wavacademy" className="hover:text-primary transition-colors">Wav Academy</Link>
               <Link to="/reserverunappel" className="hover:text-primary transition-colors">Wav Premium</Link>
               <Link to="/analyse-express" className="hover:text-primary transition-colors" onClick={() => trackPostHogEvent("click_analyse_express_nav", { location: "404" })}>Analyse Express</Link>
               <Link to="/preuves" className="hover:text-primary transition-colors">Témoignages</Link>

@@ -105,7 +105,7 @@ export default function Contact() {
               </div>
               <div>
                 <h3 className="font-semibold mb-1">Délai de réponse</h3>
-                <p className="text-muted-foreground text-sm">24-48h en semaine</p>
+                <p className="text-muted-foreground text-sm">Sous 48 h ouvrées</p>
               </div>
             </div>
           </div>

@@ -7,10 +7,14 @@ import {
   ArrowRight,
   CheckCircle2,
   Check,
+  X,
+  Eye,
   Zap,
   Radio,
   RefreshCw,
   MessageSquare,
+  MessageCircle,
+  Users,
   Loader2,
   CreditCard,
 } from "lucide-react";
@@ -21,7 +25,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SEOHead } from "@/components/SEOHead";
 import { seoFor } from "@/config/seo";
-import { ACADEMY_PLANS, ACADEMY_FEATURES, ACADEMY_FROM, ACADEMY_ENTRY, CREATORS_COUNT } from "@/config/offers";
+import {
+  ACADEMY_PLANS,
+  ACADEMY_FEATURES,
+  ACADEMY_FROM,
+  ACADEMY_ENTRY,
+  ACADEMY_GUIDES_COUNT,
+  ACADEMY_MODULES_COUNT,
+  CREATORS_COUNT,
+} from "@/config/offers";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { trackPostHogEvent } from "@/lib/posthog";
@@ -66,41 +78,78 @@ const yearsSince = (startYear: number) => new Date().getFullYear() - startYear;
 
 // ── Proof strip ────────────────────────────────────────────────────────────
 const proofItems = [
-  "Diagnostic IA sur chaque vidéo",
-  "Contenu stratégique quotidien",
-  "Live hebdo avec Fred",
+  "Un regard régulier sur ton travail",
+  "Suivi 5 jours sur 7",
+  "Live chaque jeudi, de 14h à 16h",
   "Paiement unique, sans abonnement",
 ];
 
-// ── Ce que tu obtiens (concret, zéro hype) ─────────────────────────────────
-const includes = [
+// ── Ce qui change (avant / après) ──────────────────────────────────────────
+const beforeAfter = {
+  before:
+    "Tu crées seul. Tu publies dans le doute. Tu manques de recul. Tu accumules des informations et tu répètes les mêmes erreurs.",
+  after:
+    "Tu crées avec un cadre. Tu obtiens des retours. Tu comprends tes résultats. Tu sais ce qu'il faut améliorer, et tu décides plus vite.",
+};
+
+// ── Ce que tu obtiens vraiment ─────────────────────────────────────────────
+// L'ordre compte : c'est l'accompagnement qui est vendu, pas l'outil.
+// WavStats vit plus bas, avec les ressources.
+const gains = [
   {
-    icon: Zap,
-    title: "WavSocialScan",
-    desc: "Tu colles le lien d'une vidéo, tu reçois un diagnostic en quelques secondes : hook, CTA, rétention estimée, ce qui cloche, quoi changer. 3 000 crédits/mois inclus (≈ 30 vidéos analysées).",
-  },
-  {
-    icon: RefreshCw,
-    title: "Le Tapis Roulant",
-    desc: "Un contenu stratégique applicable le jour même, posté chaque jour sur le Discord. 15 en rotation permanente ; ce que tu rates ne revient pas.",
-  },
-  {
-    icon: Radio,
-    title: "Le live hebdo",
-    desc: "Une fois par semaine, en direct avec moi : tu poses tes questions, j'analyse des comptes, je décortique ce qui marche maintenant.",
+    icon: Eye,
+    title: "Un regard régulier sur ton travail.",
+    desc: "Tu montres une vidéo, un compte, une stratégie. Je te dis ce qui va, ce qui ne va pas, et pourquoi.",
   },
   {
     icon: MessageSquare,
-    title: "Le Discord premium",
-    desc: "La communauté et les canaux avancés, réservés aux membres de l'Academy.",
+    title: "Une réponse quand tu es bloqué.",
+    desc: "Suivi cinq jours sur sept. Tes questions sont vérifiées tous les jours, tu n'attends pas la semaine suivante.",
+  },
+  {
+    icon: Radio,
+    title: "Un live chaque jeudi, de 14h à 16h.",
+    desc: "Questions, réponses, cas concrets. En direct, pas en différé.",
+  },
+  {
+    icon: MessageCircle,
+    title: "Du feedback sur n'importe lequel de tes contenus.",
+    desc: "Sur demande, autant de fois que tu veux.",
+  },
+  {
+    icon: Users,
+    title: "Une communauté qui bosse.",
+    desc: "Le Discord premium, et un accès direct.",
   },
 ];
 
 // ── Comment ça marche (3 étapes) ───────────────────────────────────────────
 const steps = [
-  { n: "1", text: "Tu postes ta vidéo." },
-  { n: "2", text: "Tu la passes au WavSocialScan." },
-  { n: "3", text: "Tu corriges le paramètre qui cloche, tu reposte." },
+  { n: "1", text: "Tu montres ton contenu, ton compte ou ta stratégie." },
+  { n: "2", text: "Je te dis ce qui va, ce qui ne va pas, et pourquoi." },
+  { n: "3", text: "Tu corriges avec un cadre, pas au hasard." },
+];
+
+// ── Ce que je garantis, ce que je ne garantis pas ──────────────────────────
+const guarantees = {
+  yes: ["Ma présence", "Mes réponses", "Mes analyses", "Mes feedbacks", "Les ressources", "De l'aide pour décider"],
+  no: ["Des vues", "De la croissance", "Un revenu", "De la viralité"],
+};
+
+// ── Les ressources incluses ────────────────────────────────────────────────
+const resources = [
+  {
+    label: `${ACADEMY_MODULES_COUNT} modules de formation`,
+    desc: "Des bases de TikTok à la monétisation, en passant par l'analyse, la technique et le mindset.",
+  },
+  {
+    label: `${ACADEMY_GUIDES_COUNT} cours, fiches et guides téléchargeables`,
+    desc: "120+ hooks prêts à l'emploi, la direction artistique, l'algorithme expliqué, l'A/B testing, le droit d'auteur, la fiscalité du créateur, l'IA dans ton workflow, et le reste.",
+  },
+  {
+    label: "WavStats inclus, 3 000 crédits par mois",
+    desc: "L'outil qui analyse tes vidéos et te dit quoi corriger.",
+  },
 ];
 
 // ── Formules (3 Pass prépayés) ─────────────────────────────────────────────
@@ -125,19 +174,23 @@ const VIDEO_TESTIMONIALS = [
 const FAQ = [
   {
     q: "Je débute totalement, c'est pour moi ?",
-    a: "Oui. Le principe du Wav Academy, c'est justement de ne plus poster à l'aveugle. Tu diagnostiques chaque vidéo avec le WavSocialScan et tu corriges au fur et à mesure — que tu en sois à ta 3e ou à ta 300e vidéo. Tu avances avec une méthode, pas en devinant.",
+    a: "Oui. Le principe de la Wav Academy, c'est justement de ne plus avancer seul. Tu montres ton travail, tu obtiens des retours, et tu progresses avec un cadre — que tu en sois à ta 3e ou à ta 300e vidéo.",
   },
   {
     q: "Concrètement, qu'est-ce que je reçois une fois inscrit ?",
-    a: "Un accès au Discord premium du Wav Academy (canaux avancés), 3 000 crédits WavSocialScan chaque mois (≈ 30 analyses de vidéo ou 10 analyses de compte), le Tapis Roulant (un contenu stratégique frais chaque jour, 15 en rotation permanente) et le live hebdomadaire avec Fred.",
+    a: "Un accompagnement : le live du jeudi de 14h à 16h, un suivi 5 jours sur 7, du feedback sur tes contenus à la demande, et le Discord premium. Plus les ressources : 6 modules de formation, 19 guides téléchargeables et 3 000 crédits WavStats par mois.",
   },
   {
     q: "Combien de temps ça me prend par semaine ?",
-    a: "Le système est fait pour les créateurs déjà occupés. Une analyse de vidéo prend quelques minutes, et le Tapis Roulant te donne une action concrète applicable le jour même. Tu peux en faire autant ou aussi peu que tu veux — mais plus tu diagnostiques, plus vite tu trouves ton Format Signature.",
+    a: "Le système est fait pour les créateurs déjà occupés. Le live dure deux heures chaque jeudi, et tu poses tes questions quand tu veux : elles sont vérifiées 5 jours sur 7. Tu peux en faire autant ou aussi peu que tu veux.",
   },
   {
-    q: "Le WavSocialScan est-il vraiment inclus ?",
-    a: "Oui. Il coûte normalement de 14,90€/mois (Standard) à 39,90€/mois (Premium). En tant que membre, tu reçois 3 000 crédits gratuits chaque mois, inclus dans ta formule.",
+    q: "Le WavStats est-il vraiment inclus ?",
+    a: "Oui. Il coûte normalement de 14,90 €/mois (Starter) à 149 €/mois (Agency). En tant que membre, tu reçois 3 000 crédits gratuits chaque mois, inclus dans ta formule.",
+  },
+  {
+    q: "Tu me garantis des vues ?",
+    a: "Non, et personne ne peut le garantir. Je garantis ma présence, mes réponses, mes analyses, mes feedbacks et les ressources. Ce que je peux tenir, c'est que tu ne restes plus seul face à tes questions et à tes contenus.",
   },
   {
     q: "C'est un abonnement ? Je peux annuler ?",
@@ -216,7 +269,7 @@ export default function WavAcademy() {
         <SEOHead
           {...seoFor("/wavacademy")}
           title="Bienvenue dans la Wav Academy ! | Fred Wav"
-          description="Ton accès Wav Academy est confirmé. Rejoins le Discord et commence ton premier diagnostic."
+          description="Ton accès Wav Academy est confirmé. Rejoins le Discord et présente ton compte."
           noindex
         />
         <Section variant="cream" size="xl">
@@ -260,11 +313,10 @@ export default function WavAcademy() {
             Wav Academy — Accès ouvert maintenant
           </div>
           <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight mb-6">
-            Diagnostique chaque vidéo, corrige en temps réel,{" "}
-            <span className="text-gold-gradient">casse ton plafond de vues.</span>
+            Ne poste <span className="text-gold-gradient">plus seul.</span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-            Un outil qui analyse tes vidéos et te dit quoi corriger. Du contenu stratégique chaque jour. Mes lives chaque semaine. Tu arrêtes de deviner.
+            Comprends pourquoi ton contenu fonctionne ou bloque, identifie quoi améliorer, et avance avec un accompagnement régulier. Sans promesse miracle de vues ou de rentabilité.
           </p>
           <div className="max-w-3xl mx-auto mb-10">
             <VideoCard
@@ -275,7 +327,7 @@ export default function WavAcademy() {
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="hero" size="xl" onClick={scrollToPlans}>
-              Rejoindre Wav Academy
+              Rejoindre la Wav Academy
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -299,15 +351,51 @@ export default function WavAcademy() {
         </div>
       </Section>
 
-      {/* ── CE QUE TU OBTIENS ────────────────────────────────────────────── */}
+      {/* ── LE PROBLÈME ──────────────────────────────────────────────────── */}
+      <Section variant="default" size="md">
+        <div className="max-w-3xl mx-auto">
+          <p className="font-display text-2xl md:text-3xl font-semibold tracking-tight text-center mb-8">
+            Tu publies. Parfois ça marche, souvent non, et tu ne sais pas pourquoi.
+          </p>
+          <p className="text-lg text-foreground/80 leading-relaxed mb-6">
+            Tu as déjà lu des conseils. Beaucoup. Tu as peut-être même acheté une formation que tu n'as pas terminée. Le problème n'est pas le manque d'informations, il y en a partout. Le problème, c'est que personne ne regarde <strong className="text-foreground">ton</strong> compte, <strong className="text-foreground">tes</strong> vidéos, <strong className="text-foreground">tes</strong> chiffres, et ne te dit quoi faire ensuite.
+          </p>
+          <p className="text-lg text-foreground/80 leading-relaxed">
+            Créer seul, c'est deviner. Et deviner, ça coûte des mois.
+          </p>
+        </div>
+      </Section>
+
+      {/* ── CE QUI CHANGE ────────────────────────────────────────────────── */}
+      <Section variant="cream" size="lg">
+        <SectionHeader title="Ce qui change." />
+        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
+          <div className="bg-background rounded-xl p-8 border border-border">
+            <h3 className="font-display text-xl font-semibold mb-4 flex items-center gap-2 text-muted-foreground">
+              <X className="h-5 w-5 text-muted-foreground/60" />
+              Avant
+            </h3>
+            <p className="text-muted-foreground leading-relaxed">{beforeAfter.before}</p>
+          </div>
+          <div className="bg-background rounded-xl p-8 border-2 border-primary/30 shadow-sm">
+            <h3 className="font-display text-xl font-semibold mb-4 flex items-center gap-2">
+              <Check className="h-5 w-5 text-primary" />
+              Après
+            </h3>
+            <p className="text-foreground/80 leading-relaxed">{beforeAfter.after}</p>
+          </div>
+        </div>
+      </Section>
+
+      {/* ── CE QUE TU OBTIENS VRAIMENT ───────────────────────────────────── */}
       <Section variant="default" size="lg">
         <SectionHeader
-          title="Ce que tu obtiens."
-          subtitle="Concret, tout de suite. Pas de promesse — des outils."
+          title="Ce que tu obtiens vraiment."
+          subtitle="Pas un stock de documents. Un regard, un suivi, et des réponses."
         />
         <div className="max-w-4xl mx-auto grid sm:grid-cols-2 gap-6">
-          {includes.map((b) => (
-            <div key={b.title} className="p-6 rounded-2xl bg-background border border-border">
+          {gains.map((b) => (
+            <div key={b.title} className="p-6 rounded-2xl bg-background border border-border sm:last:col-span-2">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                   <b.icon className="h-5 w-5 text-primary" />
@@ -334,17 +422,17 @@ export default function WavAcademy() {
           ))}
         </div>
         <p className="text-center text-foreground/80 mt-8 max-w-2xl mx-auto leading-relaxed">
-          Vidéo après vidéo, tu trouves le format qui marche pour toi. Pas en 6 mois — en 15 à 20 vidéos.
+          Vidéo après vidéo, tu trouves le format qui marche pour toi.
         </p>
         <p className="text-center text-muted-foreground mt-4 max-w-2xl mx-auto text-sm leading-relaxed">
-          Le contenu, c'est 30 % du résultat. Le reste, c'est lire tes stats et corriger le bon paramètre. C'est ce que l'outil te montre.
+          Le contenu, c'est 30 % du résultat. Le reste, c'est lire tes stats et corriger le bon paramètre. C'est ce qu'on regarde ensemble.
         </p>
       </Section>
 
       {/* ── CRÉDIBILITÉ ──────────────────────────────────────────────────── */}
       <Section variant="default" size="md">
         <div className="max-w-3xl mx-auto">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center mb-10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
             <div className="p-6 rounded-2xl bg-accent/40 border border-border">
               <p className="font-display text-4xl font-bold text-primary mb-2">{yearsSince(AUDIOVISUAL_START_YEAR)} ans</p>
               <p className="text-muted-foreground text-sm">d'expérience dans l'audiovisuel</p>
@@ -358,17 +446,9 @@ export default function WavAcademy() {
               <p className="text-muted-foreground text-sm">créateurs accompagnés</p>
             </div>
             <div className="p-6 rounded-2xl bg-accent/40 border border-border">
-              <p className="font-display text-4xl font-bold text-primary mb-2">3-6 sem.</p>
-              <p className="text-muted-foreground text-sm">pour trouver son Format Signature</p>
+              <p className="font-display text-4xl font-bold text-primary mb-2">2h/sem</p>
+              <p className="text-muted-foreground text-sm">de live et de suivi en direct</p>
             </div>
-          </div>
-          <div className="p-6 rounded-2xl bg-accent/30 border border-border text-center">
-            <p className="text-muted-foreground leading-relaxed">
-              Un créateur qui poste sans diagnostic met en moyenne <strong>6 à 12 mois</strong> pour trouver son format.
-              Un créateur qui analyse ses résultats après chaque vidéo y arrive en <strong>3 à 6 semaines</strong>.
-              <br /><br />
-              <span className="font-semibold text-foreground">300 vidéos à l'aveugle, ou 20 vidéos diagnostiquées. Le résultat est le même. Le chemin, non.</span>
-            </p>
           </div>
         </div>
       </Section>
@@ -389,6 +469,75 @@ export default function WavAcademy() {
             />
           ))}
         </div>
+      </Section>
+
+      {/* ── CE QUE JE GARANTIS, CE QUE JE NE GARANTIS PAS ────────────────── */}
+      {/* SectionHeader met son sous-titre en text-muted-foreground, illisible sur
+          fond noir : header manuel, comme le CTA final. */}
+      <Section variant="dark" size="lg">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-cream mb-4">
+              Ce que je garantis.{" "}
+              <span className="text-gold-gradient">Ce que je ne garantis pas.</span>
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="rounded-2xl border-2 border-primary/40 bg-cream/5 p-8">
+              <h3 className="font-display text-xl font-semibold text-cream mb-6">
+                Ce que je garantis
+              </h3>
+              <ul className="space-y-4">
+                {guarantees.yes.map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-sm text-cream/90">
+                    <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-2xl border border-cream/15 p-8">
+              <h3 className="font-display text-xl font-semibold text-cream/70 mb-6">
+                Ce que je ne garantis pas
+              </h3>
+              <ul className="space-y-4">
+                {guarantees.no.map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-sm text-cream/60">
+                    <X className="h-4 w-4 text-cream/30 mt-0.5 shrink-0" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <p className="text-center text-cream/70 mt-10 max-w-2xl mx-auto leading-relaxed">
+            Personne ne contrôle un algorithme. Ceux qui te promettent des chiffres te mentent, et c'est illégal. Ce que je peux tenir, c'est que tu ne restes plus seul face à tes questions et à tes contenus.
+          </p>
+        </div>
+      </Section>
+
+      {/* ── LES RESSOURCES INCLUSES ──────────────────────────────────────── */}
+      <Section variant="cream" size="md">
+        <SectionHeader
+          title="Les ressources incluses."
+          subtitle="Pour que l'accompagnement ait de quoi s'appuyer."
+        />
+        <div className="max-w-3xl mx-auto space-y-4">
+          {resources.map((r) => (
+            <div key={r.label} className="p-6 rounded-2xl bg-background border border-border">
+              <div className="flex items-start gap-3">
+                <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold mb-1">{r.label}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{r.desc}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="text-center text-foreground/80 mt-8 max-w-2xl mx-auto leading-relaxed">
+          Ce ne sont pas les documents qui font la différence. C'est ce qu'on en fait ensemble.
+        </p>
       </Section>
 
       {/* ── FORMULES ─────────────────────────────────────────────────────── */}
@@ -455,7 +604,7 @@ export default function WavAcademy() {
             <li className="flex items-start gap-3 text-sm sm:col-span-2">
               <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
               <div>
-                <span className="font-semibold">3 000 crédits WavSocialScan/mois</span>
+                <span className="font-semibold">3 000 crédits WavStats/mois</span>
                 <p className="text-xs text-muted-foreground mt-0.5">≈ 30 analyses de vidéo ou 10 analyses de compte</p>
               </div>
             </li>
@@ -523,18 +672,28 @@ export default function WavAcademy() {
       {/* ── CTA FINAL (unique) ───────────────────────────────────────────── */}
       <Section variant="dark" size="lg">
         <div className="max-w-2xl mx-auto text-center">
-          <h2 className="font-display text-3xl md:text-4xl font-semibold text-cream mb-4">
-            Rejoins le Wav Academy.
+          <h2 className="font-display text-3xl md:text-4xl font-semibold text-cream mb-8">
+            Rejoins la Wav Academy.
           </h2>
-          <p className="text-cream/70 text-lg mb-8">
-            Diagnostique ta prochaine vidéo dès cette semaine, et arrête de poster à l'aveugle.
-          </p>
           <Button variant="hero" size="xl" onClick={scrollToPlans}>
-            Voir les formules
+            Rejoindre la Wav Academy
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
           <p className="text-cream/40 text-sm mt-4">
             Dès {ACADEMY_FROM} € pour {ACADEMY_ENTRY.duration} d'accès · paiement unique · démarrage immédiat.
+          </p>
+          {/* TODO destination appel stratégique — à confirmer avec Fred.
+              /reserverunappel est aujourd'hui la candidature Wav Premium, pas un
+              appel de découverte Academy. */}
+          <p className="text-cream/70 text-sm mt-6">
+            Ou parle-m'en d'abord :{" "}
+            <Link
+              to="/reserverunappel"
+              className="text-cream underline underline-offset-4 decoration-cream/40 hover:decoration-cream transition-colors"
+            >
+              appel stratégique offert
+            </Link>
+            .
           </p>
         </div>
       </Section>

@@ -122,8 +122,9 @@ serve(async (req) => {
     const username = lookupRow?.tiktok_username as string | undefined;
     if (!username) throw new Error("Username TikTok introuvable pour cette session");
 
-    const apiKey = Deno.env.get("WAV_SOCIAL_SCAN_API_KEY");
-    if (!apiKey) throw new Error("Clé API WavSocialScan non configurée");
+    // Repli sur l'ancien nom de secret tant que WAVSTATS_API_KEY n'existe pas côté dashboard.
+    const apiKey = Deno.env.get("WAVSTATS_API_KEY") ?? Deno.env.get("WAV_SOCIAL_SCAN_API_KEY");
+    if (!apiKey) throw new Error("Clé API WavStats non configurée");
 
     const jobRes = await fetch(`${API_BASE}/jobs/${encodeURIComponent(job_id)}`, {
       headers: { "X-API-Key": apiKey },

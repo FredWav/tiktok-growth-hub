@@ -96,7 +96,7 @@ export default function Claim() {
             <>
               <CheckCircle2 className="h-16 w-16 text-primary mx-auto mb-6" />
               <h1 className="font-display text-3xl md:text-4xl font-semibold mb-4">
-                Bienvenue dans le {planLabel}
+                Bienvenue dans la {planLabel}
               </h1>
               <p className="text-lg text-muted-foreground mb-8">
                 Connecte-toi avec ton compte Discord pour activer automatiquement ton rôle sur le serveur. Ça prend 5 secondes.
@@ -115,7 +115,7 @@ export default function Claim() {
               <CheckCircle2 className="h-16 w-16 text-primary mx-auto mb-6" />
               <h1 className="font-display text-3xl md:text-4xl font-semibold mb-4">Ton accès est déjà actif</h1>
               <p className="text-muted-foreground mb-8">
-                Le rôle {planLabel} a déjà été attribué à ton compte Discord. Direction le serveur !
+                Le rôle de la {planLabel} a déjà été attribué à ton compte Discord. Direction le serveur !
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button variant="hero" size="xl" asChild>

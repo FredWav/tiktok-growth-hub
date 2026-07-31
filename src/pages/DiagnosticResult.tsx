@@ -96,7 +96,7 @@ const DiagnosticResult = () => {
     <p className="text-sm text-muted-foreground mt-4">
       Besoin d'en discuter par écrit ?{" "}
       <a
-        href="mailto:fredwavcm@gmail.com"
+        href="mailto:contact@fredwav.com"
         className="text-primary underline underline-offset-4 hover:text-primary/80"
         onClick={() => trackPostHogEvent("contact_mail_clicked", { source_offer: offer })}
       >
@@ -182,12 +182,13 @@ const DiagnosticResult = () => {
               <CardHeader><CardTitle className="font-display text-xl">Wav Academy</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground">
-                  Avec ton budget, la Wav Academy est l'option la plus rentable : toute la méthode de Fred,
-                  le diagnostic continu de ton compte et la communauté, à partir de {ACADEMY_FROM} € en paiement unique (accès 3 mois).
+                  Avec ton budget, la Wav Academy est l'option la plus adaptée : un regard régulier sur ton travail,
+                  un live chaque jeudi de 14h à 16h, un suivi 5 jours sur 7 et du feedback sur tes contenus quand tu en as
+                  besoin, à partir de {ACADEMY_FROM} € en paiement unique (accès 3 mois).
                 </p>
                 <ul className="space-y-2 text-muted-foreground">
-                  <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Contenu stratégique quotidien sur Discord</li>
-                  <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Diagnostics IA de ton compte inclus</li>
+                  <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Live hebdomadaire et suivi 5 jours sur 7</li>
+                  <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> 3 000 crédits WavStats par mois inclus</li>
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Communauté de créateurs qui avancent</li>
                 </ul>
                 <Button
@@ -221,7 +222,7 @@ const DiagnosticResult = () => {
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Accompagnement sur mesure</li>
                   <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Structuration business et contenu</li>
-                  <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Scale de l'audience et monétisation</li>
+                  <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span> Stratégie d'audience et monétisation</li>
                 </ul>
                 <Button
                   variant="hero"

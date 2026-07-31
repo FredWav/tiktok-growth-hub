@@ -240,72 +240,53 @@ serve(async (req) => {
         }
       }
 
-      // ── Provisioning WavSocialScan (crédits inclus dans l'offre) ─────────────
-      // Contrat fourni par WavStats. Leur back n'est plus sur Supabase depuis mars :
-      // c'est du Node/Express derrière nginx, d'où l'URL en wavstats.com et non un
-      // projet Supabase. L'endpoint est `wavacademy-provision`.
+      // ── Provisioning WavStats (crédits inclus dans l'offre) ──────────────────
+      // API Partenaires WavStats : une clé dans X-API-Key, plus de signature HMAC.
+      // Leur back est du Node/Express derrière nginx, d'où l'URL en wavstats.com.
       //
-      // ⚠️ DÉSACTIVÉ PAR DÉFAUT. WavStats a demandé de garder le traitement manuel
-      // tant que trois choses ne sont pas livrées de leur côté : la recharge
-      // mensuelle des crédits (aujourd'hui versés une seule fois), la coupure à
-      // l'échéance (aujourd'hui l'accès ne s'arrête jamais), et surtout le chemin
-      // de reconnexion (un membre provisionné ne peut plus revenir une fois son
-      // lien consommé). Brancher avant produirait des comptes à moitié cassés.
-      // Passer WAVSTATS_PROVISION_ENABLED à "true" quand ils donnent le feu vert.
+      // Les trois blocages qui justifiaient le traitement manuel sont levés côté
+      // WavStats : les crédits se rechargent chaque mois, l'accès s'arrête seul à
+      // `expiresAt`, et le compte du membre reste ouvert après l'échéance.
+      //
+      // Reste désactivé tant que WAVSTATS_PARTNER_KEY et WAVSTATS_PARTNER_PLAN_ID
+      // ne sont pas dans le dashboard : passer WAVSTATS_PROVISION_ENABLED à "true".
       let activationUrl: string | null = null;
+      let wavstatsProvisioned = false;
       let wavstatsError: string | null = null;
 
       const provisionEnabled = Deno.env.get("WAVSTATS_PROVISION_ENABLED") === "true";
-      const wavstatsFnUrl =
-        Deno.env.get("WAVSTATS_FUNCTIONS_URL") ?? "https://wavstats.com/functions/v1";
-      // Secret dédié, distinct de la clé API de l'Analyse Express.
-      const hmacSecret = Deno.env.get("WAVACADEMY_HMAC_SECRET");
+      // Clé partenaire, distincte de WAVSTATS_API_KEY (rapports / Analyse Express).
+      const partnerKey = Deno.env.get("WAVSTATS_PARTNER_KEY");
+      const partnerPlanId = Deno.env.get("WAVSTATS_PARTNER_PLAN_ID");
 
-      if (provisionEnabled && hmacSecret && accessExpiresAt) {
-        // Le corps est sérialisé UNE SEULE FOIS : on signe cette chaîne exacte et on
-        // envoie cette chaîne exacte. Re-sérialiser l'objet au moment du fetch
-        // invaliderait la signature (le serveur re-sérialise le corps parsé).
+      // Un paiement sandbox (?test=1) consommerait une place réelle chez le
+      // partenaire : on ne provisionne que sur les événements live.
+      const canProvision = provisionEnabled && event.livemode && !!accessExpiresAt;
+
+      if (canProvision && partnerKey && partnerPlanId) {
+        // externalRef unique par vente : rappeler avec la même valeur ne crée pas
+        // de doublon et ne redistribue pas de crédits, donc un rejeu est sans risque.
         const body = JSON.stringify({
-          stripeSubscriptionId: stripeSubscriptionId ?? session.id,
+          externalRef: session.id,
           email,
-          plan, // "live" → "growth" (3 000 crédits) côté WavStats
-          periodEnd: accessExpiresAt,
+          planId: partnerPlanId,
+          expiresAt: accessExpiresAt,
         });
 
-        const sign = async (timestamp: string): Promise<string> => {
-          const key = await crypto.subtle.importKey(
-            "raw",
-            new TextEncoder().encode(hmacSecret),
-            { name: "HMAC", hash: "SHA-256" },
-            false,
-            ["sign"],
-          );
-          const sigBytes = await crypto.subtle.sign(
-            "HMAC",
-            key,
-            new TextEncoder().encode(`${timestamp}.${body}`),
-          );
-          return Array.from(new Uint8Array(sigBytes))
-            .map((b) => b.toString(16).padStart(2, "0"))
-            .join("");
-        };
-
-        // 3 tentatives, backoff 1s / 4s. Chaque essai est RE-SIGNÉ avec un
-        // horodatage neuf : la fenêtre de validité est de 5 minutes et rejouer une
-        // vieille signature donnerait un timestamp_expired.
+        // 3 tentatives, backoff 1s / 4s. WavStats suggère 1/4/16 mais 16 s ferait
+        // dépasser le délai de réponse au webhook Stripe ; en cas d'échec définitif,
+        // rejouer l'appel à la main avec le même externalRef est idempotent.
         const BACKOFF_MS = [1000, 4000];
         for (let attempt = 1; attempt <= 3; attempt++) {
           try {
-            const timestamp = Math.floor(Date.now() / 1000).toString();
-            const res = await fetch(`${wavstatsFnUrl.replace(/\/$/, "")}/wavacademy-provision`, {
+            const res = await fetch("https://wavstats.com/api/v1/partners/subscriptions", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                "X-WavLab-Timestamp": timestamp,
-                "X-WavLab-Signature": await sign(timestamp),
+                "X-API-Key": partnerKey,
               },
               body,
-              signal: AbortSignal.timeout(15_000),
+              signal: AbortSignal.timeout(20_000),
             });
 
             const text = await res.text();
@@ -317,8 +298,17 @@ serve(async (req) => {
             }
 
             if (res.ok) {
+              // activationUrl n'est renvoyée que pour un client qui découvre
+              // WavStats. Absente = il avait déjà un compte, il se connecte
+              // normalement — c'est un succès, pas un échec.
+              wavstatsProvisioned = true;
               activationUrl = (parsed?.activationUrl as string) ?? null;
-              console.log(`WavStats provisioning OK (essai ${attempt}) • ${email}`);
+              wavstatsError = null;
+              console.log(
+                `WavStats provisioning OK (essai ${attempt}) • ref=${session.id} • ${email} • HTTP ${res.status} • ${
+                  activationUrl ? "lien d'activation émis" : "compte existant"
+                }`,
+              );
               break;
             }
 
@@ -326,36 +316,47 @@ serve(async (req) => {
               (parsed?.error as { code?: string })?.code ??
               (parsed?.error as string) ??
               text.slice(0, 200);
-            const retryable = res.status >= 500 || res.status === 429 || res.status === 408;
+            // TRY_AGAIN signale des appels concurrents, RATE_LIMITED un dépassement
+            // du plafond de 60 appels par minute : les deux se retentent.
+            const retryable =
+              res.status >= 500 ||
+              res.status === 429 ||
+              res.status === 408 ||
+              code === "TRY_AGAIN" ||
+              code === "RATE_LIMITED";
             wavstatsError = `HTTP ${res.status} • ${code}`;
 
             // 405 avec du HTML = la requête n'a pas atteint l'app, elle est tombée
-            // sur le fallback nginx. Ce n'est pas un problème de signature.
+            // sur le fallback nginx.
             if (res.status === 405 && !parsed) {
               wavstatsError = "HTTP 405 (nginx) — la requête n'atteint pas l'application WavStats";
             }
 
-            console.error(`WavStats provisioning échec (essai ${attempt}): ${wavstatsError}`);
+            console.error(
+              `WavStats provisioning échec (essai ${attempt}) • ref=${session.id} • ${email} • ${wavstatsError}`,
+            );
             if (!retryable || attempt === 3) break;
           } catch (err) {
             wavstatsError = err instanceof Error ? err.message : String(err);
-            console.error(`WavStats provisioning erreur réseau (essai ${attempt}): ${wavstatsError}`);
+            console.error(
+              `WavStats provisioning erreur réseau (essai ${attempt}) • ref=${session.id} • ${email} • ${wavstatsError}`,
+            );
             if (attempt === 3) break;
           }
           await new Promise((r) => setTimeout(r, BACKOFF_MS[attempt - 1]));
         }
 
-        if (!activationUrl) {
+        if (!wavstatsProvisioned) {
           await safeNotifyError(
             "WavAcademy Webhook",
-            `⚠️ Provisioning WavStats ÉCHOUÉ • ${email} • ${wavstatsError ?? "raison inconnue"} • créditer manuellement`,
+            `⚠️ Provisioning WavStats ÉCHOUÉ • ${email} • ref=${session.id} • ${wavstatsError ?? "raison inconnue"} • créditer manuellement`,
           );
         }
-      } else if (provisionEnabled && !hmacSecret) {
-        wavstatsError = "WAVACADEMY_HMAC_SECRET absent";
+      } else if (canProvision) {
+        wavstatsError = partnerKey ? "WAVSTATS_PARTNER_PLAN_ID absent" : "WAVSTATS_PARTNER_KEY absent";
         await safeNotifyError(
           "WavAcademy Webhook",
-          `⚠️ Provisioning WavStats activé mais secret absent • créditer manuellement ${email}`,
+          `⚠️ Provisioning WavStats activé mais mal configuré (${wavstatsError}) • créditer manuellement ${email}`,
         );
       }
 
@@ -365,7 +366,7 @@ serve(async (req) => {
         await supabase
           .from("wavacademy_subscriptions")
           .update({
-            wavstats_provisioned_at: activationUrl ? new Date().toISOString() : null,
+            wavstats_provisioned_at: wavstatsProvisioned ? new Date().toISOString() : null,
             wavstats_activation_url: activationUrl,
             wavstats_error: wavstatsError,
           })
@@ -389,6 +390,7 @@ serve(async (req) => {
               plan_type: plan,
               access_months: accessMonths,
               wavstats_activation_url: activationUrl,
+              wavstats_provisioned: wavstatsProvisioned,
             }),
           });
 
@@ -417,10 +419,12 @@ serve(async (req) => {
         "WavAcademy",
         `Nouveau membre • ${plan} • ${accessMonths ?? "?"} mois • ${email} • ${
           claimEmailSent ? "email d'activation envoyé" : "⚠️ EMAIL NON ENVOYÉ, à traiter à la main"
-        } • WavSocialScan ${
-          activationUrl
-            ? "provisionné"
-            : provisionEnabled
+        } • WavStats ${
+          wavstatsProvisioned
+            ? activationUrl
+              ? "provisionné"
+              : "provisionné (compte existant)"
+            : canProvision
               ? "⚠️ ÉCHEC, à créditer à la main"
               : "à créditer à la main (provisioning pas encore activé)"
         }`,

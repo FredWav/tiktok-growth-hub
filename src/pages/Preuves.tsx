@@ -23,7 +23,7 @@ const videoTestimonials = [
   { id: "g9QYqO-xiqw", alt: "Témoignage client - Retour d'expérience Wav Premium" },
   { id: "cc1cRfCEJGE", alt: "Témoignage client - Résultats après coaching stratégie de contenu" },
   { id: "hwTyjA6BORY", alt: "Témoignage client - Transformation de présence en ligne" },
-  { id: "FrMFqiAqAkU", alt: "Témoignage client - Impact du One Shot sur la stratégie de contenu" },
+  { id: "FrMFqiAqAkU", alt: "Témoignage client - impact sur la stratégie de contenu" },
   { id: "s-VaJvfFqbM", alt: "Témoignage client - Croissance après accompagnement" },
   { id: "wu2CPcqp-yU", alt: "Témoignage client - Avis sur le Wav Premium de Fred Wav" },
 ];
@@ -34,7 +34,7 @@ const caseStudies = [
     title: "Passer du chaos à une stratégie claire",
     before: ["Publications irrégulières", "Aucun système", "Aucune lecture des stats"],
     after: ["Calendrier éditorial structuré", "Hooks retravaillés", "CTA optimisés", "Premières demandes entrantes"],
-    resultLabel: "Résultat type observé",
+    resultLabel: "Observé chez des créateurs accompagnés",
     results: [
       "Vidéos qui dépassent régulièrement les 5k-15k vues",
       "1 à 3 prospects qualifiés par semaine",
@@ -57,26 +57,41 @@ const caseStudies = [
 
 const stats = [
   { icon: Users, value: CREATORS_COUNT, label: "Clients accompagnés" },
-  { icon: Eye, value: "10M+", label: "Vues générées" },
+  { icon: Eye, value: "10M+", label: "de vues analysées" },
   { icon: TrendingUp, value: "95%", label: "Taux de satisfaction" },
 ];
 
 const chooseOffers = [
   {
+    icon: Crown,
+    title: "La Wav Academy",
+    description: "L'accompagnement pour ne plus poster seul",
+    price: "dès 299 € / 3 mois",
+    cta: "Découvrir la Wav Academy",
+    href: "/wavacademy",
+    trackEvent: "cta_academy_click",
+    highlighted: true,
+  },
+  {
     icon: Target,
     title: "Wav Premium",
     description: "Transformation encadrée sur 30 jours",
+    price: null,
     cta: "Voir si ça me correspond",
     href: "/reserverunappel",
     trackEvent: "cta_contact_click",
+    highlighted: false,
   },
   {
     icon: Zap,
     title: "Analyse Express",
     description: "Diagnostic rapide de ton compte en 2 min",
+    price: null,
     cta: "Lancer mon Analyse Express",
     href: "/analyse-express",
+    // Nom d'événement conservé volontairement pour l'historique analytics.
     trackEvent: "cta_45j_click",
+    highlighted: false,
   },
 ];
 
@@ -226,24 +241,27 @@ export default function Preuves() {
                     </li>
                   ))}
                 </ul>
+                <p className="mt-4 text-xs text-muted-foreground">
+                  Ces résultats sont ceux de créateurs accompagnés. Aucun résultat n'est garanti.
+                </p>
               </div>
             </div>
           ))}
 
-          {/* One Shot manifeste */}
+          {/* Manifeste Wav Academy */}
           <div className="bg-noir rounded-2xl p-10 md:p-14 text-center border border-primary/20 hover:border-primary/40 hover:shadow-xl transition-all duration-300">
-            <span className="text-xs font-semibold uppercase tracking-widest text-primary">One Shot stratégique</span>
+            <span className="text-xs font-semibold uppercase tracking-widest text-primary">La Wav Academy</span>
             <h3 className="font-display text-2xl md:text-3xl font-bold mt-3 mb-8 tracking-tight text-cream">
-              Arrêter de poster pour rien
+              Ne poste plus seul
             </h3>
             <div className="space-y-2 text-cream/70 text-lg max-w-md mx-auto mb-8">
-              <p>Diagnostic direct.</p>
-              <p>Ajustement clair.</p>
-              <p>Repositionnement immédiat.</p>
+              <p>Un regard régulier sur ton travail.</p>
+              <p>Un suivi 5 jours sur 7.</p>
+              <p>Un live chaque jeudi, de 14h à 16h.</p>
             </div>
             <div className="flex items-center justify-center gap-3 text-primary font-semibold">
               <Target className="h-5 w-5" />
-              <span>Objectif : faire en sorte que chaque vidéo serve une stratégie.</span>
+              <span>Objectif : comprendre ce qui fonctionne et ce qui ne fonctionne pas et pourquoi.</span>
             </div>
           </div>
         </div>
@@ -253,17 +271,32 @@ export default function Preuves() {
       <Section variant="default" size="lg">
         <SectionHeader
           title="Quel accompagnement choisir ?"
-          subtitle="Deux formules selon ton besoin."
+          subtitle="Trois formules selon ton besoin."
         />
 
-        <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto mb-8">
+        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-8">
           {chooseOffers.map((offer) => (
-            <div key={offer.title} className="bg-muted/50 rounded-xl p-6 text-center border border-border hover:border-primary/30 transition-all">
+            <div
+              key={offer.title}
+              className={
+                offer.highlighted
+                  ? "bg-primary/5 rounded-xl p-6 text-center border border-primary/40 shadow-lg hover:border-primary/60 transition-all"
+                  : "bg-muted/50 rounded-xl p-6 text-center border border-border hover:border-primary/30 transition-all"
+              }
+            >
+              {offer.highlighted && (
+                <span className="inline-block mb-3 text-xs font-semibold uppercase tracking-widest text-primary">
+                  L'offre principale
+                </span>
+              )}
               <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <offer.icon className="h-6 w-6 text-primary" />
               </div>
               <h3 className="font-semibold text-lg mb-2">{offer.title}</h3>
-              <p className="text-sm text-muted-foreground mb-4">{offer.description}</p>
+              <div className="mb-4">
+                <p className="text-sm text-muted-foreground">{offer.description}</p>
+                {offer.price && <p className="mt-1 text-sm font-semibold text-foreground">{offer.price}</p>}
+              </div>
               <div className="flex justify-center">
                 <Button
                   variant="premium"

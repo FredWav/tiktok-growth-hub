@@ -27,7 +27,7 @@ export type AcademyPlan = {
 export const ACADEMY_PLANS: AcademyPlan[] = [
   {
     term: "3m", months: 3, total: 299, monthly: 100, label: "Fondation", duration: "3 mois",
-    save: null, note: "Pour poser des bases solides et trouver ton Format Signature.",
+    save: null, note: "Pour poser des bases solides et trouver ton format.",
   },
   {
     term: "6m", months: 6, total: 499, monthly: 83, label: "Accélération", duration: "6 mois",
@@ -36,7 +36,7 @@ export const ACADEMY_PLANS: AcademyPlan[] = [
   },
   {
     term: "12m", months: 12, total: 899, monthly: 75, label: "Maîtrise", duration: "12 mois",
-    save: "≈ 3 mois offerts", note: "Un an complet pour installer un système d'acquisition durable.",
+    save: "≈ 3 mois offerts", note: "Un an complet pour installer un système de création durable.",
     highlight: true, badge: "Meilleure offre",
   },
 ];
@@ -69,12 +69,19 @@ export const EXPRESS_PRICE_LABEL = "11,90 €";
  */
 export const PREMIUM_DURATION_DAYS = 30;
 
+/** Créneau du live hebdomadaire — engagement contractuel, il ne saute pas. */
+export const ACADEMY_LIVE_SLOT = "le jeudi de 14h à 16h";
+export const ACADEMY_SUPPORT_DAYS = "5 jours sur 7";
+export const ACADEMY_MODULES_COUNT = 6;
+export const ACADEMY_GUIDES_COUNT = 19;
+
 /** Ce que les trois Pass ont en commun. */
 export const ACADEMY_FEATURES = [
-  "Contenu stratégique quotidien (Tapis Roulant)",
-  "15 contenus en rotation permanente",
-  "Live hebdomadaire avec Fred",
-  "Discord premium (canaux avancés)",
+  `Live hebdomadaire ${ACADEMY_LIVE_SLOT}`,
+  `Suivi ${ACADEMY_SUPPORT_DAYS}, tes questions vérifiées chaque jour`,
+  "Feedback sur n'importe lequel de tes contenus, sur demande",
+  "Discord premium (canaux avancés) et accès direct",
+  `${ACADEMY_MODULES_COUNT} modules de formation et ${ACADEMY_GUIDES_COUNT} guides téléchargeables`,
 ];
 
 // ── Budget déclaré → offre recommandée ──────────────────────────────────────
@@ -150,7 +157,7 @@ export type OfferTier = {
 
 export const OFFER_TIERS: OfferTier[] = [
   {
-    need: "Je veux comprendre ce qui bloque",
+    need: "Je veux un état des lieux de mon compte",
     name: "Analyse Express",
     price: EXPRESS_PRICE_LABEL,
     href: "/analyse-express",

@@ -84,7 +84,8 @@ serve(async (req) => {
     Deno.env.get("SUPABASE_URL") || "",
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "",
   );
-  const apiKey = Deno.env.get("WAV_SOCIAL_SCAN_API_KEY");
+  // Repli sur l'ancien nom de secret tant que WAVSTATS_API_KEY n'existe pas côté dashboard.
+  const apiKey = Deno.env.get("WAVSTATS_API_KEY") ?? Deno.env.get("WAV_SOCIAL_SCAN_API_KEY");
   if (!apiKey) {
     return new Response(JSON.stringify({ error: "API key missing" }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },

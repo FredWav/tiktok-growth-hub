@@ -68,7 +68,7 @@ const cumulatedSubsLabel = () => {
 
 const stats = [
   { value: CREATORS_COUNT, label: "Créateurs accompagnés" },
-  { value: "10M+", label: "Vues générées via stratégies déployées" },
+  { value: "10M+", label: "de vues analysées" },
   { value: `${yearsSince(VIDEO_START_YEAR)} ans`, label: "D'expérience en création vidéo" },
   { value: `${yearsSince(MUSIC_START_YEAR)} ans`, label: "Dans la musique et la création artistique" },
   { value: cumulatedSubsLabel(), label: "Abonnés cumulés" },
@@ -162,8 +162,8 @@ export default function APropos() {
               De là est née une méthode structurée.
             </p>
             <p>
-              Aujourd'hui, j'accompagne plus de 300 créateurs, entrepreneurs, experts, marques,
-              qui veulent transformer leur contenu en levier business grâce au <Link to="/wav-premium/candidature" className="text-primary underline hover:no-underline">Wav Premium</Link>.
+              Aujourd'hui, j'accompagne {CREATORS_COUNT} créateurs, entrepreneurs, experts, marques,
+              qui veulent transformer leur contenu en levier business grâce au <Link to="/reserverunappel" className="text-primary underline hover:no-underline">Wav Premium</Link>.
             </p>
           </blockquote>
         </div>
@@ -234,12 +234,19 @@ export default function APropos() {
           <p className="text-muted-foreground mb-6">
             Contacte-moi directement. Tu verras rapidement si ma méthode est faite pour toi.
           </p>
-          <Button variant="hero" size="lg" asChild onClick={() => trackEvent("cta_contact_click", { location: "apropos" })}>
-            <Link to="/reserverunappel">
-              Voir si le Wav Premium me correspond
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button variant="hero" size="lg" asChild onClick={() => trackEvent("cta_academy_click", { location: "apropos" })}>
+              <Link to="/wavacademy">
+                Rejoindre la Wav Academy
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button variant="outline" size="lg" asChild onClick={() => trackEvent("cta_contact_click", { location: "apropos" })}>
+              <Link to="/reserverunappel">
+                Voir si le Wav Premium me correspond
+              </Link>
+            </Button>
+          </div>
         </div>
       </Section>
     </Layout>

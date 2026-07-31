@@ -14,7 +14,17 @@
  * Pur data : aucun import React, aucune API navigateur (importé par vite.config.ts).
  */
 
-import { ACADEMY_PLANS, ACADEMY_FROM, ACADEMY_ENTRY, EXPRESS_PRICE, PREMIUM_DURATION_DAYS } from "./offers";
+import {
+  ACADEMY_PLANS,
+  ACADEMY_FROM,
+  ACADEMY_ENTRY,
+  ACADEMY_GUIDES_COUNT,
+  ACADEMY_LIVE_SLOT,
+  ACADEMY_MODULES_COUNT,
+  ACADEMY_SUPPORT_DAYS,
+  EXPRESS_PRICE,
+  PREMIUM_DURATION_DAYS,
+} from "./offers";
 
 export const BASE_URL = "https://fredwav.com";
 export const OG_IMAGE = `${BASE_URL}/og-image.png`;
@@ -44,11 +54,11 @@ const academyPricing = ACADEMY_PLANS.map((p) => `${p.duration} (${p.total} €)`
 export const HOME_FAQ = [
   {
     question: "Par où je commence ?",
-    answer: `La Wav Academy, dans la quasi-totalité des cas : tu accèdes à la méthode, à l'outil de diagnostic, au live hebdo et à la communauté à partir de ${ACADEMY_FROM} € pour ${ACADEMY_ENTRY.duration} d'accès, en paiement unique. Si tu veux d'abord un état des lieux de ton compte, l'Analyse Express te le donne pour 11,90 €.`,
+    answer: `La Wav Academy, dans la quasi-totalité des cas : tu n'es plus seul pour créer. Tu as un regard régulier sur ton travail, un live chaque semaine ${ACADEMY_LIVE_SLOT}, un suivi ${ACADEMY_SUPPORT_DAYS} et du feedback sur tes contenus à la demande. Tu accèdes aussi aux modules, aux guides et à l'outil WavStats, à partir de ${ACADEMY_FROM} € pour ${ACADEMY_ENTRY.duration} d'accès, en paiement unique. Si tu veux d'abord un état des lieux de ton compte, l'Analyse Express te le donne pour 11,90 €.`,
   },
   {
     question: "Quelle différence entre la Wav Academy et le Wav Premium ?",
-    answer: `La Wav Academy, c'est la méthode, les outils et un cadre régulier : tu appliques toi-même, avec la communauté et mes lives pour ne jamais rester bloqué. Le Wav Premium, c'est ${PREMIUM_DURATION_DAYS} jours de suivi individuel avec moi sur ton compte, sur candidature. L'Academy convient à la grande majorité des créateurs.`,
+    answer: `La Wav Academy, c'est un cadre collectif avec des retours réguliers : mes lives, mon regard sur tes contenus et la communauté pour ne jamais rester bloqué. Le Wav Premium, c'est ${PREMIUM_DURATION_DAYS} jours de suivi individuel et intensif avec moi sur ton compte, sur candidature. L'Academy convient à la grande majorité des créateurs.`,
   },
   {
     question: "La Wav Academy, c'est un abonnement ?",
@@ -60,7 +70,7 @@ export const HOME_FAQ = [
   },
   {
     question: "Combien de temps ça me prend par semaine ?",
-    answer: "Compte 3 à 5 heures par semaine pour créer et appliquer les recommandations. Analyser une vidéo prend quelques minutes, et tu reçois chaque jour une action concrète applicable le jour même.",
+    answer: `Compte 3 à 5 heures par semaine pour créer et appliquer les retours. Le live a lieu ${ACADEMY_LIVE_SLOT}, et tes questions sont suivies ${ACADEMY_SUPPORT_DAYS}.`,
   },
   {
     question: "Je débute, c'est trop tôt ?",
@@ -77,12 +87,12 @@ export const ROUTE_SEO: RouteSeo[] = [
     path: "/",
     title: "Fred Wav — Expert Stratégie Formats Courts",
     description:
-      "Tu plafonnes en vues ? J'analyse tes vraies stats pour te montrer pourquoi — et comment en sortir. Rejoins la Wav Academy et arrête de poster à l'aveugle.",
+      "Comprends ce qui fonctionne dans tes contenus, ce qui ne fonctionne pas et pourquoi. Ne crée plus seul : rejoins la Wav Academy.",
     keywords:
-      "stratégie formats courts, accompagnement créateur de contenu, coach réseaux sociaux formats courts, Fred Wav, plafond de vues",
+      "stratégie formats courts, accompagnement créateur de contenu, coach réseaux sociaux formats courts, Fred Wav, ne plus créer seul",
     noscript: {
-      h1: "Arrête de poster à l'aveugle. Tes stats disent déjà pourquoi tu plafonnes en vues.",
-      body: "Pas d'astuces d'algorithme, pas de promesses. J'analyse tes vraies données pour te montrer ce qui bloque ta visibilité — et on corrige, preuves à l'appui. Trois façons de travailler ensemble : la Wav Academy (l'offre principale), l'Analyse Express et le Wav Premium.",
+      h1: "Arrête de poster seul. Tes stats disent déjà ce qui bloque.",
+      body: "Pas d'astuces d'algorithme, pas de promesses. On part de tes vraies données pour comprendre ce qui fonctionne, ce qui ne fonctionne pas et pourquoi. Trois façons de travailler ensemble : la Wav Academy (l'offre principale), l'Analyse Express et le Wav Premium.",
       links: [
         { href: "/wavacademy", label: "Wav Academy — dès 299 €" },
         { href: "/analyse-express", label: "Analyse Express — 11,90 €" },
@@ -119,21 +129,20 @@ export const ROUTE_SEO: RouteSeo[] = [
   },
   {
     path: "/wavacademy",
-    title: "Wav Academy — Diagnostique chaque vidéo, casse ton plafond de vues | Fred Wav",
-    description: `Apprends à lire tes stats et à corriger tes vidéos, sans rester seul. Outil de diagnostic, contenu stratégique quotidien, live hebdo et communauté. Accès ${ACADEMY_PLANS.map((p) => p.duration).join(", ")} — dès ${ACADEMY_FROM} €, paiement unique.`,
+    title: "Wav Academy — ne poste plus seul, comprends ce qui fonctionne | Fred Wav",
+    description: `Un accompagnement régulier pour ne plus créer seul : live hebdomadaire, suivi ${ACADEMY_SUPPORT_DAYS}, feedback sur tes contenus, ${ACADEMY_MODULES_COUNT} modules et ${ACADEMY_GUIDES_COUNT} guides. Accès ${ACADEMY_PLANS.map((p) => p.duration).join(", ")} — dès ${ACADEMY_FROM} €, paiement unique. Sans promesse de vues.`,
     keywords:
-      "wav academy, formation tiktok, diagnostic tiktok, wavsocialscan, contenu stratégique, formats courts, communauté créateurs",
+      "wav academy, formation tiktok, accompagnement tiktok, wavstats, accompagnement créateur, formats courts, communauté créateurs",
     noscript: {
-      h1: "Wav Academy — diagnostique chaque vidéo, corrige en temps réel, casse ton plafond de vues",
-      body: `Un outil qui analyse tes vidéos et te dit quoi corriger, du contenu stratégique chaque jour, un live hebdomadaire avec Fred et un Discord premium. Trois Pass prépayés : ${academyPricing}. Paiement unique, sans abonnement ni reconduction.`,
+      h1: "Wav Academy — ne poste plus seul, comprends pourquoi ton contenu fonctionne ou bloque",
+      body: `Un accompagnement régulier : un live hebdomadaire ${ACADEMY_LIVE_SLOT}, un suivi ${ACADEMY_SUPPORT_DAYS}, du feedback sur tes contenus à la demande, un Discord premium, ${ACADEMY_MODULES_COUNT} modules de formation et ${ACADEMY_GUIDES_COUNT} guides téléchargeables. Trois Pass prépayés : ${academyPricing}. Paiement unique, sans abonnement ni reconduction.`,
       links: [{ href: "/wavacademy", label: "Voir les formules Wav Academy" }],
     },
     schema: {
       "@context": "https://schema.org",
       "@type": "Course",
       name: "Wav Academy",
-      description:
-        "Programme de diagnostic continu pour créateurs : analyse data de chaque vidéo, contenu stratégique quotidien, lives hebdomadaires et communauté privée.",
+      description: `Accompagnement pour créateurs de contenu : live hebdomadaire, suivi ${ACADEMY_SUPPORT_DAYS}, feedback sur les contenus à la demande, ${ACADEMY_MODULES_COUNT} modules de formation, ${ACADEMY_GUIDES_COUNT} guides téléchargeables et outil d'analyse WavStats inclus.`,
       provider: { "@type": "Person", name: "Fred Wav", url: BASE_URL },
       url: `${BASE_URL}/wavacademy`,
       inLanguage: "fr-FR",
@@ -152,7 +161,7 @@ export const ROUTE_SEO: RouteSeo[] = [
       },
     },
     sitemap: 0.9,
-    llms: `Programme de diagnostic continu pour créateurs (outil d'analyse vidéo, contenu stratégique quotidien, Discord et live hebdo). Trois Pass prépayés, paiement unique sans abonnement : ${academyPricing}.`,
+    llms: `Accompagnement régulier pour créateurs (live hebdomadaire, suivi ${ACADEMY_SUPPORT_DAYS}, feedback à la demande, Discord premium, ${ACADEMY_MODULES_COUNT} modules, ${ACADEMY_GUIDES_COUNT} guides et outil d'analyse WavStats). Trois Pass prépayés, paiement unique sans abonnement : ${academyPricing}.`,
     llmsSection: "offres",
   },
   {
@@ -192,14 +201,14 @@ export const ROUTE_SEO: RouteSeo[] = [
       "wav premium, réserver un appel, candidature accompagnement, contact fred wav, coaching formats courts",
     noscript: {
       h1: `Wav Premium — ${PREMIUM_DURATION_DAYS} jours d'accompagnement individuel`,
-      body: "Un accompagnement intensif et individuel : analyse complète de ton compte, un point stratégique chaque semaine, correction de tes scripts et des objectifs chiffrés. L'accès se fait sur candidature, après un échange écrit.",
+      body: "Un accompagnement intensif et individuel : analyse complète de ton compte, un point stratégique chaque semaine, correction de tes scripts et un cap clair à tenir. L'accès se fait sur candidature, après un échange écrit.",
       links: [{ href: "/reserverunappel", label: "Candidater au Wav Premium" }],
     },
     schema: {
       "@context": "https://schema.org",
       "@type": "Service",
       name: `Wav Premium — accompagnement ${PREMIUM_DURATION_DAYS} jours`,
-      description: `${PREMIUM_DURATION_DAYS} jours d'accompagnement individuel et intensif pour casser ton plafond de vues, sur candidature.`,
+      description: `${PREMIUM_DURATION_DAYS} jours d'accompagnement individuel et intensif pour progresser sur tes contenus, sur candidature.`,
       provider: { "@type": "Person", name: "Fred Wav", url: BASE_URL },
       areaServed: "FR",
       url: `${BASE_URL}/reserverunappel`,

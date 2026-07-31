@@ -29,7 +29,11 @@ serve(async (req) => {
   }
 
   try {
-    const { email, token, plan_type, access_months, wavstats_activation_url } = await req.json();
+    // wavstats_provisioned distingue « accès ouvert, mais le client avait déjà un
+    // compte WavStats » (pas d'activationUrl, rien à faire de notre côté) de
+    // « provisioning échoué ou désactivé » (crédits à ouvrir à la main).
+    const { email, token, plan_type, access_months, wavstats_activation_url, wavstats_provisioned } =
+      await req.json();
     if (!email || !token) throw new Error("Missing email or token");
 
     const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD") || "";
@@ -44,7 +48,7 @@ serve(async (req) => {
     const htmlBody = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #0a0a0a; color: #f5f0e8;">
         <div style="text-align: center; padding: 30px 0; border-bottom: 2px solid #c8a97e;">
-          <h1 style="color: #c8a97e; margin: 0; font-size: 24px;">🎉 Bienvenue dans le ${planLabel}${durationLabel}</h1>
+          <h1 style="color: #c8a97e; margin: 0; font-size: 24px;">🎉 Bienvenue dans la ${planLabel}${durationLabel}</h1>
         </div>
         <div style="padding: 30px 0;">
           <p style="color: #f5f0e8; font-size: 16px; line-height: 1.6;">
@@ -66,23 +70,28 @@ serve(async (req) => {
             <a href="${claimUrl}" style="color: #c8a97e; word-break: break-all;">${claimUrl}</a>
           </p>
           <div style="margin-top: 24px; padding: 20px; background: rgba(200,169,126,0.08); border: 1px solid rgba(200,169,126,0.3); border-radius: 8px;">
-            <p style="color: #c8a97e; font-size: 15px; font-weight: bold; margin: 0 0 8px 0;">📊 Tes crédits WavSocialScan</p>
+            <p style="color: #c8a97e; font-size: 15px; font-weight: bold; margin: 0 0 8px 0;">📊 Tes crédits WavStats</p>
             <p style="color: #f5f0e8; font-size: 14px; line-height: 1.6; margin: 0 0 10px 0;">
               Ton Pass <strong style="color: #c8a97e;">${planLabel}</strong>${months ? ` (<strong style="color: #c8a97e;">${months} mois</strong>)` : ""} inclut
-              <strong style="color: #c8a97e;">3 000 crédits WavSocialScan par mois</strong> pour analyser tes vidéos et ton compte.
+              <strong style="color: #c8a97e;">3 000 crédits WavStats par mois</strong> pour analyser tes vidéos et ton compte.
             </p>
             ${wavstats_activation_url ? `
             <p style="color: #f5f0e8; font-size: 14px; line-height: 1.6; margin: 0 0 16px 0;">
-              Deuxième étape : active ton accès WavSocialScan et lie ton compte.
+              Deuxième étape : active ton accès WavStats et lie ton compte.
             </p>
             <div style="text-align: center; padding: 6px 0 4px 0;">
               <a href="${wavstats_activation_url}" style="background: transparent; color: #c8a97e; border: 2px solid #c8a97e; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 15px; display: inline-block;">
-                Activer mes crédits WavSocialScan
+                Activer mes crédits WavStats
               </a>
             </div>
             <p style="color: #999; font-size: 12px; line-height: 1.6; margin: 12px 0 0 0;">
               Ce lien est valable 7 jours. Si le bouton ne fonctionne pas :<br/>
               <a href="${wavstats_activation_url}" style="color: #c8a97e; word-break: break-all;">${wavstats_activation_url}</a>
+            </p>` : wavstats_provisioned ? `
+            <p style="color: #f5f0e8; font-size: 14px; line-height: 1.6; margin: 0;">
+              Tu as déjà un compte WavStats : connecte-toi sur
+              <a href="https://wavstats.com" style="color: #c8a97e;">wavstats.com</a> avec
+              <strong style="color: #c8a97e;">cette adresse email</strong> (${email}), tes crédits sont déjà actifs.
             </p>` : `
             <p style="color: #f5f0e8; font-size: 14px; line-height: 1.6; margin: 0;">
               Crée ton compte sur <a href="https://wavstats.com" style="color: #c8a97e;">wavstats.com</a> avec

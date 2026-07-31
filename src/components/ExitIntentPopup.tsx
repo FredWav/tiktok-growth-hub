@@ -10,8 +10,8 @@ const SESSION_KEY = "exit_intent_shown";
 const highlights = [
   { icon: BarChart3, text: "Audit complet de ton profil, ta bio et ta photo" },
   { icon: Target, text: "Analyse de tes 30 dernières vidéos avec métriques" },
-  { icon: Lightbulb, text: "Hooks, hashtags et plan d'action sur 14 jours" },
-  { icon: FileText, text: "Rapport PDF détaillé livré en 3 minutes" },
+  { icon: Lightbulb, text: "Hooks, hashtags et plan d'action sur 30 jours" },
+  { icon: FileText, text: "Rapport PDF détaillé livré en moins de 2 minutes" },
 ];
 
 export function ExitIntentPopup() {
@@ -70,7 +70,7 @@ export function ExitIntentPopup() {
             Obtiens un diagnostic complet de ton compte TikTok
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground pt-2">
-            Le même niveau d'analyse que mes clients Wav Premium, automatisé et livré en 3 minutes.
+            Le même niveau d'analyse que mes clients Wav Premium, automatisé et livré en moins de 2 minutes.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-2.5 py-3">

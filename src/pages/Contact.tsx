@@ -114,6 +114,7 @@ export default function Contact() {
               </div>
             </div>
           </div>
+          </div>
 
           {/* CTA */}
           <div className="bg-muted/50 rounded-xl p-8 text-center">

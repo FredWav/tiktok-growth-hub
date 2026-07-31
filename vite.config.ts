@@ -77,11 +77,10 @@ function renderShell(template: string, route: RouteSeo) {
 }
 
 function generateSitemap() {
-  const today = new Date().toISOString().slice(0, 10);
   const urls = ROUTE_SEO.filter((r) => r.sitemap !== false)
     .map((r) => {
       const loc = `${BASE_URL}${r.path === "/" ? "/" : r.path}`;
-      return `  <url><loc>${loc}</loc><lastmod>${today}</lastmod><priority>${r.sitemap}</priority></url>`;
+      return `  <url><loc>${loc}</loc><priority>${r.sitemap}</priority></url>`;
     })
     .join("\n");
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;

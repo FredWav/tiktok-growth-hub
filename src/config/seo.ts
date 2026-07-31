@@ -197,9 +197,10 @@ export const ROUTE_SEO: RouteSeo[] = [
   },
   {
     path: "/reserverunappel",
-    title: "Contacter Fred Wav - premier échange | Fred Wav",
+    title: "Contacter Fred Wav — premier échange",
     description:
-      "Premier contact avec Fred Wav : décris ta situation en 2 minutes et je t'oriente vers la solution adaptée (audit, session live ou accompagnement). Réponse écrite avant tout appel.",
+      "Premier contact avec Fred Wav : décris ta situation et je t'oriente vers la solution adaptée.",
+
     keywords:
       "contact fred wav, premier contact, réserver un appel, diagnostic contenu, accompagnement formats courts",
     noscript: {

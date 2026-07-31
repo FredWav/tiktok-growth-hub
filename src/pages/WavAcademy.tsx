@@ -34,6 +34,8 @@ import {
   ACADEMY_MODULES_COUNT,
   CREATORS_COUNT,
 } from "@/config/offers";
+import { WAVACADEMY_FAQ } from "@/config/wavacademy-faq";
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { trackPostHogEvent } from "@/lib/posthog";
@@ -171,36 +173,9 @@ const VIDEO_TESTIMONIALS = [
 ];
 
 // ── FAQ ─────────────────────────────────────────────────────────────────────
-const FAQ = [
-  {
-    q: "Je débute totalement, c'est pour moi ?",
-    a: "Oui. Le principe de la Wav Academy, c'est justement de ne plus avancer seul. Tu montres ton travail, tu obtiens des retours, et tu progresses avec un cadre — que tu en sois à ta 3e ou à ta 300e vidéo.",
-  },
-  {
-    q: "Concrètement, qu'est-ce que je reçois une fois inscrit ?",
-    a: "Un accompagnement : le live du jeudi de 14h à 16h, un suivi 5 jours sur 7, du feedback sur tes contenus à la demande, et le Discord premium. Plus les ressources : 6 modules de formation, 19 guides téléchargeables et 3 000 crédits WavStats par mois.",
-  },
-  {
-    q: "Combien de temps ça me prend par semaine ?",
-    a: "Le système est fait pour les créateurs déjà occupés. Le live dure deux heures chaque jeudi, et tu poses tes questions quand tu veux : elles sont vérifiées 5 jours sur 7. Tu peux en faire autant ou aussi peu que tu veux.",
-  },
-  {
-    q: "Le WavStats est-il vraiment inclus ?",
-    a: "Oui. Il coûte normalement de 14,90 €/mois (Starter) à 149 €/mois (Agency). En tant que membre, tu reçois 3 000 crédits gratuits chaque mois, inclus dans ta formule.",
-  },
-  {
-    q: "Tu me garantis des vues ?",
-    a: "Non, et personne ne peut le garantir. Je garantis ma présence, mes réponses, mes analyses, mes feedbacks et les ressources. Ce que je peux tenir, c'est que tu ne restes plus seul face à tes questions et à tes contenus.",
-  },
-  {
-    q: "C'est un abonnement ? Je peux annuler ?",
-    a: "Non, ce n'est pas un abonnement. Les trois formules (3, 6 et 12 mois) sont des paiements uniques, sans reconduction : il n'y a rien à résilier. Tu paies une fois, tu accèdes à tout pendant la durée choisie, et l'accès s'arrête simplement au terme.",
-  },
-  {
-    q: "Comment je reçois mes accès après le paiement ?",
-    a: "Juste après le paiement, tu reçois un email avec ton lien d'activation Discord (valable 7 jours). Tu te connectes avec ton compte Discord et ton rôle est attribué automatiquement. Pense à vérifier tes spams.",
-  },
-];
+// Source unique partagée avec src/config/seo.ts pour le JSON-LD FAQPage.
+const FAQ = WAVACADEMY_FAQ.map((item) => ({ q: item.question, a: item.answer }));
+
 
 // ── Main component ───────────────────────────────────────────────────────────
 export default function WavAcademy() {

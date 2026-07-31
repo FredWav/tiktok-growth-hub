@@ -274,9 +274,10 @@ export const ROUTE_SEO: RouteSeo[] = [
   },
   {
     path: "/newsletter",
-    title: "Guide gratuit : 120+ hooks TikTok classés par objectif | Fred Wav",
+    title: "Guide gratuit : 120+ hooks TikTok | Fred Wav",
     description:
-      "Télécharge gratuitement le guide des 120+ hooks TikTok qui captent l'attention en moins de 2 secondes. Testés sur des millions de vues.",
+      "Télécharge le guide des 120+ hooks TikTok qui captent l'attention en moins de 2 secondes. Testés sur des millions de vues.",
+
     keywords: "guide hooks tiktok, hooks gratuits, accroches tiktok, rétention tiktok, Fred Wav",
     noscript: {
       h1: "Reçois le guide des hooks gratuitement",

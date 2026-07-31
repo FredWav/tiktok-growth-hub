@@ -195,26 +195,27 @@ export const ROUTE_SEO: RouteSeo[] = [
   },
   {
     path: "/reserverunappel",
-    title: "Wav Premium — Candidature à l'accompagnement 30 jours | Fred Wav",
-    description: `Premier contact avec Fred Wav : remplis le formulaire de qualification pour l'accompagnement individuel Wav Premium (${PREMIUM_DURATION_DAYS} jours). Réponse écrite avant tout appel.`,
+    title: "Contacter Fred Wav - premier échange | Fred Wav",
+    description:
+      "Premier contact avec Fred Wav : décris ta situation en 2 minutes et je t'oriente vers la solution adaptée (audit, session live ou accompagnement). Réponse écrite avant tout appel.",
     keywords:
-      "wav premium, réserver un appel, candidature accompagnement, contact fred wav, coaching formats courts",
+      "contact fred wav, premier contact, réserver un appel, diagnostic contenu, accompagnement formats courts",
     noscript: {
-      h1: `Wav Premium — ${PREMIUM_DURATION_DAYS} jours d'accompagnement individuel`,
-      body: "Un accompagnement intensif et individuel : analyse complète de ton compte, un point stratégique chaque semaine, correction de tes scripts et un cap clair à tenir. L'accès se fait sur candidature, après un échange écrit.",
-      links: [{ href: "/reserverunappel", label: "Candidater au Wav Premium" }],
+      h1: "Premier contact avec Fred Wav",
+      body: `Décris ta situation et tes objectifs : je te réponds par écrit et je t'oriente vers ce qui correspond réellement à ton besoin - audit de compte, session live ou accompagnement individuel de ${PREMIUM_DURATION_DAYS} jours.`,
+      links: [{ href: "/reserverunappel", label: "Prendre contact" }],
     },
     schema: {
       "@context": "https://schema.org",
-      "@type": "Service",
-      name: `Wav Premium — accompagnement ${PREMIUM_DURATION_DAYS} jours`,
-      description: `${PREMIUM_DURATION_DAYS} jours d'accompagnement individuel et intensif pour progresser sur tes contenus, sur candidature.`,
-      provider: { "@type": "Person", name: "Fred Wav", url: BASE_URL },
-      areaServed: "FR",
+      "@type": "ContactPage",
+      name: "Premier contact avec Fred Wav",
+      description:
+        "Formulaire de premier contact : décris ta situation, Fred Wav répond par écrit et oriente vers la solution adaptée.",
+      about: { "@type": "Person", name: "Fred Wav", url: BASE_URL },
       url: `${BASE_URL}/reserverunappel`,
     },
     sitemap: 0.8,
-    llms: `Accompagnement individuel Wav Premium sur ${PREMIUM_DURATION_DAYS} jours, accessible sur candidature via un formulaire de qualification.`,
+    llms: "Formulaire de premier contact avec Fred Wav : orientation vers l'offre adaptée (audit, session live ou accompagnement individuel) après réponse écrite.",
     llmsSection: "offres",
   },
   {

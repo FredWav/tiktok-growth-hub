@@ -76,3 +76,9 @@ verify_jwt = false
 # connecté). La clé anon est bien envoyée, mais ce n'est pas un JWT de session.
 [functions.wavacademy-claim-status]
 verify_jwt = false
+
+# Relais d'images WavStats. Publique et sans secret : elle ne fait que rejouer
+# une image déjà publique, en ajoutant l'en-tête CORS qui manque en amont. Le
+# domaine et le chemin sont en liste blanche stricte côté fonction.
+[functions.image-proxy]
+verify_jwt = false

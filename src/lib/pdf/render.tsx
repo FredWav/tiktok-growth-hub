@@ -2,7 +2,6 @@ import { pdf } from "@react-pdf/renderer";
 
 import { ExpressReportDocument } from "./document/ExpressReportDocument";
 import { registerFonts } from "./document/fonts";
-import { stripEmojis } from "./format";
 import type { ReportModel } from "./report-model";
 
 /**
@@ -11,57 +10,28 @@ import type { ReportModel } from "./report-model";
  * ailleurs de façon statique ramènerait le moteur dans le bundle initial.
  */
 
-/** Retire les emojis de tous les textes libres du modèle. */
-function withoutEmojis(model: ReportModel): ReportModel {
-  const clean = (v?: string) => (v ? stripEmojis(v) : v);
-  return {
-    ...model,
-    meta: { ...model.meta, bio: clean(model.meta.bio) },
-    shadowban: model.shadowban
-      ? {
-          ...model.shadowban,
-          diagnosis: clean(model.shadowban.diagnosis),
-          recommendations: model.shadowban.recommendations.map((r) => stripEmojis(r)),
-        }
-      : undefined,
-    health: model.health
-      ? { ...model.health, priorityActions: model.health.priorityActions.map((a) => stripEmojis(a)) }
-      : undefined,
-    topVideos: model.topVideos.map((v) => ({ ...v, description: stripEmojis(v.description) })),
-    ai: model.ai
-      ? {
-          ...model.ai,
-          summary: clean(model.ai.summary),
-          strengths: model.ai.strengths.map((x) => ({
-            title: stripEmojis(x.title),
-            description: stripEmojis(x.description),
-          })),
-          improvements: model.ai.improvements.map((x) => ({
-            title: stripEmojis(x.title),
-            description: stripEmojis(x.description),
-          })),
-          actionPlan: model.ai.actionPlan.map((x) => ({ ...x, text: stripEmojis(x.text) })),
-          strategy36: model.ai.strategy36.map((x) => ({ ...x, text: stripEmojis(x.text) })),
-          bioOptimized: model.ai.bioOptimized.map((b) => stripEmojis(b)),
-          profilePhoto: model.ai.profilePhoto
-            ? { ...model.ai.profilePhoto, verdict: stripEmojis(model.ai.profilePhoto.verdict) }
-            : undefined,
-          gridVisual: model.ai.gridVisual
-            ? { ...model.ai.gridVisual, verdict: stripEmojis(model.ai.gridVisual.verdict) }
-            : undefined,
-        }
-      : undefined,
-  };
-}
+/**
+ * Au-delà de ce délai, on rend la main plutôt que de laisser l'utilisateur
+ * devant un bouton qui tourne indéfiniment. Ne protège que d'un blocage
+ * asynchrone (police injoignable) : une boucle de calcul monopoliserait le
+ * thread et empêcherait ce minuteur de se déclencher.
+ */
+const RENDER_TIMEOUT_MS = 30_000;
 
 export async function renderExpressReportBlob(model: ReportModel): Promise<Blob> {
   registerFonts();
+
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(
+      () => reject(new Error("Génération du PDF interrompue : délai dépassé.")),
+      RENDER_TIMEOUT_MS,
+    );
+  });
+
   try {
-    return await pdf(<ExpressReportDocument model={model} />).toBlob();
-  } catch (error) {
-    // Les emojis sont rendus depuis des PNG distants (Twemoji) : hors ligne ou
-    // CDN indisponible, le rendu échoue. Mieux vaut un rapport sans emoji.
-    console.warn("Rendu PDF en échec, seconde tentative sans emoji.", error);
-    return await pdf(<ExpressReportDocument model={withoutEmojis(model)} />).toBlob();
+    return await Promise.race([pdf(<ExpressReportDocument model={model} />).toBlob(), timeout]);
+  } finally {
+    if (timer) clearTimeout(timer);
   }
 }

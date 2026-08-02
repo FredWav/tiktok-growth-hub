@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "@react-pdf/renderer";
+import { Image, StyleSheet, Text, View } from "@react-pdf/renderer";
 
 import { WeekBars } from "../charts";
 import {
@@ -15,6 +15,7 @@ import {
   SubTitle,
 } from "../primitives";
 import { color, font, impactColor, riskColor, scoreColor, size } from "../theme";
+import { hasActionPlan, hasBranding, hasStrengths } from "../../report-model";
 import type { ActionItem, ReportModel } from "../../report-model";
 
 const s = StyleSheet.create({
@@ -48,8 +49,11 @@ const s = StyleSheet.create({
   th: {
     fontFamily: font.sans,
     fontWeight: 700,
-    fontSize: size.micro,
-    letterSpacing: 0.5,
+    // 6 pt, pas size.micro : « COMMENTAIRES » et « INTERACTIONS » ne tiennent
+    // pas dans la colonne à 7 pt, et la césure étant désactivée un mot trop
+    // long déborde sur la colonne voisine au lieu de passer à la ligne.
+    fontSize: 6.5,
+    letterSpacing: 0.3,
     color: color.muted,
     textTransform: "uppercase",
   },
@@ -68,6 +72,13 @@ const s = StyleSheet.create({
     fontSize: size.small,
     color: color.gold,
     width: 14,
+  },
+  videoCover: {
+    width: 26,
+    height: 34,
+    borderRadius: 3,
+    marginRight: 8,
+    objectFit: "cover",
   },
   videoDesc: { fontFamily: font.sans, fontSize: size.small, color: color.ink, lineHeight: 1.35 },
   videoDate: { fontFamily: font.sans, fontSize: size.micro, color: color.muted, marginTop: 2 },
@@ -89,7 +100,7 @@ const s = StyleSheet.create({
   },
 });
 
-const NUM_COL = 46;
+const NUM_COL = 50;
 
 /* ── Synthèse ────────────────────────────────────────────────────────────── */
 
@@ -129,13 +140,16 @@ export function HealthSection({ model }: { model: ReportModel }) {
   const sb = model.shadowban;
   if (!health) return null;
   return (
-    // Titre et carte solidaires : séparés, le titre restait en bas de la page
-    // précédente et la carte ouvrait la suivante sans en-tête.
-    <View wrap={false}>
-      <SectionTitle subtitle="Six critères, chacun noté sur 100. Les notes les plus basses sont celles où tu as le plus à gagner.">
-        Le détail de ta note
-      </SectionTitle>
-      <Card noWrap>
+    // Le `wrap={false}` ne couvre QUE le titre et la carte : leur hauteur est
+    // bornée (six scores plus une ligne). L'englober sur toute la section, avec
+    // ses douze puces de texte IA non plafonné, dépassait la hauteur d'une page
+    // et faisait tronquer le contenu en silence.
+    <View>
+      <View wrap={false}>
+        <SectionTitle subtitle="Six critères, chacun noté sur 100. Les notes les plus basses sont celles où tu as le plus à gagner.">
+          Le détail de ta note
+        </SectionTitle>
+        <Card noWrap>
         {health.components.map((c) => (
           <View key={c.key} style={s.scoreRow} wrap={false}>
             <Text style={s.scoreName}>{c.label}</Text>
@@ -185,7 +199,8 @@ export function HealthSection({ model }: { model: ReportModel }) {
             </Text>
           </View>
         ) : null}
-      </Card>
+        </Card>
+      </View>
       {health.priorityActions.length ? (
         <View style={{ marginTop: 14 }}>
           <SubTitle>À traiter en premier</SubTitle>
@@ -219,8 +234,8 @@ function StatRow({ items, small }: { items: { label: string; value: string }[]; 
 }
 
 export function StatsSection({ model }: { model: ReportModel }) {
-  const { primary, averages, medians } = model.stats;
-  if (!primary.length && !averages.length && !medians.length) return null;
+  const { primary, rates, averages, medians } = model.stats;
+  if (!primary.length && !rates.length && !averages.length && !medians.length) return null;
   return (
     <>
       <View wrap={false}>
@@ -229,6 +244,24 @@ export function StatsSection({ model }: { model: ReportModel }) {
         </SectionTitle>
         {primary.length ? <StatRow items={primary} /> : null}
       </View>
+      {rates.length ? (
+        <View style={{ marginTop: 2 }} minPresenceAhead={70}>
+          <Label>Tes taux</Label>
+          <Text
+            style={{
+              fontFamily: font.sans,
+              fontSize: size.micro,
+              color: color.muted,
+              marginTop: 3,
+              marginBottom: 6,
+            }}
+          >
+            Part de ton audience qui réagit, et part qui enregistre la vidéo pour y revenir.
+            L'enregistrement est le signal le plus fort pour TikTok.
+          </Text>
+          <StatRow items={rates} small />
+        </View>
+      ) : null}
       {averages.length ? (
         <View style={{ marginTop: 8 }} minPresenceAhead={70}>
           <Label>En moyenne, par vidéo</Label>
@@ -348,16 +381,22 @@ export function TopVideosSection({ model }: { model: ReportModel }) {
         <View style={s.tableHead}>
           <Text style={[s.th, { width: 14 }]}> </Text>
           <Text style={[s.th, { flex: 1 }]}>Vidéo</Text>
+          {/* Abrégés : six colonnes chiffrées ne laissent pas la place aux mots
+              entiers, et la césure étant désactivée un mot trop long déborde
+              sur sa voisine au lieu de passer à la ligne. */}
           <Text style={[s.th, { width: NUM_COL, textAlign: "right" }]}>Vues</Text>
           <Text style={[s.th, { width: NUM_COL, textAlign: "right" }]}>J'aime</Text>
-          <Text style={[s.th, { width: NUM_COL, textAlign: "right" }]}>Commentaires</Text>
+          <Text style={[s.th, { width: NUM_COL, textAlign: "right" }]}>Comm.</Text>
           <Text style={[s.th, { width: NUM_COL, textAlign: "right" }]}>Partages</Text>
-          <Text style={[s.th, { width: NUM_COL, textAlign: "right" }]}>Enregistr.</Text>
-          <Text style={[s.th, { width: NUM_COL, textAlign: "right" }]}>Interactions</Text>
+          <Text style={[s.th, { width: NUM_COL, textAlign: "right" }]}>Enreg.</Text>
+          <Text style={[s.th, { width: NUM_COL, textAlign: "right" }]}>Interac.</Text>
         </View>
         {model.topVideos.map((v) => (
           <View key={v.rank} style={s.tr} wrap={false}>
             <Text style={s.rank}>{v.rank}</Text>
+            {/* La miniature n'est présente que si elle a pu être récupérée ;
+                sinon la colonne disparaît et le texte reprend la place. */}
+            {v.cover ? <Image src={v.cover} style={s.videoCover} /> : null}
             <View style={{ flex: 1, paddingRight: 8 }}>
               <Text style={s.videoDesc}>{v.description}</Text>
               {v.dateLabel ? <Text style={s.videoDate}>{v.dateLabel}</Text> : null}
@@ -366,7 +405,16 @@ export function TopVideosSection({ model }: { model: ReportModel }) {
             <Text style={[s.td, { width: NUM_COL }]}>{v.likes}</Text>
             <Text style={[s.td, { width: NUM_COL }]}>{v.comments}</Text>
             <Text style={[s.td, { width: NUM_COL }]}>{v.shares}</Text>
-            <Text style={[s.td, { width: NUM_COL }]}>{v.saves}</Text>
+            {/* Le taux est glissé sous le nombre : une 7e colonne écraserait la
+                description, déjà à quatre lignes. */}
+            <View style={{ width: NUM_COL }}>
+              <Text style={s.td}>{v.saves}</Text>
+              {v.saveRateLabel ? (
+                <Text style={[s.td, { fontSize: size.micro, color: color.muted, marginTop: 1 }]}>
+                  {v.saveRateLabel}
+                </Text>
+              ) : null}
+            </View>
             <Text style={[s.td, { width: NUM_COL, color: color.gold, fontWeight: 700 }]}>
               {v.erLabel ?? "—"}
             </Text>
@@ -423,7 +471,7 @@ function TitledList({
 
 export function StrengthsSection({ model }: { model: ReportModel }) {
   const ai = model.ai;
-  if (!ai || (!ai.strengths.length && !ai.improvements.length)) return null;
+  if (!hasStrengths(model) || !ai) return null;
   return (
     <>
       <SectionTitle subtitle="Ce qui marche sur ton compte, et ce qui te freine.">
@@ -437,7 +485,7 @@ export function StrengthsSection({ model }: { model: ReportModel }) {
       ) : null}
       {ai.improvements.length ? (
         <View>
-          <SubTitle newPage>Ce qu'il faut corriger</SubTitle>
+          <SubTitle minAhead={90}>Ce qu'il faut corriger</SubTitle>
           <TitledList items={ai.improvements} accent={color.amber} />
         </View>
       ) : null}
@@ -496,12 +544,12 @@ function ActionList({ items }: { items: ActionItem[] }) {
 
 export function ActionPlanSection({ model }: { model: ReportModel }) {
   const ai = model.ai;
-  if (!ai || (!ai.actionPlan.length && !ai.strategy36.length)) return null;
+  if (!hasActionPlan(model) || !ai) return null;
   return (
     <>
       {ai.actionPlan.length ? (
         <>
-          <SectionTitle newPage subtitle="À appliquer dans l'ordre, sur les trente prochains jours.">
+          <SectionTitle subtitle="À appliquer dans l'ordre, sur les trente prochains jours.">
             Plan d'action 30 jours
           </SectionTitle>
           <ActionList items={ai.actionPlan} />
@@ -540,20 +588,24 @@ function Verdict({ title, score, verdict }: { title: string; score?: number; ver
     );
 
   return (
-    <View style={{ marginBottom: 8 }}>
-      {/* Titre et premier paragraphe solidaires : seul, le titre restait en bas
-          de page pendant que son texte ouvrait la suivante. */}
-      <View wrap={false}>
-        <View style={{ flexDirection: "row", alignItems: "baseline", marginBottom: 4 }}>
-          <Text style={{ fontFamily: font.sans, fontWeight: 700, fontSize: size.h3, color: color.ink }}>
-            {title}
-          </Text>
-          {score !== undefined ? (
-            <Text style={[s.verdictScore, { marginLeft: 10 }]}>{score}/10</Text>
-          ) : null}
-        </View>
-        {first ? renderPart(first, 0) : null}
+    // `minPresenceAhead` est porté par le bloc ENTIER, pas par la ligne de titre.
+    // Le moteur refuse en effet de provoquer un saut sur le premier enfant d'un
+    // conteneur (il exige un frère déjà posé sur la page) : placée sur le titre,
+    // la contrainte était donc ignorée et le titre restait seul en bas de page.
+    // Ici le bloc a des frères dans BrandingSection, la règle s'applique.
+    <View style={{ marginBottom: 8 }} minPresenceAhead={90}>
+      {/* Le titre reste insécable, mais sans le premier paragraphe : quand le
+          verdict de l'IA n'a ni saut de ligne ni numérotation, ce paragraphe
+          contient le texte entier et le bloc dépasserait la hauteur d'une page. */}
+      <View style={{ flexDirection: "row", alignItems: "baseline", marginBottom: 4 }} wrap={false}>
+        <Text style={{ fontFamily: font.sans, fontWeight: 700, fontSize: size.h3, color: color.ink }}>
+          {title}
+        </Text>
+        {score !== undefined ? (
+          <Text style={[s.verdictScore, { marginLeft: 10 }]}>{score}/10</Text>
+        ) : null}
       </View>
+      {first ? renderPart(first, 0) : null}
       {rest.map((p, i) => (
         <View key={i + 1} minPresenceAhead={38}>
           {renderPart(p, i + 1)}
@@ -565,14 +617,11 @@ function Verdict({ title, score, verdict }: { title: string; score?: number; ver
 
 export function BrandingSection({ model }: { model: ReportModel }) {
   const ai = model.ai;
-  if (!ai) return null;
-  const hasAny =
-    ai.bioOptimized.length || ai.hashtagStrategy || ai.profilePhoto || ai.gridVisual;
-  if (!hasAny) return null;
+  if (!hasBranding(model) || !ai) return null;
 
   return (
     <>
-      <SectionTitle newPage subtitle="Ta description, tes mots-clés, ta photo et l'allure générale de ton profil.">
+      <SectionTitle subtitle="Ta description, tes mots-clés, ta photo et l'allure générale de ton profil.">
         Améliorer ton profil
       </SectionTitle>
 
@@ -580,7 +629,7 @@ export function BrandingSection({ model }: { model: ReportModel }) {
           pas besoin de la respiration d'une carte pleine. */}
       {ai.bioOptimized.length ? (
         <View style={{ marginBottom: 8 }}>
-          <SubTitle tight minAhead={150}>
+          <SubTitle tight minAhead={70}>
             Propositions pour ta description de profil
           </SubTitle>
           {ai.bioOptimized.map((b, i) => (
@@ -606,7 +655,7 @@ export function BrandingSection({ model }: { model: ReportModel }) {
 
       {ai.hashtagStrategy ? (
         <View style={{ marginBottom: 8 }}>
-          <SubTitle tight minAhead={150}>
+          <SubTitle tight minAhead={70}>
             Quels mots-clés (hashtags) utiliser
           </SubTitle>
           {ai.hashtagStrategy.strategy ? (

@@ -79,16 +79,24 @@ const s = StyleSheet.create({
  * Un titre de section ne doit jamais rester seul en bas de page : 90 pt de
  * présence exigée en aval, soit le titre plus trois lignes de corps.
  */
+/**
+ * Aucune de ces primitives n'expose de saut de page forcé, et c'est délibéré.
+ *
+ * Un `break` posé sur le premier enfant d'un conteneur fait boucler à l'infini
+ * la pagination de @react-pdf/layout : `splitPage` renvoie une page identique à
+ * la précédente et la boucle `while (nextPage !== null)` n'a pas de garde de
+ * progression. Le thread se bloque à 100 %, l'onglet meurt. Comme une section
+ * peut disparaître quand l'IA ne renvoie rien, n'importe quel `break` peut se
+ * retrouver en première position. La séparation des pages passe donc
+ * exclusivement par des éléments `<Page>` dans ExpressReportDocument.
+ */
 export function SectionTitle({
   children,
   subtitle,
-  newPage,
   tight,
 }: {
   children: string;
   subtitle?: string;
-  /** Ouvre une page neuve : réservé aux sections que le lecteur doit aborder à froid. */
-  newPage?: boolean;
   /** Marge haute réduite, pour enchaîner deux sections sur la même page. */
   tight?: boolean;
 }) {
@@ -96,7 +104,6 @@ export function SectionTitle({
     <View
       style={[s.sectionTitleWrap, tight ? { marginTop: 12, marginBottom: 8 } : {}]}
       minPresenceAhead={130}
-      break={newPage}
     >
       <Text style={s.sectionTitle}>{children}</Text>
       <View style={s.sectionRule} />
@@ -107,18 +114,16 @@ export function SectionTitle({
 
 export function SubTitle({
   children,
-  newPage,
   minAhead,
   tight,
 }: {
   children: ReactNode;
-  newPage?: boolean;
   minAhead?: number;
   /** Marges réduites, pour les sections qui enchaînent plusieurs sous-blocs. */
   tight?: boolean;
 }) {
   return (
-    <View break={newPage} minPresenceAhead={minAhead ?? 60}>
+    <View minPresenceAhead={minAhead ?? 60}>
       <Text style={[s.subTitle, tight ? { marginTop: 8, marginBottom: 5 } : {}]}>{children}</Text>
     </View>
   );

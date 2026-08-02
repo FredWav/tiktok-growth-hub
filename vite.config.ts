@@ -159,6 +159,17 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    proxy: {
+      // Équivalent local de la fonction edge `image-proxy` : WavStats sert ses
+      // images sans en-tête CORS, donc le générateur de PDF ne peut pas les
+      // lire depuis le navigateur. Passer par le serveur de dev les rend
+      // same-origin et permet de travailler la mise en page sans déployer.
+      "/__wavstats-image": {
+        target: "https://wavstats.com",
+        changeOrigin: true,
+        rewrite: (p) => p.replace(/^\/__wavstats-image/, ""),
+      },
+    },
   },
   plugins: [react(), mode === "development" && componentTagger(), seoPrerender()].filter(Boolean),
   resolve: {

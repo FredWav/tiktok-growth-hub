@@ -84,7 +84,22 @@ export const HOME_FAQ = [
   },
 ];
 
-export const ROUTE_SEO: RouteSeo[] = [
+/**
+ * Fil d'Ariane « Accueil › la page ». Le site est plat — aucune page n'a de
+ * parent réel — donc deux niveaux suffisent, et en afficher plus serait faux.
+ */
+function breadcrumbSchema(path: string, name: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Accueil", item: `${BASE_URL}/` },
+      { "@type": "ListItem", position: 2, name, item: `${BASE_URL}${path}` },
+    ],
+  };
+}
+
+const ROUTES: RouteSeo[] = [
   {
     path: "/",
     title: "Fred Wav — Expert Stratégie Formats Courts",
@@ -115,16 +130,10 @@ export const ROUTE_SEO: RouteSeo[] = [
           acceptedAnswer: { "@type": "Answer", text: item.answer },
         })),
       },
-      {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Accueil", item: `${BASE_URL}/` },
-          { "@type": "ListItem", position: 2, name: "Wav Academy", item: `${BASE_URL}/wavacademy` },
-          { "@type": "ListItem", position: 3, name: "Témoignages", item: `${BASE_URL}/preuves` },
-        ],
-      },
     ],
+    // Pas de fil d'Ariane sur l'accueil : c'est la racine. Le précédent
+    // annonçait Accueil > Academy > Témoignages, un chemin de navigation
+    // qui n'existe nulle part sur le site.
     sitemap: 1.0,
     llms: "Landing principale : la Wav Academy, l'Analyse Express et le Wav Premium, avec témoignages et preuves.",
     llmsSection: "principales",
@@ -375,6 +384,24 @@ export const ROUTE_SEO: RouteSeo[] = [
 ];
 
 /** Accès par chemin — utilisé par les pages : <SEOHead {...seoFor("/wavacademy")} /> */
+/**
+ * Ajoute son fil d'Ariane à chaque page hors accueil.
+ *
+ * Généré ici plutôt que recopié dans chaque route : c'est mécanique, et un
+ * oubli dans une liste de douze entrées passerait inaperçu. Le libellé reprend
+ * la partie du titre qui précède le tiret, comme llms.txt.
+ */
+export const ROUTE_SEO: RouteSeo[] = ROUTES.map((route) => {
+  if (route.path === "/") return route;
+  const name = route.title.split(/[—|]/)[0].trim();
+  const existants = route.schema
+    ? Array.isArray(route.schema)
+      ? route.schema
+      : [route.schema]
+    : [];
+  return { ...route, schema: [...existants, breadcrumbSchema(route.path, name)] };
+});
+
 export function seoFor(path: string): RouteSeo {
   const found = ROUTE_SEO.find((r) => r.path === path);
   if (!found) throw new Error(`[seo] Route inconnue : ${path}. Ajoute-la dans src/config/seo.ts.`);

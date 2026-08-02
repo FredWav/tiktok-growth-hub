@@ -109,7 +109,7 @@ export function CoverPage({ model }: { model: ReportModel }) {
       </Text>
 
       <View style={s.identity}>
-        <Monogram initials={meta.initials} boxSize={44} />
+        <Monogram initials={meta.initials} avatar={meta.avatar} boxSize={44} />
         <View style={{ marginLeft: 14, flex: 1 }}>
           <Text style={s.handle}>@{meta.username}</Text>
           {meta.displayName !== meta.username ? (
@@ -118,7 +118,10 @@ export function CoverPage({ model }: { model: ReportModel }) {
           <View style={s.chips}>
             {meta.niche ? (
               <View style={s.chip}>
-                <Text style={s.chipText}>{meta.niche}</Text>
+                <Text style={s.chipText}>
+                  {meta.niche}
+                  {meta.nicheConfidence !== undefined ? ` · fiabilité ${meta.nicheConfidence} %` : ""}
+                </Text>
               </View>
             ) : null}
             {meta.creatorLevel ? (

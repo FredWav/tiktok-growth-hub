@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { buildReportModel } from "@/lib/pdf/build-report-model";
 import { ExpressReportDocument } from "@/lib/pdf/document/ExpressReportDocument";
 import { registerFonts } from "@/lib/pdf/document/fonts";
+import { withEmbeddedImages } from "@/lib/pdf/images";
+import type { ReportModel } from "@/lib/pdf/report-model";
 
 /**
  * Atelier de mise au point du rapport PDF — monté uniquement en développement
@@ -33,18 +35,34 @@ export default function PdfPreview() {
       .catch((e) => setError(String(e)));
   }, [selected]);
 
-  const model = useMemo(() => {
-    if (!raw) return null;
+  const [model, setModel] = useState<ReportModel | null>(null);
+
+  // Les images passent par le relais du serveur de dev : même chemin qu'en
+  // production, pour que l'aperçu montre le rapport tel qu'il sera livré.
+  useEffect(() => {
+    let annule = false;
+    if (!raw) {
+      setModel(null);
+      return;
+    }
+    const source =
+      degraded && typeof raw === "object"
+        ? { ...(raw as Record<string, unknown>), ai_analysis: undefined }
+        : raw;
     try {
-      const source =
-        degraded && raw && typeof raw === "object"
-          ? { ...(raw as Record<string, unknown>), ai_analysis: undefined }
-          : raw;
-      return buildReportModel(source);
+      withEmbeddedImages(buildReportModel(source))
+        .then((m) => {
+          if (!annule) setModel(m);
+        })
+        .catch((e) => {
+          if (!annule) setError(String(e));
+        });
     } catch (e) {
       setError(String(e));
-      return null;
     }
+    return () => {
+      annule = true;
+    };
   }, [raw, degraded]);
 
   if (!names.length) {

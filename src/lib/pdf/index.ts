@@ -1,5 +1,6 @@
 import { buildReportModel } from "./build-report-model";
 import { cleanUsername } from "./format";
+import { withEmbeddedImages } from "./images";
 
 /**
  * API publique du rapport PDF. Ce module reste **léger** : le moteur react-pdf
@@ -16,7 +17,7 @@ export function buildExpressReportFilename(username: string, date = new Date()):
 }
 
 export async function downloadExpressReport(resultData: unknown, username: string): Promise<void> {
-  const model = buildReportModel(resultData);
+  const model = await withEmbeddedImages(buildReportModel(resultData));
   const { renderExpressReportBlob } = await import("./render");
   const blob = await renderExpressReportBlob(model);
 

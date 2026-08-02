@@ -36,11 +36,10 @@ export function registerFonts(): void {
   // La césure automatique de react-pdf coupe les mots français n'importe où.
   Font.registerHyphenationCallback((word) => [word]);
 
-  // Les textes de l'IA contiennent des emojis (ex. « ✅ Aucun shadowban »).
-  // Sans source déclarée, ils sortiraient en glyphes vides.
-  Font.registerEmojiSource({
-    format: "png",
-    url: "https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/72x72/",
-    withVariationSelectors: true,
-  });
+  // Pas de `registerEmojiSource` : les emojis sont retirés en amont, dans
+  // buildReportModel. Les charger depuis un CDN faisait une requête réseau par
+  // occurrence, et la convention de nommage de Twemoji retire le sélecteur de
+  // variante (U+FE0F) des noms de fichiers — « 26a0-fe0f.png » répond 404 là où
+  // « 26a0.png » répond 200. Chaque ⚠️ ❤️ ✔️ produisait donc un glyphe manquant
+  // et un avertissement en console. Un rapport imprimable n'en a pas besoin.
 }

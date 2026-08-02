@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "@react-pdf/renderer";
+import { Image, StyleSheet, Text, View } from "@react-pdf/renderer";
 
 import { color, font, size } from "./theme";
 
@@ -41,32 +41,38 @@ const s = StyleSheet.create({
 });
 
 /** Pastille aux initiales : l'avatar TikTok n'est pas récupérable (CDN sans CORS). */
+/**
+ * Pastille ronde : l'avatar quand il a pu être récupéré, les initiales sinon.
+ * `avatar` doit être un data URI — une URL distante ferait échouer le rendu.
+ */
 export function Monogram({
   initials,
+  avatar,
   boxSize = 40,
   background = color.goldBright,
   textColor = color.noir,
   borderColor,
 }: {
   initials: string;
+  avatar?: string;
   boxSize?: number;
   background?: string;
   textColor?: string;
   borderColor?: string;
 }) {
+  const shape = {
+    width: boxSize,
+    height: boxSize,
+    borderRadius: boxSize / 2,
+    ...(borderColor ? { borderWidth: 1, borderColor } : {}),
+  };
+
+  if (avatar) {
+    return <Image src={avatar} style={[s.monogram, shape, { objectFit: "cover" }]} />;
+  }
+
   return (
-    <View
-      style={[
-        s.monogram,
-        {
-          width: boxSize,
-          height: boxSize,
-          borderRadius: boxSize / 2,
-          backgroundColor: background,
-          ...(borderColor ? { borderWidth: 1, borderColor } : {}),
-        },
-      ]}
-    >
+    <View style={[s.monogram, shape, { backgroundColor: background }]}>
       <Text style={[s.monogramText, { color: textColor, fontSize: boxSize * 0.4 }]}>{initials}</Text>
     </View>
   );

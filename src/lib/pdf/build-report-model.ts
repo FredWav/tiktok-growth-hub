@@ -7,7 +7,7 @@ import {
   fmtPercent,
   fmtShortDateFr,
   initialsOf,
-  stripMarkdown,
+  cleanText,
   toNumber,
   truncate,
 } from "./format";
@@ -93,13 +93,13 @@ function normalizeActionItems(raw: unknown): ActionItem[] {
   if (!Array.isArray(raw)) return [];
   return raw
     .map((entry): ActionItem | null => {
-      if (typeof entry === "string") return { text: stripMarkdown(entry) };
+      if (typeof entry === "string") return { text: cleanText(entry) };
       const e = asRecord(entry);
-      const text = stripMarkdown(String(e.text ?? e.title ?? ""));
+      const text = cleanText(String(e.text ?? e.title ?? ""));
       if (!text) return null;
       return {
         text,
-        metric: e.metric ? stripMarkdown(String(e.metric)) : undefined,
+        metric: e.metric ? cleanText(String(e.metric)) : undefined,
         impact: e.impact ? String(e.impact).trim() : undefined,
         effort: e.effort ? String(e.effort).trim() : undefined,
         timeline: e.timeline ? String(e.timeline).trim() : undefined,
@@ -112,10 +112,10 @@ function normalizeTitled(raw: unknown): { title: string; description: string }[]
   if (!Array.isArray(raw)) return [];
   return raw
     .map((entry) => {
-      if (typeof entry === "string") return { title: stripMarkdown(entry), description: "" };
+      if (typeof entry === "string") return { title: cleanText(entry), description: "" };
       const e = asRecord(entry);
-      const title = stripMarkdown(String(e.title ?? ""));
-      const description = stripMarkdown(String(e.description ?? ""));
+      const title = cleanText(String(e.title ?? ""));
+      const description = cleanText(String(e.description ?? ""));
       if (!title && !description) return null;
       return { title: title || description, description: title ? description : "" };
     })
@@ -125,7 +125,7 @@ function normalizeTitled(raw: unknown): { title: string; description: string }[]
 function normalizeStringList(raw: unknown, max = 20): string[] {
   if (!Array.isArray(raw)) return [];
   return raw
-    .map((v) => stripMarkdown(String(v ?? "")))
+    .map((v) => cleanText(String(v ?? "")))
     .filter(Boolean)
     .slice(0, max);
 }
@@ -160,11 +160,21 @@ export function buildReportModel(input: unknown): ReportModel {
       : undefined;
 
   // ── Statistiques ─────────────────────────────────────────────────────────
+  const avgRaw = asRecord(raw.averages);
   const primary = compact([
     stat("Abonnés", fmtCompact(account.follower_count)),
-    stat("Mentions J'aime", fmtCompact(account.total_likes ?? account.like_count)),
+    stat("Abonnements", fmtCompact(account.following_count)),
     stat("Vidéos publiées", fmtInt(account.video_count)),
+    stat("Mentions J'aime", fmtCompact(account.total_likes ?? account.like_count)),
+  ]);
+  // Le taux d'enregistrement est un signal fort sur TikTok — il a même sa propre
+  // composante dans la note de santé — mais le chiffre n'apparaissait nulle part.
+  const rates = compact([
     stat("Taux d'interaction", fmtPercent(account.engagement_rate, 2)),
+    stat(
+      "Taux d'enregistrement",
+      fmtPercent(account.save_rate ?? avgRaw.saveRate, 2),
+    ),
   ]);
   const averages = compact([
     stat("Vues", fmtCompact(account.avg_views)),
@@ -179,6 +189,10 @@ export function buildReportModel(input: unknown): ReportModel {
     stat("Commentaires", fmtCompact(account.median_comments)),
     stat("Partages", fmtCompact(account.median_shares)),
     stat("Enregistrements", fmtCompact(account.median_saves)),
+    stat(
+      "Interaction",
+      fmtPercent(account.median_engagement_rate ?? avgRaw.medianEngagementRate, 2),
+    ),
   ]);
 
   // ── Rythme de publication ────────────────────────────────────────────────
@@ -220,7 +234,7 @@ export function buildReportModel(input: unknown): ReportModel {
     ? {
         riskLevel,
         riskLabel: RISK_LABELS[riskLevel] ?? RISK_LABELS.unknown,
-        diagnosis: sb.diagnosis ? stripMarkdown(String(sb.diagnosis)) : undefined,
+        diagnosis: sb.diagnosis ? cleanText(String(sb.diagnosis)) : undefined,
         ratioLabel:
           sbTotal !== null && sbHit !== null
             ? `${sbHit} vidéo${sbHit > 1 ? "s" : ""} sur ${sbTotal} analysée${sbTotal > 1 ? "s" : ""}${
@@ -247,18 +261,24 @@ export function buildReportModel(input: unknown): ReportModel {
     .slice(0, 5)
     .map(({ video }, i) => {
       const er = pickVideoMetric(video, ["engagement_rate", "engagementRate"]);
+      const sr = pickVideoMetric(video, ["save_rate", "saveRate"]);
+      const cover = video.cover_url ?? video.coverUrl ?? video.thumbnail_url ?? video.thumbnailUrl;
       return {
         rank: i + 1,
         description: truncate(String(video.description ?? video.title ?? "Sans description"), 120),
         dateLabel: fmtShortDateFr(
           String(video.date ?? video.create_time ?? video.createTime ?? "") || undefined,
         ),
+        // URL brute à ce stade : elle est remplacée par un data URI avant le
+        // rendu (le navigateur ne peut pas lire ces images directement).
+        cover: cover ? String(cover) : undefined,
         views: fmtCompact(pickVideoMetric(video, ["views", "playCount", "play_count"])) ?? "—",
         likes: fmtCompact(pickVideoMetric(video, ["likes", "diggCount", "like_count"])) ?? "—",
         comments: fmtCompact(pickVideoMetric(video, ["comments", "commentCount", "comment_count"])) ?? "—",
         shares: fmtCompact(pickVideoMetric(video, ["shares", "shareCount", "share_count"])) ?? "—",
         saves: fmtCompact(pickVideoMetric(video, ["saves", "collectCount", "save_count"])) ?? "—",
         erLabel: er !== null ? fmtPercent(er, 2) ?? undefined : undefined,
+        saveRateLabel: sr !== null ? fmtPercent(sr, 2) ?? undefined : undefined,
       };
     });
 
@@ -271,7 +291,7 @@ export function buildReportModel(input: unknown): ReportModel {
   const hashtagRaw = asRecord(aiRaw.hashtagStrategy);
   const photo = asRecord(aiRaw.profilePhoto);
   const grid = asRecord(aiRaw.gridVisual);
-  const summary = aiRaw.summary ? stripMarkdown(String(aiRaw.summary)) : undefined;
+  const summary = aiRaw.summary ? cleanText(String(aiRaw.summary)) : undefined;
 
   const hasAi =
     !!summary ||
@@ -293,14 +313,14 @@ export function buildReportModel(input: unknown): ReportModel {
           ? {
               current: normalizeStringList(hashtagRaw.current, 12),
               suggested: normalizeStringList(hashtagRaw.suggested, 12),
-              strategy: hashtagRaw.strategy ? stripMarkdown(String(hashtagRaw.strategy)) : undefined,
+              strategy: hashtagRaw.strategy ? cleanText(String(hashtagRaw.strategy)) : undefined,
             }
           : undefined,
         profilePhoto: photo.verdict
-          ? { score: toNumber(photo.score) ?? undefined, verdict: stripMarkdown(String(photo.verdict)) }
+          ? { score: toNumber(photo.score) ?? undefined, verdict: cleanText(String(photo.verdict)) }
           : undefined,
         gridVisual: grid.verdict
-          ? { score: toNumber(grid.score) ?? undefined, verdict: stripMarkdown(String(grid.verdict)) }
+          ? { score: toNumber(grid.score) ?? undefined, verdict: cleanText(String(grid.verdict)) }
           : undefined,
       }
     : undefined;
@@ -324,14 +344,17 @@ export function buildReportModel(input: unknown): ReportModel {
       username,
       displayName,
       initials: initialsOf(account.display_name as string, username),
+      // URL brute à ce stade, remplacée par un data URI avant le rendu.
+      avatar: account.avatar_url ? String(account.avatar_url) : undefined,
       verified: Boolean(account.verified),
       bio: account.bio ? String(account.bio).trim() : undefined,
       niche: account.detected_niche ? String(account.detected_niche).trim() : undefined,
+      nicheConfidence: toNumber(account.niche_confidence) ?? undefined,
       creatorLevel: account.creator_level ? String(account.creator_level).trim() : undefined,
       generatedAtLabel: fmtDateFr(),
     },
     health,
-    stats: { primary, averages, medians },
+    stats: { primary, rates, averages, medians },
     publication,
     shadowban,
     topVideos,

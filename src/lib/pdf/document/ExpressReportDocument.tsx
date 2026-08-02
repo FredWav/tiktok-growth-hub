@@ -1,4 +1,4 @@
-import { Document, Page, StyleSheet, View } from "@react-pdf/renderer";
+import { Document, Page, StyleSheet } from "@react-pdf/renderer";
 
 import { PageFooter, PageHeader } from "./chrome";
 import { color, page } from "./theme";
@@ -14,6 +14,7 @@ import {
   SummarySection,
   TopVideosSection,
 } from "./sections/ContentSections";
+import { hasActionPlan, hasBranding, hasStrengths } from "../report-model";
 import type { ReportModel } from "../report-model";
 
 const s = StyleSheet.create({
@@ -26,15 +27,13 @@ const s = StyleSheet.create({
 });
 
 export function ExpressReportDocument({ model }: { model: ReportModel }) {
-  const hasRecommendations =
-    !!model.ai &&
-    (model.ai.strengths.length > 0 ||
-      model.ai.improvements.length > 0 ||
-      model.ai.actionPlan.length > 0 ||
-      model.ai.strategy36.length > 0 ||
-      model.ai.bioOptimized.length > 0 ||
-      !!model.ai.profilePhoto ||
-      !!model.ai.gridVisual);
+  // Une page par bloc de recommandations. C'est ce qui remplace les anciens
+  // `break` : une `<Page>` démarre à froid par construction, sans dépendre de
+  // l'algorithme de pagination — donc sans le risque de boucle infinie qu'un
+  // saut forcé en première position déclenchait.
+  const chrome = (
+    <PageHeader username={model.meta.username} dateLabel={model.meta.generatedAtLabel} />
+  );
 
   return (
     <Document
@@ -49,7 +48,7 @@ export function ExpressReportDocument({ model }: { model: ReportModel }) {
 
       {/* Constat : les chiffres. */}
       <Page size="A4" style={s.page} wrap>
-        <PageHeader username={model.meta.username} dateLabel={model.meta.generatedAtLabel} />
+        {chrome}
         <SummarySection model={model} />
         <HealthSection model={model} />
         <StatsSection model={model} />
@@ -58,15 +57,29 @@ export function ExpressReportDocument({ model }: { model: ReportModel }) {
         <PageFooter />
       </Page>
 
-      {/* Recommandations : page neuve, c'est le repère éditorial du rapport. */}
-      {hasRecommendations ? (
+      {/* Recommandations : chacune ouvre sa propre page, c'est le repère
+          éditorial du rapport. Les gardes évitent d'émettre une page blanche
+          quand l'IA n'a rien renvoyé pour un bloc. */}
+      {hasStrengths(model) ? (
         <Page size="A4" style={s.page} wrap>
-          <PageHeader username={model.meta.username} dateLabel={model.meta.generatedAtLabel} />
-          <View>
-            <StrengthsSection model={model} />
-            <ActionPlanSection model={model} />
-            <BrandingSection model={model} />
-          </View>
+          {chrome}
+          <StrengthsSection model={model} />
+          <PageFooter />
+        </Page>
+      ) : null}
+
+      {hasActionPlan(model) ? (
+        <Page size="A4" style={s.page} wrap>
+          {chrome}
+          <ActionPlanSection model={model} />
+          <PageFooter />
+        </Page>
+      ) : null}
+
+      {hasBranding(model) ? (
+        <Page size="A4" style={s.page} wrap>
+          {chrome}
+          <BrandingSection model={model} />
           <PageFooter />
         </Page>
       ) : null}

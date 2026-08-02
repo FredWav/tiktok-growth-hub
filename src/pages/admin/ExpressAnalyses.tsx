@@ -1,6 +1,10 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
-import { useExpressAnalyses } from "@/hooks/useExpressAnalyses";
+import {
+  fetchAnalysisResultData,
+  useExpressAnalyses,
+  type ExpressAnalysis,
+} from "@/hooks/useExpressAnalyses";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,10 +31,17 @@ const statusConfig: Record<string, { label: string; variant: "default" | "second
   failed: { label: "Échouée", variant: "destructive" },
 };
 
-async function downloadPDF(analysis: any) {
+async function downloadPDF(analysis: ExpressAnalysis) {
   try {
+    // `result_data` ne fait pas partie de la liste (trop lourd) : on le charge
+    // pour cette seule ligne, au moment du clic.
+    const resultData = await fetchAnalysisResultData(analysis.id);
+    if (!resultData) {
+      toast.error("Cette analyse n'a pas de données à exporter");
+      return;
+    }
     // buildReportModel tolère les lignes anciennes où result_data EST le compte.
-    await downloadExpressReport(analysis.result_data, analysis.tiktok_username);
+    await downloadExpressReport(resultData, analysis.tiktok_username);
     toast.success("PDF téléchargé !");
   } catch (err) {
     console.error("PDF generation error:", err);
@@ -38,14 +49,17 @@ async function downloadPDF(analysis: any) {
   }
 }
 
-function canRetry(analysis: any): boolean {
+/**
+ * Ne s'appuie que sur des colonnes légères.
+ *
+ * L'ancienne version fouillait `result_data` pour repérer les analyses
+ * « terminées mais sans conseil IA ». Ce champ n'est plus chargé dans la liste,
+ * et une analyse terminée sans note de santé est précisément le symptôme de ce
+ * cas-là.
+ */
+function canRetry(analysis: ExpressAnalysis): boolean {
   if (analysis.status === "failed") return true;
-  if (analysis.status === "complete" && analysis.result_data) {
-    const account = analysis.result_data?.account || analysis.result_data;
-    const ai = account?.ai_insights;
-    if (!ai || (typeof ai === "string" && ai.trim() === "")) return true;
-  }
-  return false;
+  return analysis.status === "complete" && analysis.health_score === null;
 }
 
 const ExpressAnalyses = () => {
@@ -67,6 +81,16 @@ const ExpressAnalyses = () => {
       toast.error("Impossible de copier l'email");
     }
   };
+
+  // Sans ce nettoyage, quitter la page laissait les intervalles tourner : ils
+  // continuaient d'interroger check-express-job et d'invalider la liste toutes
+  // les 5 secondes, indéfiniment et en s'empilant à chaque relance.
+  useEffect(() => {
+    const timers = pollingRefs.current;
+    return () => {
+      Object.values(timers).forEach(clearInterval);
+    };
+  }, []);
 
   const stopPolling = useCallback((analysisId: string) => {
     if (pollingRefs.current[analysisId]) {
@@ -197,14 +221,17 @@ const ExpressAnalyses = () => {
     }
   };
 
-  const stats = analyses
-    ? {
-        total: analyses.length,
-        complete: analyses.filter((a) => a.status === "complete").length,
-        failed: analyses.filter((a) => a.status === "failed").length,
-        processing: analyses.filter((a) => a.status === "processing" || a.status === "pending").length,
-      }
-    : null;
+  // Mémoïsé : sans ça, ces quatre parcours du tableau étaient refaits à chaque
+  // frappe dans le champ « @username » du lancement manuel.
+  const stats = useMemo(() => {
+    if (!analyses) return null;
+    return {
+      total: analyses.length,
+      complete: analyses.filter((a) => a.status === "complete").length,
+      failed: analyses.filter((a) => a.status === "failed").length,
+      processing: analyses.filter((a) => a.status === "processing" || a.status === "pending").length,
+    };
+  }, [analyses]);
 
   return (
     <AdminLayout>
@@ -279,7 +306,9 @@ const ExpressAnalyses = () => {
               <TableBody>
                 {analyses.map((analysis) => {
                   const config = statusConfig[analysis.status] || statusConfig.pending;
-                  const canDownload = analysis.status === "complete" && analysis.result_data;
+                  // `result_data` n'est plus dans la liste : le statut suffit à
+                  // savoir s'il y a quelque chose à exporter, et le clic vérifie.
+                  const canDownload = analysis.status === "complete";
                   const isRetrying = retryingIds.has(analysis.id);
                   const showRetry = canRetry(analysis) && !isRetrying;
                   const isProcessing = analysis.status === "processing" || analysis.status === "pending" || isRetrying;

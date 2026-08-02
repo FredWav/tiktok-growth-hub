@@ -61,9 +61,11 @@ export function truncate(text: string, max: number): string {
 }
 
 /**
- * Retire les emojis. Utilisé uniquement en repli quand le rendu échoue faute
- * d'avoir pu charger les images Twemoji (hors ligne, CDN indisponible) : mieux
- * vaut un PDF sans emoji qu'une erreur de téléchargement.
+ * Retire les emojis.
+ *
+ * Le PDF ne les rend pas nativement : react-pdf va chercher une image par
+ * emoji sur un CDN, une requête par occurrence. Les retirer à la source évite
+ * ces allers-retours, et un rapport imprimable n'en a pas l'usage.
  */
 export function stripEmojis(text: string): string {
   return text
@@ -75,18 +77,24 @@ export function stripEmojis(text: string): string {
 }
 
 /**
- * Les textes de l'IA contiennent du markdown (**gras**, `code`, ### titres).
- * Le PDF n'a pas de moteur markdown : les marqueurs sortiraient tels quels.
+ * Nettoie un texte produit par l'IA avant de le poser dans le PDF : marqueurs
+ * markdown (**gras**, `code`, ### titres) qui sortiraient tels quels faute de
+ * moteur markdown, et emojis.
+ *
+ * Point de passage unique : tout texte libre affiché dans le rapport doit
+ * traverser cette fonction.
  */
-export function stripMarkdown(text: string): string {
-  return text
-    .replace(/\*\*(.+?)\*\*/g, "$1")
-    .replace(/(^|[\s(])\*(\S[^*]*?)\*(?=[\s.,;:)!?]|$)/g, "$1$2")
-    .replace(/`([^`]+)`/g, "$1")
-    .replace(/^#{1,6}\s+/gm, "")
-    .replace(/^\s*[-–—]\s+/gm, "• ")
-    .replace(/[ \t]{2,}/g, " ")
-    .trim();
+export function cleanText(text: string): string {
+  return stripEmojis(
+    text
+      .replace(/\*\*(.+?)\*\*/g, "$1")
+      .replace(/(^|[\s(])\*(\S[^*]*?)\*(?=[\s.,;:)!?]|$)/g, "$1$2")
+      .replace(/`([^`]+)`/g, "$1")
+      .replace(/^#{1,6}\s+/gm, "")
+      .replace(/^\s*[-–—]\s+/gm, "• ")
+      .replace(/[ \t]{2,}/g, " ")
+      .trim(),
+  );
 }
 
 export function cleanUsername(value: unknown): string {

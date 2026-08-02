@@ -25,11 +25,15 @@ export interface ReportModel {
   meta: {
     username: string;
     displayName: string;
-    /** Deux lettres pour la pastille monogramme (l'avatar TikTok est inutilisable : pas de CORS). */
+    /** Deux lettres, affichées en repli quand l'avatar n'a pas pu être chargé. */
     initials: string;
+    /** Avatar en data URI. Absent si l'image n'a pas pu être récupérée. */
+    avatar?: string;
     verified: boolean;
     bio?: string;
     niche?: string;
+    /** Fiabilité de la niche détectée, en pourcentage. */
+    nicheConfidence?: number;
     creatorLevel?: string;
     generatedAtLabel: string;
   };
@@ -41,6 +45,8 @@ export interface ReportModel {
   };
   stats: {
     primary: Stat[];
+    /** Taux d'interaction et d'enregistrement, exprimés en pourcentage. */
+    rates: Stat[];
     averages: Stat[];
     medians: Stat[];
   };
@@ -64,12 +70,16 @@ export interface ReportModel {
     rank: number;
     description: string;
     dateLabel?: string;
+    /** Miniature en data URI. Absente si l'image n'a pas pu être récupérée. */
+    cover?: string;
     views: string;
     likes: string;
     comments: string;
     shares: string;
     saves: string;
     erLabel?: string;
+    /** Taux d'enregistrement de la vidéo, en pourcentage. */
+    saveRateLabel?: string;
   }[];
   hashtags: string[];
   ai?: {
@@ -86,3 +96,21 @@ export interface ReportModel {
   /** Sommaire de couverture, calculé depuis les sections réellement présentes. */
   contents: string[];
 }
+
+/**
+ * Présence des blocs de recommandations.
+ *
+ * Le document en a besoin pour décider quelles pages émettre : une section qui
+ * renvoie `null` à l'intérieur d'une `<Page>` laisserait une page blanche. Ces
+ * prédicats sont donc la source unique, partagée entre le document et les
+ * sections elles-mêmes.
+ */
+export const hasStrengths = (m: ReportModel): boolean =>
+  !!m.ai && (m.ai.strengths.length > 0 || m.ai.improvements.length > 0);
+
+export const hasActionPlan = (m: ReportModel): boolean =>
+  !!m.ai && (m.ai.actionPlan.length > 0 || m.ai.strategy36.length > 0);
+
+export const hasBranding = (m: ReportModel): boolean =>
+  !!m.ai &&
+  (m.ai.bioOptimized.length > 0 || !!m.ai.hashtagStrategy || !!m.ai.profilePhoto || !!m.ai.gridVisual);

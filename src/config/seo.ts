@@ -82,7 +82,76 @@ export const HOME_FAQ = [
   },
 ];
 
-export const ROUTE_SEO: RouteSeo[] = [
+/**
+ * FAQ de /wavacademy. Même raison d'être que HOME_FAQ : l'accordéon affiché et
+ * le JSON-LD FAQPage doivent sortir de la même source, sans quoi le balisage
+ * annonce des questions absentes de la page — ce que Google sanctionne.
+ */
+export const ACADEMY_FAQ = [
+  {
+    question: "Je débute totalement, c'est pour moi ?",
+    answer:
+      "Oui. Le principe de la Wav Academy, c'est justement de ne plus avancer seul. Tu montres ton travail, tu obtiens des retours, et tu progresses avec un cadre — que tu en sois à ta 3e ou à ta 300e vidéo.",
+  },
+  {
+    question: "Concrètement, qu'est-ce que je reçois une fois inscrit ?",
+    answer: `Un accompagnement : le live du jeudi de 14h à 16h, un suivi ${ACADEMY_SUPPORT_DAYS}, du feedback sur tes contenus à la demande, et le Discord premium. Plus les ressources : ${ACADEMY_MODULES_COUNT} modules de formation, ${ACADEMY_GUIDES_COUNT} guides téléchargeables et 3 000 crédits WavStats par mois.`,
+  },
+  {
+    question: "Combien de temps ça me prend par semaine ?",
+    answer: `Le système est fait pour les créateurs déjà occupés. Le live dure deux heures chaque jeudi, et tu poses tes questions quand tu veux : elles sont vérifiées ${ACADEMY_SUPPORT_DAYS}. Tu peux en faire autant ou aussi peu que tu veux.`,
+  },
+  {
+    question: "Le WavStats est-il vraiment inclus ?",
+    answer:
+      "Oui. Il coûte normalement de 14,90 €/mois (Starter) à 149 €/mois (Agency). En tant que membre, tu reçois 3 000 crédits gratuits chaque mois, inclus dans ta formule.",
+  },
+  {
+    question: "Tu me garantis des vues ?",
+    answer:
+      "Non, et personne ne peut le garantir. Je garantis ma présence, mes réponses, mes analyses, mes feedbacks et les ressources. Ce que je peux tenir, c'est que tu ne restes plus seul face à tes questions et à tes contenus.",
+  },
+  {
+    question: "C'est un abonnement ? Je peux annuler ?",
+    answer:
+      "Non, ce n'est pas un abonnement. Les trois formules (3, 6 et 12 mois) sont des paiements uniques, sans reconduction : il n'y a rien à résilier. Tu paies une fois, tu accèdes à tout pendant la durée choisie, et l'accès s'arrête simplement au terme.",
+  },
+  {
+    question: "Comment je reçois mes accès après le paiement ?",
+    answer:
+      "Juste après le paiement, tu reçois un email avec ton lien d'activation Discord (valable 7 jours). Tu te connectes avec ton compte Discord et ton rôle est attribué automatiquement. Pense à vérifier tes spams.",
+  },
+];
+
+/** Balisage FAQ, à partir de questions réellement affichées sur la page. */
+function faqSchema(items: { question: string; answer: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: { "@type": "Answer", text: item.answer },
+    })),
+  };
+}
+
+/**
+ * Fil d'Ariane : « Accueil › la page ». Le site est plat (aucune page n'a de
+ * parent réel), donc deux niveaux suffisent et refléter davantage serait faux.
+ */
+function breadcrumbSchema(path: string, name: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Accueil", item: `${BASE_URL}/` },
+      { "@type": "ListItem", position: 2, name, item: `${BASE_URL}${path}` },
+    ],
+  };
+}
+
+const ROUTES: RouteSeo[] = [
   {
     path: "/",
     title: "Fred Wav — Expert Stratégie Formats Courts",
@@ -103,26 +172,9 @@ export const ROUTE_SEO: RouteSeo[] = [
         { href: "/contact", label: "Contact" },
       ],
     },
-    schema: [
-      {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        mainEntity: HOME_FAQ.map((item) => ({
-          "@type": "Question",
-          name: item.question,
-          acceptedAnswer: { "@type": "Answer", text: item.answer },
-        })),
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Accueil", item: `${BASE_URL}/` },
-          { "@type": "ListItem", position: 2, name: "Wav Academy", item: `${BASE_URL}/wavacademy` },
-          { "@type": "ListItem", position: 3, name: "Témoignages", item: `${BASE_URL}/preuves` },
-        ],
-      },
-    ],
+    // La home n'a pas de fil d'Ariane : elle EST la racine. L'ancien listait
+    // Accueil > Academy > Preuves, un chemin de navigation qui n'existe pas.
+    schema: [faqSchema(HOME_FAQ)],
     sitemap: 1.0,
     llms: "Landing principale : la Wav Academy, l'Analyse Express et le Wav Premium, avec témoignages et preuves.",
     llmsSection: "principales",
@@ -138,7 +190,8 @@ export const ROUTE_SEO: RouteSeo[] = [
       body: `Un accompagnement régulier : un live hebdomadaire ${ACADEMY_LIVE_SLOT}, un suivi ${ACADEMY_SUPPORT_DAYS}, du feedback sur tes contenus à la demande, un Discord premium, ${ACADEMY_MODULES_COUNT} modules de formation et ${ACADEMY_GUIDES_COUNT} guides téléchargeables. Trois Pass prépayés : ${academyPricing}. Paiement unique, sans abonnement ni reconduction.`,
       links: [{ href: "/wavacademy", label: "Voir les formules Wav Academy" }],
     },
-    schema: {
+    schema: [
+      {
       "@context": "https://schema.org",
       "@type": "Course",
       name: "Wav Academy",
@@ -159,7 +212,10 @@ export const ROUTE_SEO: RouteSeo[] = [
         courseMode: "online",
         courseWorkload: "PT2H",
       },
-    },
+      },
+      // Les sept questions sont bien affichées sur la page, via le même tableau.
+      faqSchema(ACADEMY_FAQ),
+    ],
     sitemap: 0.9,
     llms: `Accompagnement régulier pour créateurs (live hebdomadaire, suivi ${ACADEMY_SUPPORT_DAYS}, feedback à la demande, Discord premium, ${ACADEMY_MODULES_COUNT} modules, ${ACADEMY_GUIDES_COUNT} guides et outil d'analyse WavStats). Trois Pass prépayés, paiement unique sans abonnement : ${academyPricing}.`,
     llmsSection: "offres",
@@ -356,6 +412,24 @@ export const ROUTE_SEO: RouteSeo[] = [
 ];
 
 /** Accès par chemin — utilisé par les pages : <SEOHead {...seoFor("/wavacademy")} /> */
+/**
+ * Ajoute son fil d'Ariane à chaque page hors accueil.
+ *
+ * Fait ici plutôt que route par route : c'est mécanique, et un oubli dans une
+ * liste de douze entrées ne se verrait pas. Le libellé reprend la partie du
+ * titre qui précède le tiret, comme llms.txt.
+ */
+export const ROUTE_SEO: RouteSeo[] = ROUTES.map((route) => {
+  if (route.path === "/") return route;
+  const name = route.title.split(/[—|]/)[0].trim();
+  const existants = route.schema
+    ? Array.isArray(route.schema)
+      ? route.schema
+      : [route.schema]
+    : [];
+  return { ...route, schema: [...existants, breadcrumbSchema(route.path, name)] };
+});
+
 export function seoFor(path: string): RouteSeo {
   const found = ROUTE_SEO.find((r) => r.path === path);
   if (!found) throw new Error(`[seo] Route inconnue : ${path}. Ajoute-la dans src/config/seo.ts.`);

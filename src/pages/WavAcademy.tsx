@@ -24,7 +24,7 @@ import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SEOHead } from "@/components/SEOHead";
-import { seoFor } from "@/config/seo";
+import { ACADEMY_FAQ, seoFor } from "@/config/seo";
 import {
   ACADEMY_PLANS,
   ACADEMY_FEATURES,
@@ -168,38 +168,6 @@ const VIDEO_TESTIMONIALS = [
   { id: "FrMFqiAqAkU", alt: "Témoignage client Wav Academy — impact sur la stratégie de contenu" },
   { id: "s-VaJvfFqbM", alt: "Témoignage client Wav Academy — croissance après accompagnement" },
   { id: "cc1cRfCEJGE", alt: "Témoignage client Wav Academy — résultats après coaching" },
-];
-
-// ── FAQ ─────────────────────────────────────────────────────────────────────
-const FAQ = [
-  {
-    q: "Je débute totalement, c'est pour moi ?",
-    a: "Oui. Le principe de la Wav Academy, c'est justement de ne plus avancer seul. Tu montres ton travail, tu obtiens des retours, et tu progresses avec un cadre — que tu en sois à ta 3e ou à ta 300e vidéo.",
-  },
-  {
-    q: "Concrètement, qu'est-ce que je reçois une fois inscrit ?",
-    a: "Un accompagnement : le live du jeudi de 14h à 16h, un suivi 5 jours sur 7, du feedback sur tes contenus à la demande, et le Discord premium. Plus les ressources : 6 modules de formation, 19 guides téléchargeables et 3 000 crédits WavStats par mois.",
-  },
-  {
-    q: "Combien de temps ça me prend par semaine ?",
-    a: "Le système est fait pour les créateurs déjà occupés. Le live dure deux heures chaque jeudi, et tu poses tes questions quand tu veux : elles sont vérifiées 5 jours sur 7. Tu peux en faire autant ou aussi peu que tu veux.",
-  },
-  {
-    q: "Le WavStats est-il vraiment inclus ?",
-    a: "Oui. Il coûte normalement de 14,90 €/mois (Starter) à 149 €/mois (Agency). En tant que membre, tu reçois 3 000 crédits gratuits chaque mois, inclus dans ta formule.",
-  },
-  {
-    q: "Tu me garantis des vues ?",
-    a: "Non, et personne ne peut le garantir. Je garantis ma présence, mes réponses, mes analyses, mes feedbacks et les ressources. Ce que je peux tenir, c'est que tu ne restes plus seul face à tes questions et à tes contenus.",
-  },
-  {
-    q: "C'est un abonnement ? Je peux annuler ?",
-    a: "Non, ce n'est pas un abonnement. Les trois formules (3, 6 et 12 mois) sont des paiements uniques, sans reconduction : il n'y a rien à résilier. Tu paies une fois, tu accèdes à tout pendant la durée choisie, et l'accès s'arrête simplement au terme.",
-  },
-  {
-    q: "Comment je reçois mes accès après le paiement ?",
-    a: "Juste après le paiement, tu reçois un email avec ton lien d'activation Discord (valable 7 jours). Tu te connectes avec ton compte Discord et ton rôle est attribué automatiquement. Pense à vérifier tes spams.",
-  },
 ];
 
 // ── Main component ───────────────────────────────────────────────────────────
@@ -655,13 +623,13 @@ export default function WavAcademy() {
         <div className="max-w-3xl mx-auto">
           <SectionHeader title="Les questions que tu te poses." />
           <Accordion type="single" collapsible className="w-full">
-            {FAQ.map((item, i) => (
+            {ACADEMY_FAQ.map((item, i) => (
               <AccordionItem key={i} value={`faq-${i}`}>
                 <AccordionTrigger className="text-left font-semibold">
-                  {item.q}
+                  {item.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground leading-relaxed">
-                  {item.a}
+                  {item.answer}
                 </AccordionContent>
               </AccordionItem>
             ))}

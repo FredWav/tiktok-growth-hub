@@ -35,6 +35,24 @@ function buildNoscript(route: RouteSeo) {
     </noscript>`;
 }
 
+/**
+ * Contenu placé dans `#root` avant que React ne prenne la main.
+ *
+ * Deux rôles : donner un `<h1>` et une accroche aux robots qui n'exécutent pas
+ * JavaScript, et servir d'écran d'attente le temps du chargement. Styles en
+ * ligne obligatoires — la feuille Tailwind n'est pas encore appliquée.
+ */
+function buildRootFallback(route: RouteSeo) {
+  // Fond crème identique à celui du site : la bascule vers le rendu React
+  // passe inaperçue au lieu de faire clignoter un écran blanc.
+  return `<div style="min-height:100vh;background:#FBF6EE">
+        <div style="max-width:760px;margin:0 auto;padding:96px 24px;font-family:system-ui,sans-serif;color:#1a1a1a;text-align:center">
+          <h1 style="font-size:2rem;line-height:1.25;margin:0 0 16px">${escText(route.noscript.h1)}</h1>
+          <p style="font-size:1rem;line-height:1.6;color:#6b6456;margin:0">${escText(route.description)}</p>
+        </div>
+      </div>`;
+}
+
 /** Applique les métadonnées d'une route à la coquille HTML buildée. */
 function renderShell(template: string, route: RouteSeo) {
   const url = `${BASE_URL}${route.path === "/" ? "" : route.path}`;
@@ -73,6 +91,19 @@ function renderShell(template: string, route: RouteSeo) {
     );
   }
   html = html.replace(bodyNoscript, buildNoscript(route));
+
+  // Titre et accroche dans le corps même, pas seulement dans le <noscript>.
+  // Sans ça le HTML servi ne contient qu'un <div id="root"> vide : les robots
+  // qui n'exécutent pas JavaScript ne voient aucun titre de niveau 1. React
+  // remplace ce contenu au montage, il fait donc aussi office d'écran d'attente.
+  const rootDiv = /<div id="root"><\/div>/i;
+  if (!rootDiv.test(html)) {
+    throw new Error(
+      '[seo-prerender] <div id="root"></div> introuvable dans index.html — ' +
+        "le titre de niveau 1 ne serait pas injecté dans le corps de la page.",
+    );
+  }
+  html = html.replace(rootDiv, `<div id="root">${buildRootFallback(route)}</div>`);
   return html;
 }
 

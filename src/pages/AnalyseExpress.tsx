@@ -192,6 +192,40 @@ export default function AnalyseExpress() {
         </div>
       </Section>
 
+      {/* Exemple de rapport réel — le compte de Fred lui-même */}
+      <Section className="pb-20">
+        <SectionHeader
+          title="À quoi ressemble ton rapport"
+          subtitle="Voici le rapport de mon propre compte, tel que l'Analyse Express le génère. Le tien aura la même profondeur, sur tes chiffres."
+        />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 max-w-4xl mx-auto">
+          {[
+            { src: "/exemple-rapport-couverture.webp", alt: "Couverture du rapport Analyse Express : score de santé du compte sur 100" },
+            { src: "/exemple-rapport-synthese.webp", alt: "Page de synthèse : ce qui fonctionne et ce qui bloque sur le compte" },
+            { src: "/exemple-rapport-videos.webp", alt: "Tableau des meilleures vidéos avec vues, interactions et enregistrements" },
+          ].map((p) => (
+            <a
+              key={p.src}
+              href="/exemple-rapport-analyse-express.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackPostHogEvent("click_example_report", { from: "preview" })}
+              className="block rounded-xl overflow-hidden border border-border shadow-sm hover:shadow-md hover:border-primary/40 transition"
+            >
+              <img src={p.src} alt={p.alt} loading="lazy" width={620} height={876} className="w-full h-auto" />
+            </a>
+          ))}
+        </div>
+        <div className="text-center mt-8">
+          <Button variant="outline" size="lg" asChild onClick={() => trackPostHogEvent("click_example_report", { from: "button" })}>
+            <a href="/exemple-rapport-analyse-express.pdf" target="_blank" rel="noopener noreferrer">
+              Voir le rapport complet (exemple)
+            </a>
+          </Button>
+          <p className="text-xs text-muted-foreground mt-3">11 pages, texte sélectionnable · c'est exactement ce que tu reçois.</p>
+        </div>
+      </Section>
+
       {/* Confirmation Modal */}
       <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
         <DialogContent className="max-w-md">

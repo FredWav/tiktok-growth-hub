@@ -657,19 +657,6 @@ export default function WavAcademy() {
           <p className="text-cream/40 text-sm mt-4">
             Dès {ACADEMY_FROM} € pour {ACADEMY_ENTRY.duration} d'accès · paiement unique · démarrage immédiat.
           </p>
-          {/* TODO destination appel stratégique — à confirmer avec Fred.
-              /reserverunappel est aujourd'hui la candidature Wav Premium, pas un
-              appel de découverte Academy. */}
-          <p className="text-cream/70 text-sm mt-6">
-            Ou parle-m'en d'abord :{" "}
-            <Link
-              to="/reserverunappel"
-              className="text-cream underline underline-offset-4 decoration-cream/40 hover:decoration-cream transition-colors"
-            >
-              appel stratégique offert
-            </Link>
-            .
-          </p>
         </div>
       </Section>
 

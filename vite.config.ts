@@ -38,16 +38,44 @@ function buildNoscript(route: RouteSeo) {
 /**
  * Contenu placé dans `#root` avant que React ne prenne la main.
  *
- * Deux rôles : donner un titre de niveau 1 et une accroche aux robots qui
- * n'exécutent pas JavaScript — sans quoi le corps servi n'est qu'un div vide —
- * et servir d'écran d'attente le temps du chargement. Styles en ligne
- * obligatoires : la feuille Tailwind n'est pas encore appliquée.
+ * C'est du HTML normal, pas du `<noscript>` : un crawler qui n'exécute pas le
+ * JavaScript (les robots des IA, notamment) le lit à pleine valeur, alors que
+ * le contenu confiné dans `<noscript>` est pondéré faiblement. On y sert donc
+ * le titre, la proposition de valeur ET les liens vers les offres, pas
+ * seulement le titre. React (createRoot, pas d'hydratation) remplace tout ce
+ * bloc au montage : il fait aussi office d'écran d'attente pendant le chargement.
+ *
+ * Styles en ligne obligatoires : la feuille Tailwind n'est pas encore appliquée.
+ * Les données proviennent de `noscript` — aucun champ nouveau, aucune source qui
+ * puisse diverger du reste du SEO.
  */
 function buildRootFallback(route: RouteSeo) {
+  // Proposition de valeur : le paragraphe du noscript est plus riche que la
+  // meta description ; on prend les deux quand ils diffèrent.
+  const lead = `<p style="font-size:1.05rem;line-height:1.6;color:#3a352b;margin:0 auto 14px;max-width:640px">${escText(route.description)}</p>`;
+  const body =
+    route.noscript.body && route.noscript.body !== route.description
+      ? `<p style="font-size:0.95rem;line-height:1.6;color:#6b6456;margin:0 auto;max-width:640px">${escText(route.noscript.body)}</p>`
+      : "";
+
+  // Liens vers les offres : ce sont les CTA et le maillage interne, servis en
+  // clair au lieu d'être noyés dans le <noscript>.
+  const links = (route.noscript.links ?? [])
+    .map(
+      (l) =>
+        `<a href="${escAttr(l.href)}" style="display:inline-block;margin:5px;padding:9px 16px;border:1px solid #d8cdb8;border-radius:8px;color:#1a1a1a;text-decoration:none;font-size:0.9rem">${escText(l.label)}</a>`,
+    )
+    .join("");
+  const linksBlock = links
+    ? `<div style="margin-top:24px;display:flex;flex-wrap:wrap;justify-content:center;gap:2px;max-width:720px;margin-left:auto;margin-right:auto">${links}</div>`
+    : "";
+
   return `<div style="min-height:100vh;background:#FBF6EE">
-        <div style="max-width:760px;margin:0 auto;padding:96px 24px;font-family:system-ui,sans-serif;color:#1a1a1a;text-align:center">
-          <h1 style="font-size:2rem;line-height:1.25;margin:0 0 16px">${escText(route.noscript.h1)}</h1>
-          <p style="font-size:1rem;line-height:1.6;color:#6b6456;margin:0">${escText(route.description)}</p>
+        <div style="max-width:820px;margin:0 auto;padding:80px 24px;font-family:system-ui,sans-serif;color:#1a1a1a;text-align:center">
+          <h1 style="font-size:2rem;line-height:1.25;margin:0 0 18px">${escText(route.noscript.h1)}</h1>
+          ${lead}
+          ${body}
+          ${linksBlock}
         </div>
       </div>`;
 }

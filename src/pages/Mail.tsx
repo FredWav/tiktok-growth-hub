@@ -1,99 +1,17 @@
-import { useState, useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { SEOHead } from "@/components/SEOHead";
 import { seoFor } from "@/config/seo";
-import { CREATORS_COUNT } from "@/config/offers";
-import { CheckCircle, Loader2, Gift, Zap, FileText, Lightbulb, ShieldAlert } from "lucide-react";
+import { NewsletterForm } from "@/components/NewsletterForm";
+import { Gift, Zap, FileText, Lightbulb } from "lucide-react";
 
 const benefits = [
-  { icon: Zap, text: "120+ hooks prêts à l'emploi testés sur des millions de vues" },
-  { icon: FileText, text: "Les structures exactes qui captent l'attention en moins de 2 secondes" },
-  { icon: Lightbulb, text: "Les erreurs fatales qui tuent ta rétention (et comment les corriger)" },
+  { icon: Zap, text: "Toutes les familles d'accroches, avec des exemples prêts à l'emploi" },
+  { icon: FileText, text: "Les structures qui captent l'attention dans les deux premières secondes" },
+  { icon: Lightbulb, text: "Les modèles à compléter avec ton propre sujet, et une grille pour noter un hook" },
 ];
 
 export default function MailPage() {
-  const [firstName, setFirstName] = useState("");
-  const [email, setEmail] = useState("");
-  const [accepted, setAccepted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
-  const [subscriberCount, setSubscriberCount] = useState<number | null>(null);
-
-  useEffect(() => {
-    supabase.functions.invoke("mailerlite-count")
-      .then(({ data }) => {
-        if (data?.count != null) setSubscriberCount(data.count);
-      })
-      .catch(() => {/* silently fail — fallback text shown */});
-  }, []);
-
-  // Traduit le message brut renvoyé par la fonction (venant de MailerLite)
-  // en message lisible pour l'utilisateur.
-  const friendlyMessage = (raw: string): string => {
-    if (/valid email|email.*invalid|email.*format/i.test(raw)) {
-      return "Cet email ne semble pas valide. Vérifie-le et réessaie !";
-    }
-    // MailerLite renvoie un 413 quand le compte a atteint sa limite d'abonnés.
-    if (/subscriber limit|exceed/i.test(raw)) {
-      return "Les inscriptions sont momentanément saturées. Réessaie un peu plus tard, ou écris-moi à contact@fredwav.com et je t'envoie le guide directement.";
-    }
-    return "Une erreur est survenue. Réessaie !";
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!accepted) {
-      setError("Si tu ne coches pas la case, je n'ai pas le droit de t'envoyer de mail !");
-      return;
-    }
-    setLoading(true);
-    setError("");
-
-    try {
-      const { data, error: fnError } = await supabase.functions.invoke(
-        "mailerlite-subscribe",
-        { body: { email, firstName } }
-      );
-
-      // Sur une réponse non-2xx, supabase-js remplit `fnError` (FunctionsHttpError)
-      // et laisse `data` à null : le vrai message est dans le corps de la réponse,
-      // qu'il faut relire depuis `fnError.context`.
-      let apiError: string | null = data?.error ?? null;
-      if (fnError) {
-        const ctx = (fnError as { context?: Response }).context;
-        if (ctx && typeof ctx.json === "function") {
-          try {
-            const body = await ctx.json();
-            apiError = body?.error || body?.message || fnError.message;
-          } catch {
-            apiError = fnError.message;
-          }
-        } else {
-          apiError = fnError.message;
-        }
-      }
-
-      if (apiError) {
-        setError(friendlyMessage(apiError));
-        return;
-      }
-
-      setSuccess(true);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "";
-      setError(friendlyMessage(message));
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <Layout>
       <SEOHead {...seoFor("/newsletter")} />
@@ -101,133 +19,38 @@ export default function MailPage() {
       <Section className="bg-background py-20 md:py-32">
         <div className="max-w-lg mx-auto">
           <div className="bg-card border border-border rounded-xl overflow-hidden shadow-lg">
-
-            {/* Badge valeur */}
             <div className="bg-primary text-primary-foreground text-center py-2.5 px-4">
-              <span className="text-sm font-semibold tracking-wide">ACCÈS GRATUIT — Guide exclusif abonnés</span>
+              <span className="text-sm font-semibold tracking-wide">GRATUIT — Guide offert à l'inscription</span>
             </div>
 
             <div className="p-8">
-              {success ? (
-                <div className="text-center space-y-5 py-8">
-                  <CheckCircle className="h-16 w-16 text-primary mx-auto" />
-                  <h2 className="text-2xl font-bold text-foreground">
-                    Ton guide arrive !
-                  </h2>
-                  <div className="text-left space-y-3 bg-muted/50 border border-border rounded-lg p-5 text-sm text-muted-foreground leading-relaxed">
-                    <p className="font-semibold text-foreground">Une dernière chose avant qu'on commence.</p>
-                    <p>Mon premier email avec ton guide est déjà en route. Pour être sûr de le recevoir :</p>
-                    <ul className="list-disc list-inside space-y-1.5">
-                      <li>Vérifie tes spams et ajoute <span className="font-medium text-foreground">hello@fredwav.com</span> à tes contacts.</li>
-                      <li>Si tu es sur Gmail et que l'email atterrit dans l'onglet "Promotions", glisse-le dans ta boîte de réception principale. Ça prend 3 secondes et ça change tout pour la suite.</li>
-                    </ul>
-                    <p>Et <span className="font-medium text-foreground">réponds-moi dès le premier email</span>. Je t'offre une belle ressource si tu joues le jeu.</p>
-                    <p className="font-semibold text-foreground">À tout de suite.</p>
-                  </div>
+              <div className="text-center mb-8 space-y-4">
+                <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary/10 mb-2">
+                  <Gift className="h-8 w-8 text-primary" />
                 </div>
-              ) : (
-                <>
-                  <div className="text-center mb-8 space-y-4">
-                    <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary/10 mb-2">
-                      <Gift className="h-8 w-8 text-primary" />
+                <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight">
+                  La newsletter de Fred Wav, et le guide des hooks{" "}
+                  <span className="text-gold-gradient">en cadeau</span>
+                </h1>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Mes conseils formats courts par email, et pour commencer, le guide complet des hooks : le même que
+                  j'utilise avec mes clients pour construire des accroches qui retiennent l'attention dès la première
+                  seconde.
+                </p>
+              </div>
+
+              <div className="space-y-3 mb-8">
+                {benefits.map((b, i) => (
+                  <div key={i} className="flex items-start gap-3 text-sm">
+                    <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
+                      <b.icon className="h-4 w-4 text-primary" />
                     </div>
-                    <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight">
-                      Reçois le guide Ultime des hooks{" "}
-                      <span className="text-gold-gradient">gratuitement</span>
-                    </h1>
-                    <p className="text-sm font-semibold text-primary mt-1">
-                      Réservé à mes abonnés les plus motivés
-                    </p>
-                    <p className="text-muted-foreground text-sm leading-relaxed">
-                      Le même guide que j'utilise avec mes clients Wav Premium pour construire des accroches qui retiennent l'attention dès la première seconde.
-                    </p>
+                    <span className="text-foreground">{b.text}</span>
                   </div>
+                ))}
+              </div>
 
-                  {/* Benefits */}
-                  <div className="space-y-3 mb-8">
-                    {benefits.map((b, i) => (
-                      <div key={i} className="flex items-start gap-3 text-sm">
-                        <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
-                          <b.icon className="h-4 w-4 text-primary" />
-                        </div>
-                        <span className="text-foreground">{b.text}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="firstName">Prénom</Label>
-                      <Input
-                        id="firstName"
-                        type="text"
-                        placeholder="Ton prénom"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="ton@email.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-
-                    <div className="flex items-start space-x-3 pt-2">
-                      <Checkbox
-                        id="accept"
-                        checked={accepted}
-                        onCheckedChange={(v) => setAccepted(v === true)}
-                      />
-                      <label
-                        htmlFor="accept"
-                        className="text-xs text-muted-foreground leading-relaxed cursor-pointer"
-                      >
-                        J'accepte de recevoir le guide et les conseils de FredWav !
-                      </label>
-                    </div>
-
-                    <p className="text-[11px] text-muted-foreground leading-relaxed">
-                      Te désinscrire ? Un clic, c'est fait, pas de drama. Tes données ne bougent pas, ne se vendent pas, ne se partagent pas. Ici on est entre nous, pas sur une marketplace à la con.
-                    </p>
-
-                    {error && (
-                      <div className="flex items-start gap-3 bg-amber-50 border border-amber-300 rounded-xl px-4 py-3 animate-in slide-in-from-top-2 fade-in duration-300">
-                        <ShieldAlert className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
-                        <p className="text-amber-800 text-sm font-medium leading-snug">{error}</p>
-                      </div>
-                    )}
-
-                    <Button
-                      type="submit"
-                      variant="hero"
-                      className="w-full"
-                      size="xl"
-                      disabled={loading}
-                    >
-                      {loading ? (
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      ) : null}
-                      {loading ? "Envoi..." : "Recevoir mon guide gratuit"}
-                    </Button>
-
-                    <p className="text-center text-xs text-muted-foreground">
-                      Déjà{" "}
-                      <span className="font-semibold text-foreground">
-                        {subscriberCount != null ? `${subscriberCount}` : CREATORS_COUNT} créateur{subscriberCount !== 1 ? "s" : ""}
-                      </span>{" "}
-                      {subscriberCount != null ? "inscrit" + (subscriberCount !== 1 ? "s" : "") : "l'ont téléchargé"}
-                    </p>
-                  </form>
-                </>
-              )}
+              <NewsletterForm location="newsletter_page" />
             </div>
           </div>
         </div>

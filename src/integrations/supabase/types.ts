@@ -420,62 +420,89 @@ export type Database = {
         Row: {
           accompagnement_critere: string | null
           accompagnement_type: string | null
+          availability: string | null
           blockers: string | null
           budget: string | null
           conversion_trigger: string | null
           created_at: string
           current_level: string | null
           email: string
+          facebook_url: string | null
           first_name: string
           follower_since: string | null
           goals: string
+          help_topics: string[] | null
           id: string
+          instagram_username: string | null
           last_name: string
           motivation: string | null
+          objectives: string[] | null
           origin_source: string | null
+          other_social_url: string | null
           posthog_id: string | null
           profil: string | null
+          success_30_days: string | null
           tiktok_username: string | null
+          why_now: string | null
+          youtube_url: string | null
         }
         Insert: {
           accompagnement_critere?: string | null
           accompagnement_type?: string | null
+          availability?: string | null
           blockers?: string | null
           budget?: string | null
           conversion_trigger?: string | null
           created_at?: string
           current_level?: string | null
           email: string
+          facebook_url?: string | null
           first_name: string
           follower_since?: string | null
           goals: string
+          help_topics?: string[] | null
           id?: string
+          instagram_username?: string | null
           last_name: string
           motivation?: string | null
+          objectives?: string[] | null
           origin_source?: string | null
+          other_social_url?: string | null
           posthog_id?: string | null
           profil?: string | null
+          success_30_days?: string | null
           tiktok_username?: string | null
+          why_now?: string | null
+          youtube_url?: string | null
         }
         Update: {
           accompagnement_critere?: string | null
           accompagnement_type?: string | null
+          availability?: string | null
           blockers?: string | null
           budget?: string | null
           conversion_trigger?: string | null
           created_at?: string
           current_level?: string | null
           email?: string
+          facebook_url?: string | null
           first_name?: string
           follower_since?: string | null
           goals?: string
+          help_topics?: string[] | null
           id?: string
+          instagram_username?: string | null
           last_name?: string
           motivation?: string | null
+          objectives?: string[] | null
           origin_source?: string | null
+          other_social_url?: string | null
           posthog_id?: string | null
           profil?: string | null
+          success_30_days?: string | null
           tiktok_username?: string | null
+          why_now?: string | null
+          youtube_url?: string | null
         }
         Relationships: []
       }

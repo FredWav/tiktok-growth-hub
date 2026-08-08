@@ -40,9 +40,13 @@ const values = [
 // Pour ajuster, changer uniquement les constantes ci-dessous.
 const VIDEO_START_YEAR = 2007;    // 19 ans d'expérience en 2026
 const MUSIC_START_YEAR = 2005;    // 21 ans en 2026
+const SOUND_START_YEAR = 2010;    // 16 ans en 2026
+const BIRTH_YEAR = 1991;          // 16 ans lors des premières vidéos (2007)
 
 const yearsSince = (startYear: number) =>
   new Date().getFullYear() - startYear;
+
+const currentAge = () => yearsSince(BIRTH_YEAR);
 
 const stats = [
   { value: CREATORS_COUNT, label: "Créateurs accompagnés" },

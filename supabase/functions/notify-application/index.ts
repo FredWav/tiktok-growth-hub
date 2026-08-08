@@ -8,26 +8,59 @@ const corsHeaders = {
 };
 
 const DISCORD_WEBHOOK_URL = Deno.env.get("DISCORD_WEBHOOK_URL") ?? "";
-
-// Rate-limit anti-spam : max 3 soumissions / 10 min / IP. En mémoire (par instance),
-// suffisant pour bloquer un spam basique sans dépendance externe.
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX = 3;
 const rateLimitStore = new Map<string, number[]>();
+const PREMIUM_BUDGET_CODES = new Set([
+  "total_no_budget",
+  "total_15_a_100",
+  "total_100_a_300",
+  "total_300_a_900",
+  "total_900_plus",
+]);
+const PREMIUM_BUDGET_LABELS: Record<string, string> = {
+  total_no_budget: "Pas de budget total",
+  total_15_a_100: "15 € à 100 € au total",
+  total_100_a_300: "100 € à 300 € au total",
+  total_300_a_900: "300 € à 900 € au total",
+  total_900_plus: "900 € et + au total",
+};
+
+type ApplicationPayload = {
+  first_name?: unknown;
+  last_name?: unknown;
+  email?: unknown;
+  tiktok_username?: unknown;
+  instagram_username?: unknown;
+  youtube_url?: unknown;
+  facebook_url?: unknown;
+  other_social_url?: unknown;
+  profil?: unknown;
+  objectives?: unknown;
+  goals?: unknown;
+  success_30_days?: unknown;
+  why_now?: unknown;
+  help_topics?: unknown;
+  availability?: unknown;
+  budget?: unknown;
+  origin_source?: unknown;
+  follower_since?: unknown;
+  conversion_trigger?: unknown;
+  posthog_id?: unknown;
+};
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
-  const recent = (rateLimitStore.get(ip) ?? []).filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+  const recent = (rateLimitStore.get(ip) ?? []).filter((time) => now - time < RATE_LIMIT_WINDOW_MS);
   if (recent.length >= RATE_LIMIT_MAX) {
     rateLimitStore.set(ip, recent);
     return false;
   }
   recent.push(now);
   rateLimitStore.set(ip, recent);
-  // Nettoyage opportuniste pour éviter une croissance illimitée.
   if (rateLimitStore.size > 5000) {
     for (const [key, times] of rateLimitStore) {
-      const kept = times.filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+      const kept = times.filter((time) => now - time < RATE_LIMIT_WINDOW_MS);
       if (kept.length === 0) rateLimitStore.delete(key);
       else rateLimitStore.set(key, kept);
     }
@@ -35,8 +68,23 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
-function escapeHtml(str: string): string {
-  return str
+function cleanText(value: unknown, max: number, required = false): string | null {
+  if (typeof value !== "string") return required ? null : null;
+  const cleaned = value.trim().slice(0, max);
+  return cleaned || null;
+}
+
+function cleanList(value: unknown, maxItems = 12, maxLength = 180): string[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((item): item is string => typeof item === "string")
+    .map((item) => item.trim().slice(0, maxLength))
+    .filter(Boolean)
+    .slice(0, maxItems);
+}
+
+function escapeHtml(value: string): string {
+  return value
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -44,10 +92,20 @@ function escapeHtml(str: string): string {
     .replace(/'/g, "&#039;");
 }
 
+function discordValue(value: string | null | undefined): string {
+  return (value?.trim() || "-")
+    .split("")
+    .map((character) => "\\`*_{}[]()#+-.!|>~".includes(character) ? `\\${character}` : character)
+    .join("")
+    .slice(0, 1024);
+}
+
+function tableRow(label: string, value: string | null | undefined): string {
+  return `<tr><td style="padding:12px;border-bottom:1px solid #eee;font-weight:bold;color:#555;width:180px;vertical-align:top">${escapeHtml(label)}</td><td style="padding:12px;border-bottom:1px solid #eee;white-space:pre-wrap">${escapeHtml(value || "-")}</td></tr>`;
+}
+
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   const ip =
     req.headers.get("cf-connecting-ip") ||
@@ -56,156 +114,168 @@ Deno.serve(async (req) => {
     "unknown";
 
   if (!checkRateLimit(ip)) {
-    return new Response(
-      JSON.stringify({ error: "Trop de demandes. Réessaie dans quelques minutes." }),
-      { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: "Trop de demandes. Réessaie dans quelques minutes." }), {
+      status: 429,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 
   try {
-    const { first_name, last_name, email, tiktok_username, profil, motivation, accompagnement_type, accompagnement_critere, goals, budget, origin_source, follower_since, conversion_trigger, posthog_id } =
-      await req.json();
+    const raw = await req.json() as ApplicationPayload;
+    const firstName = cleanText(raw.first_name, 100, true);
+    const lastName = cleanText(raw.last_name, 100, true);
+    const email = cleanText(raw.email, 254, true);
+    const tiktok = cleanText(raw.tiktok_username, 100);
+    const instagram = cleanText(raw.instagram_username, 100);
+    const youtube = cleanText(raw.youtube_url, 500);
+    const facebook = cleanText(raw.facebook_url, 500);
+    const otherNetwork = cleanText(raw.other_social_url, 500);
+    const profile = cleanText(raw.profil, 600, true);
+    const objectives = cleanList(raw.objectives);
+    const blocker = cleanText(raw.goals, 3000, true);
+    const success30Days = cleanText(raw.success_30_days, 3000, true);
+    const whyNow = cleanText(raw.why_now, 3000, true);
+    const helpTopics = cleanList(raw.help_topics);
+    const availability = cleanText(raw.availability, 300, true);
+    const budget = cleanText(raw.budget, 100, true);
+    const originSource = cleanText(raw.origin_source, 500);
+    const followerSince = cleanText(raw.follower_since, 100);
+    const conversionTrigger = cleanText(raw.conversion_trigger, 500);
+    const posthogId = cleanText(raw.posthog_id, 200);
 
-    if (!first_name || !last_name || !email || !profil || !motivation || !accompagnement_type || !goals) {
-      await notifyError("Demande de contact", "Champs obligatoires manquants");
+    const hasNetwork = Boolean(tiktok || instagram || youtube || facebook || otherNetwork);
+    if (!firstName || !lastName || !email || !profile || !blocker || !success30Days || !whyNow || !availability || !budget || !PREMIUM_BUDGET_CODES.has(budget) || !hasNetwork || objectives.length === 0 || helpTopics.length === 0) {
+      await notifyError("Demande Wav Premium", "Champs de qualification obligatoires manquants");
       return new Response(JSON.stringify({ error: "Champs obligatoires manquants" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Validation simple du format email pour éviter l'open relay.
-    if (typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return new Response(JSON.stringify({ error: "Email invalide" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // ── 1. Discord webhook ──
-    const payload = {
-      content: "<@967099537439227965> <@826133033069051954>📋 **Nouvelle demande de contact !**",
-      embeds: [{
-        title: `${first_name} ${last_name}`,
-        color: 0xc8a97e,
-        fields: [
-          { name: "📧 Email", value: email, inline: true },
-          { name: "🎵 TikTok", value: tiktok_username || "-", inline: true },
-          { name: "💰 Budget", value: budget || "-", inline: true },
-          { name: "👤 Profil", value: profil || "-" },
-          { name: "🎯 Attente", value: motivation || "-" },
-          { name: "🤝 Accompagnement", value: accompagnement_type || "-" },
-          { name: "⭐ Ce qui compte", value: accompagnement_critere || "-" },
-          { name: "📝 Ce qui l'amène", value: (goals || "-").slice(0, 1024) },
-          { name: "🔥 Contenu déclencheur", value: (conversion_trigger || "-").slice(0, 1024) },
-          { name: "📍 Source", value: origin_source || "-", inline: true },
-          { name: "⏳ Follower depuis", value: follower_since || "-", inline: true },
-          { name: "📊 PostHog", value: posthog_id ? `[Voir](https://us.posthog.com/person/${posthog_id})` : "-", inline: true },
-        ],
-        timestamp: new Date().toISOString(),
-      }],
-    };
+    const networks = [
+      tiktok && `TikTok : ${tiktok}`,
+      instagram && `Instagram : ${instagram}`,
+      youtube && `YouTube : ${youtube}`,
+      facebook && `Facebook : ${facebook}`,
+      otherNetwork && `Autre : ${otherNetwork}`,
+    ].filter((value): value is string => Boolean(value));
+    const budgetLabel = PREMIUM_BUDGET_LABELS[budget] ?? budget;
 
-    const res = await fetch(DISCORD_WEBHOOK_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    if (DISCORD_WEBHOOK_URL) {
+      const discordPayload = {
+        content: "<@967099537439227965> <@826133033069051954> 📋 **Nouvelle demande Wav Premium !**",
+        allowed_mentions: { users: ["967099537439227965", "826133033069051954"] },
+        embeds: [{
+          title: discordValue(`${firstName} ${lastName}`),
+          color: 0xc8a97e,
+          fields: [
+            { name: "📧 Email", value: discordValue(email), inline: true },
+            { name: "💰 Budget total", value: discordValue(budgetLabel), inline: true },
+            { name: "🌐 Réseaux", value: discordValue(networks.join("\n")) },
+            { name: "👤 Profil", value: discordValue(profile) },
+            { name: "🎯 Objectifs", value: discordValue(objectives.join("\n")) },
+            { name: "🧱 Blocage principal", value: discordValue(blocker) },
+            { name: "📅 Résultat attendu à 30 jours", value: discordValue(success30Days) },
+            { name: "⏱️ Pourquoi maintenant", value: discordValue(whyNow) },
+            { name: "🤝 Aides recherchées", value: discordValue(helpTopics.join("\n")) },
+            { name: "🕒 Disponibilité", value: discordValue(availability) },
+            { name: "📍 Source", value: discordValue(originSource), inline: true },
+            { name: "⌛ Suit Fred depuis", value: discordValue(followerSince), inline: true },
+            { name: "🔥 Déclencheur", value: discordValue(conversionTrigger) },
+            { name: "📊 PostHog", value: posthogId ? `[Voir](https://us.posthog.com/person/${encodeURIComponent(posthogId)})` : "-", inline: true },
+          ],
+          timestamp: new Date().toISOString(),
+        }],
+      };
 
-    if (!res.ok) {
-      const text = await res.text();
-      console.error("Discord webhook error:", res.status, text);
-      await notifyError("Demande de contact Discord", `Webhook échoué (${res.status}) • ${first_name} ${last_name}`);
-    } else {
-      console.log(`Discord notification sent for ${first_name} ${last_name}`);
+      const discordResponse = await fetch(DISCORD_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(discordPayload),
+      });
+      if (!discordResponse.ok) {
+        console.error("Discord webhook error:", discordResponse.status, await discordResponse.text());
+        await notifyError("Demande Wav Premium Discord", `Webhook échoué (${discordResponse.status}) • ${firstName} ${lastName}`);
+      }
     }
 
-    // ── 2. SMTP email to admin ──
     try {
-      const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD") || "";
-      if (SMTP_PASSWORD) {
+      const smtpPassword = Deno.env.get("SMTP_PASSWORD") || "";
+      if (smtpPassword) {
         const adminHtml = `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <h1 style="color: #333; border-bottom: 2px solid #c8a97e; padding-bottom: 10px;">
-              📋 Nouvelle demande de contact
-            </h1>
-            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; width: 160px;">Nom</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(first_name)} ${escapeHtml(last_name)}</td></tr>
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Email</td><td style="padding: 12px; border-bottom: 1px solid #eee;"><a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></td></tr>
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">TikTok</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(tiktok_username || "-")}</td></tr>
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; vertical-align: top;">Profil</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(profil || "-")}</td></tr>
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; vertical-align: top;">Attente</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(motivation || "-")}</td></tr>
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; vertical-align: top;">Accompagnement</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(accompagnement_type || "-")}</td></tr>
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; vertical-align: top;">Ce qui compte</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(accompagnement_critere || "-")}</td></tr>
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Budget</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(budget || "-")}</td></tr>
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; vertical-align: top;">Ce qui l'amène</td><td style="padding: 12px; border-bottom: 1px solid #eee; white-space: pre-wrap;">${escapeHtml(goals || "-")}</td></tr>
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Source</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(origin_source || "-")}</td></tr>
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Follower depuis</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(follower_since || "-")}</td></tr>
-              <tr><td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; vertical-align: top;">Contenu déclencheur</td><td style="padding: 12px; border-bottom: 1px solid #eee;">${escapeHtml(conversion_trigger || "-")}</td></tr>
+          <div style="font-family:Arial,sans-serif;max-width:680px;margin:0 auto;padding:20px">
+            <h1 style="color:#333;border-bottom:2px solid #c8a97e;padding-bottom:10px">Nouvelle demande Wav Premium</h1>
+            <table style="width:100%;border-collapse:collapse;margin-top:20px">
+              ${tableRow("Nom", `${firstName} ${lastName}`)}
+              ${tableRow("Email", email)}
+              ${tableRow("Réseaux", networks.join("\n"))}
+              ${tableRow("Profil", profile)}
+              ${tableRow("Objectifs", objectives.join("\n"))}
+              ${tableRow("Blocage principal", blocker)}
+              ${tableRow("Résultat attendu à 30 jours", success30Days)}
+              ${tableRow("Pourquoi maintenant", whyNow)}
+              ${tableRow("Aides recherchées", helpTopics.join("\n"))}
+              ${tableRow("Disponibilité", availability)}
+              ${tableRow("Budget total", budgetLabel)}
+              ${tableRow("Source", originSource)}
+              ${tableRow("Suit Fred depuis", followerSince)}
+              ${tableRow("Contenu ou expérience déclencheur", conversionTrigger)}
             </table>
           </div>`;
 
         const transporter = nodemailer.createTransport({
-          host: "ssl0.ovh.net", port: 465, secure: true,
-          auth: { user: "noreply@fredwav.com", pass: SMTP_PASSWORD },
+          host: "ssl0.ovh.net",
+          port: 465,
+          secure: true,
+          auth: { user: "noreply@fredwav.com", pass: smtpPassword },
         });
 
-        // Email to admin
         await transporter.sendMail({
           from: "noreply@fredwav.com",
           to: "fredwavcm@gmail.com",
-          subject: `📋 Nouvelle demande de contact - ${first_name} ${last_name}`.trim(),
+          subject: `Nouvelle demande Wav Premium - ${firstName} ${lastName}`,
           html: adminHtml,
         });
-        console.log("Admin email sent for", first_name, last_name);
 
-        // Email to candidate
         const candidateHtml = `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <h1 style="color: #333; border-bottom: 2px solid #c8a97e; padding-bottom: 10px;">
-              Merci pour ta demande, ${escapeHtml(first_name)} !
-            </h1>
-            <p style="color: #555; font-size: 16px; line-height: 1.6;">
-              Ta demande de contact a bien été reçue. Je prends le temps de la lire en détail.
-            </p>
-            <div style="background-color: #faf7f2; border-left: 4px solid #c8a97e; padding: 20px; margin: 24px 0; border-radius: 8px;">
-              <p style="color: #333; font-size: 16px; line-height: 1.6; margin: 0;">
-                <strong>Prochaine étape&nbsp;:</strong> je te recontacte personnellement par email sous <strong>48h (jours ouvrés)</strong> à cette adresse.
-              </p>
+          <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px">
+            <h1 style="color:#333;border-bottom:2px solid #c8a97e;padding-bottom:10px">Merci pour ta demande, ${escapeHtml(firstName)} !</h1>
+            <p style="color:#555;font-size:16px;line-height:1.6">Ta demande Wav Premium a bien été reçue. Je prends le temps de la lire en détail.</p>
+            <div style="background:#faf7f2;border-left:4px solid #c8a97e;padding:20px;margin:24px 0;border-radius:8px">
+              <p style="color:#333;font-size:16px;line-height:1.6;margin:0"><strong>Prochaine étape :</strong> je te recontacte personnellement par email sous <strong>48 h ouvrées</strong>.</p>
             </div>
-            <p style="color: #555; font-size: 16px; line-height: 1.6;">
-              En attendant, pense à vérifier tes spams au cas où ma réponse atterrirait là-bas. Si tu as des questions entre-temps, tu peux répondre directement à cet email.
-            </p>
-            <p style="color: #555; font-size: 16px; margin-top: 24px;">
-              À très vite,<br/>
-              <strong>Fred Wav</strong>
-            </p>
+            <p style="color:#555;font-size:16px;line-height:1.6">Pense à vérifier tes spams. Tu peux aussi répondre directement à cet email si tu veux ajouter un élément.</p>
+            <p style="color:#555;font-size:16px;margin-top:24px">À très vite,<br><strong>Fred Wav</strong></p>
           </div>`;
 
         await transporter.sendMail({
           from: "noreply@fredwav.com",
           replyTo: "fredwavcm@gmail.com",
           to: email,
-          subject: `${first_name}, ta demande est bien reçue !`,
+          subject: `${firstName}, ta demande Wav Premium est bien reçue`,
           html: candidateHtml,
         });
-        console.log("Candidate email sent to", email);
-      } else {
-        console.warn("SMTP_PASSWORD not configured, skipping emails");
       }
-    } catch (emailErr) {
-      console.error("Email send failed:", emailErr);
-      await notifyError("Demande de contact Email", `Exception • ${first_name} ${last_name}`);
+    } catch (emailError) {
+      console.error("Email send failed:", emailError);
+      await notifyError("Demande Wav Premium Email", `Exception • ${firstName} ${lastName}`);
     }
 
-    await notifySuccess("Demande de contact", `${first_name} ${last_name} • ${email}`);
-
+    await notifySuccess("Demande Wav Premium", `${firstName} ${lastName} • ${email}`);
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
     console.error("Error:", error);
-    await notifyError("Demande de contact", `Erreur: ${error.message}`);
+    const message = error instanceof Error ? error.message : "Erreur inconnue";
+    await notifyError("Demande Wav Premium", `Erreur: ${message}`);
     return new Response(JSON.stringify({ error: "Erreur interne du serveur" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

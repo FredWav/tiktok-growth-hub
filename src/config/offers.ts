@@ -32,12 +32,11 @@ export const ACADEMY_PLANS: AcademyPlan[] = [
   {
     term: "6m", months: 6, total: 499, monthly: 83, label: "Accélération", duration: "6 mois",
     save: "≈ 1 mois offert", note: "Le temps d'ancrer la méthode et de tenir le rythme.",
-    badge: "Populaire",
+    highlight: true, badge: "Recommandé",
   },
   {
     term: "12m", months: 12, total: 899, monthly: 75, label: "Maîtrise", duration: "12 mois",
     save: "≈ 3 mois offerts", note: "Un an complet pour installer un système de création durable.",
-    highlight: true, badge: "Meilleure offre",
   },
 ];
 
@@ -104,6 +103,23 @@ export const BUDGET_LABELS: Record<string, string> = Object.fromEntries(
   BUDGET_TIERS.map((t) => [t.value, t.short]),
 );
 
+/**
+ * Paliers dédiés au Wav Premium. Les codes sont distincts des budgets mensuels
+ * du diagnostic TikTok : ici la question porte bien sur l'investissement total
+ * pour les 30 jours, et la réponse sert uniquement à qualifier la demande.
+ */
+export const PREMIUM_BUDGET_TIERS = [
+  { value: "total_no_budget", label: "Je n'ai pas de budget pour me faire accompagner", short: "Pas de budget total" },
+  { value: "total_15_a_100", label: "Entre 15 € et 100 €", short: "15 € à 100 € au total" },
+  { value: "total_100_a_300", label: "De 100 € à 300 €", short: "100 € à 300 € au total" },
+  { value: "total_300_a_900", label: "De 300 € à 900 €", short: "300 € à 900 € au total" },
+  { value: "total_900_plus", label: "900 € et +", short: "900 € et + au total" },
+] as const;
+
+export const PREMIUM_BUDGET_LABELS: Record<string, string> = Object.fromEntries(
+  PREMIUM_BUDGET_TIERS.map((t) => [t.value, t.short]),
+);
+
 export type RecommendedOffer = "express" | "academy" | "premium";
 
 /**
@@ -149,7 +165,9 @@ export function recommendedOfferForBudget(budget: string | null | undefined): Re
 export type OfferTier = {
   need: string;
   name: string;
-  price: string;
+  price?: string;
+  description: string;
+  note?: string;
   href: string;
   cta: string;
   featured?: boolean;
@@ -157,25 +175,28 @@ export type OfferTier = {
 
 export const OFFER_TIERS: OfferTier[] = [
   {
-    need: "Je veux un état des lieux de mon compte",
+    need: "Je veux comprendre ce qui bloque maintenant.",
     name: "Analyse Express",
     price: EXPRESS_PRICE_LABEL,
+    description: "Un diagnostic automatisé de ton compte TikTok pour identifier rapidement tes principaux points forts, tes blocages et tes prochaines actions.",
+    note: "Disponible sur TikTok uniquement pour le moment.",
     href: "/analyse-express",
-    cta: "Lancer mon Analyse Express",
+    cta: "Analyser mon compte",
   },
   {
-    need: "Je veux apprendre avec un cadre et une communauté",
+    need: "Je veux progresser dans un cadre régulier.",
     name: "Wav Academy",
-    price: `dès ${ACADEMY_FROM} € / ${ACADEMY_ENTRY.duration}`,
+    price: "3, 6 ou 12 mois",
+    description: "Des ressources, des outils, des lives et une communauté pour apprendre à analyser tes contenus et prendre de meilleures décisions semaine après semaine.",
     href: "/wavacademy",
     cta: "Rejoindre la Wav Academy",
     featured: true,
   },
   {
-    need: `Je veux un suivi individuel intensif de ${PREMIUM_DURATION_DAYS} jours`,
+    need: "Je veux travailler directement avec Fred.",
     name: "Wav Premium",
-    price: "sur candidature",
+    description: `${PREMIUM_DURATION_DAYS} jours d'accompagnement individuel pour travailler directement sur ta stratégie, tes contenus et tes objectifs réseaux sociaux.`,
     href: "/reserverunappel",
-    cta: "Voir si le Wav Premium me correspond",
+    cta: "Réserve ton appel",
   },
 ];

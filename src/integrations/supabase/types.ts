@@ -428,14 +428,23 @@ export type Database = {
           email: string
           first_name: string
           follower_since: string | null
+          facebook_url: string | null
           goals: string
+          help_topics: string[] | null
           id: string
+          instagram_username: string | null
           last_name: string
           motivation: string | null
+          objectives: string[] | null
+          other_social_url: string | null
           origin_source: string | null
           posthog_id: string | null
           profil: string | null
+          success_30_days: string | null
           tiktok_username: string | null
+          availability: string | null
+          why_now: string | null
+          youtube_url: string | null
         }
         Insert: {
           accompagnement_critere?: string | null
@@ -448,14 +457,23 @@ export type Database = {
           email: string
           first_name: string
           follower_since?: string | null
+          facebook_url?: string | null
           goals: string
+          help_topics?: string[] | null
           id?: string
+          instagram_username?: string | null
           last_name: string
           motivation?: string | null
+          objectives?: string[] | null
+          other_social_url?: string | null
           origin_source?: string | null
           posthog_id?: string | null
           profil?: string | null
+          success_30_days?: string | null
           tiktok_username?: string | null
+          availability?: string | null
+          why_now?: string | null
+          youtube_url?: string | null
         }
         Update: {
           accompagnement_critere?: string | null
@@ -468,14 +486,23 @@ export type Database = {
           email?: string
           first_name?: string
           follower_since?: string | null
+          facebook_url?: string | null
           goals?: string
+          help_topics?: string[] | null
           id?: string
+          instagram_username?: string | null
           last_name?: string
           motivation?: string | null
+          objectives?: string[] | null
+          other_social_url?: string | null
           origin_source?: string | null
           posthog_id?: string | null
           profil?: string | null
+          success_30_days?: string | null
           tiktok_username?: string | null
+          availability?: string | null
+          why_now?: string | null
+          youtube_url?: string | null
         }
         Relationships: []
       }

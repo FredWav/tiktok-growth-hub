@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, type ComponentProps } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { trackEvent } from "@/lib/tracking";
 import { trackPostHogEvent } from "@/lib/posthog";
@@ -25,13 +25,30 @@ import { downloadExpressReport } from "@/lib/pdf";
 const POLL_INTERVAL = 5000;
 const MAX_POLL_DURATION = 600_000;
 
+type AccountData = ComponentProps<typeof MetricsGrids>["account"] & Partial<ComponentProps<typeof ProfileHeader>> & {
+  health_score?: ComponentProps<typeof HealthScoreSection>["healthScore"];
+  recent_videos?: ComponentProps<typeof TopVideosSection>["videos"];
+  shadowban_analysis?: ComponentProps<typeof ShadowbanSection>["sb"];
+  top_hashtags?: ComponentProps<typeof HashtagsSection>["hashtags"];
+  ai_insights?: unknown;
+};
+
+type ExpressAnalysisData = {
+  account?: AccountData;
+  ai_analysis?: ComponentProps<typeof AIAnalysisSection>["ai"];
+  publication_pattern?: ComponentProps<typeof PublicationPatternSection>["pp"];
+  health_score?: ComponentProps<typeof HealthScoreSection>["healthScore"];
+  top_videos?: ComponentProps<typeof TopVideosSection>["videos"];
+  shadowban_analysis?: ComponentProps<typeof ShadowbanSection>["sb"];
+};
+
 export default function AnalyseExpressResult() {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("session_id");
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<ExpressAnalysisData | null>(null);
   const [username, setUsername] = useState<string>("");
   const [pdfLoading, setPdfLoading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -68,9 +85,9 @@ export default function AnalyseExpressResult() {
       if (result.current_step) setCurrentStep(result.current_step);
       if (result.status === "complete" && result.data) {
         stopPolling();
-        setData(result.data);
+        setData(result.data as ExpressAnalysisData);
         setLoading(false);
-        trackPostHogEvent("analyse_express_result_viewed", { username: result.username || "" });
+        trackPostHogEvent("analyse_express_result_viewed", { source: "fresh_analysis" });
       } else if (result.status === "failed") {
         stopPolling();
         setError(result.error || "L'analyse a échoué. Réessayez.");
@@ -108,8 +125,8 @@ export default function AnalyseExpressResult() {
       startTimeRef.current = Date.now();
       pollingRef.current = setInterval(checkStatus, POLL_INTERVAL);
       setTimeout(checkStatus, 1500);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "L'analyse n'a pas pu démarrer");
       setLoading(false);
     }
   }, [sessionId, checkStatus]);
@@ -143,9 +160,9 @@ export default function AnalyseExpressResult() {
 
           if ((existing.status === "complete" || existing.status === "completed") && existing.result_data) {
             // Results already available — display directly
-            setData(existing.result_data);
+            setData(existing.result_data as ExpressAnalysisData);
             setLoading(false);
-            trackPostHogEvent("analyse_express_result_viewed", { username: existing.tiktok_username || "" });
+            trackPostHogEvent("analyse_express_result_viewed", { source: "existing_analysis" });
             return;
           }
 
@@ -188,8 +205,8 @@ export default function AnalyseExpressResult() {
   const handleDownloadPdf = async () => {
     if (!username || !data?.account) return;
     setPdfLoading(true);
-    trackEvent("express_pdf_download", { username });
-    trackPostHogEvent("click_pdf_download", { username });
+    trackEvent("express_pdf_download", { product: "analyse_express_tiktok" });
+    trackPostHogEvent("click_pdf_download", { product: "analyse_express_tiktok" });
     try {
       // Le moteur de rendu (~500 ko) n'est téléchargé qu'ici, au clic.
       await downloadExpressReport(data, username);

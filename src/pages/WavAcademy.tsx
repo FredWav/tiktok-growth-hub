@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -39,6 +39,7 @@ import { WAVACADEMY_FAQ } from "@/config/wavacademy-faq";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { trackPostHogEvent } from "@/lib/posthog";
+import { trackEvent } from "@/lib/tracking";
 import {
   Dialog,
   DialogContent,
@@ -186,9 +187,17 @@ export default function WavAcademy() {
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedTerm, setSelectedTerm] = useState<string>("12m");
+  const [selectedTerm, setSelectedTerm] = useState<string>("6m");
 
-  const selectedPlan = PLANS.find((p) => p.term === selectedTerm) ?? PLANS.find((p) => p.term === "12m")!;
+  const selectedPlan = PLANS.find((p) => p.term === selectedTerm) ?? PLANS.find((p) => p.term === "6m")!;
+
+  useEffect(() => {
+    if (!isSuccess) return;
+    const eventKey = "fw_academy_checkout_success_tracked";
+    if (sessionStorage.getItem(eventKey)) return;
+    sessionStorage.setItem(eventKey, "1");
+    trackEvent("academy_checkout_success", { source: "confirmed_return" });
+  }, [isSuccess]);
 
   const form = useForm<CheckoutForm>({
     resolver: zodResolver(checkoutSchema),
@@ -208,12 +217,21 @@ export default function WavAcademy() {
     setSelectedTerm(term);
     form.reset();
     setDialogOpen(true);
-    trackPostHogEvent("academy_checkout_open", { term });
+    const plan = PLANS.find((item) => item.term === term);
+    trackEvent("academy_checkout_open", {
+      term,
+      total: String(plan?.total ?? ""),
+      location: "pricing",
+    });
   };
 
   const onCheckout = async (data: CheckoutForm) => {
     setIsSubmitting(true);
-    trackPostHogEvent("academy_checkout_submit", { term: selectedTerm });
+    trackEvent("academy_checkout_submit", {
+      term: selectedTerm,
+      total: String(selectedPlan.total),
+      location: "checkout_dialog",
+    });
     try {
       const { data: result, error } = await supabase.functions.invoke("record-wavacademy-consent", {
         body: {
@@ -400,7 +418,7 @@ export default function WavAcademy() {
           Vidéo après vidéo, tu trouves le format qui marche pour toi.
         </p>
         <p className="text-center text-muted-foreground mt-4 max-w-2xl mx-auto text-sm leading-relaxed">
-          Le contenu, c'est 30 % du résultat. Le reste, c'est lire tes stats et corriger le bon paramètre. C'est ce qu'on regarde ensemble.
+          Tes statistiques ne servent à rien si elles ne changent aucune de tes décisions. C'est ce qu'on regarde ensemble.
         </p>
       </Section>
 

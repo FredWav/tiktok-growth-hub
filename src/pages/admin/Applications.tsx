@@ -12,16 +12,27 @@ import {
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Loader2, Trash2 } from "lucide-react";
-import { BUDGET_LABELS } from "@/config/offers";
+import { BUDGET_LABELS, PREMIUM_BUDGET_LABELS } from "@/config/offers";
 
 const budgetLabels: Record<string, string> = {
   // Grille actuelle — dérivée de config/offers.ts pour qu'aucune tranche ne
   // s'affiche jamais en code brut dans l'admin.
   ...BUDGET_LABELS,
+  ...PREMIUM_BUDGET_LABELS,
   // Anciennes valeurs (candidatures historiques)
   "10_a_100": "De 10€ à 100€",
   "1000_plus": "1000€ et +",
 };
+
+function applicationNetworks(application: WavPremiumApplication) {
+  return [
+    application.tiktok_username && ["TikTok", application.tiktok_username],
+    application.instagram_username && ["Instagram", application.instagram_username],
+    application.youtube_url && ["YouTube", application.youtube_url],
+    application.facebook_url && ["Facebook", application.facebook_url],
+    application.other_social_url && ["Autre", application.other_social_url],
+  ].filter((network): network is string[] => Boolean(network));
+}
 
 const Applications = () => {
   const { data: applications, isLoading } = useWavPremiumApplications();
@@ -107,7 +118,7 @@ const Applications = () => {
                   <TableHead className="text-cream/70">Date</TableHead>
                   <TableHead className="text-cream/70">Nom</TableHead>
                   <TableHead className="text-cream/70">Email</TableHead>
-                  <TableHead className="text-cream/70">TikTok</TableHead>
+                  <TableHead className="text-cream/70">Réseaux</TableHead>
                   <TableHead className="text-cream/70">Profil</TableHead>
                   <TableHead className="text-cream/70">Source</TableHead>
                 </TableRow>
@@ -127,7 +138,9 @@ const Applications = () => {
                     </TableCell>
                     <TableCell className="text-cream/80">{app.email}</TableCell>
                     <TableCell className="text-cream/80">
-                      {app.tiktok_username ? `@${app.tiktok_username}` : "-"}
+                      {applicationNetworks(app).length > 1
+                        ? `${applicationNetworks(app).length} réseaux`
+                        : applicationNetworks(app)[0]?.[0] || "-"}
                     </TableCell>
                     <TableCell className="text-cream/80 max-w-[200px] truncate">
                       {app.profil || "-"}
@@ -162,11 +175,7 @@ const Applications = () => {
                     <p>{selected.email}</p>
                   </div>
                   <div>
-                    <p className="text-cream/50 text-sm">TikTok</p>
-                    <p>{selected.tiktok_username ? `@${selected.tiktok_username}` : "-"}</p>
-                  </div>
-                  <div>
-                    <p className="text-cream/50 text-sm">Budget</p>
+                    <p className="text-cream/50 text-sm">Budget total</p>
                     <p>{selected.budget ? (budgetLabels[selected.budget] ?? selected.budget) : "-"}</p>
                   </div>
                   <div>
@@ -185,31 +194,38 @@ const Applications = () => {
 
                 <div className="space-y-3">
                   <div>
+                    <p className="text-cream/50 text-sm mb-1">Réseaux</p>
+                    {applicationNetworks(selected).length ? (
+                      <ul className="bg-noir rounded-lg p-3 space-y-1 text-sm">
+                        {applicationNetworks(selected).map(([name, value]) => (
+                          <li key={`${name}-${value}`}><span className="text-cream/50">{name} :</span> {value}</li>
+                        ))}
+                      </ul>
+                    ) : <p>-</p>}
+                  </div>
+                  <div>
                     <p className="text-cream/50 text-sm">Profil</p>
                     <p>{selected.profil || "-"}</p>
                   </div>
-                  <div>
-                    <p className="text-cream/50 text-sm">Attente sur TikTok</p>
-                    <p>{selected.motivation || "-"}</p>
-                  </div>
-                  <div>
-                    <p className="text-cream/50 text-sm">Type d'accompagnement souhaité</p>
-                    <p>{selected.accompagnement_type || "-"}</p>
-                  </div>
-                  <div>
-                    <p className="text-cream/50 text-sm">Ce qui compte le plus</p>
-                    <p>{selected.accompagnement_critere || "-"}</p>
-                  </div>
+                  {selected.objectives?.length ? <div><p className="text-cream/50 text-sm">Objectifs</p><ul className="list-disc pl-5 text-sm space-y-1">{selected.objectives.map((item) => <li key={item}>{item}</li>)}</ul></div> : null}
                 </div>
 
                 <div>
-                  <p className="text-cream/50 text-sm mb-1">Ce qui l'amène à réserver</p>
+                  <p className="text-cream/50 text-sm mb-1">Blocage principal</p>
                   <p className="bg-noir rounded-lg p-3 whitespace-pre-wrap text-sm">{selected.goals}</p>
                 </div>
 
-                {(selected.current_level || selected.blockers) && (
+                {selected.success_30_days && <div><p className="text-cream/50 text-sm mb-1">Résultat attendu à 30 jours</p><p className="bg-noir rounded-lg p-3 whitespace-pre-wrap text-sm">{selected.success_30_days}</p></div>}
+                {selected.why_now && <div><p className="text-cream/50 text-sm mb-1">Pourquoi maintenant</p><p className="bg-noir rounded-lg p-3 whitespace-pre-wrap text-sm">{selected.why_now}</p></div>}
+                {selected.help_topics?.length ? <div><p className="text-cream/50 text-sm">Aides recherchées</p><ul className="list-disc pl-5 text-sm space-y-1">{selected.help_topics.map((item) => <li key={item}>{item}</li>)}</ul></div> : null}
+                {selected.availability && <div><p className="text-cream/50 text-sm">Disponibilité réelle</p><p>{selected.availability}</p></div>}
+
+                {(selected.current_level || selected.blockers || selected.motivation || selected.accompagnement_type || selected.accompagnement_critere) && (
                   <div className="space-y-3 border-t border-primary/10 pt-4">
                     <p className="text-cream/40 text-xs uppercase tracking-wide">Anciennes réponses</p>
+                    {selected.motivation && <div><p className="text-cream/50 text-sm">Attente TikTok</p><p>{selected.motivation}</p></div>}
+                    {selected.accompagnement_type && <div><p className="text-cream/50 text-sm">Type d'accompagnement</p><p>{selected.accompagnement_type}</p></div>}
+                    {selected.accompagnement_critere && <div><p className="text-cream/50 text-sm">Critère principal</p><p>{selected.accompagnement_critere}</p></div>}
                     {selected.current_level && (
                       <div>
                         <p className="text-cream/50 text-sm">Niveau</p>

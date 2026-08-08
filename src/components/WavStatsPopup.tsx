@@ -10,6 +10,10 @@ export function WavStatsPopup() {
 
   useEffect(() => {
     if (sessionStorage.getItem("from_diagnostic")) return;
+    // Ne concurrence pas le CTA Academy sur le premier écran mobile et ne
+    // s'empile pas au-dessus du bandeau de consentement lors d'une première visite.
+    if (window.matchMedia("(max-width: 767px)").matches) return;
+    if (!localStorage.getItem("cookie_consent")) return;
 
     const lastShown = localStorage.getItem("wavstats_last_shown");
     if (lastShown) {

@@ -1,12 +1,11 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, TrendingUp, Users, Eye, Check, X, Target, Zap, Crown } from "lucide-react";
+import { ArrowRight, Target, Zap, Crown } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/tracking";
 import { SEOHead } from "@/components/SEOHead";
 import { seoFor } from "@/config/seo";
-import { CREATORS_COUNT } from "@/config/offers";
 import { ScreenshotWall } from "@/components/ScreenshotWall";
 import { ClientResults } from "@/components/ClientResults";
 import { VideoCard } from "@/components/VideoCard";
@@ -28,39 +27,6 @@ const videoTestimonials = [
   { id: "wu2CPcqp-yU", alt: "Témoignage client - Avis sur le Wav Premium de Fred Wav" },
 ];
 
-const caseStudies = [
-  {
-    category: "Accompagnement Wav Premium",
-    title: "Passer du chaos à une stratégie claire",
-    before: ["Publications irrégulières", "Aucun système", "Aucune lecture des stats"],
-    after: ["Calendrier éditorial structuré", "Hooks retravaillés", "CTA optimisés", "Premières demandes entrantes"],
-    resultLabel: "Observé chez des créateurs accompagnés",
-    results: [
-      "Vidéos qui dépassent régulièrement les 5k-15k vues",
-      "1 à 3 prospects qualifiés par semaine",
-      "Compréhension réelle des métriques",
-    ],
-  },
-  {
-    category: "Accompagnement Business",
-    title: "Transformer l'audience en chiffre d'affaires",
-    before: ["Des vues", "Peu de conversion", "Positionnement flou"],
-    after: ["Offre clarifiée", "CTA stratégique", "Contenu orienté acquisition"],
-    resultLabel: "Effet constaté",
-    results: [
-      "Plus de leads qualifiés",
-      "Moins de perte d'audience",
-      "Meilleur ratio vues / ventes",
-    ],
-  },
-];
-
-const stats = [
-  { icon: Users, value: CREATORS_COUNT, label: "Clients accompagnés" },
-  { icon: Eye, value: "10M+", label: "de vues analysées" },
-  { icon: TrendingUp, value: "95%", label: "Taux de satisfaction" },
-];
-
 const chooseOffers = [
   {
     icon: Crown,
@@ -75,22 +41,23 @@ const chooseOffers = [
   {
     icon: Target,
     title: "Wav Premium",
-    description: "Transformation encadrée sur 30 jours",
+    description: "30 jours de travail individuel sur ta stratégie réseaux sociaux",
     price: null,
-    cta: "Voir si ça me correspond",
+    cta: "Réserve ton appel",
     href: "/reserverunappel",
-    trackEvent: "cta_contact_click",
+    trackEvent: "cta_premium_click",
+    legacyTrackEvent: "cta_contact_click",
     highlighted: false,
   },
   {
     icon: Zap,
     title: "Analyse Express",
-    description: "Diagnostic rapide de ton compte en 2 min",
-    price: null,
-    cta: "Lancer mon Analyse Express",
+    description: "Diagnostic automatisé de ton compte TikTok uniquement",
+    price: "11,90 €",
+    cta: "Analyser mon compte",
     href: "/analyse-express",
-    // Nom d'événement conservé volontairement pour l'historique analytics.
-    trackEvent: "cta_45j_click",
+    trackEvent: "cta_express_click",
+    legacyTrackEvent: "cta_45j_click",
     highlighted: false,
   },
 ];
@@ -144,17 +111,20 @@ export default function Preuves() {
         <Section variant="dark" size="md" className="rounded-2xl md:rounded-none">
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="font-display text-2xl md:text-3xl font-semibold text-cream mb-4">
-              Prêt à obtenir les mêmes résultats ?
+              Tu veux travailler à partir de tes propres données ?
             </h2>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 variant="hero"
                 size="lg"
                 asChild
-                onClick={() => trackEvent("cta_contact_click", { location: "preuves_mid" })}
+                onClick={() => {
+                  trackEvent("cta_premium_click", { location: "preuves_mid" });
+                  trackEvent("cta_contact_click", { location: "preuves_mid" });
+                }}
               >
                 <Link to="/reserverunappel">
-                  Voir si le Wav Premium me correspond
+                  Réserve ton appel
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
@@ -162,7 +132,10 @@ export default function Preuves() {
                 variant="premium"
                 size="lg"
                 asChild
-                onClick={() => trackEvent("cta_analyse_express_click", { location: "preuves_mid" })}
+                onClick={() => {
+                  trackEvent("cta_express_click", { location: "preuves_mid" });
+                  trackEvent("cta_analyse_express_click", { location: "preuves_mid" });
+                }}
               >
                 <Link to="/analyse-express">
                   Analyse Express
@@ -174,81 +147,9 @@ export default function Preuves() {
         </Section>
       </div>
 
-      {/* Stats */}
-      <Section variant="default" size="sm">
-        <div className="flex flex-wrap justify-center gap-12">
-          {stats.map((stat, index) => (
-            <div key={index} className="text-center">
-              <stat.icon className="h-6 w-6 text-primary mx-auto mb-2" />
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <div className="text-sm text-muted-foreground">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-      </Section>
-
-      {/* Case Studies */}
+      {/* Manifeste Wav Academy */}
       <Section variant="cream" size="lg">
-        <SectionHeader
-          title="Études de cas"
-          subtitle="Des transformations mesurables et documentées."
-        />
-
-        <div className="space-y-8">
-          {caseStudies.map((study, index) => (
-            <div
-              key={index}
-              className="bg-background rounded-2xl p-8 md:p-10 border border-border/50 hover:border-primary/30 hover:shadow-xl transition-all duration-300"
-            >
-              <span className="text-xs font-semibold uppercase tracking-widest text-primary">{study.category}</span>
-              <h3 className="font-display text-2xl md:text-3xl font-bold mt-3 mb-8 tracking-tight">
-                {study.title}
-              </h3>
-
-              <div className="grid md:grid-cols-2 gap-6 mb-8">
-                <div className="bg-destructive/5 rounded-xl p-6">
-                  <div className="text-xs font-bold uppercase tracking-widest text-destructive/60 mb-4">Avant</div>
-                  <ul className="space-y-3">
-                    {study.before.map((item, i) => (
-                      <li key={i} className="flex items-start gap-3 text-muted-foreground line-through decoration-muted-foreground/30">
-                        <X className="h-4 w-4 mt-0.5 shrink-0 text-destructive/60" />
-                        <span className="text-sm">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="bg-primary/10 rounded-xl p-6 border border-primary/20">
-                  <div className="text-xs font-bold uppercase tracking-widest text-primary mb-4">Après</div>
-                  <ul className="space-y-3">
-                    {study.after.map((item, i) => (
-                      <li key={i} className="flex items-start gap-3 text-foreground">
-                        <Check className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
-                        <span className="text-sm font-medium">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              <div className="bg-muted/50 rounded-xl p-6">
-                <div className="text-xs font-bold uppercase tracking-widest text-primary mb-4">{study.resultLabel}</div>
-                <ul className="grid md:grid-cols-3 gap-3">
-                  {study.results.map((result, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-foreground/80">
-                      <Check className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
-                      {result}
-                    </li>
-                  ))}
-                </ul>
-                <p className="mt-4 text-xs text-muted-foreground">
-                  Ces résultats sont ceux de créateurs accompagnés. Aucun résultat n'est garanti.
-                </p>
-              </div>
-            </div>
-          ))}
-
-          {/* Manifeste Wav Academy */}
+        <div className="max-w-5xl mx-auto">
           <div className="bg-noir rounded-2xl p-10 md:p-14 text-center border border-primary/20 hover:border-primary/40 hover:shadow-xl transition-all duration-300">
             <span className="text-xs font-semibold uppercase tracking-widest text-primary">La Wav Academy</span>
             <h3 className="font-display text-2xl md:text-3xl font-bold mt-3 mb-8 tracking-tight text-cream">
@@ -302,7 +203,10 @@ export default function Preuves() {
                   variant="premium"
                   size="sm"
                   asChild
-                  onClick={() => trackEvent(offer.trackEvent, { location: "preuves_bottom" })}
+                  onClick={() => {
+                    trackEvent(offer.trackEvent, { location: "preuves_bottom" });
+                    if (offer.legacyTrackEvent) trackEvent(offer.legacyTrackEvent, { location: "preuves_bottom" });
+                  }}
                 >
                   <Link to={offer.href}>
                     {offer.cta}

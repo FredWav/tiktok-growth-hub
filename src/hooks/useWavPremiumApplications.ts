@@ -7,7 +7,16 @@ export interface WavPremiumApplication {
   last_name: string;
   email: string;
   tiktok_username: string | null;
+  instagram_username: string | null;
+  youtube_url: string | null;
+  facebook_url: string | null;
+  other_social_url: string | null;
   profil: string | null;
+  objectives: string[] | null;
+  success_30_days: string | null;
+  why_now: string | null;
+  help_topics: string[] | null;
+  availability: string | null;
   motivation: string | null;
   accompagnement_type: string | null;
   accompagnement_critere: string | null;

@@ -1,18 +1,34 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle, AlertTriangle, BarChart3, RefreshCw, MessageSquare, Target, Check, X, Zap, Radio, Eye } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowRight,
+  BarChart3,
+  Check,
+  Eye,
+  MessageSquare,
+  Radio,
+  RefreshCw,
+  Target,
+  X,
+  Zap,
+} from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/tracking";
 import { SEOHead } from "@/components/SEOHead";
 import { seoFor, HOME_FAQ } from "@/config/seo";
-import { ACADEMY_PLANS, ACADEMY_FROM, ACADEMY_ENTRY, PREMIUM_DURATION_DAYS } from "@/config/offers";
+import {
+  ACADEMY_PLANS,
+  EXPRESS_PRICE_LABEL,
+  PREMIUM_DURATION_DAYS,
+} from "@/config/offers";
 import { OfferComparison } from "@/components/OfferComparison";
 import { WavStatsPopup } from "@/components/WavStatsPopup";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
-import { TrustedBy } from "@/components/TrustedBy";
 import { ScreenshotWall } from "@/components/ScreenshotWall";
 import { VideoCard } from "@/components/VideoCard";
+import { ClientResults } from "@/components/ClientResults";
 import {
   Accordion,
   AccordionContent,
@@ -20,107 +36,84 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-const proofStrip = [
-  "Témoignages vidéo",
-  "Cas clients concrets",
-  "Décisions basées sur tes stats",
-  "Feedback créateurs",
-  "Un regard extérieur sur ton travail",
-  "Sans bullshit",
-];
-
 const problems = [
-  {
-    icon: AlertTriangle,
-    text: "Tu ne sais pas dire précisément à qui tu parles, ni ce que tu apportes.",
-  },
-  {
-    icon: AlertTriangle,
-    text: "Tes premières secondes ne retiennent pas, et l'audience décroche avant le message.",
-  },
-  {
-    icon: AlertTriangle,
-    text: "Tes vidéos manquent de rythme et personne ne comprend ce que tu attends à la fin.",
-  },
-  {
-    icon: AlertTriangle,
-    text: "Tu crées seul : personne ne regarde ton compte, tes vidéos, tes chiffres.",
-  },
+  "Tu postes sans savoir exactement ce que tu testes.",
+  "Tu regardes tes statistiques après coup, mais elles ne changent pas réellement ta prochaine vidéo.",
+  "Tu corriges plusieurs choses en même temps et tu ne sais plus ce qui a eu un impact.",
+  "Tu accumules du contenu, mais pas forcément de la compréhension.",
 ];
 
-// ── Wav Academy : l'offre principale ────────────────────────────────────────
 const academyPillars = [
   {
     icon: Eye,
-    title: "Un regard régulier sur ton travail",
-    description: "Tu montres une vidéo, un compte, une stratégie. Je te dis ce qui va, ce qui ne va pas, et pourquoi.",
-  },
-  {
-    icon: Radio,
-    title: "Un live chaque semaine",
-    description: "En direct avec moi : tu poses tes questions, j'analyse des comptes, on décortique ce qui marche.",
-  },
-  {
-    icon: MessageSquare,
-    title: "Une communauté privée",
-    description: "Les canaux avancés et les autres membres, pour ne jamais rester bloqué seul.",
+    title: "Tes contenus deviennent des données exploitables",
+    description: "Tu analyses ce que tu publies et tu apprends à transformer tes statistiques en décisions.",
   },
   {
     icon: Zap,
-    title: "WavStats inclus",
-    description: "L'outil qui analyse tes vidéos et te dit quoi corriger. 3 000 crédits par mois.",
+    title: "Des actions concrètes",
+    description: "Pas 40 heures de théorie avant de commencer. Les ressources t'aident à modifier ce que tu fais maintenant.",
+  },
+  {
+    icon: Radio,
+    title: "Des lives réguliers avec Fred",
+    description: "Questions, analyse de comptes, décryptage de contenus et décisions à prendre.",
+  },
+  {
+    icon: MessageSquare,
+    title: "Tu n'es plus seul devant tes stats",
+    description: "Tu confrontes tes décisions, poses tes questions et bénéficies du regard du groupe.",
   },
 ];
 
-// ── Wav Premium : le haut de gamme, sur candidature ─────────────────────────
 const premiumMethod = [
   {
     icon: BarChart3,
-    title: "Analyse complète de ton compte",
-    description: "On passe en revue ton positionnement, ton référencement et ton marché pour trouver ta place.",
+    title: "Analyse stratégique complète",
+    description: "On regarde ton positionnement, tes comptes, tes contenus, tes statistiques, ton marché et le rôle réel de tes réseaux.",
   },
   {
     icon: RefreshCw,
     title: "Un point stratégique chaque semaine",
-    description: "On regarde ensemble ce que tes chiffres racontent et on corrige immédiatement.",
+    description: "On regarde ce qui s'est passé, ce que les chiffres racontent et ce qu'on modifie pour la semaine suivante.",
   },
   {
     icon: MessageSquare,
-    title: "Mes retours entre les sessions",
-    description: "Tu me montres tes scripts et tes accroches avant de tourner, je te réponds directement.",
+    title: "Feedback entre les rendez-vous",
+    description: "Tu peux me montrer tes idées, hooks, scripts ou contenus quand tu bloques, sans attendre le rendez-vous suivant.",
   },
   {
     icon: Target,
-    title: "Un cap clair chaque semaine",
-    description: "Chaque semaine a un objectif défini, écrit noir sur blanc.",
+    title: "Des objectifs concrets",
+    description: "On définit ce qu'on veut faire progresser et comment on saura si la stratégie avance dans la bonne direction.",
+  },
+  {
+    icon: RefreshCw,
+    title: "Une stratégie réutilisable",
+    description: "Le but n'est pas que tu dépendes de moi. Tu repars avec une logique que tu comprends et peux continuer à appliquer après les 30 jours.",
   },
 ];
 
 const premiumForYou = [
-  "Tu veux faire des formats courts un vrai levier — pour vendre ton offre, ou pour gagner la visibilité qui attire les marques",
-  `Tu es prêt à corriger tes vidéos semaine après semaine pendant ${PREMIUM_DURATION_DAYS} jours`,
-  "Tu veux un suivi exigeant sur tes contenus, pas des conseils génériques",
+  "Tes réseaux ont un vrai rôle à jouer dans ton activité ou ton projet",
+  "Tu veux travailler directement avec Fred",
+  "Tu es prêt à publier, tester et modifier tes contenus pendant les 30 jours",
+  "Tu acceptes de remettre en question ce que tu fais déjà",
+  "Tu veux prendre des décisions à partir de faits plutôt que de suppositions",
 ];
 
 const premiumNotForYou = [
-  "Tu cherches une agence pour produire tes contenus à ta place",
-  "Tu ne comptes pas publier régulièrement",
-  "Tu cherches une recette miracle pour devenir viral sans effort",
-];
-
-const premiumDeliverables = [
-  "Un plan éditorial complet et une stratégie pour rentabiliser ton audience",
-  "La correction de tes scripts, ligne par ligne",
-  "Des structures réutilisables : accroches, formats qui retiennent",
-  "L'optimisation de ta bio et du parcours de tes abonnés",
-  `Un plan pour tenir le rythme après les ${PREMIUM_DURATION_DAYS} jours`,
-  "Les rediffusions de toutes les sessions d'analyse",
+  "Tu veux déléguer toute ta création de contenu",
+  "Tu veux qu'on te garantisse un nombre de vues ou d'abonnés",
+  "Tu cherches une technique secrète pour devenir viral",
+  "Tu n'as pas le temps ou l'envie d'appliquer les recommandations",
+  "Tu veux uniquement qu'on te confirme que ta stratégie actuelle est parfaite",
 ];
 
 const featuredVideos = [
-  { id: "g9QYqO-xiqw", alt: "Témoignage client - Retour d'expérience Wav Premium" },
-  { id: "wu2CPcqp-yU", alt: "Témoignage client - Avis sur le Wav Premium" },
-  { id: "cc1cRfCEJGE", alt: "Témoignage client - Résultats après coaching stratégie de contenu" },
+  { id: "XMMmmLLKue4", alt: "Témoignage de PlotBreaker sur la Wav Academy" },
+  { id: "Hgkn3ifjSS0", alt: "Témoignage de Lucille après son accompagnement" },
+  { id: "LOi7RTx12nE", alt: "Témoignage de David sur sa stratégie multiréseaux" },
 ];
 
 export default function Home() {
@@ -130,312 +123,210 @@ export default function Home() {
       <ExitIntentPopup />
       <SEOHead {...seoFor("/")} />
 
-      {/* ===== Hero ===== */}
       <Section variant="default" size="xl" className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-cream via-background to-primary/5 -z-10" />
-
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 animate-fade-in">
-            Arrête de poster à l'aveugle.{" "}
-            <span className="text-gold-gradient">Tes stats disent déjà ce qui bloque.</span>
+          <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 animate-fade-in text-balance">
+            Arrête de poster seul. <span className="text-gold-gradient">Tes stats disent déjà ce qui bloque.</span>
           </h1>
-
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-            Pas d'astuces d'algorithme, pas de promesses. Tu es accompagné : un regard régulier sur ton travail pour comprendre ce qui fonctionne, ce qui ne fonctionne pas et pourquoi. Tu ne crées plus seul. <Link to="/a-propos" className="text-primary underline hover:no-underline">Découvre mon approche</Link>.
+          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-8 animate-fade-in" style={{ animationDelay: "0.1s" }}>
+            Tu postes, tu testes, tu changes de stratégie et tu recommences sans toujours savoir ce qui a vraiment fait la différence. Ici, pas de hack ni de promesse de viralité : on regarde ce que tes contenus racontent, on identifie ce qui bloque et on corrige.
           </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in" style={{ animationDelay: "0.2s" }}>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-stretch sm:items-center animate-fade-in" style={{ animationDelay: "0.2s" }}>
             <Button variant="hero" size="xl" asChild onClick={() => trackEvent("cta_academy_click", { location: "hero" })}>
-              <Link to="/wavacademy">
-                Rejoindre la Wav Academy
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
+              <Link to="/wavacademy">Rejoindre la Wav Academy<ArrowRight className="ml-2 h-5 w-5" /></Link>
             </Button>
             <Button variant="outline" size="xl" asChild onClick={() => trackEvent("cta_express_click", { location: "hero" })}>
               <Link to="/analyse-express">Analyser mon compte d'abord</Link>
             </Button>
           </div>
           <p className="text-sm text-muted-foreground mt-4 animate-fade-in" style={{ animationDelay: "0.3s" }}>
-            Dès {ACADEMY_FROM} € pour {ACADEMY_ENTRY.duration} d'accès · paiement unique, sans abonnement.
+            3, 6 ou 12 mois — paiement unique, sans abonnement.
           </p>
         </div>
       </Section>
 
-      {/* ===== Proof strip ===== */}
-      <div className="px-4 md:px-0">
-        <Section variant="dark" size="sm" className="rounded-2xl md:rounded-none mx-0 md:mx-0">
-          <div className="flex flex-wrap justify-center gap-x-8 gap-y-3">
-            {proofStrip.map((item, index) => (
-              <div key={index} className="flex items-center gap-2 text-sm text-cream/80">
-                <CheckCircle className="h-4 w-4 text-primary" />
-                <span>{item}</span>
-              </div>
-            ))}
-          </div>
-        </Section>
-      </div>
-
-      {/* ===== Problème ===== */}
       <Section variant="default" size="lg">
         <SectionHeader
-          title="Tu publies, mais tu ne sais pas pourquoi ça ne décolle pas."
-          subtitle="Le contenu, c'est 30 % du résultat. Le reste, c'est savoir lire tes chiffres et corriger le bon paramètre — c'est exactement ce qui ne s'apprend pas tout seul."
+          title="Tu ne manques pas forcément d'idées. Tu manques de certitudes sur ce qui mérite d'être répété."
+          subtitle="Une vidéo marche, la suivante tombe à plat. Tu modifies le hook, le montage, le sujet et les hashtags en même temps. Résultat : même quand ça fonctionne, tu ne sais pas vraiment pourquoi."
         />
-
-        <div className="grid md:grid-cols-2 gap-4 lg:gap-6 max-w-3xl mx-auto">
-          {problems.map((problem, index) => (
-            <div key={index} className="flex items-start gap-3 p-4 rounded-lg bg-destructive/5 border border-destructive/10">
-              <problem.icon className="h-5 w-5 text-destructive mt-0.5 shrink-0" />
-              <span className="text-sm">{problem.text}</span>
+        <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+          {problems.map((problem) => (
+            <div key={problem} className="flex items-start gap-3 p-5 rounded-xl bg-destructive/5 border border-destructive/10">
+              <AlertTriangle className="h-5 w-5 text-destructive mt-0.5 shrink-0" />
+              <span className="text-sm leading-relaxed">{problem}</span>
             </div>
           ))}
         </div>
+        <p className="font-display text-xl md:text-2xl font-semibold text-center max-w-3xl mx-auto mt-10">
+          Le problème n'est pas de poster plus. Le problème, c'est de continuer à créer dans le flou.
+        </p>
       </Section>
 
-      {/* ===== Trusted By ===== */}
-      <Section variant="default" size="sm">
-        <TrustedBy />
+      <Section variant="dark" size="md">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="font-display text-3xl md:text-4xl font-semibold text-cream mb-5 text-balance">Continuer au hasard a un coût.</h2>
+          <p className="text-cream/75 text-lg leading-relaxed mb-5">
+            Du temps passé sur des contenus qui n'avaient parfois aucune chance de remplir leur objectif. De l'énergie gaspillée à changer de stratégie toutes les deux semaines. Des opportunités de visibilité, de crédibilité ou de business que tu ne peux pas exploiter parce que tu ne sais pas encore reproduire ce qui fonctionne.
+          </p>
+          <p className="rounded-xl border border-primary/30 bg-primary/10 p-5 text-cream font-medium text-lg">
+            Le but n'est pas de réussir toutes tes vidéos. Personne ne peut te promettre ça. Le but, c'est que chaque vidéo t'apprenne quelque chose pour la suivante.
+          </p>
+        </div>
       </Section>
 
-      {/* ===== Wav Academy : l'offre principale ===== */}
+      <Section variant="default" size="lg">
+        <SectionHeader
+          title="Pas des promesses. Des cas réels."
+          subtitle="Ce qui s'est réellement passé chez des créateurs accompagnés, avec le contexte qui va avec."
+        />
+        <ClientResults limit={3} />
+        <div className="text-center mt-8">
+          <Button variant="outline" asChild onClick={() => trackEvent("click_proof_strip", { location: "home_early" })}>
+            <Link to="/preuves">Voir toutes les preuves<ArrowRight className="ml-2 h-4 w-4" /></Link>
+          </Button>
+        </div>
+      </Section>
+
       <Section variant="cream" size="lg">
         <SectionHeader
-          title="La Wav Academy : ne poste plus seul"
-          subtitle="Tu veux progresser avec un cadre régulier, sans passer par un accompagnement individuel. Un regard extérieur sur ton travail, des retours réguliers, et tu comprends enfin tes résultats."
+          title="Wav Academy : arrête de créer seul dans ton coin."
+          subtitle="Un cadre collectif pour comprendre tes contenus, corriger ce qui bloque et progresser sans repartir de zéro à chaque vidéo."
         />
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto mb-12">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-6xl mx-auto mb-14">
           {academyPillars.map((item) => (
-            <div
-              key={item.title}
-              className="bg-background border border-border rounded-xl p-6 text-center hover:border-primary/40 transition-colors"
-            >
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <item.icon className="h-6 w-6 text-primary" />
+            <div key={item.title} className="bg-background border border-border rounded-xl p-6 hover:border-primary/40 transition-colors">
+              <div className="w-11 h-11 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                <item.icon className="h-5 w-5 text-primary" />
               </div>
               <h3 className="font-semibold mb-2">{item.title}</h3>
-              <p className="text-sm text-muted-foreground">{item.description}</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
             </div>
           ))}
         </div>
 
-        {/* Les 3 Pass */}
-        <div className="max-w-3xl mx-auto">
-          <div className="grid sm:grid-cols-3 gap-4 mb-6">
+        <div className="max-w-5xl mx-auto">
+          <h3 className="font-display text-2xl md:text-3xl font-semibold text-center mb-8">Choisis le temps dont tu as besoin pour appliquer.</h3>
+          <div className="grid md:grid-cols-3 gap-5 mb-6">
             {ACADEMY_PLANS.map((plan) => (
-              <div
-                key={plan.term}
-                className={`rounded-xl bg-background p-5 text-center ${
-                  plan.highlight ? "border-2 border-primary" : "border border-border"
-                }`}
-              >
+              <div key={plan.term} className={`rounded-2xl bg-background p-6 text-center relative ${plan.highlight ? "border-2 border-primary shadow-lg shadow-primary/10" : "border border-border"}`}>
+                {plan.badge && <span className="inline-block bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide mb-3">{plan.badge}</span>}
                 <p className="text-xs font-bold tracking-widest text-primary uppercase mb-2">{plan.label}</p>
-                <p className="font-display text-3xl font-bold mb-1">{plan.total} €</p>
-                <p className="text-xs text-muted-foreground">accès {plan.duration}</p>
-                {plan.save && (
-                  <p className="text-xs font-semibold text-emerald-600 mt-2">{plan.save}</p>
-                )}
+                <p className="font-display text-4xl font-bold mb-1">{plan.total} €</p>
+                <p className="text-sm text-muted-foreground">{plan.duration} d'accès</p>
+                {plan.save && <p className="text-xs font-semibold text-emerald-700 mt-2">{plan.save}</p>}
+                <p className="text-sm text-muted-foreground mt-4">{plan.note}</p>
               </div>
             ))}
           </div>
-          <p className="text-center text-sm text-muted-foreground mb-8">
-            Paiement unique. Aucun abonnement, aucun prélèvement récurrent, aucune reconduction.
-          </p>
-        </div>
-
-        <div className="flex flex-col items-center gap-4">
-          <Button variant="hero" size="xl" asChild onClick={() => trackEvent("cta_academy_click", { location: "academy_section" })}>
-            <Link to="/wavacademy">
-              Découvrir la Wav Academy
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
-          <p className="text-xs text-muted-foreground">Jusqu'à 4× sans frais avec PayPal et 3× sans frais avec Klarna, sous réserve d'acceptation.</p>
+          <p className="text-center text-sm text-muted-foreground mb-8">Paiement unique. Aucun abonnement, aucun prélèvement récurrent, aucune reconduction automatique.</p>
+          <div className="text-center">
+            <Button variant="hero" size="xl" asChild onClick={() => trackEvent("cta_academy_click", { location: "academy_section" })}>
+              <Link to="/wavacademy">Rejoindre la Wav Academy<ArrowRight className="ml-2 h-5 w-5" /></Link>
+            </Button>
+          </div>
         </div>
       </Section>
 
-      {/* ===== Comparateur des 3 offres ===== */}
       <Section variant="default" size="lg">
         <SectionHeader
-          title="Trois façons de travailler ensemble"
-          subtitle="Choisis selon là où tu en es, pas selon ton budget."
+          title="Trois besoins. Trois façons de travailler ensemble."
+          subtitle="Pas trois niveaux de prix. Trois façons différentes d'avancer."
         />
         <OfferComparison location="home" />
       </Section>
 
-      {/* ===== Wav Premium : le haut de gamme ===== */}
       <Section variant="cream" size="lg">
         <SectionHeader
-          title={`Wav Premium : ${PREMIUM_DURATION_DAYS} jours en individuel avec moi`}
-          subtitle="L'option la plus intensive, sur candidature. On travaille directement sur ton compte, chaque semaine, jusqu'à ce que chaque vidéo ait un objectif clair."
+          title={`Wav Premium : ${PREMIUM_DURATION_DAYS} jours pour travailler directement sur ta stratégie réseaux avec moi.`}
+          subtitle="On part de ta situation réelle : ton activité, ton positionnement, tes contenus, tes plateformes et tes objectifs. TikTok peut faire partie de la stratégie, mais on ne va pas ignorer Instagram, YouTube ou Facebook simplement parce que je suis surtout connu pour TikTok."
         />
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto mb-12">
+        <p className="max-w-3xl mx-auto text-center text-muted-foreground text-lg leading-relaxed mb-12">
+          Les fondamentaux d'un bon contenu se transfèrent d'une plateforme à l'autre. Positionnement, accroche, narration, rétention, lisibilité du message et compréhension de l'audience restent essentiels. Ensuite, on adapte l'exécution au réseau.
+        </p>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-5 max-w-7xl mx-auto mb-12">
           {premiumMethod.map((item) => (
-            <div
-              key={item.title}
-              className="bg-background border border-border rounded-xl p-6 text-center hover:border-primary/40 transition-colors"
-            >
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <item.icon className="h-6 w-6 text-primary" />
-              </div>
+            <div key={item.title} className="bg-background border border-border rounded-xl p-6 hover:border-primary/40 transition-colors">
+              <div className="w-11 h-11 bg-primary/10 rounded-full flex items-center justify-center mb-4"><item.icon className="h-5 w-5 text-primary" /></div>
               <h3 className="font-semibold mb-2">{item.title}</h3>
-              <p className="text-sm text-muted-foreground">{item.description}</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
             </div>
           ))}
         </div>
-
-        {/* Pour toi / Pas pour toi */}
-        <div className="max-w-3xl mx-auto mb-12">
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-background rounded-xl p-8 border border-border">
-              <h3 className="font-display text-xl font-semibold mb-4 flex items-center gap-2">
-                <Check className="h-5 w-5 text-primary" />
-                C'est pour toi si...
-              </h3>
-              <ul className="space-y-3">
-                {premiumForYou.map((item, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm">
-                    <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="bg-destructive/5 rounded-xl p-8 border border-destructive/10">
-              <h3 className="font-display text-xl font-semibold mb-4 flex items-center gap-2">
-                <X className="h-5 w-5 text-destructive" />
-                Ce n'est PAS pour toi si...
-              </h3>
-              <ul className="space-y-3">
-                {premiumNotForYou.map((item, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm">
-                    <X className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-10">
+          <div className="bg-background rounded-xl p-7 border border-border">
+            <h3 className="font-display text-xl font-semibold mb-4 flex items-center gap-2"><Check className="h-5 w-5 text-primary" />C'est pour toi si...</h3>
+            <ul className="space-y-3">{premiumForYou.map((item) => <li key={item} className="flex items-start gap-3 text-sm"><Check className="h-4 w-4 text-primary mt-0.5 shrink-0" /><span>{item}</span></li>)}</ul>
+          </div>
+          <div className="bg-destructive/5 rounded-xl p-7 border border-destructive/10">
+            <h3 className="font-display text-xl font-semibold mb-4 flex items-center gap-2"><X className="h-5 w-5 text-destructive" />Ce n'est PAS pour toi si...</h3>
+            <ul className="space-y-3">{premiumNotForYou.map((item) => <li key={item} className="flex items-start gap-3 text-sm"><X className="h-4 w-4 text-destructive mt-0.5 shrink-0" /><span>{item}</span></li>)}</ul>
           </div>
         </div>
-
-        {/* Livrables */}
-        <div className="max-w-4xl mx-auto mb-8">
-          <h3 className="font-display text-2xl font-semibold text-center mb-6">Ce que tu intègres dans ton business</h3>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {premiumDeliverables.map((item, i) => (
-              <div key={i} className="bg-background border border-border rounded-xl p-6 hover:border-primary/30 transition-colors">
-                <Check className="h-5 w-5 text-primary mb-3" />
-                <p className="text-sm font-medium">{item}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex flex-col items-center gap-4 mt-8">
+        <div className="flex flex-col items-center gap-3">
           <Button variant="premium" size="xl" asChild onClick={() => trackEvent("cta_premium_click", { location: "premium_section" })}>
-            <Link to="/reserverunappel">
-              Voir si le Wav Premium me correspond
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
+            <Link to="/reserverunappel">Réserve ton appel<ArrowRight className="ml-2 h-5 w-5" /></Link>
           </Button>
-          <p className="text-xs text-muted-foreground">Accès sur candidature : un formulaire court, puis un échange écrit avant tout appel.</p>
+          <p className="text-sm text-muted-foreground text-center">Quelques questions d'abord. Si l'accompagnement correspond vraiment à ta situation, on échange ensuite directement.</p>
         </div>
       </Section>
 
-      {/* ===== Témoignages ===== */}
       <Section variant="default" size="lg">
         <SectionHeader
-          title="Ils sont passés par là."
-          subtitle="Des créateurs et des entrepreneurs que j'ai accompagnés, qui racontent ce que ça a changé dans leur façon de travailler."
+          title="Ils expliquent ce que le travail a changé."
+          subtitle="Des créateurs et des entrepreneurs, avec leurs mots et leur contexte. Aucun résultat n'est une garantie."
         />
-
         <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-12">
-          {featuredVideos.map((video) => (
-            <VideoCard key={video.id} id={video.id} alt={video.alt} location="home" />
-          ))}
+          {featuredVideos.map((video) => <VideoCard key={video.id} id={video.id} alt={video.alt} location="home" />)}
         </div>
-
-        <ScreenshotWall location="home" title="Ils étaient là où tu es maintenant" subtitle="Créateurs et entrepreneurs qui ont clarifié leur stratégie." />
+        <ScreenshotWall location="home" title="Des retours directs" subtitle="Ce qu'ils disent après avoir appliqué, testé et corrigé." />
         <div className="text-center mt-10">
-          <Button variant="premium" size="lg" asChild onClick={() => trackEvent("click_proof_strip", { location: "home" })}>
-            <Link to="/preuves">
-              Voir toutes les preuves
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
+          <Button variant="outline" size="lg" asChild onClick={() => trackEvent("click_proof_strip", { location: "home_full" })}>
+            <Link to="/preuves">Voir toutes les preuves<ArrowRight className="ml-2 h-4 w-4" /></Link>
           </Button>
         </div>
       </Section>
 
-      {/* ===== FAQ ===== */}
       <Section variant="default" size="lg">
-        <SectionHeader
-          title="Questions fréquentes"
-        />
-
-        <div className="max-w-2xl mx-auto">
+        <SectionHeader title="Questions fréquentes" />
+        <div className="max-w-3xl mx-auto">
           <Accordion type="single" collapsible className="w-full">
             {HOME_FAQ.map((item, index) => (
-              <AccordionItem key={index} value={`faq-${index}`}>
-                <AccordionTrigger className="text-left font-medium" onClick={() => trackEvent("faq_open", { question: item.question })}>
-                  {item.question}
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground">
-                  {item.answer}
-                </AccordionContent>
+              <AccordionItem key={item.question} value={`faq-${index}`}>
+                <AccordionTrigger className="text-left font-medium" onClick={() => trackEvent("faq_open", { question: item.question })}>{item.question}</AccordionTrigger>
+                <AccordionContent className="text-muted-foreground leading-relaxed">{item.answer}</AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
-          <p className="text-sm text-muted-foreground text-center mt-6">
-            Tu as d'autres questions ? <Link to="/contact" className="text-primary underline hover:no-underline">Contacte-moi directement</Link>.
-          </p>
         </div>
       </Section>
 
-      {/* ===== Guide gratuit ===== */}
       <Section variant="cream" size="md">
         <div className="max-w-2xl mx-auto text-center">
           <span className="inline-block bg-primary/10 text-primary text-xs font-semibold px-3 py-1 rounded-full mb-4">GUIDE GRATUIT</span>
-          <h2 className="font-display text-2xl md:text-3xl font-semibold mb-3">
-            Reçois mon guide des hooks gratuitement
-          </h2>
-          <p className="text-muted-foreground mb-6">
-            Les structures d'accroches classées par famille, les modèles à compléter avec ton sujet, et ce que chaque famille coûte quand on en abuse.
-          </p>
-          <Button variant="hero" size="lg" asChild onClick={() => trackEvent("cta_guide_click", { location: "home" })}>
-            <Link to="/newsletter">
-              Recevoir mon guide gratuit
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
+          <h2 className="font-display text-2xl md:text-3xl font-semibold mb-3">Reçois mon guide des hooks gratuitement</h2>
+          <p className="text-muted-foreground mb-6">Les structures d'accroches classées par famille, les modèles à compléter avec ton sujet, et ce que chaque famille coûte quand on en abuse.</p>
+          <Button variant="outline" size="lg" asChild onClick={() => trackEvent("cta_guide_click", { location: "home" })}>
+            <Link to="/newsletter">Recevoir mon guide gratuit<ArrowRight className="ml-2 h-4 w-4" /></Link>
           </Button>
-          <p className="text-sm text-muted-foreground mt-4">
-            Ou <Link to="/hooks-tiktok" className="text-primary underline hover:no-underline">vois les hooks classés par famille</Link> tout de suite.
-          </p>
         </div>
       </Section>
 
-      {/* ===== CTA final ===== */}
       <Section variant="dark" size="lg">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="font-display text-3xl md:text-4xl font-semibold mb-4 text-cream">
-            Prêt à ne plus poster seul ?
-          </h2>
-          <p className="text-cream/70 text-lg mb-8">
-            Rejoins la Wav Academy et avance avec un regard régulier sur ton travail.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="hero" size="xl" asChild onClick={() => trackEvent("cta_academy_click", { location: "bottom" })}>
-              <Link to="/wavacademy">
-                Rejoindre la Wav Academy
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="font-display text-3xl md:text-4xl font-semibold mb-4 text-cream text-balance">Tu peux continuer à poster au feeling. Ou commencer à comprendre ce que tes contenus te racontent.</h2>
+          <p className="text-cream/70 text-lg mb-8">Si tu veux un cadre pour progresser régulièrement, rejoins la Wav Academy.</p>
+          <Button variant="hero" size="xl" asChild onClick={() => trackEvent("cta_academy_click", { location: "bottom" })}>
+            <Link to="/wavacademy">Rejoindre la Wav Academy<ArrowRight className="ml-2 h-5 w-5" /></Link>
+          </Button>
+          <p className="text-xs text-cream/50 mt-4">3, 6 ou 12 mois — paiement unique — aucune reconduction automatique.</p>
+          <div className="mt-8 pt-8 border-t border-cream/10">
+            <p className="text-sm text-cream/60 mb-3">Tu veux seulement commencer par un diagnostic de ton compte TikTok ?</p>
+            <Button variant="hero-outline" size="lg" asChild onClick={() => trackEvent("cta_express_click", { location: "bottom" })}>
+              <Link to="/analyse-express">Faire mon Analyse Express — {EXPRESS_PRICE_LABEL}</Link>
             </Button>
           </div>
-          <p className="text-xs text-cream/50 mt-4">Dès {ACADEMY_FROM} € pour {ACADEMY_ENTRY.duration} d'accès · paiement unique · jusqu'à 4× sans frais avec PayPal.</p>
-          <p className="text-sm text-cream/50 mt-6">
-            Pas encore prêt ? <Link to="/analyse-express" className="text-primary underline hover:no-underline">Commence par une Analyse Express</Link> pour un premier diagnostic de ton compte.
-          </p>
         </div>
       </Section>
     </Layout>

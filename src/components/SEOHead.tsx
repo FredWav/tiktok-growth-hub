@@ -38,7 +38,7 @@ export function SEOHead({ title, description, path, keywords, noindex, schema }:
     setMeta("og:locale", "fr_FR", "property");
     setMeta("og:site_name", "Fred Wav", "property");
     setMeta("og:image", OG_IMAGE, "property");
-    setMeta("og:image:alt", "Fred Wav - Expert Stratégie TikTok", "property");
+    setMeta("og:image:alt", "Fred Wav - Stratégie réseaux sociaux et contenus", "property");
     setMeta("twitter:card", "summary_large_image");
     setMeta("twitter:title", title);
     setMeta("twitter:description", description);

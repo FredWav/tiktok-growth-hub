@@ -16,8 +16,6 @@
 
 import {
   ACADEMY_PLANS,
-  ACADEMY_FROM,
-  ACADEMY_ENTRY,
   ACADEMY_GUIDES_COUNT,
   ACADEMY_LIVE_SLOT,
   ACADEMY_MODULES_COUNT,
@@ -67,32 +65,24 @@ const academyPricing = ACADEMY_PLANS.map((p) => `${p.duration} (${p.total} €)`
  */
 export const HOME_FAQ = [
   {
-    question: "Par où je commence ?",
-    answer: `La Wav Academy, dans la quasi-totalité des cas : tu n'es plus seul pour créer. Tu as un regard régulier sur ton travail, un live chaque semaine ${ACADEMY_LIVE_SLOT}, un suivi ${ACADEMY_SUPPORT_DAYS} et du feedback sur tes contenus à la demande. Tu accèdes aussi aux modules, aux guides et à l'outil WavStats, à partir de ${ACADEMY_FROM} € pour ${ACADEMY_ENTRY.duration} d'accès, en paiement unique. Si tu veux d'abord un état des lieux de ton compte, l'Analyse Express te le donne pour 11,90 €.`,
+    question: "Est-ce que Fred travaille uniquement sur TikTok ?",
+    answer: "Non. TikTok est une grosse partie de mon expertise et de mon contenu, mais les accompagnements portent sur ta stratégie réseaux dans son ensemble. Instagram, YouTube ou Facebook peuvent parfaitement faire partie du travail si c'est pertinent pour ton activité. L'Analyse Express, en revanche, reste actuellement limitée à TikTok.",
   },
   {
     question: "Quelle différence entre la Wav Academy et le Wav Premium ?",
-    answer: `La Wav Academy, c'est un cadre collectif avec des retours réguliers : mes lives, mon regard sur tes contenus et la communauté pour ne jamais rester bloqué. Le Wav Premium, c'est ${PREMIUM_DURATION_DAYS} jours de suivi individuel et intensif avec moi sur ton compte, sur candidature. L'Academy convient à la grande majorité des créateurs.`,
+    answer: `Ce ne sont pas deux niveaux du même accompagnement. La Wav Academy est un cadre collectif avec des ressources, des outils, des lives et une communauté. Le Wav Premium est un accompagnement individuel de ${PREMIUM_DURATION_DAYS} jours où on travaille directement sur ta situation et ta stratégie.`,
   },
   {
-    question: "La Wav Academy, c'est un abonnement ?",
-    answer: "Non. Les trois Pass (3, 6 et 12 mois) sont des paiements uniques, sans reconduction et sans rien à résilier. Tu paies une fois, tu accèdes à tout pendant la durée choisie, et l'accès s'arrête au terme.",
+    question: "La Wav Academy est-elle un abonnement ?",
+    answer: "Non. Tu choisis 3, 6 ou 12 mois et tu paies la période choisie. Il n'y a pas de reconduction automatique.",
   },
   {
-    question: "Est-ce que ça marche dans mon domaine ?",
-    answer: "La méthode part de tes propres données, donc elle s'adapte à ton secteur : coaching, e-commerce, artisanat, services, formation. Ce qui change d'un domaine à l'autre, c'est le sujet des vidéos, pas la façon de lire les résultats.",
+    question: "Je débute. Est-ce trop tôt ?",
+    answer: "Pas forcément. Un cadre peut t'éviter d'empiler des contenus sans comprendre ce que tu testes. Mais il faut être prêt à créer, à regarder les retours et à appliquer : aucun accompagnement ne peut faire cette partie à ta place.",
   },
   {
-    question: "Combien de temps ça me prend par semaine ?",
-    answer: `Compte 3 à 5 heures par semaine pour créer et appliquer les retours. Le live a lieu ${ACADEMY_LIVE_SLOT}, et tes questions sont suivies ${ACADEMY_SUPPORT_DAYS}.`,
-  },
-  {
-    question: "Je débute, c'est trop tôt ?",
-    answer: "Non, c'est même le meilleur moment. Mieux vaut démarrer avec une méthode que de poster six mois dans le vide puis devoir tout défaire.",
-  },
-  {
-    question: "Comment se passe le paiement ?",
-    answer: "Paiement sécurisé via Stripe. Jusqu'à 4× sans frais avec PayPal et 3× sans frais avec Klarna, sous réserve d'acceptation.",
+    question: "Est-ce que tu peux garantir mes résultats ?",
+    answer: "Non. Et méfie-toi de quelqu'un qui te dit l'inverse. Je peux analyser, corriger, structurer et t'aider à prendre de meilleures décisions. Je ne contrôle ni ton niveau d'exécution, ni ton audience, ni les plateformes.",
   },
 ];
 
@@ -114,14 +104,14 @@ function breadcrumbSchema(path: string, name: string) {
 const ROUTES: RouteSeo[] = [
   {
     path: "/",
-    title: "Fred Wav — Expert Stratégie Formats Courts",
+    title: "Fred Wav — stratégie réseaux sociaux et contenus",
     description:
-      "Comprends ce qui fonctionne dans tes contenus, ce qui ne fonctionne pas et pourquoi. Ne crée plus seul : rejoins la Wav Academy.",
+      "Comprends ce que racontent tes contenus et prends de meilleures décisions sur TikTok, Instagram, YouTube et Facebook avec Fred Wav.",
     keywords:
-      "stratégie formats courts, accompagnement créateur de contenu, coach réseaux sociaux formats courts, Fred Wav, ne plus créer seul",
+      "stratégie réseaux sociaux, création de contenu, formats courts, TikTok, Instagram, YouTube, Facebook, statistiques réseaux sociaux, consultant réseaux sociaux, accompagnement créateurs entrepreneurs, Fred Wav",
     noscript: {
       h1: "Arrête de poster seul. Tes stats disent déjà ce qui bloque.",
-      body: "Pas d'astuces d'algorithme, pas de promesses. On part de tes vraies données pour comprendre ce qui fonctionne, ce qui ne fonctionne pas et pourquoi. Trois façons de travailler ensemble : la Wav Academy (l'offre principale), l'Analyse Express et le Wav Premium.",
+      body: "Pas de hack ni de promesse de viralité. Fred Wav part de tes contenus, de tes statistiques, de ton positionnement et de tes objectifs pour travailler ta stratégie sur TikTok, Instagram, YouTube et Facebook. Trois besoins : l'Analyse Express TikTok, la Wav Academy et le Wav Premium multiréseaux.",
       links: [
         { href: "/wavacademy", label: "Wav Academy — dès 299 €" },
         { href: "/analyse-express", label: "Analyse Express — 11,90 €" },
@@ -147,7 +137,7 @@ const ROUTES: RouteSeo[] = [
     // annonçait Accueil > Academy > Témoignages, un chemin de navigation
     // qui n'existe nulle part sur le site.
     sitemap: 1.0,
-    llms: "Landing principale : la Wav Academy, l'Analyse Express et le Wav Premium, avec témoignages et preuves.",
+    llms: "Stratégie de contenu et réseaux sociaux avec Fred Wav : Wav Academy comme offre principale, Analyse Express automatisée uniquement pour TikTok, et Wav Premium individuel sur TikTok, Instagram, YouTube ou Facebook.",
     llmsSection: "principales",
   },
   {
@@ -232,44 +222,44 @@ const ROUTES: RouteSeo[] = [
   },
   {
     path: "/reserverunappel",
-    title: "Contacter Fred Wav — premier échange",
+    title: "Wav Premium — accompagnement réseaux sociaux | Fred Wav",
     description:
-      "Premier contact avec Fred Wav : décris ta situation et je t'oriente vers la solution adaptée.",
+      `Wav Premium : ${PREMIUM_DURATION_DAYS} jours d'accompagnement individuel avec Fred Wav sur TikTok, Instagram, YouTube, Facebook ou une stratégie multiréseaux.`,
 
     keywords:
-      "contact fred wav, premier contact, réserver un appel, diagnostic contenu, accompagnement formats courts",
+      "Wav Premium, accompagnement réseaux sociaux, consultant réseaux sociaux, stratégie TikTok Instagram YouTube Facebook, accompagnement individuel contenu, Fred Wav",
     noscript: {
-      h1: "Premier contact avec Fred Wav",
-      body: `Décris ta situation et tes objectifs : je te réponds par écrit et je t'oriente vers ce qui correspond réellement à ton besoin - audit de compte, session live ou accompagnement individuel de ${PREMIUM_DURATION_DAYS} jours.`,
-      links: [{ href: "/reserverunappel", label: "Prendre contact" }],
+      h1: `Wav Premium — ${PREMIUM_DURATION_DAYS} jours d'accompagnement individuel`,
+      body: "Présente ta situation, tes réseaux, tes objectifs, ton blocage et le résultat que tu attends. L'accompagnement peut porter sur TikTok, Instagram, YouTube, Facebook ou une stratégie qui combine plusieurs plateformes. Fred lit chaque demande avant de proposer un appel.",
+      links: [{ href: "/reserverunappel", label: "Envoyer ma demande Wav Premium" }],
     },
     schema: {
       "@context": "https://schema.org",
       "@type": "ContactPage",
-      name: "Premier contact avec Fred Wav",
+      name: "Wav Premium avec Fred Wav",
       description:
-        "Formulaire de premier contact : décris ta situation, Fred Wav répond par écrit et oriente vers la solution adaptée.",
+        `Formulaire de qualification pour un accompagnement individuel de ${PREMIUM_DURATION_DAYS} jours en stratégie réseaux sociaux.`,
       about: { "@type": "Person", name: "Fred Wav", url: BASE_URL },
       url: `${BASE_URL}/reserverunappel`,
     },
     sitemap: 0.8,
-    llms: "Formulaire de premier contact avec Fred Wav : orientation vers l'offre adaptée (audit, session live ou accompagnement individuel) après réponse écrite.",
+    llms: `Wav Premium : formulaire de qualification pour ${PREMIUM_DURATION_DAYS} jours d'accompagnement individuel avec Fred Wav sur TikTok, Instagram, YouTube, Facebook ou une stratégie multiréseaux.`,
     llmsSection: "offres",
   },
   {
     path: "/preuves",
     title: "Témoignages et résultats clients | Fred Wav",
     description:
-      "Découvre les résultats concrets de mes clients : témoignages vidéo, études de cas et retours d'expérience documentés.",
+      "Découvre des résultats clients contextualisés, des témoignages vidéo et des retours directs après accompagnement avec Fred Wav.",
     keywords:
-      "témoignages formats courts, résultats clients, études de cas, retours expérience, preuves",
+      "témoignages formats courts, résultats clients contextualisés, retours expérience, preuves Fred Wav",
     noscript: {
       h1: "Des résultats, pas des promesses",
-      body: "Ce que mes clients ont accompli en appliquant la méthode : témoignages vidéo, captures de résultats et cas concrets. Pas de chiffres gonflés.",
+      body: "Ce qui s'est réellement passé chez des créateurs accompagnés : résultats contextualisés, témoignages vidéo et captures de retours. Aucun résultat n'est présenté comme une garantie.",
       links: [{ href: "/preuves", label: "Voir tous les témoignages" }],
     },
     sitemap: 0.7,
-    llms: "Avant/après, résultats clients et preuves sociales (témoignages vidéo, captures).",
+    llms: "Résultats clients contextualisés, témoignages vidéo et captures de retours, sans garantie ni cas générique inventé.",
     llmsSection: "principales",
   },
   {

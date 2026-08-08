@@ -51,6 +51,7 @@ const DiagnosticStart = lazy(() => import("./pages/DiagnosticStart"));
 const DiagnosticProcessing = lazy(() => import("./pages/DiagnosticProcessing"));
 const DiagnosticResult = lazy(() => import("./pages/DiagnosticResult"));
 const Mail = lazy(() => import("./pages/Mail"));
+const HooksTikTok = lazy(() => import("./pages/HooksTikTok"));
 const WavAcademy = lazy(() => import("./pages/WavAcademy"));
 const Claim = lazy(() => import("./pages/Claim"));
 
@@ -104,6 +105,7 @@ const App = () => (
             <Route path="/cgv" element={<CGV />} />
             <Route path="/newsletter" element={<Mail />} />
             <Route path="/mail" element={<Navigate to="/newsletter" replace />} />
+            <Route path="/hooks-tiktok" element={<HooksTikTok />} />
             <Route path="/analyse-express" element={<AnalyseExpress />} />
             <Route path="/analyse-express/result" element={<AnalyseExpressResult />} />
             <Route path="/reserverunappel" element={<ReserverUnAppel />} />

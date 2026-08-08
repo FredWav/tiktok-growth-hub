@@ -11,4 +11,9 @@ Disallow: /mail
 Disallow: /analyse-express/result
 Disallow: /one-shot/success
 
+# Le PDF brut du guide ne doit pas être indexé : la page /hooks-tiktok est la
+# porte d'entrée. Le fichier reste servi (lien des emails MailerLite) le temps
+# de le remplacer par la version réécrite.
+Disallow: /guide-hooks-tiktok.pdf
+
 Sitemap: https://fredwav.com/sitemap.xml

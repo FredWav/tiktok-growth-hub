@@ -401,7 +401,7 @@ export default function Home() {
             Reçois mon guide des hooks gratuitement
           </h2>
           <p className="text-muted-foreground mb-6">
-            120+ structures d'accroches classées par objectif, testées sur des millions de vues, et les erreurs qui tuent ta rétention dès la première seconde.
+            Les structures d'accroches classées par famille, les modèles à compléter avec ton sujet, et ce que chaque famille coûte quand on en abuse.
           </p>
           <Button variant="hero" size="lg" asChild onClick={() => trackEvent("cta_guide_click", { location: "home" })}>
             <Link to="/newsletter">
@@ -409,6 +409,9 @@ export default function Home() {
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
+          <p className="text-sm text-muted-foreground mt-4">
+            Ou <Link to="/hooks-tiktok" className="text-primary underline hover:no-underline">vois les hooks classés par famille</Link> tout de suite.
+          </p>
         </div>
       </Section>
 

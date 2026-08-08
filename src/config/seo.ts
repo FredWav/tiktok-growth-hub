@@ -26,6 +26,8 @@ import {
   PREMIUM_DURATION_DAYS,
 } from "./offers";
 import { WAVACADEMY_FAQ } from "./wavacademy-faq";
+import { HOOKS_FAQ } from "./hooks-faq";
+import { HOOK_CATEGORIES, HOOKS_PUBLISHED_COUNT, HOOKS_TOTAL_COUNT } from "../data/hooks";
 
 
 export const BASE_URL = "https://fredwav.com";
@@ -36,8 +38,18 @@ export type RouteSeo = {
   title: string;
   description: string;
   keywords?: string;
-  /** Titre visible et paragraphe servis dans le <noscript> de la coquille prerendue. */
-  noscript: { h1: string; body: string; links?: { href: string; label: string }[] };
+  /**
+   * Contenu servi dans le <noscript> de la coquille prerendue.
+   * `sections` (facultatif) : des couples titre + résumé, pour donner de la
+   * matière aux crawlers qui n'exécutent pas JavaScript (robots des IA) sur les
+   * pages éditoriales, là où un titre et un paragraphe ne suffisent pas.
+   */
+  noscript: {
+    h1: string;
+    body: string;
+    sections?: { h2: string; body: string }[];
+    links?: { href: string; label: string }[];
+  };
   schema?: Record<string, unknown> | Record<string, unknown>[];
   /** Priorité sitemap. `false` = hors sitemap (mais la route reste prerendue). */
   sitemap?: number | false;
@@ -261,6 +273,65 @@ const ROUTES: RouteSeo[] = [
     llmsSection: "principales",
   },
   {
+    path: "/hooks-tiktok",
+    title: `Hooks TikTok : ${HOOKS_TOTAL_COUNT} accroches classées | Fred Wav`,
+    description: `Les hooks TikTok (ou accroches) rangés par famille : curiosité, suspense, urgence, émotion. ${HOOKS_PUBLISHED_COUNT} exemples en clair, ce que chaque famille coûte quand on en abuse, et le guide complet en PDF.`,
+    keywords:
+      "hook tiktok, hooks tiktok, accroches tiktok, phrase d'accroche tiktok, exemples de hooks tiktok, accroche vidéo courte",
+    noscript: {
+      h1: `Hooks TikTok : ${HOOKS_TOTAL_COUNT} accroches classées par famille`,
+      body: `Un hook, c'est la première seconde qui décide si ton spectateur reste ou scrolle. Voici ${HOOKS_PUBLISHED_COUNT} accroches classées en ${HOOK_CATEGORIES.length} familles, avec pour chacune ce qu'elle coûte quand on en abuse. Le guide complet (${HOOKS_TOTAL_COUNT} accroches, modèles à compléter et grille de notation) est disponible par email.`,
+      sections: [
+        { h2: "Un hook TikTok, c'est quoi exactement ?", body: "Les deux premières secondes de ta vidéo, celles qui décident si le spectateur reste ou passe à la suivante. Le hook, c'est la raison qu'il a de ne pas scroller." },
+        { h2: `Les ${HOOK_CATEGORIES.length} familles de hooks TikTok, avec des exemples`, body: HOOK_CATEGORIES.map((c) => c.label).join(", ") + ". Chaque famille avec des exemples concrets et ce qu'elle coûte quand on la surexploite." },
+        { h2: "Pourquoi je ne te promets pas de vues avec ces hooks", body: "Un hook gagne l'attention des deux premières secondes, pas la diffusion. Personne ne contrôle l'algorithme. Ce que tu contrôles, c'est ta rétention sur les trois premières secondes, et ça se travaille." },
+        { h2: "Le guide complet des hooks TikTok en PDF", body: `Toutes les accroches classées, les modèles à compléter avec ton sujet et une grille pour noter un hook avant de tourner. Par email, gratuitement.` },
+        { h2: "Questions fréquentes sur les hooks TikTok", body: HOOKS_FAQ.slice(0, 4).map((f) => f.question).join(" ") },
+      ],
+      links: [
+        { href: "/newsletter", label: "Recevoir le guide complet des hooks en PDF" },
+        { href: "/wavacademy", label: "Wav Academy — ne poste plus seul" },
+      ],
+    },
+    schema: [
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: `Hooks TikTok : ${HOOKS_TOTAL_COUNT} accroches classées par famille`,
+        description: `Les hooks TikTok rangés par famille, avec ${HOOKS_PUBLISHED_COUNT} exemples en clair et ce que chaque famille coûte quand on en abuse.`,
+        inLanguage: "fr-FR",
+        author: { "@type": "Person", name: "Fred Wav", url: `${BASE_URL}/a-propos` },
+        publisher: { "@type": "Person", name: "Fred Wav", url: BASE_URL },
+        datePublished: "2026-08-05",
+        dateModified: "2026-08-05",
+        mainEntityOfPage: `${BASE_URL}/hooks-tiktok`,
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        name: "Familles de hooks TikTok",
+        itemListElement: HOOK_CATEGORIES.map((c, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          name: c.label,
+          url: `${BASE_URL}/hooks-tiktok#hooks-${c.slug}`,
+        })),
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: HOOKS_FAQ.map((item) => ({
+          "@type": "Question",
+          name: item.question,
+          acceptedAnswer: { "@type": "Answer", text: item.answer },
+        })),
+      },
+    ],
+    sitemap: 0.7,
+    llms: `Les hooks TikTok (accroches) classés en ${HOOK_CATEGORIES.length} familles, avec ${HOOKS_PUBLISHED_COUNT} exemples en clair et ce que chaque famille coûte. Guide complet (${HOOKS_TOTAL_COUNT} accroches, modèles à compléter, grille de notation) par email.`,
+    llmsSection: "ressources",
+  },
+  {
     path: "/a-propos",
     title: "Qui est Fred Wav — parcours et méthode formats courts",
     description:
@@ -297,18 +368,20 @@ const ROUTES: RouteSeo[] = [
   },
   {
     path: "/newsletter",
-    title: "Guide gratuit : 120+ hooks TikTok | Fred Wav",
+    title: "La newsletter de Fred Wav — un mail, du concret",
     description:
-      "Télécharge le guide des 120+ hooks TikTok qui captent l'attention en moins de 2 secondes. Testés sur des millions de vues.",
-
-    keywords: "guide hooks tiktok, hooks gratuits, accroches tiktok, rétention tiktok, Fred Wav",
+      "Reçois mes conseils formats courts par email, et le guide complet des hooks TikTok en cadeau de bienvenue. Sans spam, désinscription en un clic.",
+    keywords: "newsletter fred wav, conseils tiktok par email, guide hooks tiktok, Fred Wav",
     noscript: {
-      h1: "Reçois le guide des hooks gratuitement",
-      body: "120+ hooks testés sur des millions de vues, les structures qui captent l'attention en moins de 2 secondes et les erreurs qui tuent ta rétention.",
-      links: [{ href: "/newsletter", label: "Recevoir le guide gratuit" }],
+      h1: "La newsletter de Fred Wav",
+      body: "Mes conseils formats courts par email, et le guide complet des hooks TikTok pour commencer. La page /hooks-tiktok te donne déjà les familles d'accroches en clair.",
+      links: [
+        { href: "/hooks-tiktok", label: "Voir les hooks classés par famille" },
+        { href: "/wavacademy", label: "Wav Academy — ne poste plus seul" },
+      ],
     },
-    sitemap: 0.5,
-    llms: "Inscription à la newsletter et téléchargement du guide des 120+ hooks TikTok.",
+    sitemap: 0.4,
+    llms: "Inscription à la newsletter de Fred Wav ; le guide complet des hooks TikTok est offert à l'inscription.",
     llmsSection: "ressources",
   },
   {

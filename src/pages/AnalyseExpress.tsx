@@ -47,14 +47,14 @@ export default function AnalyseExpress() {
       toast.error("Entre une adresse email valide");
       return;
     }
-    trackPostHogEvent("click_analyse_express_submit", { username: cleanUsername });
+    trackPostHogEvent("click_analyse_express_submit", { input_provided: "true" });
     setShowConfirmModal(true);
   };
 
   const proceedToPayment = async () => {
     setShowConfirmModal(false);
     setLoading(true);
-    trackEvent("express_checkout_start", { username: cleanUsername });
+    trackEvent("express_checkout_start", { product: "analyse_express_tiktok" });
     try {
       const { data, error } = await supabase.functions.invoke("create-express-checkout", {
         body: { username: cleanUsername, email: email.trim(), subscribeToNewsletter },
@@ -65,8 +65,8 @@ export default function AnalyseExpress() {
       }
 
       window.location.href = data.url;
-    } catch (err: any) {
-      toast.error(err.message || "Une erreur est survenue");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Une erreur est survenue");
       setLoading(false);
     }
   };
@@ -254,7 +254,7 @@ export default function AnalyseExpress() {
               <Button variant="outline" className="flex-1" onClick={handleGoBack}>
                 Ha je me suis trompé !
               </Button>
-              <Button variant="hero" className="flex-1" onClick={() => { trackPostHogEvent("click_analyse_express_confirm", { username: cleanUsername }); proceedToPayment(); }}>
+              <Button variant="hero" className="flex-1" onClick={() => { trackPostHogEvent("click_analyse_express_confirm", { product: "analyse_express_tiktok" }); proceedToPayment(); }}>
                 Je valide ✅
               </Button>
             </div>

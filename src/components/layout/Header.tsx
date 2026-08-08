@@ -8,6 +8,7 @@ const navItems = [
   { label: "Accueil", href: "/" },
   { label: "Wav Academy", href: "/wavacademy" },
   { label: "Analyse Express", href: "/analyse-express" },
+  { label: "Wav Premium", href: "/reserverunappel" },
   { label: "Témoignages", href: "/preuves" },
   { label: "À propos", href: "/a-propos" },
   { label: "Newsletter", href: "/newsletter" },
@@ -47,7 +48,7 @@ export function Header({ minimal = false }: { minimal?: boolean }) {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-8" aria-label="Navigation principale">
+          <nav className="hidden lg:flex items-center gap-5 xl:gap-7" aria-label="Navigation principale">
             {navItems.map((item) => (
               <Link
                 key={item.href}

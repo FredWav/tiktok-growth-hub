@@ -44,7 +44,7 @@ export function useWavPremiumApplications() {
         .neq("first_name", "")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data as WavPremiumApplication[];
+      return data as unknown as WavPremiumApplication[];
     },
   });
 }

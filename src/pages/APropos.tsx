@@ -22,7 +22,7 @@ const values = [
   {
     icon: TrendingUp,
     title: "Performance mesurable",
-    description: "On ne vise pas des vues. On vise des leads, des ventes, une audience qualifiée, une montée en autorité. Si ça ne génère pas de levier business, on ajuste.",
+    description: "On définit ce que tes réseaux doivent réellement produire : visibilité, audience qualifiée, crédibilité, partenariats, prospects ou ventes. Ensuite, on mesure ce qui avance.",
   },
   {
     icon: Shield,
@@ -32,7 +32,7 @@ const values = [
   {
     icon: RefreshCw,
     title: "Optimisation continue",
-    description: "TikTok évolue. Les formats courts évoluent. Le marché évolue. On teste, on ajuste, on mesure, on itère. La stratégie n'est jamais figée.",
+    description: "Les plateformes, les formats et ton marché évoluent. On teste, on ajuste et on mesure sans chercher la technique secrète d'un algorithme.",
   },
 ];
 
@@ -40,17 +40,21 @@ const values = [
 // Pour ajuster, changer uniquement les constantes ci-dessous.
 const VIDEO_START_YEAR = 2007;    // 19 ans d'expérience en 2026
 const MUSIC_START_YEAR = 2005;    // 21 ans en 2026
+const BIRTH_YEAR = 1991;
+const SOUND_START_YEAR = 2013;
 
 const yearsSince = (startYear: number) =>
   new Date().getFullYear() - startYear;
+
+const currentAge = () => yearsSince(BIRTH_YEAR);
 
 const stats = [
   { value: CREATORS_COUNT, label: "Créateurs accompagnés" },
   { value: `${yearsSince(VIDEO_START_YEAR)} ans`, label: "D'expérience en création vidéo" },
   { value: `${yearsSince(MUSIC_START_YEAR)} ans`, label: "Dans la musique et la création artistique" },
   { value: "330K+", label: "Abonnés cumulés — mai 2026" },
-  { value: "35K", label: "Abonnés Instagram" },
-  { value: "30K", label: "Abonnés YouTube" },
+  { value: "35K", label: "Abonnés Instagram — mai 2026" },
+  { value: "30K", label: "Abonnés YouTube — mai 2026" },
 ];
 
 export default function APropos() {
@@ -61,15 +65,16 @@ export default function APropos() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">
-              Je suis là pour <span className="text-gold-gradient">tes résultats</span>, pas pour te vendre du rêve.
+              Je ne t'aide pas à poster plus. <span className="text-gold-gradient">Je t'aide à comprendre quoi faire ensuite.</span>
             </h1>
             <p className="text-lg text-muted-foreground mb-6">
-              Stratégiste en contenu et formats courts, j'accompagne entrepreneurs et créateurs
-              à construire une présence qui sert vraiment leurs objectifs — des clients, ou la visibilité qui attire les marques — pas juste des vues sans lendemain. Découvre les <Link to="/preuves" className="text-primary underline hover:no-underline">résultats concrets</Link> de mes accompagnements.
+              Je suis créateur de contenu, formateur et consultant en stratégie réseaux sociaux. J'accompagne les créateurs et les entrepreneurs à comprendre leurs contenus, lire leurs statistiques et construire une présence qui sert réellement leurs objectifs.
+            </p>
+            <p className="text-muted-foreground mb-4">
+              TikTok est une grosse partie de mon parcours et de mon expertise. Mais une stratégie cohérente peut aussi faire travailler Instagram, YouTube et Facebook ensemble, selon ton activité et ton audience.
             </p>
             <p className="text-muted-foreground">
-              Mon approche est simple : stratégie, analyse, performance mesurable.
-              Pas de hacks miracles. Pas de bullshit marketing. Juste ce qui fonctionne.
+              Mon approche : du contexte, des données, du feedback et des décisions que tu comprends. Pas de hacks miracles ni de viralité garantie. Tu peux voir les <Link to="/preuves" className="text-primary underline hover:no-underline">résultats documentés</Link> avec leur contexte.
             </p>
           </div>
 
@@ -86,7 +91,7 @@ export default function APropos() {
 
       {/* Stats */}
       <Section variant="dark" size="md">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
           {stats.map((stat, index) => (
             <div key={index} className="text-center">
               <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
@@ -124,7 +129,7 @@ export default function APropos() {
 
             <p>
               Comme tout le monde, j'ai posté sans stratégie au début.<br />
-              Puis j'ai décidé de comprendre la plateforme en profondeur.
+              Puis j'ai décidé de comprendre les plateformes, leurs formats et surtout les comportements des audiences en profondeur.
             </p>
             <p>
               J'ai analysé des milliers de vidéos.
@@ -138,8 +143,7 @@ export default function APropos() {
               De là est née une méthode structurée.
             </p>
             <p>
-              Aujourd'hui, j'accompagne {CREATORS_COUNT} créateurs, entrepreneurs, experts, marques,
-              qui veulent transformer leur contenu en levier business grâce au <Link to="/reserverunappel" className="text-primary underline hover:no-underline">Wav Premium</Link>.
+              Aujourd'hui, j'ai accompagné {CREATORS_COUNT} créateurs, entrepreneurs, experts et marques à mieux comprendre leurs contenus et à relier leurs décisions à un objectif concret, dans la <Link to="/wavacademy" className="text-primary underline hover:no-underline">Wav Academy</Link> ou en accompagnement individuel.
             </p>
           </blockquote>
         </div>
@@ -151,14 +155,13 @@ export default function APropos() {
           <SectionHeader title="Ma philosophie" align="center" />
 
           <p className="text-muted-foreground text-lg">
-            Un contenu qui ne génère ni autorité, ni audience qualifiée, ni clients
-            est un divertissement personnel. Pas une stratégie.
+            Un réseau n'a pas besoin de tout faire. Mais il doit avoir un rôle clair : visibilité, crédibilité, audience, partenariats, prospects ou ventes. Sinon, tu risques de publier beaucoup sans savoir ce que tu construis.
           </p>
 
           <div className="border-t border-border pt-8">
             <p className="font-display font-semibold text-3xl md:text-4xl text-foreground leading-snug">
-              "On ne poste pas pour exister.<br />
-              On poste pour convertir."
+              « On ne poste pas pour nourrir un algorithme.<br />
+              On poste pour servir un objectif qu'on comprend. »
             </p>
           </div>
         </div>
@@ -208,7 +211,7 @@ export default function APropos() {
             Envie de travailler ensemble ?
           </h2>
           <p className="text-muted-foreground mb-6">
-            Contacte-moi directement. Tu verras rapidement si ma méthode est faite pour toi.
+            Tu veux progresser dans un cadre régulier ? La Wav Academy reste le point de départ. Tu veux travailler directement sur une stratégie multiréseaux pendant 30 jours ? Commence par me donner le contexte.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="hero" size="lg" asChild onClick={() => trackEvent("cta_academy_click", { location: "apropos" })}>
@@ -218,8 +221,8 @@ export default function APropos() {
               </Link>
             </Button>
             <Button variant="outline" size="lg" asChild onClick={() => trackEvent("cta_contact_click", { location: "apropos" })}>
-              <Link to="/reserverunappel">
-                Voir si le Wav Premium me correspond
+              <Link to="/reserverunappel" onClick={() => trackEvent("cta_premium_click", { location: "apropos" })}>
+                Réserve ton appel
               </Link>
             </Button>
           </div>

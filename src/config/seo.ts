@@ -323,24 +323,28 @@ const ROUTES: RouteSeo[] = [
   },
   {
     path: "/a-propos",
-    title: "Qui est Fred Wav — parcours et méthode formats courts",
+    title: "Fred Wav — consultant en stratégie réseaux sociaux",
     description:
-      "Le parcours et la méthode de Fred Wav : des années d'expérience vidéo, des centaines de créateurs accompagnés. Stratégie, analyse, performance mesurable.",
+      "Découvre le parcours et la méthode de Fred Wav, créateur, formateur et consultant en stratégie sur TikTok, Instagram, YouTube et Facebook.",
     keywords:
-      "Fred Wav, expert formats courts, parcours, méthode data-driven, accompagnement créateur",
+      "Fred Wav, consultant réseaux sociaux, stratégie TikTok Instagram YouTube Facebook, créateur de contenu, formateur, accompagnement créateurs entrepreneurs",
     noscript: {
-      h1: "Je suis là pour tes résultats, pas pour te vendre du rêve",
-      body: "Stratégiste en contenu et formats courts, j'accompagne entrepreneurs et créateurs à construire une présence qui sert vraiment leurs objectifs — des clients, ou la visibilité qui attire les marques — pas juste des vues sans lendemain. Mon approche : stratégie, analyse, performance mesurable.",
+      h1: "Je ne t'aide pas à poster plus. Je t'aide à comprendre quoi faire ensuite.",
+      body: "Fred Wav est créateur de contenu, formateur et consultant en stratégie réseaux sociaux. Son expertise historique vient de TikTok et des formats courts, mais ses accompagnements peuvent aussi intégrer Instagram, YouTube, Facebook et les stratégies multiréseaux. Son approche repose sur le contexte, les contenus, les statistiques, le positionnement et les objectifs réels.",
       links: [{ href: "/preuves", label: "Voir les résultats" }],
     },
     schema: {
       "@context": "https://schema.org",
       "@type": "Person",
       name: "Fred Wav",
-      jobTitle: "Expert Stratégie Formats Courts",
+      jobTitle: "Consultant en stratégie réseaux sociaux",
       url: `${BASE_URL}/a-propos`,
       knowsAbout: [
         "Stratégie formats courts",
+        "Stratégie TikTok",
+        "Stratégie Instagram",
+        "Stratégie YouTube",
+        "Stratégie Facebook",
         "Marketing vidéo",
         "Hook engineering",
         "Réseaux sociaux",
@@ -353,7 +357,7 @@ const ROUTES: RouteSeo[] = [
       ],
     },
     sitemap: 0.6,
-    llms: "Présentation de Fred Wav, son parcours et sa philosophie sur la création de contenu.",
+    llms: "Présentation de Fred Wav, créateur, formateur et consultant en stratégie réseaux sociaux sur TikTok, Instagram, YouTube, Facebook et les formats courts.",
     llmsSection: "principales",
   },
   {

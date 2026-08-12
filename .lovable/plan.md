@@ -14,6 +14,7 @@
 - Vérification dans le HTML brut (pas via le navigateur) : contenu visible, `title`, `description`, `canonical`, `H1` unique, header, footer, JSON-LD.
 - Aucune canonique modifiée : elles restent sur `https://fredwav.com`.
 - Si un compte attendu ne correspond pas, je le signale et je m'arrête au lieu de bricoler le manifeste.
+- Correctif préalable identifié : `src/entry-server.tsx` importe `node:stream` alors que `"node"` n'est pas déclaré dans les `types` du tsconfig applicatif, ce qui fait échouer le typecheck. Seul ajustement de configuration prévu (déclaration des types Node), sans toucher à l'architecture de la refonte.
 
 ## Étape 2 - Backend
 

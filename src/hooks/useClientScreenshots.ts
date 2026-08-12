@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useHydrated } from "@/hooks/useHydrated";
 
 export interface ClientScreenshot {
   id: string;
@@ -14,6 +15,7 @@ export interface ClientScreenshot {
 }
 
 export const useClientScreenshots = (location: string) => {
+  const hydrated = useHydrated();
   return useQuery({
     queryKey: ["client-screenshots", location],
     queryFn: async () => {
@@ -26,10 +28,12 @@ export const useClientScreenshots = (location: string) => {
       if (error) throw error;
       return data as ClientScreenshot[];
     },
+    enabled: hydrated,
   });
 };
 
 export const useAllClientScreenshots = () => {
+  const hydrated = useHydrated();
   return useQuery({
     queryKey: ["client-screenshots", "all"],
     queryFn: async () => {
@@ -40,6 +44,7 @@ export const useAllClientScreenshots = () => {
       if (error) throw error;
       return data as ClientScreenshot[];
     },
+    enabled: hydrated,
   });
 };
 

@@ -9,7 +9,7 @@ function CookieSettingsButton() {
     <button
       type="button"
       onClick={openCookieSettings}
-      className="hover:text-primary transition-colors"
+      className="inline-flex min-h-11 items-center hover:text-gold-light transition-colors"
     >
       Gérer mes cookies
     </button>
@@ -23,6 +23,7 @@ const navLinks = [
   { label: "Analyse Express", href: "/analyse-express", section: "navigation" },
   { label: "Diagnostic TikTok gratuit", href: "/start", section: "navigation" },
   { label: "Témoignages", href: "/preuves", section: "navigation" },
+  { label: "Ressources TikTok", href: "/ressources", section: "navigation" },
   { label: "À propos", href: "/a-propos", section: "navigation" },
   { label: "Hooks TikTok", href: "/hooks-tiktok", section: "navigation" },
   { label: "Newsletter", href: "/newsletter", section: "navigation" },
@@ -60,23 +61,24 @@ const legalLinks = [
   { label: "Mentions légales", href: "/mentions-legales" },
   { label: "Confidentialité", href: "/politique-de-confidentialite" },
   { label: "CGV", href: "/cgv" },
+  { label: "Rétractation", href: "/retractation" },
 ];
 
 export function Footer({ minimal = false }: { minimal?: boolean }) {
   // Landing page : on ne garde que les liens légaux (CGV obligatoire pour le paiement) + copyright.
   if (minimal) {
     return (
-      <footer className="bg-noir text-muted-foreground">
+      <footer className="bg-noir text-neutral-300">
         <div className="container mx-auto px-4 py-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-neutral-300">
             © {new Date().getFullYear()} Fred Wav. Tous droits réservés.
           </p>
-          <nav aria-label="Mentions légales" className="flex gap-6 text-xs">
+          <nav aria-label="Mentions légales" className="flex flex-wrap justify-center gap-x-6 gap-y-3 text-xs">
             {legalLinks.map((link) => (
               <Link
                 key={link.href}
                 to={link.href}
-                className="hover:text-primary transition-colors"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center hover:text-gold-light transition-colors"
                 onClick={() => trackPostHogEvent("click_footer_link", { item: link.label, section: "legal" })}
               >
                 {link.label}
@@ -90,17 +92,17 @@ export function Footer({ minimal = false }: { minimal?: boolean }) {
   }
 
   return (
-    <footer className="bg-noir text-muted-foreground">
+    <footer className="bg-noir text-neutral-300">
       <div className="container mx-auto px-4 py-12 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="md:col-span-1">
-            <Link to="/" className="inline-block mb-4" onClick={() => trackPostHogEvent("click_footer_link", { item: "logo", section: "brand" })}>
+            <Link to="/" className="mb-4 inline-flex min-h-11 items-center" onClick={() => trackPostHogEvent("click_footer_link", { item: "logo", section: "brand" })}>
               <span className="font-display text-2xl font-semibold tracking-tight text-cream">
-                Fred<span className="text-primary">Wav</span>
+                Fred<span className="text-gold-light">Wav</span>
               </span>
             </Link>
-            <p className="text-sm text-muted-foreground max-w-md">
+            <p className="text-sm text-neutral-300 max-w-md">
               Expert stratégie formats courts. 
               Des résultats, pas des promesses.
             </p>
@@ -108,13 +110,13 @@ export function Footer({ minimal = false }: { minimal?: boolean }) {
 
           {/* Navigation */}
           <nav aria-label="Navigation footer - Pages principales">
-            <h4 className="font-semibold text-cream mb-4">Navigation</h4>
+            <h2 className="font-semibold text-cream mb-4">Navigation</h2>
             <ul className="space-y-2 text-sm">
               {navLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     to={link.href}
-                    className="hover:text-primary transition-colors"
+                    className="inline-flex min-h-11 items-center hover:text-gold-light transition-colors"
                     onClick={() => trackPostHogEvent("click_footer_link", { item: link.label, section: "navigation" })}
                   >
                     {link.label}
@@ -126,7 +128,7 @@ export function Footer({ minimal = false }: { minimal?: boolean }) {
 
           {/* Réseaux sociaux */}
           <nav aria-label="Réseaux sociaux">
-            <h4 className="font-semibold text-cream mb-4">Réseaux</h4>
+            <h2 className="font-semibold text-cream mb-4">Réseaux</h2>
             <ul className="space-y-2 text-sm">
               {socialLinks.map((s) => (
                 <li key={s.name}>
@@ -134,7 +136,7 @@ export function Footer({ minimal = false }: { minimal?: boolean }) {
                     href={s.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-primary transition-colors flex items-center gap-2"
+                    className="flex min-h-11 items-center gap-2 hover:text-gold-light transition-colors"
                     onClick={() => trackPostHogEvent("click_social", { platform: s.name, location: "footer" })}
                   >
                     {s.icon}
@@ -147,15 +149,15 @@ export function Footer({ minimal = false }: { minimal?: boolean }) {
 
           {/* Contact */}
           <div>
-            <h4 className="font-semibold text-cream mb-4">Contact</h4>
+            <h2 className="font-semibold text-cream mb-4">Contact</h2>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/contact" className="hover:text-primary transition-colors" onClick={() => trackPostHogEvent("click_footer_link", { item: "Contact", section: "contact" })}>
+                <Link to="/contact" className="inline-flex min-h-11 items-center hover:text-gold-light transition-colors" onClick={() => trackPostHogEvent("click_footer_link", { item: "Contact", section: "contact" })}>
                   Nous contacter
                 </Link>
               </li>
               <li>
-                <a href="mailto:contact@fredwav.com" className="hover:text-primary transition-colors" onClick={() => trackPostHogEvent("click_email_link", { location: "footer" })}>
+                <a href="mailto:contact@fredwav.com" className="inline-flex min-h-11 items-center hover:text-gold-light transition-colors" onClick={() => trackPostHogEvent("click_email_link", { location: "footer" })}>
                   contact@fredwav.com
                 </a>
               </li>
@@ -164,15 +166,15 @@ export function Footer({ minimal = false }: { minimal?: boolean }) {
         </div>
 
         <div className="border-t border-border/20 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-neutral-300">
             © {new Date().getFullYear()} Fred Wav. Tous droits réservés.
           </p>
-          <nav aria-label="Mentions légales" className="flex gap-6 text-xs">
+          <nav aria-label="Mentions légales" className="flex flex-wrap justify-center gap-x-6 gap-y-3 text-xs">
             {legalLinks.map((link) => (
               <Link
                 key={link.href}
                 to={link.href}
-                className="hover:text-primary transition-colors"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center hover:text-gold-light transition-colors"
                 onClick={() => trackPostHogEvent("click_footer_link", { item: link.label, section: "legal" })}
               >
                 {link.label}

@@ -82,3 +82,8 @@ verify_jwt = false
 # domaine et le chemin sont en liste blanche stricte côté fonction.
 [functions.image-proxy]
 verify_jwt = false
+
+# Fonction publique de rétractation : le visiteur n'est pas nécessairement connecté.
+# Validation, limitation de débit et écriture service-role sont gérées dans la fonction.
+[functions.withdrawal-request]
+verify_jwt = false

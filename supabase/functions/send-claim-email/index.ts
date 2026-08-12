@@ -13,6 +13,15 @@ const PLAN_LABELS: Record<string, string> = {
   live: "Wav Academy · Live",
 };
 
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -32,8 +41,20 @@ serve(async (req) => {
     // wavstats_provisioned distingue « accès ouvert, mais le client avait déjà un
     // compte WavStats » (pas d'activationUrl, rien à faire de notre côté) de
     // « provisioning échoué ou désactivé » (crédits à ouvrir à la main).
-    const { email, token, plan_type, access_months, wavstats_activation_url, wavstats_provisioned } =
-      await req.json();
+    const {
+      email,
+      token,
+      plan_type,
+      access_months,
+      wavstats_activation_url,
+      wavstats_provisioned,
+      stripe_session_id,
+      cgv_version,
+      cgv_accepted_text,
+      immediate_delivery_notice_version,
+      immediate_delivery_accepted_text,
+      accepted_at,
+    } = await req.json();
     if (!email || !token) throw new Error("Missing email or token");
 
     const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD") || "";
@@ -44,6 +65,27 @@ serve(async (req) => {
     const planLabel = PLAN_LABELS[plan_type] || "Wav Academy";
     const months = typeof access_months === "number" && access_months > 0 ? access_months : null;
     const durationLabel = months ? ` (accès ${months} mois)` : "";
+    const acceptedAtLabel = typeof accepted_at === "string"
+      ? new Intl.DateTimeFormat("fr-FR", {
+          dateStyle: "long",
+          timeStyle: "long",
+          timeZone: "Europe/Paris",
+        }).format(new Date(accepted_at))
+      : null;
+    const consentSummary = cgv_version && cgv_accepted_text &&
+        immediate_delivery_notice_version && immediate_delivery_accepted_text
+      ? `
+          <div style="margin-top:24px;padding:20px;background:rgba(255,255,255,0.04);border:1px solid #333;border-radius:8px;">
+            <p style="color:#c8a97e;font-size:15px;font-weight:bold;margin:0 0 12px 0;">Confirmation de tes consentements contractuels</p>
+            ${acceptedAtLabel ? `<p style="color:#f5f0e8;font-size:13px;line-height:1.6;"><strong>Acceptés le :</strong> ${escapeHtml(acceptedAtLabel)}</p>` : ""}
+            <p style="color:#f5f0e8;font-size:13px;line-height:1.6;"><strong>Version des CGV :</strong> ${escapeHtml(String(cgv_version))}</p>
+            <blockquote style="color:#f5f0e8;font-size:13px;line-height:1.6;margin:8px 0 16px;padding-left:12px;border-left:3px solid #c8a97e;">${escapeHtml(String(cgv_accepted_text))}</blockquote>
+            <p style="color:#f5f0e8;font-size:13px;line-height:1.6;"><strong>Version de la demande d'exécution immédiate :</strong> ${escapeHtml(String(immediate_delivery_notice_version))}</p>
+            <blockquote style="color:#f5f0e8;font-size:13px;line-height:1.6;margin:8px 0 16px;padding-left:12px;border-left:3px solid #c8a97e;">${escapeHtml(String(immediate_delivery_accepted_text))}</blockquote>
+            ${stripe_session_id ? `<p style="color:#999;font-size:12px;line-height:1.6;"><strong>Référence Stripe :</strong> ${escapeHtml(String(stripe_session_id))}</p>` : ""}
+            <p style="color:#999;font-size:12px;line-height:1.6;">CGV : <a href="${siteUrl}/cgv" style="color:#c8a97e;">${siteUrl}/cgv</a> · Rétractation : <a href="${siteUrl}/retractation" style="color:#c8a97e;">${siteUrl}/retractation</a></p>
+          </div>`
+      : "";
 
     const htmlBody = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #0a0a0a; color: #f5f0e8;">
@@ -99,6 +141,7 @@ serve(async (req) => {
               Je les active manuellement sous 48h ouvrées — si tu ne les vois pas passer, réponds simplement à cet email.
             </p>`}
           </div>
+          ${consentSummary}
         </div>
         <div style="border-top: 1px solid #333; padding-top: 20px; text-align: center;">
           <p style="color: #666; font-size: 12px;">FredWav · Coaching TikTok · noreply@fredwav.com</p>

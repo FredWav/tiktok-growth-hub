@@ -2,17 +2,16 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { trackPostHogEvent } from "@/lib/posthog";
+import { trackEvent } from "@/lib/tracking";
+import { FUNNEL_EVENTS, trackFunnelEvent } from "@/lib/funnel-events";
 
 const navItems = [
-  { label: "Accueil", href: "/" },
   { label: "Wav Academy", href: "/wavacademy" },
   { label: "Analyse Express", href: "/analyse-express" },
   { label: "Wav Premium", href: "/reserverunappel" },
-  { label: "Témoignages", href: "/preuves" },
+  { label: "Résultats", href: "/preuves" },
+  { label: "Ressources", href: "/ressources" },
   { label: "À propos", href: "/a-propos" },
-  { label: "Newsletter", href: "/newsletter" },
-  { label: "Contact", href: "/contact" },
 ];
 
 export function Header({ minimal = false }: { minimal?: boolean }) {
@@ -40,7 +39,7 @@ export function Header({ minimal = false }: { minimal?: boolean }) {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex min-h-11 items-center gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label="FredWav — Accueil">
             <span className="font-display text-xl md:text-2xl font-semibold tracking-tight">
               <span className="text-foreground">Fred</span>
               <span className="text-primary">Wav</span>
@@ -48,18 +47,18 @@ export function Header({ minimal = false }: { minimal?: boolean }) {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-5 xl:gap-7" aria-label="Navigation principale">
+          <nav className="hidden lg:flex items-center gap-4 xl:gap-6" aria-label="Navigation principale">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 to={item.href}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  location.pathname === item.href
+                className={`inline-flex min-h-11 items-center text-sm font-medium transition-colors hover:text-primary ${
+                  location.pathname === item.href || location.pathname.startsWith(`${item.href}/`)
                     ? "text-primary"
                     : "text-muted-foreground"
                 }`}
                 onClick={() => {
-                  trackPostHogEvent("click_nav", { item: item.label, location: "header" });
+                  trackEvent("navigation_click", { item: item.label, position: "header_desktop" });
                 }}
               >
                 {item.label}
@@ -69,16 +68,33 @@ export function Header({ minimal = false }: { minimal?: boolean }) {
 
           {/* CTA Button */}
           <div className="hidden lg:block">
-            <Button asChild>
-              <Link to="/wavacademy" onClick={() => trackPostHogEvent("click_nav_cta", { location: "header" })}>Rejoindre la Wav Academy</Link>
+            <Button asChild className="min-h-11">
+              <Link
+                to="/wavacademy"
+                onClick={() =>
+                  trackFunnelEvent(FUNNEL_EVENTS.academyCtaClick, {
+                    source_page: location.pathname,
+                    position: "header_desktop",
+                  })
+                }
+              >
+                Rejoindre la Wav Academy
+              </Link>
             </Button>
           </div>
 
           {/* Mobile Menu Button */}
           <button
-            className="lg:hidden p-2"
-            onClick={() => { const next = !isOpen; setIsOpen(next); trackPostHogEvent("toggle_mobile_menu", { open: next }); }}
-            aria-label="Toggle menu"
+            type="button"
+            className="lg:hidden flex h-11 w-11 items-center justify-center rounded-md transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            onClick={() => {
+              const next = !isOpen;
+              setIsOpen(next);
+              trackEvent("mobile_menu_toggle", { open: String(next), position: "header_mobile" });
+            }}
+            aria-label={isOpen ? "Fermer le menu" : "Ouvrir le menu"}
+            aria-expanded={isOpen}
+            aria-controls="mobile-navigation"
           >
             {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
@@ -86,27 +102,36 @@ export function Header({ minimal = false }: { minimal?: boolean }) {
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <nav className="lg:hidden py-4 border-t border-border animate-fade-in">
+          <nav id="mobile-navigation" className="lg:hidden py-4 border-t border-border animate-fade-in" aria-label="Navigation mobile">
             <div className="flex flex-col gap-4">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
                   to={item.href}
-                  className={`text-base font-medium transition-colors hover:text-primary ${
-                    location.pathname === item.href
+                  className={`flex min-h-11 items-center rounded-md px-2 text-base font-medium transition-colors hover:bg-muted hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+                    location.pathname === item.href || location.pathname.startsWith(`${item.href}/`)
                       ? "text-primary"
                       : "text-muted-foreground"
                   }`}
                   onClick={() => {
-                    trackPostHogEvent("click_nav", { item: item.label, location: "header_mobile" });
+                    trackEvent("navigation_click", { item: item.label, position: "header_mobile" });
                     setIsOpen(false);
                   }}
                 >
                   {item.label}
                 </Link>
               ))}
-              <Button asChild className="mt-2">
-                <Link to="/wavacademy" onClick={() => { trackPostHogEvent("click_nav_cta", { location: "header_mobile" }); setIsOpen(false); }}>
+              <Button asChild className="mt-2 min-h-11">
+                <Link
+                  to="/wavacademy"
+                  onClick={() => {
+                    trackFunnelEvent(FUNNEL_EVENTS.academyCtaClick, {
+                      source_page: location.pathname,
+                      position: "header_mobile",
+                    });
+                    setIsOpen(false);
+                  }}
+                >
                   Rejoindre la Wav Academy
                 </Link>
               </Button>

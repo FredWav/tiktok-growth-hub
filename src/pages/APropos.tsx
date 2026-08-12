@@ -80,8 +80,10 @@ export default function APropos() {
 
           <div className="relative">
             <img
-              src="/fred-wav.jpg"
-              alt="Fred Wav - Expert Stratégie Formats Courts"
+              src="/fred-wav.webp"
+              alt="Fred Wav, consultant en stratégie TikTok et contenus courts"
+              width={896}
+              height={962}
               className="aspect-square object-cover rounded-2xl shadow-lg border border-border/50"
               loading="lazy"
             />

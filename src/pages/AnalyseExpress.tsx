@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Zap, BarChart3, FileText, TrendingUp, Search } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
 import { trackPostHogEvent } from "@/lib/posthog";
@@ -22,6 +22,51 @@ const features = [
   { icon: FileText, title: "Rapport PDF complet", description: "Résumé exécutif, points forts, axes d'amélioration et actions immédiates en PDF" },
 ];
 
+const steps = [
+  {
+    title: "Tu indiques ton compte",
+    description: "Entre ton nom d'utilisateur TikTok public et l'email auquel rattacher la commande.",
+  },
+  {
+    title: "L'outil analyse les données publiques",
+    description: "Le profil et jusqu'à 30 vidéos récentes sont examinés à partir des métriques publiquement disponibles.",
+  },
+  {
+    title: "Tu récupères ton rapport",
+    description: "Le diagnostic, les priorités et le plan d'action sont réunis dans un rapport PDF et un tableau de bord.",
+  },
+];
+
+const faqs = [
+  {
+    question: "Quelles données sont analysées ?",
+    answer: "Les informations publiques du profil TikTok et jusqu'à 30 vidéos récentes : présentation du compte, vues et interactions visibles, thèmes, hooks et régularité de publication. L'outil n'accède ni à ton mot de passe ni à tes statistiques privées.",
+  },
+  {
+    question: "Est-ce que cela fonctionne avec un compte privé ?",
+    answer: "Non. Le compte et les vidéos doivent être publics au moment de l'analyse pour que les données nécessaires soient accessibles.",
+  },
+  {
+    question: "En combien de temps le rapport est-il disponible ?",
+    answer: "Le rapport est généralement généré en moins de deux minutes après le paiement. Un ralentissement de TikTok ou du service d'analyse peut exceptionnellement prolonger ce délai.",
+  },
+  {
+    question: "L'analyse est-elle réalisée par Fred ?",
+    answer: "L'Analyse Express est automatisée à partir de la méthode de Fred. Elle ne comprend pas de relecture humaine ni de rendez-vous individuel ; ces besoins relèvent du Wav Premium.",
+  },
+  {
+    question: "Les recommandations garantissent-elles plus de vues ?",
+    answer: "Non. Le rapport fournit un diagnostic et des pistes d'amélioration à partir d'un instantané des données publiques. Les résultats dépendent ensuite du contenu, de l'exécution et des évolutions de la plateforme.",
+  },
+  {
+    question: "Que faire si mon rapport ne se génère pas ?",
+    answer: "Conserve l'email de confirmation et la référence Stripe, puis écris à contact@fredwav.com. La commande pourra être retrouvée et le rapport relancé si nécessaire.",
+  },
+];
+
+const CGV_ACCEPTED_TEXT = "J'ai lu et j'accepte les Conditions Générales de Vente.";
+const IMMEDIATE_DELIVERY_ACCEPTED_TEXT = "Je demande expressément l'exécution immédiate de l'Analyse Express avant la fin du délai de 14 jours et je reconnais perdre mon droit de rétractation lorsque la prestation est pleinement exécutée et le rapport mis à disposition.";
+
 export default function AnalyseExpress() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -29,10 +74,18 @@ export default function AnalyseExpress() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   // Consentement marketing = acte positif (RGPD/CNIL) : décoché par défaut.
   const [subscribeToNewsletter, setSubscribeToNewsletter] = useState(false);
+  // Consentements contractuels distincts, explicites et décochés par défaut.
+  const [consentCgv, setConsentCgv] = useState(false);
+  const [consentImmediateDelivery, setConsentImmediateDelivery] = useState(false);
+  const [existingSessionId, setExistingSessionId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const testMode = import.meta.env.VITE_STRIPE_TEST_MODE === "true" || searchParams.get("test") === "1";
 
-  const existingSessionId = localStorage.getItem("express_session_id");
+  useEffect(() => {
+    setExistingSessionId(window.localStorage.getItem("express_session_id"));
+  }, []);
 
   const cleanUsername = username.trim().replace(/^@/, "");
 
@@ -52,12 +105,24 @@ export default function AnalyseExpress() {
   };
 
   const proceedToPayment = async () => {
+    if (!consentCgv || !consentImmediateDelivery) {
+      toast.error("Les deux consentements sont nécessaires avant le paiement");
+      return;
+    }
+
     setShowConfirmModal(false);
     setLoading(true);
     trackEvent("express_checkout_start", { product: "analyse_express_tiktok" });
     try {
       const { data, error } = await supabase.functions.invoke("create-express-checkout", {
-        body: { username: cleanUsername, email: email.trim(), subscribeToNewsletter },
+        body: {
+          username: cleanUsername,
+          email: email.trim(),
+          subscribeToNewsletter,
+          consent_cgv: consentCgv,
+          consent_immediate_delivery: consentImmediateDelivery,
+          ...(testMode ? { mode: "test" } : {}),
+        },
       });
 
       if (error || !data?.url) {
@@ -80,12 +145,18 @@ export default function AnalyseExpress() {
     <Layout>
       <SEOHead {...seoFor("/analyse-express")} />
 
+      {testMode && (
+        <div className="bg-amber-500 px-4 py-2 text-center text-sm font-semibold text-black">
+          Mode test Stripe — aucun paiement réel.
+        </div>
+      )}
+
       {/* Hero */}
       <Section className="pt-32 pb-16 md:pt-40 md:pb-20">
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
             <Zap className="h-4 w-4" />
-            Résultats en moins de 2 minutes
+            Résultats généralement en moins de 2 minutes
           </div>
 
           <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">
@@ -155,6 +226,49 @@ export default function AnalyseExpress() {
         </div>
       </Section>
 
+      {/* Méthode */}
+      <Section className="pb-20">
+        <SectionHeader
+          title="Comment fonctionne l'Analyse Express"
+          subtitle="Un parcours court, transparent et sans accès à tes données privées"
+        />
+        <ol className="mx-auto grid max-w-4xl gap-5 md:grid-cols-3">
+          {steps.map((step, index) => (
+            <li key={step.title} className="rounded-xl border border-border bg-card p-6">
+              <span className="mb-4 inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">
+                {index + 1}
+              </span>
+              <h2 className="mb-2 font-display text-xl font-semibold">{step.title}</h2>
+              <p className="text-sm leading-relaxed text-muted-foreground">{step.description}</p>
+            </li>
+          ))}
+        </ol>
+      </Section>
+
+      {/* Données et limites */}
+      <Section className="pb-20">
+        <div className="mx-auto grid max-w-4xl gap-6 md:grid-cols-2">
+          <div className="rounded-xl border border-border bg-card p-6 md:p-8">
+            <h2 className="font-display text-2xl font-semibold">Ce que l'outil utilise</h2>
+            <ul className="mt-4 space-y-3 text-sm leading-relaxed text-muted-foreground">
+              <li>• Les informations visibles sur ton profil TikTok public.</li>
+              <li>• Jusqu'à 30 vidéos récentes et leurs métriques publiques disponibles.</li>
+              <li>• Les signaux de contenu utiles au diagnostic : hooks, sujets, formats et régularité.</li>
+              <li>• Aucun mot de passe, aucune connexion à ton compte et aucune statistique privée.</li>
+            </ul>
+          </div>
+          <div className="rounded-xl border border-border bg-muted/40 p-6 md:p-8">
+            <h2 className="font-display text-2xl font-semibold">Les limites à connaître</h2>
+            <ul className="mt-4 space-y-3 text-sm leading-relaxed text-muted-foreground">
+              <li>• Le rapport est automatisé : il ne remplace pas un audit humain avec entretien.</li>
+              <li>• Il décrit un instantané du compte au moment de la commande.</li>
+              <li>• La disponibilité et la précision dépendent des données rendues publiques par TikTok.</li>
+              <li>• Les recommandations constituent des pistes de travail, pas une garantie de vues ou de revenus.</li>
+            </ul>
+          </div>
+        </div>
+      </Section>
+
       {/* Features */}
       <Section className="pb-20">
         <SectionHeader
@@ -189,6 +303,24 @@ export default function AnalyseExpress() {
             </a>{" "}
             pour accéder à l'outil complet.
           </p>
+        </div>
+      </Section>
+
+      {/* FAQ visible, sans balisage FAQPage réservé aux cas éligibles Google */}
+      <Section className="pb-24">
+        <SectionHeader
+          title="Questions fréquentes"
+          subtitle="Tout ce qu'il faut savoir avant de lancer ton analyse TikTok"
+        />
+        <div className="mx-auto max-w-3xl space-y-3">
+          {faqs.map((faq) => (
+            <details key={faq.question} className="group rounded-xl border border-border bg-card p-5">
+              <summary className="cursor-pointer list-none pr-8 font-semibold marker:content-none">
+                {faq.question}
+              </summary>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{faq.answer}</p>
+            </details>
+          ))}
         </div>
       </Section>
 
@@ -250,12 +382,54 @@ export default function AnalyseExpress() {
               Email : <span className="font-medium text-foreground">{email.trim()}</span>
             </p>
 
+            <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-4 text-left">
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  id="express-cgv"
+                  checked={consentCgv}
+                  onCheckedChange={(value) => setConsentCgv(value === true)}
+                  disabled={loading}
+                />
+                <label htmlFor="express-cgv" className="cursor-pointer text-sm leading-relaxed text-muted-foreground">
+                  {CGV_ACCEPTED_TEXT.replace("Conditions Générales de Vente.", "")}{" "}
+                  <Link
+                    to="/cgv"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-primary underline underline-offset-2"
+                  >
+                    Conditions Générales de Vente
+                  </Link>.
+                </label>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  id="express-immediate-delivery"
+                  checked={consentImmediateDelivery}
+                  onCheckedChange={(value) => setConsentImmediateDelivery(value === true)}
+                  disabled={loading}
+                />
+                <label
+                  htmlFor="express-immediate-delivery"
+                  className="cursor-pointer text-sm leading-relaxed text-muted-foreground"
+                >
+                  {IMMEDIATE_DELIVERY_ACCEPTED_TEXT}
+                </label>
+              </div>
+            </div>
+
             <div className="flex flex-col sm:flex-row gap-2">
               <Button variant="outline" className="flex-1" onClick={handleGoBack}>
                 Ha je me suis trompé !
               </Button>
-              <Button variant="hero" className="flex-1" onClick={() => { trackPostHogEvent("click_analyse_express_confirm", { product: "analyse_express_tiktok" }); proceedToPayment(); }}>
-                Je valide ✅
+              <Button
+                variant="hero"
+                className="flex-1"
+                disabled={loading || !consentCgv || !consentImmediateDelivery}
+                onClick={() => { trackPostHogEvent("click_analyse_express_confirm", { product: "analyse_express_tiktok" }); proceedToPayment(); }}
+              >
+                Confirmer et payer
               </Button>
             </div>
           </div>

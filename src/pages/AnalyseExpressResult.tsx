@@ -25,6 +25,15 @@ import { downloadExpressReport } from "@/lib/pdf";
 const POLL_INTERVAL = 5000;
 const MAX_POLL_DURATION = 600_000;
 
+function trackExpressResult(sessionId: string | null, source: string) {
+  trackEvent("express_result_view", { source });
+  if (!sessionId || typeof window === "undefined") return;
+  const purchaseKey = `fw_express_purchase_${sessionId}`;
+  if (sessionStorage.getItem(purchaseKey)) return;
+  sessionStorage.setItem(purchaseKey, "1");
+  trackEvent("express_purchase", { source: "confirmed_paid_session" });
+}
+
 type AccountData = ComponentProps<typeof MetricsGrids>["account"] & Partial<ComponentProps<typeof ProfileHeader>> & {
   health_score?: ComponentProps<typeof HealthScoreSection>["healthScore"];
   recent_videos?: ComponentProps<typeof TopVideosSection>["videos"];
@@ -87,7 +96,7 @@ export default function AnalyseExpressResult() {
         stopPolling();
         setData(result.data as ExpressAnalysisData);
         setLoading(false);
-        trackPostHogEvent("analyse_express_result_viewed", { source: "fresh_analysis" });
+        trackExpressResult(sessionId, "fresh_analysis");
       } else if (result.status === "failed") {
         stopPolling();
         setError(result.error || "L'analyse a échoué. Réessayez.");
@@ -162,7 +171,7 @@ export default function AnalyseExpressResult() {
             // Results already available — display directly
             setData(existing.result_data as ExpressAnalysisData);
             setLoading(false);
-            trackPostHogEvent("analyse_express_result_viewed", { source: "existing_analysis" });
+            trackExpressResult(sessionId, "existing_analysis");
             return;
           }
 
@@ -305,20 +314,23 @@ export default function AnalyseExpressResult() {
               {/* Shadowban */}
               {shadowban && <ShadowbanSection sb={shadowban} />}
 
-              {/* Regularity alert CTA */}
+              {/* Regularity alert — Academy first, Premium for high-touch needs */}
               {pubPattern?.consistency_score != null && pubPattern.consistency_score < 60 && (
                 <div className="bg-amber-50 border border-amber-300 rounded-xl p-6 flex flex-col sm:flex-row items-center gap-4">
                   <div className="flex-1">
                     <p className="font-semibold text-amber-900">
-                      ⚠️ Ta régularité freine ta visibilité. Tes abonnés ne te voient pas assez pour acheter. On règle ça en 1h30 ?
+                      Ta régularité freine ta progression. Ton rapport te montre le signal ; il te faut maintenant un cadre pour le corriger.
                     </p>
                     <p className="text-sm text-amber-800 mt-1">
-                      Le Wav Premium pour structurer ta stratégie de publication et transformer ton audience en revenus.
+                      Dans la Wav Academy, tu testes, compares tes résultats et obtiens du feedback sans rester seul face à tes statistiques.
                     </p>
                   </div>
                   <Button asChild variant="hero" size="lg" className="shrink-0">
-                    <Link to="/reserverunappel">
-                      Candidater au Wav Premium
+                    <Link
+                      to="/wavacademy"
+                      onClick={() => trackEvent("academy_cta_click", { source_page: "express_result", position: "regularity_alert" })}
+                    >
+                      Découvrir la Wav Academy
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
@@ -342,6 +354,38 @@ export default function AnalyseExpressResult() {
                   </p>
                 </div>
               ) : null}
+
+              {/* Default continuation after the report */}
+              <div className="rounded-2xl bg-foreground text-cream border border-gold/30 p-6 md:p-8 space-y-5">
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold">La suite logique</p>
+                  <h2 className="font-display text-2xl md:text-3xl font-semibold">
+                    Un rapport éclaire le problème. Un cadre t'aide à le corriger.
+                  </h2>
+                  <p className="text-cream/75 leading-relaxed max-w-2xl">
+                    Rejoins la Wav Academy pour appliquer ton plan, faire relire tes contenus et suivre l'évolution de tes statistiques avec Fred et d'autres créateurs.
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button asChild variant="hero" size="lg">
+                    <Link
+                      to="/wavacademy"
+                      onClick={() => trackEvent("academy_cta_click", { source_page: "express_result", position: "continuation" })}
+                    >
+                      Rejoindre la Wav Academy
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" size="lg" className="border-cream/30 bg-transparent text-cream hover:bg-cream/10 hover:text-cream">
+                    <Link
+                      to="/reserverunappel"
+                      onClick={() => trackEvent("premium_application_start", { source_page: "express_result", position: "continuation" })}
+                    >
+                      Besoin d'un suivi individuel ?
+                    </Link>
+                  </Button>
+                </div>
+              </div>
 
               {/* Download */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">

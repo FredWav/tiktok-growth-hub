@@ -29,7 +29,7 @@ async function subscribeToNewsletter(
         "Content-Type": "application/json",
         Authorization: `Bearer ${serviceKey}`,
       },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, source: "analyse_express" }),
     });
     const result = await resp.json();
     if (!resp.ok) {
@@ -63,6 +63,7 @@ serve(async (req) => {
   let wantsNewsletter = false;
   let analysisId: string | null = null;
   let session_id: string | undefined;
+  let ownsLaunch = false;
 
   try {
     const body = await req.json();
@@ -75,18 +76,28 @@ serve(async (req) => {
       await notifyError("Analyse Express", `Paiement non confirmé • session ${session_id}`);
       throw new Error("Paiement non confirmé");
     }
+    if (!session.livemode && Deno.env.get("ALLOW_TEST_FULFILLMENT") !== "true") {
+      throw new Error("Exécution des paiements test désactivée");
+    }
 
     // ── 1. Résoudre la ligne express_analyses ──
     // Soit déjà liée à cette session Stripe (retry), soit via client_reference_id
     // posé par create-express-checkout sur le Payment Link.
-    let row: any = null;
+    type ExpressAnalysisRow = {
+      id: string;
+      tiktok_username: string;
+      email: string | null;
+      newsletter_requested: boolean | null;
+      job_id: string | null;
+    };
+    let row: ExpressAnalysisRow | null = null;
     {
       const { data: bySession } = await supabase
         .from("express_analyses")
         .select("id, tiktok_username, email, newsletter_requested, job_id")
         .eq("stripe_session_id", session_id)
         .maybeSingle();
-      row = bySession ?? null;
+      row = (bySession as ExpressAnalysisRow | null) ?? null;
     }
     if (!row && session.client_reference_id) {
       const { data: byRef } = await supabase
@@ -94,7 +105,7 @@ serve(async (req) => {
         .select("id, tiktok_username, email, newsletter_requested, job_id")
         .eq("id", session.client_reference_id)
         .maybeSingle();
-      row = byRef ?? null;
+      row = (byRef as ExpressAnalysisRow | null) ?? null;
       if (row) {
         // Lie définitivement la session Stripe à cette ligne d'intention.
         await supabase
@@ -119,12 +130,58 @@ serve(async (req) => {
       });
     }
 
-    // ── 2. Trigger newsletter subscription right away (don't wait for analysis) ──
+    const { data: consent, error: consentError } = await supabase
+      .from("express_purchase_consents")
+      .select("checkout_mode")
+      .eq("express_analysis_id", analysisId)
+      .maybeSingle();
+    if (consentError) throw new Error(`Lecture du mode de paiement impossible : ${consentError.message}`);
+    if (consent && ((consent.checkout_mode === "live") !== session.livemode)) {
+      throw new Error("Incohérence entre le mode Stripe et le registre de consentement");
+    }
+
+    // Verrou idempotent : completed et async_payment_succeeded peuvent arriver
+    // presque simultanément. Un seul appel lance WavStats ; les autres constatent
+    // l'état de démarrage. Un verrou interrompu redevient récupérable après 10 min.
+    const launchAt = new Date().toISOString();
+    const staleBefore = new Date(Date.now() - 10 * 60 * 1_000).toISOString();
+    let { data: launchLock, error: launchLockError } = await supabase
+      .from("express_analyses")
+      .update({ status: "starting", launch_started_at: launchAt, error_message: null })
+      .eq("id", analysisId)
+      .is("job_id", null)
+      .in("status", ["pending", "awaiting_payment", "failed"])
+      .select("id")
+      .maybeSingle();
+
+    if (!launchLock && !launchLockError) {
+      const staleLock = await supabase
+        .from("express_analyses")
+        .update({ status: "starting", launch_started_at: launchAt, error_message: null })
+        .eq("id", analysisId)
+        .is("job_id", null)
+        .eq("status", "starting")
+        .lt("launch_started_at", staleBefore)
+        .select("id")
+        .maybeSingle();
+      launchLock = staleLock.data;
+      launchLockError = staleLock.error;
+    }
+
+    if (launchLockError) throw new Error(`Verrou de lancement impossible : ${launchLockError.message}`);
+    if (!launchLock) {
+      return new Response(JSON.stringify({ username, status: "starting" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 202,
+      });
+    }
+    ownsLaunch = true;
+
+    // ── 2. Inscription volontaire à la séquence Express ──
     if (wantsNewsletter && customerEmail) {
-      // fire-and-forget — runs in parallel with the API call
-      subscribeToNewsletter(supabase, analysisId, customerEmail).catch((err) =>
-        console.error("Newsletter background error:", err)
-      );
+      // Une Edge Function peut être interrompue dès sa réponse : on attend
+      // donc cet appel afin que le groupe Express ne dépende pas du retour navigateur.
+      await subscribeToNewsletter(supabase, analysisId, customerEmail);
     }
 
     // ── 3. Call WavStats API ──
@@ -146,6 +203,7 @@ serve(async (req) => {
           .from("express_analyses")
           .update({
             status: "failed",
+            launch_started_at: null,
             error_message: `API erreur ${analyzeRes.status}: ${errText.slice(0, 500)}`,
           })
           .eq("id", analysisId);
@@ -162,7 +220,7 @@ serve(async (req) => {
       if (analysisId) {
         await supabase
           .from("express_analyses")
-          .update({ status: "failed", error_message: "job_id non retourné par l'API" })
+          .update({ status: "failed", launch_started_at: null, error_message: "job_id non retourné par l'API" })
           .eq("id", analysisId);
       }
       throw new Error("job_id non retourné par l'API");
@@ -172,7 +230,7 @@ serve(async (req) => {
     if (analysisId) {
       await supabase
         .from("express_analyses")
-        .update({ job_id: jobId, status: "processing" })
+        .update({ job_id: jobId, status: "processing", launch_started_at: null })
         .eq("id", analysisId);
     }
 
@@ -183,6 +241,17 @@ serve(async (req) => {
       status: 200,
     });
   } catch (error) {
+    if (ownsLaunch && analysisId) {
+      await supabase
+        .from("express_analyses")
+        .update({
+          status: "failed",
+          launch_started_at: null,
+          error_message: error instanceof Error ? error.message.slice(0, 1_000) : String(error).slice(0, 1_000),
+        })
+        .eq("id", analysisId)
+        .is("job_id", null);
+    }
     await notifyError("Analyse Express", `${error.message}${customerEmail ? " • " + customerEmail : ""}${username ? " • @" + username : ""}`);
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

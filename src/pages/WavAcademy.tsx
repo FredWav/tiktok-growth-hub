@@ -174,7 +174,7 @@ const VIDEO_TESTIMONIALS = [
 ];
 
 // ── FAQ ─────────────────────────────────────────────────────────────────────
-// Source unique partagée avec src/config/seo.ts pour le JSON-LD FAQPage.
+// Source unique pour la FAQ visible ; aucun balisage FAQPage commercial.
 const FAQ = WAVACADEMY_FAQ.map((item) => ({ q: item.question, a: item.answer }));
 
 
@@ -196,7 +196,10 @@ export default function WavAcademy() {
     const eventKey = "fw_academy_checkout_success_tracked";
     if (sessionStorage.getItem(eventKey)) return;
     sessionStorage.setItem(eventKey, "1");
-    trackEvent("academy_checkout_success", { source: "confirmed_return" });
+    // La présence de ?success=true est un simple retour navigateur, pas une
+    // preuve de paiement. L'événement d'achat doit venir d'un signal serveur
+    // vérifié ; on ne l'invente jamais côté client.
+    trackEvent("academy_checkout_return", { source: "browser_return" });
   }, [isSuccess]);
 
   const form = useForm<CheckoutForm>({
@@ -219,6 +222,11 @@ export default function WavAcademy() {
     setDialogOpen(true);
     const plan = PLANS.find((item) => item.term === term);
     trackEvent("academy_checkout_open", {
+      term,
+      total: String(plan?.total ?? ""),
+      location: "pricing",
+    });
+    trackEvent("academy_checkout_start", {
       term,
       total: String(plan?.total ?? ""),
       location: "pricing",
@@ -306,7 +314,7 @@ export default function WavAcademy() {
             Wav Academy — Accès ouvert maintenant
           </div>
           <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight mb-6">
-            Ne poste <span className="text-gold-gradient">plus seul.</span>
+            Wav Academy : l’accompagnement TikTok pour créateurs.
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
             Comprends pourquoi ton contenu fonctionne ou bloque, identifie quoi améliorer, et avance avec un accompagnement régulier. Sans promesse miracle de vues ou de rentabilité.

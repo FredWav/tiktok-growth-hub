@@ -1,87 +1,102 @@
-import posthog from "posthog-js";
+type PostHogClient = typeof import("posthog-js")["default"];
+type PostHogProperties = import("posthog-js").Properties;
 
 const POSTHOG_KEY = "phc_PtioXOoY4oT3GYJsV7xTpI3a2fscFeJfX6mzFGMWGDj";
 const POSTHOG_HOST = "https://us.i.posthog.com";
 
-let initialized = false;
+let client: PostHogClient | null = null;
+let loading: Promise<PostHogClient | null> | null = null;
 
-export function initPostHog() {
-  if (initialized || typeof window === "undefined") return;
+function runWhenReady(action: (posthog: PostHogClient) => void) {
+  if (client) {
+    action(client);
+    return;
+  }
 
-  posthog.init(POSTHOG_KEY, {
-    api_host: POSTHOG_HOST,
-    capture_pageview: false, // We handle pageviews manually via router
-    capture_pageleave: true,
-    autocapture: true,
-    persistence: "localStorage+cookie",
-  });
-
-  initialized = true;
-}
-
-export function trackPostHogEvent(event: string, properties?: Record<string, any>) {
-  if (initialized) {
-    posthog.capture(event, properties);
+  // Une action demandée juste après `initPostHog` (opt-in, attribution ou
+  // premier pageview) doit attendre le chunk. Avant consentement, `loading`
+  // reste null et l'action est volontairement abandonnée.
+  if (loading) {
+    void loading.then((posthog) => {
+      if (posthog) action(posthog);
+    });
   }
 }
 
-export function identifyUser(distinctId: string, properties?: Record<string, any>) {
-  if (initialized) {
-    posthog.identify(distinctId, properties);
+export function initPostHog(): Promise<void> {
+  if (typeof window === "undefined" || client) return Promise.resolve();
+
+  if (!loading) {
+    loading = import("posthog-js")
+      .then(({ default: posthog }) => {
+        posthog.init(POSTHOG_KEY, {
+          api_host: POSTHOG_HOST,
+          capture_pageview: false,
+          capture_pageleave: true,
+          autocapture: true,
+          persistence: "localStorage+cookie",
+        });
+        client = posthog;
+        return posthog;
+      })
+      .catch((error) => {
+        console.error("[posthog] Chargement impossible.", error);
+        loading = null;
+        return null;
+      });
   }
+
+  return loading.then(() => undefined);
 }
 
-/**
- * Attache des propriétés à la personne SANS changer le distinct_id (on garde
- * l'identifiant anonyme). Sert à enregistrer email/nom sans faire de l'email
- * la clé d'identité PostHog.
- */
+export function trackPostHogEvent(event: string, properties?: PostHogProperties) {
+  runWhenReady((posthog) => posthog.capture(event, properties));
+}
+
+export function identifyUser(distinctId: string, properties?: PostHogProperties) {
+  runWhenReady((posthog) => posthog.identify(distinctId, properties));
+}
+
+/** Attache des propriétés à la personne sans changer son distinct_id. */
 export function setUserProperties(properties: Record<string, unknown>) {
-  if (initialized) {
-    posthog.setPersonProperties(properties);
-  }
+  runWhenReady((posthog) => posthog.setPersonProperties(properties));
 }
 
-/** Super-propriétés attachées à TOUS les events suivants (ex. attribution). */
+/** Super-propriétés attachées à tous les événements suivants. */
 export function registerSuperProperties(properties: Record<string, unknown>) {
-  if (initialized) {
-    posthog.register(properties);
-  }
+  runWhenReady((posthog) => posthog.register(properties));
 }
 
 export function capturePageview() {
-  if (initialized) {
-    posthog.capture("$pageview");
-  }
+  runWhenReady((posthog) => posthog.capture("$pageview"));
 }
 
-/** Retrait du consentement : coupe la capture PostHog sans recharger la page. */
 export function optOutPostHog() {
-  if (!initialized) return;
-  try {
-    posthog.opt_out_capturing();
-  } catch {
-    // no-op
-  }
+  runWhenReady((posthog) => {
+    try {
+      posthog.opt_out_capturing();
+    } catch {
+      // Le stockage peut être désactivé par le navigateur.
+    }
+  });
 }
 
-/** Ré-activation de la capture après un nouveau consentement. */
 export function optInPostHog() {
-  if (!initialized) return;
-  try {
-    posthog.opt_in_capturing();
-  } catch {
-    // no-op
-  }
+  runWhenReady((posthog) => {
+    try {
+      posthog.opt_in_capturing();
+    } catch {
+      // Le stockage peut être désactivé par le navigateur.
+    }
+  });
 }
 
 export function getPostHogId(): string | null {
-  if (initialized) {
-    try {
-      return posthog.get_distinct_id() || null;
-    } catch {
-      return null;
-    }
+  if (!client) return null;
+
+  try {
+    return client.get_distinct_id() || null;
+  } catch {
+    return null;
   }
-  return null;
 }

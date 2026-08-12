@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CREATORS_COUNT } from "@/config/offers";
 import { trackPostHogEvent } from "@/lib/posthog";
+import { trackEvent } from "@/lib/tracking";
 import { CheckCircle, Loader2, ShieldAlert } from "lucide-react";
+
+const NEWSLETTER_CONSENT_TEXT =
+  "J'accepte de recevoir le guide et les conseils de Fred Wav par email. Je peux me désinscrire à tout moment.";
 
 /**
  * Formulaire d'inscription MailerLite, partagé entre /newsletter et /hooks-tiktok.
@@ -31,14 +34,18 @@ export function NewsletterForm({
   const [subscriberCount, setSubscriberCount] = useState<number | null>(null);
 
   useEffect(() => {
-    supabase.functions
-      .invoke("mailerlite-count")
+    let cancelled = false;
+    void import("@/integrations/supabase/client")
+      .then(({ supabase }) => supabase.functions.invoke("mailerlite-count"))
       .then(({ data }) => {
-        if (data?.count != null) setSubscriberCount(data.count);
+        if (!cancelled && data?.count != null) setSubscriberCount(data.count);
       })
       .catch(() => {
         /* échoue en silence — le texte de repli s'affiche */
       });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Traduit le message brut de MailerLite en message lisible.
@@ -49,6 +56,9 @@ export function NewsletterForm({
     // MailerLite renvoie un 413 quand le compte a atteint sa limite d'abonnés.
     if (/subscriber limit|exceed/i.test(raw)) {
       return "Les inscriptions sont momentanément saturées. Réessaie un peu plus tard, ou écris-moi à contact@fredwav.com et je t'envoie le guide directement.";
+    }
+    if (/too many|trop de/i.test(raw)) {
+      return "Trop de tentatives récentes. Réessaie un peu plus tard.";
     }
     return "Une erreur est survenue. Réessaie !";
   };
@@ -63,8 +73,9 @@ export function NewsletterForm({
     setError("");
 
     try {
+      const { supabase } = await import("@/integrations/supabase/client");
       const { data, error: fnError } = await supabase.functions.invoke("mailerlite-subscribe", {
-        body: { email, firstName },
+        body: { email, firstName, sourcePage: location, consentAccepted: true },
       });
 
       // Sur une réponse non-2xx, supabase-js remplit `fnError` et laisse `data`
@@ -90,6 +101,7 @@ export function NewsletterForm({
       }
 
       trackPostHogEvent("newsletter_subscribe", { location });
+      trackEvent("newsletter_opt_in", { source_page: location });
       setSuccess(true);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "";
@@ -103,10 +115,13 @@ export function NewsletterForm({
     return (
       <div className="text-center space-y-5 py-8">
         <CheckCircle className="h-16 w-16 text-primary mx-auto" />
-        <h2 className="text-2xl font-bold text-foreground">Ton guide arrive !</h2>
+        <h2 className="text-2xl font-bold text-foreground">Confirme ton inscription</h2>
         <div className="text-left space-y-3 bg-muted/50 border border-border rounded-lg p-5 text-sm text-muted-foreground leading-relaxed">
-          <p className="font-semibold text-foreground">Une dernière chose avant qu'on commence.</p>
-          <p>Mon premier email avec ton guide est déjà en route. Pour être sûr de le recevoir :</p>
+          <p className="font-semibold text-foreground">Une dernière étape avant de recevoir le guide.</p>
+          <p>
+            Je viens de t'envoyer un email de confirmation. Clique sur le lien qu'il contient : le guide et mes
+            conseils ne seront envoyés qu'après cette confirmation.
+          </p>
           <ul className="list-disc list-inside space-y-1.5">
             <li>
               Vérifie tes spams et ajoute <span className="font-medium text-foreground">hello@fredwav.com</span> à
@@ -114,13 +129,9 @@ export function NewsletterForm({
             </li>
             <li>
               Si tu es sur Gmail et que l'email atterrit dans l'onglet « Promotions », glisse-le dans ta boîte de
-              réception principale. Ça prend 3 secondes et ça change tout pour la suite.
+              réception principale.
             </li>
           </ul>
-          <p>
-            Et <span className="font-medium text-foreground">réponds-moi dès le premier email</span>. Je t'offre une
-            belle ressource si tu joues le jeu.
-          </p>
           <p className="font-semibold text-foreground">À tout de suite.</p>
         </div>
       </div>
@@ -156,7 +167,7 @@ export function NewsletterForm({
       <div className="flex items-start space-x-3 pt-2">
         <Checkbox id="accept" checked={accepted} onCheckedChange={(v) => setAccepted(v === true)} />
         <label htmlFor="accept" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
-          J'accepte de recevoir le guide et les conseils de Fred Wav !
+          {NEWSLETTER_CONSENT_TEXT}
         </label>
       </div>
 

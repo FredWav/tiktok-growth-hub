@@ -3,6 +3,7 @@ import { Section } from "@/components/ui/section";
 import { SEOHead } from "@/components/SEOHead";
 import { seoFor } from "@/config/seo";
 import { ACADEMY_LIVE_SLOT, ACADEMY_SUPPORT_DAYS } from "@/config/offers";
+import { Link } from "react-router-dom";
 
 export default function CGV() {
   return (
@@ -11,7 +12,7 @@ export default function CGV() {
       <Section variant="default" size="lg">
         <div className="max-w-3xl mx-auto prose prose-neutral">
           <h1 className="font-display text-3xl md:text-4xl font-semibold mb-2">Conditions Générales de Vente (CGV) — Fred Wav</h1>
-          <p className="text-sm text-muted-foreground mb-10">Dernière mise à jour : 30 juillet 2026</p>
+          <p className="text-sm text-muted-foreground mb-10">Dernière mise à jour : 11 août 2026 — version 2026-08-11</p>
 
           {/* ARTICLE 1 */}
           <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 1 — Identification du vendeur</h2>
@@ -85,6 +86,9 @@ export default function CGV() {
             Le processus de commande suit la règle du "double clic" (sélection, validation des CGV, confirmation de paiement).
             Pour Wav Premium, la validation finale est soumise à l'acceptation de la candidature par Fred Wav. En cas de refus, aucun débit n'est effectué.
           </p>
+          <p className="text-muted-foreground mb-4">
+            Lorsque l'offre doit être exécutée avant la fin du délai de rétractation, l'acceptation des CGV et la demande d'exécution immédiate font l'objet de cases distinctes, non précochées. Leur texte exact, leur version et leur horodatage sont enregistrés avant la redirection vers le paiement puis rattachés à la référence Stripe. Une confirmation est ensuite envoyée par email sur un support durable.
+          </p>
 
           {/* ARTICLE 7 */}
           <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 7 — Prix et paiement</h2>
@@ -101,7 +105,7 @@ export default function CGV() {
             <strong>Rétrofacturation (chargeback) :</strong> toute rétrofacturation entraîne la suspension immédiate des accès et l'exigibilité des sommes dues. Le vendeur pourra réclamer, sur justificatifs, les frais réellement supportés du fait de l'impayé ou de la rétrofacturation (frais de traitement du prestataire de paiement, frais de recouvrement, frais administratifs externes si applicable).
           </p>
           <p className="text-muted-foreground mb-4">
-            <strong>Frais de transaction en cas de remboursement :</strong> en cas de remboursement accepté par le Vendeur, les frais de transaction facturés par les prestataires de paiement (Stripe, PayPal, etc.) et non restitués au Vendeur restent à la charge exclusive du Client. Ces frais seront déduits de plein droit du montant total à rembourser.
+            <strong>Remboursements :</strong> aucune retenue de frais de transaction n'est appliquée lorsqu'un remboursement est dû au titre du droit légal de rétractation, d'une garantie légale ou d'un manquement du Vendeur. Pour un geste commercial demandé en dehors de ces droits, les conditions sont convenues au cas par cas avant remboursement.
           </p>
 
           {/* ARTICLE 8 */}
@@ -127,7 +131,7 @@ export default function CGV() {
             Toute prestation payée auprès du Vendeur — qu'il s'agisse de Wav Premium, de la Wav Academy ou de l'Analyse Express — constitue un forfait global et indivisible, correspondant à un dispositif construit, réservé et planifié dans son ensemble. Le prix n'est pas décomposable par session, par ressource, par fonctionnalité, par semaine ou par période entamée.
           </p>
           <p className="text-muted-foreground mb-4">
-            Après l'expiration du délai de rétractation, ou après sa renonciation valable dans les conditions de l'Article 9, toute interruption, suspension ou arrêt de la prestation à la seule initiative du Client, pour convenance personnelle, ne donne lieu à aucun remboursement, total ou partiel.
+            Sous réserve des droits impératifs du Client, après l'expiration du délai de rétractation ou après sa perte valable dans les conditions de l'Article 9, toute interruption, suspension ou arrêt de la prestation à la seule initiative du Client, pour convenance personnelle, ne donne lieu à aucun remboursement, total ou partiel.
           </p>
           <p className="text-muted-foreground mb-4">
             <strong>Accompagnements individuels (Wav Premium) :</strong> les sessions et ressources déjà délivrées sont définitivement dues. Les sessions non encore consommées restent acquises au Client et disponibles dans la limite de la durée de validité prévue à l'article 8.2 ci-dessous, sans pouvoir donner lieu à un remboursement en numéraire.
@@ -136,7 +140,7 @@ export default function CGV() {
             <strong>Wav Academy — formules prépayées (3, 6 et 12 mois) :</strong> formules payées intégralement et d'avance pour la totalité de la durée choisie. Le prix est définitivement dû dès la commande, sans remboursement, même partiel ou au prorata, quel que soit le niveau d'utilisation effective. Ces formules ne sont pas des abonnements et ne sont pas reconduites automatiquement : l'accès cesse de plein droit au terme de la durée souscrite, sauf souscription d'une nouvelle formule.
           </p>
           <p className="text-muted-foreground mb-4">
-            <strong>Prestations à livraison numérique immédiate (Analyse Express) :</strong> le rapport et les contenus délivrés sont définitivement dus dès leur mise à disposition, le Client ayant expressément demandé l'exécution immédiate et renoncé à son droit de rétractation dans les conditions de l'article 9.2.
+            <strong>Prestations à livraison numérique immédiate (Analyse Express) :</strong> le rapport et les contenus délivrés sont définitivement dus dès leur mise à disposition lorsque le Client a expressément demandé l'exécution immédiate et préalablement reconnu la perte de son droit de rétractation dans les conditions de l'article 9.2.
           </p>
           <p className="text-muted-foreground mb-4">
             La présente clause ne s'applique pas lorsque l'interruption résulte d'un manquement du Vendeur à ses obligations. Dans ce cas, les dispositions de l'Article 10 s'appliquent.
@@ -169,44 +173,49 @@ export default function CGV() {
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">9.1 Démarrage avant la fin des 14 jours (Wav Premium)</h3>
           <p className="text-muted-foreground mb-4">
-            Si le Client demande le démarrage de l'accompagnement Wav Premium avant la fin du délai de 14 jours, il reconnaît expressément que l'Audit Stratégique Initial constitue une prestation de service distincte, exécutée et livrée dès le début de la collaboration.
+            Si le Client demande expressément le démarrage de l'accompagnement Wav Premium avant la fin du délai de 14 jours, l'exécution peut commencer sans attendre l'expiration de ce délai.
           </p>
-          <p className="text-muted-foreground mb-2">
-            En cas d'exercice du droit de rétractation après le début de cette exécution, les frais suivants resteront acquis au Vendeur et seront déduits du remboursement :
-          </p>
-          <ul className="text-muted-foreground mb-4 space-y-1">
-            <li>Le montant forfaitaire de l'Audit Stratégique Initial s'élevant à <strong>149 €</strong> ;</li>
-            <li>Les frais administratifs de gestion de dossier et d'immobilisation de calendrier s'élevant à <strong>48 €</strong> ;</li>
-            <li>Les frais de transaction mentionnés à l'Article 7.</li>
-          </ul>
           <p className="text-muted-foreground mb-4">
-            Si la prestation d'accompagnement est pleinement exécutée avant la fin du délai de 14 jours, le Client reconnaît qu'il perd tout droit de rétractation.
+            Si le Client se rétracte alors que l'exécution a commencé à sa demande, il reste redevable uniquement d'un montant proportionné au service effectivement fourni jusqu'à la notification de sa décision, rapporté au prix total convenu, conformément à l'article L221-25 du Code de la consommation. Si la prestation est pleinement exécutée avant la fin du délai de 14 jours, le droit de rétractation n'est perdu qu'après demande expresse d'exécution et reconnaissance préalable de cette perte.
           </p>
 
-          <h3 className="font-display text-lg font-medium mt-4 mb-2">9.2 Contenus numériques (Analyse Express)</h3>
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">9.2 Exécution et livraison immédiates (Analyse Express)</h3>
           <p className="text-muted-foreground mb-2">
-            L'Analyse Express fournit un rapport numérique délivré immédiatement après paiement. Le droit de rétractation ne s'applique pas dès lors que :
+            L'Analyse Express est une prestation automatisée aboutissant à la mise à disposition rapide d'un rapport numérique. Avant le paiement, le Client :
           </p>
           <ul className="text-muted-foreground mb-4 space-y-1">
-            <li>le client a donné son accord préalable et exprès pour le démarrage immédiat,</li>
-            <li>et qu'il a reconnu perdre son droit de rétractation du fait de ce démarrage.</li>
+            <li>accepte séparément les présentes CGV ;</li>
+            <li>demande expressément l'exécution avant la fin du délai de 14 jours ;</li>
+            <li>reconnaît perdre son droit de rétractation lorsque la prestation est pleinement exécutée et le rapport mis à disposition.</li>
           </ul>
+          <p className="text-muted-foreground mb-4">
+            Le texte accepté, la version des CGV, l'horodatage et la référence de paiement sont récapitulés par email après confirmation du paiement. Si la prestation n'a pas été pleinement exécutée, les droits impératifs du consommateur demeurent applicables selon l'état réel d'exécution.
+          </p>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">9.3 Contenu numérique et service (Wav Academy)</h3>
           <p className="text-muted-foreground mb-2">
             La Wav Academy combine un <strong>contenu numérique</strong> (accès dès la commande à un espace Discord, ressources, replays) et une <strong>prestation de service</strong> exécutée pendant la durée souscrite (lives, accompagnement, animation de la communauté). Au moment de l'achat, le Client demande l'exécution immédiate du service et l'accès immédiat au contenu numérique avant l'expiration du délai de 14 jours. En conséquence, conformément aux articles L221-28, 1° et 13° du Code de la consommation :
           </p>
           <ul className="text-muted-foreground mb-4 space-y-1">
-            <li>pour la part de <strong>contenu numérique</strong>, le Client perd son droit de rétractation dès le début de l'accès, qu'il a expressément demandé et accepté ;</li>
+            <li>pour la part de <strong>contenu numérique</strong>, le Client perd son droit de rétractation dès le début de l'accès, après l'avoir expressément demandé et avoir expressément reconnu la perte de ce droit ;</li>
             <li>pour la part de <strong>service</strong>, en cas de rétractation dans le délai de 14 jours, le Client reste redevable du prix au prorata du service déjà fourni à la date de sa demande.</li>
           </ul>
           <p className="text-muted-foreground mb-4">
-            Les formules Wav Academy étant des paiements uniques prépayés (3, 6 ou 12 mois), elles ne sont pas reconduites : l'accès court jusqu'au terme souscrit puis cesse automatiquement, sans reconduction ni remboursement (article 8.1).
+            Les formules Wav Academy étant des paiements uniques prépayés (3, 6 ou 12 mois), elles ne sont pas reconduites : l'accès court jusqu'au terme souscrit puis cesse automatiquement. Cette règle reste sans préjudice du droit de rétractation et du prorata légal décrits ci-dessus.
           </p>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">9.4 Confirmation sur support durable</h3>
           <p className="text-muted-foreground mb-4">
-            Après la commande, le vendeur adresse au client une confirmation par email (support durable) récapitulant la commande, les CGV acceptées, ainsi que, le cas échéant, les consentements au démarrage immédiat et à la perte du droit de rétractation.
+            Après la commande, le vendeur adresse au Client une confirmation par email (support durable) récapitulant la commande, la version des CGV acceptées et le texte exact des consentements donnés au démarrage ou à la livraison immédiate.
+          </p>
+
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">9.5 Modalités d'exercice</h3>
+          <p className="text-muted-foreground mb-4">
+            Le Client peut notifier sa décision sans justification au moyen de la{" "}
+            <Link to="/retractation" className="text-primary underline">fonctionnalité de rétractation en ligne</Link>,
+            du formulaire modèle en Annexe 1 ou d'un email dénué d'ambiguïté adressé à{" "}
+            <a href="mailto:contact@fredwav.com" className="text-primary underline">contact@fredwav.com</a>.
+            La fonctionnalité en ligne délivre immédiatement une référence horodatée. Un accusé de réception est adressé par email ; en cas d'incident de messagerie, son état est conservé pour permettre une relance sans recréer la demande. La date d'envoi de la notification est prise en compte pour apprécier le respect du délai.
           </p>
 
           {/* ARTICLE 10 */}
@@ -247,7 +256,7 @@ export default function CGV() {
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">12.3 Fin de l'accès</h3>
           <p className="text-muted-foreground mb-4">
-            Les trois formules (3, 6 et 12 mois) sont payées intégralement d'avance. Elles ne donnent lieu à aucune résiliation anticipée ni remboursement, même partiel ou au prorata (article 8.1). L'accès reste ouvert jusqu'au terme souscrit, puis prend fin automatiquement — il n'y a aucune démarche de résiliation à effectuer.
+            Les trois formules (3, 6 et 12 mois) sont payées intégralement d'avance. Hors exercice d'un droit impératif, notamment le droit de rétractation dans les conditions de l'article 9.3, elles ne donnent lieu à aucune résiliation anticipée ni remboursement. L'accès reste ouvert jusqu'au terme souscrit, puis prend fin automatiquement — il n'y a aucune démarche de résiliation à effectuer.
           </p>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">12.4 Suspension</h3>
@@ -287,7 +296,7 @@ export default function CGV() {
           {/* ANNEXE 1 */}
           <h2 className="font-display text-xl font-semibold mt-14 mb-3 border-t pt-8">Annexe 1 — Formulaire de rétractation (modèle)</h2>
           <p className="text-muted-foreground mb-4 text-sm italic">
-            (À renvoyer par email à <a href="mailto:contact@fredwav.com" className="text-primary underline">contact@fredwav.com</a> uniquement si vous souhaitez vous rétracter du contrat dans les 14 jours, sous réserve du non-démarrage de la prestation ou des exceptions légales.)
+            (À utiliser si vous souhaitez vous rétracter dans le délai légal, sous réserve des exceptions applicables. Vous pouvez l'envoyer à <a href="mailto:contact@fredwav.com" className="text-primary underline">contact@fredwav.com</a> ou utiliser la <Link to="/retractation" className="text-primary underline">fonctionnalité en ligne</Link>.)
           </p>
           <div className="bg-muted/50 rounded-lg p-4 mb-4 space-y-2 text-sm text-muted-foreground">
             <p>À l'attention de Frédéric Olalde (Fred Wav), 2 route de Malagué, 86270 Coussay-les-Bois.</p>
@@ -302,9 +311,9 @@ export default function CGV() {
           {/* ANNEXE 2 */}
           <h2 className="font-display text-xl font-semibold mt-14 mb-3 border-t pt-8">Annexe 2 — Consentements express (cases à cocher au checkout)</h2>
           <div className="bg-muted/50 rounded-lg p-4 mb-4 space-y-3 text-sm text-muted-foreground">
-            <p>☐ Je reconnais avoir lu et accepté les CGV.</p>
-            <p>☐ (Wav Premium) Je demande l'exécution immédiate de la prestation avant la fin du délai légal de rétractation de 14 jours et je reconnais que l'Audit Stratégique Initial, les frais administratifs et les frais de transaction resteront acquis au Vendeur en cas de rétractation.</p>
-            <p>☐ (Analyse Express) Je demande l'accès immédiat au rapport numérique et je reconnais perdre mon droit de rétractation dès le démarrage de la fourniture du contenu numérique.</p>
+            <p>☐ J'ai lu et j'accepte les Conditions Générales de Vente.</p>
+            <p>☐ (Wav Premium) Je demande expressément l'exécution de la prestation avant la fin du délai légal de rétractation de 14 jours. En cas de rétractation après le début de l'exécution, je resterai redevable du montant proportionné au service effectivement fourni ; si la prestation est pleinement exécutée, je reconnais perdre mon droit de rétractation.</p>
+            <p>☐ (Analyse Express) Je demande expressément l'exécution immédiate de l'Analyse Express avant la fin du délai de 14 jours et je reconnais perdre mon droit de rétractation lorsque la prestation est pleinement exécutée et le rapport mis à disposition.</p>
             <p>☐ (Wav Academy) Je demande l'exécution immédiate du service et l'accès immédiat au contenu numérique avant l'expiration du délai de rétractation de 14 jours. Je reconnais que pour le contenu numérique, je perds mon droit de rétractation dès l'accès ; pour la partie service, en cas de rétractation, je reste redevable du prix au prorata du service déjà fourni.</p>
           </div>
         </div>

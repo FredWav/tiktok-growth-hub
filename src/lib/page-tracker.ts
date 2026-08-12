@@ -76,6 +76,7 @@ export function setupBeforeUnloadTracking() {
   if (!hasConsent()) return;
 
   window.addEventListener("beforeunload", () => {
+    if (!hasConsent()) return;
     if (!currentPageViewId || !pageEnteredAt) return;
     const duration = Math.round((Date.now() - pageEnteredAt) / 1000);
     if (duration < 1) return;

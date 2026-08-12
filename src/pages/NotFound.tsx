@@ -19,6 +19,7 @@ const NotFound = () => {
         title="Page introuvable | Fred Wav"
         description="Cette page n'existe pas ou a été déplacée. Retrouve les offres et ressources de Fred Wav."
         path={location.pathname}
+        canonical={false}
         noindex
       />
       <div className="flex min-h-[60vh] items-center justify-center">

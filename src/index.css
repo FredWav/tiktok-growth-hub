@@ -15,38 +15,38 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 6%;
 
-    --primary: 43 61% 58%;
-    --primary-foreground: 0 0% 6%;
+    --primary: 43 72% 30%;
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 96%;
     --secondary-foreground: 0 0% 6%;
 
     --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
+    --muted-foreground: 0 0% 42%;
 
-    --accent: 43 61% 58%;
-    --accent-foreground: 0 0% 6%;
+    --accent: 43 72% 30%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
     --border: 0 0% 90%;
     --input: 0 0% 90%;
-    --ring: 43 61% 58%;
+    --ring: 43 72% 30%;
 
     --radius: 0.5rem;
 
     /* Custom tokens */
-    --gold: 43 61% 58%;
+    --gold: 43 72% 30%;
     --gold-light: 43 61% 70%;
-    --gold-dark: 43 61% 45%;
+    --gold-dark: 43 70% 25%;
     --noir: 0 0% 6%;
     --noir-light: 0 0% 15%;
     --cream: 45 29% 97%;
-    --slate: 0 0% 45%;
+    --slate: 0 0% 42%;
 
     /* Gradients */
-    --gradient-gold: linear-gradient(135deg, hsl(43 61% 58%) 0%, hsl(43 61% 45%) 100%);
+    --gradient-gold: linear-gradient(135deg, hsl(var(--gold)) 0%, hsl(var(--gold-dark)) 100%);
     --gradient-dark: linear-gradient(180deg, hsl(0 0% 6%) 0%, hsl(0 0% 12%) 100%);
     --gradient-premium: linear-gradient(135deg, hsl(0 0% 6%) 0%, hsl(0 0% 15%) 50%, hsl(43 61% 58% / 0.1) 100%);
 
@@ -54,16 +54,16 @@
     --shadow-sm: 0 1px 2px hsl(0 0% 0% / 0.05);
     --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.1);
     --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.1);
-    --shadow-gold: 0 4px 20px hsl(43 61% 58% / 0.3);
+    --shadow-gold: 0 4px 20px hsl(43 72% 30% / 0.25);
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 0 0% 6%;
-    --sidebar-primary: 43 61% 58%;
-    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-primary: 43 72% 30%;
+    --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 0 0% 96%;
     --sidebar-accent-foreground: 0 0% 6%;
     --sidebar-border: 0 0% 90%;
-    --sidebar-ring: 43 61% 58%;
+    --sidebar-ring: 43 72% 30%;
   }
 
   .dark {

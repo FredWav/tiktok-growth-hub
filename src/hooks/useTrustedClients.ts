@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useHydrated } from "@/hooks/useHydrated";
 
 export interface TrustedClient {
   id: string;
@@ -13,6 +14,7 @@ export interface TrustedClient {
 }
 
 export const useTrustedClients = (filter?: string) => {
+  const hydrated = useHydrated();
   return useQuery({
     queryKey: ["trusted-clients", filter],
     queryFn: async () => {
@@ -30,10 +32,12 @@ export const useTrustedClients = (filter?: string) => {
       if (error) throw error;
       return (data as unknown as TrustedClient[]) || [];
     },
+    enabled: hydrated,
   });
 };
 
 export const useAllTrustedClients = () => {
+  const hydrated = useHydrated();
   return useQuery({
     queryKey: ["trusted-clients-all"],
     queryFn: async () => {
@@ -44,6 +48,7 @@ export const useAllTrustedClients = () => {
       if (error) throw error;
       return (data as unknown as TrustedClient[]) || [];
     },
+    enabled: hydrated,
   });
 };
 

@@ -20,6 +20,12 @@ export function OfferComparison({ location = "home" }: { location?: string }) {
         ? "cta_premium_click"
         : "cta_express_click";
     trackEvent(event, { location: `${location}_comparison` });
+    const funnelEvent = name === "Wav Academy"
+      ? "academy_cta_click"
+      : name === "Wav Premium"
+        ? "premium_application_start"
+        : "express_cta_click";
+    trackEvent(funnelEvent, { source_page: location, position: "offer_comparison" });
   };
 
   return (

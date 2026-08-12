@@ -1,10 +1,8 @@
 /**
  * FAQ de la page /hooks-tiktok.
  *
- * Source unique partagée entre HooksTikTok.tsx (l'accordéon affiché) et
- * src/config/seo.ts (le JSON-LD FAQPage du prerender). Google sanctionne un
- * FAQPage dont les questions ne sont pas visibles sur la page : elles doivent
- * sortir d'ici, des deux côtés.
+ * Source unique utilisée par HooksTikTok.tsx pour l'accordéon affiché.
+ * La FAQ reste visible, mais n'est volontairement pas balisée en FAQPage.
  *
  * Deux questions portent des requêtes que le positionnement du site conteste
  * (« plus de vues », « algorithme ») : elles répondent vraiment à l'intention

@@ -24,6 +24,7 @@ export function trackEvent(event: string, data?: Record<string, string>) {
 
 const ATTR_KEY = "fw_attribution";
 const ATTR_TTL_MS = 90 * 24 * 60 * 60 * 1000; // 90 jours
+export const ATTRIBUTION_UPDATED_EVENT = "fredwav:attribution-updated";
 
 const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"] as const;
 const CLICK_ID_KEYS = ["gclid", "fbclid", "ttclid", "msclkid"] as const;
@@ -72,9 +73,54 @@ export function captureUtmParams() {
   }
 
   // Rétro-compat : page-tracker et getStoredUtmSource lisent encore ces clés simples.
-  if (params.utm_source) localStorage.setItem("utm_source", params.utm_source);
-  if (params.utm_medium) localStorage.setItem("utm_medium", params.utm_medium);
-  if (params.utm_campaign) localStorage.setItem("utm_campaign", params.utm_campaign);
+  try {
+    if (params.utm_source) localStorage.setItem("utm_source", params.utm_source);
+    if (params.utm_medium) localStorage.setItem("utm_medium", params.utm_medium);
+    if (params.utm_campaign) localStorage.setItem("utm_campaign", params.utm_campaign);
+  } catch {
+    // Le stockage de compatibilité est facultatif.
+  }
+
+  // L'attribution est maintenant conservée localement : les paramètres de
+  // campagne n'ont plus à rester dans l'URL visible. On garde les paramètres
+  // fonctionnels (par exemple un retour de paiement) ainsi que le hash.
+  try {
+    const cleanUrl = new URL(window.location.href);
+    [...UTM_KEYS, ...CLICK_ID_KEYS].forEach((key) => cleanUrl.searchParams.delete(key));
+    const cleanLocation = `${cleanUrl.pathname}${cleanUrl.search}${cleanUrl.hash}`;
+    window.history.replaceState(window.history.state, "", cleanLocation);
+  } catch {
+    // Certains navigateurs intégrés peuvent bloquer History API : l'attribution
+    // reste malgré tout capturée et la canonique demeure propre.
+  }
+
+  window.dispatchEvent(new CustomEvent(ATTRIBUTION_UPDATED_EVENT));
+}
+
+/** Efface attribution et paramètres de campagne après un refus de consentement. */
+export function clearAttribution() {
+  if (typeof window === "undefined") return;
+
+  try {
+    localStorage.removeItem(ATTR_KEY);
+    [...UTM_KEYS, ...CLICK_ID_KEYS].forEach((key) => localStorage.removeItem(key));
+  } catch {
+    // Le stockage peut être indisponible ; on nettoie tout de même l'URL.
+  }
+
+  try {
+    const cleanUrl = new URL(window.location.href);
+    [...UTM_KEYS, ...CLICK_ID_KEYS].forEach((key) => cleanUrl.searchParams.delete(key));
+    window.history.replaceState(
+      window.history.state,
+      "",
+      `${cleanUrl.pathname}${cleanUrl.search}${cleanUrl.hash}`,
+    );
+  } catch {
+    // Les navigateurs intégrés peuvent bloquer History API.
+  }
+
+  window.dispatchEvent(new CustomEvent(ATTRIBUTION_UPDATED_EVENT));
 }
 
 /** Last-touch encore valide (non expiré), ou null. */
@@ -99,6 +145,7 @@ export function getStoredUtmForPageView(): { utm_source: string | null; utm_medi
 /** Chaîne source lisible pour rattacher un lead (last-touch non expiré). */
 export function getStoredUtmSource(): string {
   if (typeof window === "undefined") return "";
+  if (localStorage.getItem("cookie_consent") !== "accepted") return "";
   const last = freshLastTouch();
   const source = last?.params.utm_source;
   const campaign = last?.params.utm_campaign;

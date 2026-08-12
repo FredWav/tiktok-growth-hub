@@ -218,6 +218,7 @@ export type Database = {
           health_score: number | null
           id: string
           job_id: string | null
+          launch_started_at: string | null
           newsletter_requested: boolean | null
           newsletter_subscribed: boolean | null
           result_data: Json | null
@@ -233,6 +234,7 @@ export type Database = {
           health_score?: number | null
           id?: string
           job_id?: string | null
+          launch_started_at?: string | null
           newsletter_requested?: boolean | null
           newsletter_subscribed?: boolean | null
           result_data?: Json | null
@@ -248,12 +250,141 @@ export type Database = {
           health_score?: number | null
           id?: string
           job_id?: string | null
+          launch_started_at?: string | null
           newsletter_requested?: boolean | null
           newsletter_subscribed?: boolean | null
           result_data?: Json | null
           status?: string
           stripe_session_id?: string | null
           tiktok_username?: string
+        }
+        Relationships: []
+      }
+      express_purchase_consents: {
+        Row: {
+          accepted_at: string
+          cgv_accepted_text: string
+          cgv_version: string
+          checkout_mode: string
+          confirmation_delivery_error: string | null
+          confirmation_email: string | null
+          confirmation_sent_at: string | null
+          consent_cgv: boolean
+          consent_immediate_delivery: boolean
+          created_at: string
+          email: string
+          express_analysis_id: string
+          id: string
+          immediate_delivery_accepted_text: string
+          immediate_delivery_notice_version: string
+          stripe_linked_at: string | null
+          stripe_payment_status: string | null
+          stripe_session_id: string | null
+          technical_fingerprint_hash: string | null
+          tiktok_username: string
+        }
+        Insert: {
+          accepted_at?: string
+          cgv_accepted_text: string
+          cgv_version: string
+          checkout_mode?: string
+          confirmation_delivery_error?: string | null
+          confirmation_email?: string | null
+          confirmation_sent_at?: string | null
+          consent_cgv: boolean
+          consent_immediate_delivery: boolean
+          created_at?: string
+          email: string
+          express_analysis_id: string
+          id?: string
+          immediate_delivery_accepted_text: string
+          immediate_delivery_notice_version: string
+          stripe_linked_at?: string | null
+          stripe_payment_status?: string | null
+          stripe_session_id?: string | null
+          technical_fingerprint_hash?: string | null
+          tiktok_username: string
+        }
+        Update: {
+          accepted_at?: string
+          cgv_accepted_text?: string
+          cgv_version?: string
+          checkout_mode?: string
+          confirmation_delivery_error?: string | null
+          confirmation_email?: string | null
+          confirmation_sent_at?: string | null
+          consent_cgv?: boolean
+          consent_immediate_delivery?: boolean
+          created_at?: string
+          email?: string
+          express_analysis_id?: string
+          id?: string
+          immediate_delivery_accepted_text?: string
+          immediate_delivery_notice_version?: string
+          stripe_linked_at?: string | null
+          stripe_payment_status?: string | null
+          stripe_session_id?: string | null
+          technical_fingerprint_hash?: string | null
+          tiktok_username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "express_purchase_consents_express_analysis_id_fkey"
+            columns: ["express_analysis_id"]
+            isOneToOne: true
+            referencedRelation: "express_analyses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      newsletter_opt_in_requests: {
+        Row: {
+          consent_accepted: boolean
+          consent_text: string
+          consent_version: string
+          email: string
+          first_name: string | null
+          id: string
+          mailerlite_request_error: string | null
+          mailerlite_request_status: string
+          mailerlite_status: string | null
+          mailerlite_subscriber_id: string | null
+          requested_at: string
+          source: string
+          source_page: string | null
+          technical_fingerprint_hash: string | null
+        }
+        Insert: {
+          consent_accepted: boolean
+          consent_text: string
+          consent_version: string
+          email: string
+          first_name?: string | null
+          id?: string
+          mailerlite_request_error?: string | null
+          mailerlite_request_status?: string
+          mailerlite_status?: string | null
+          mailerlite_subscriber_id?: string | null
+          requested_at?: string
+          source: string
+          source_page?: string | null
+          technical_fingerprint_hash?: string | null
+        }
+        Update: {
+          consent_accepted?: boolean
+          consent_text?: string
+          consent_version?: string
+          email?: string
+          first_name?: string | null
+          id?: string
+          mailerlite_request_error?: string | null
+          mailerlite_request_status?: string
+          mailerlite_status?: string | null
+          mailerlite_subscriber_id?: string | null
+          requested_at?: string
+          source?: string
+          source_page?: string | null
+          technical_fingerprint_hash?: string | null
         }
         Relationships: []
       }
@@ -552,42 +683,57 @@ export type Database = {
       }
       wavacademy_consents: {
         Row: {
+          accepted_at: string
           access_months: number | null
+          cgv_accepted_text: string | null
           cgv_version: string
           consent_cgv: boolean
           consent_renonciation: boolean
           created_at: string
           email: string
           id: string
+          immediate_delivery_accepted_text: string | null
+          immediate_delivery_notice_version: string | null
           ip_address: string | null
           plan_type: string
           stripe_session_id: string | null
+          technical_fingerprint_hash: string | null
           user_agent: string | null
         }
         Insert: {
+          accepted_at?: string
           access_months?: number | null
+          cgv_accepted_text?: string | null
           cgv_version?: string
           consent_cgv: boolean
           consent_renonciation: boolean
           created_at?: string
           email: string
           id?: string
+          immediate_delivery_accepted_text?: string | null
+          immediate_delivery_notice_version?: string | null
           ip_address?: string | null
           plan_type: string
           stripe_session_id?: string | null
+          technical_fingerprint_hash?: string | null
           user_agent?: string | null
         }
         Update: {
+          accepted_at?: string
           access_months?: number | null
+          cgv_accepted_text?: string | null
           cgv_version?: string
           consent_cgv?: boolean
           consent_renonciation?: boolean
           created_at?: string
           email?: string
           id?: string
+          immediate_delivery_accepted_text?: string | null
+          immediate_delivery_notice_version?: string | null
           ip_address?: string | null
           plan_type?: string
           stripe_session_id?: string | null
+          technical_fingerprint_hash?: string | null
           user_agent?: string | null
         }
         Relationships: []
@@ -596,6 +742,10 @@ export type Database = {
         Row: {
           access_expires_at: string | null
           access_months: number | null
+          activation_email_attempted_at: string | null
+          activation_email_error: string | null
+          activation_email_sent_at: string | null
+          activation_email_status: string
           created_at: string
           discord_role_env: string | null
           discord_role_granted: boolean
@@ -610,6 +760,10 @@ export type Database = {
         Insert: {
           access_expires_at?: string | null
           access_months?: number | null
+          activation_email_attempted_at?: string | null
+          activation_email_error?: string | null
+          activation_email_sent_at?: string | null
+          activation_email_status?: string
           created_at?: string
           discord_role_env?: string | null
           discord_role_granted?: boolean
@@ -624,6 +778,10 @@ export type Database = {
         Update: {
           access_expires_at?: string | null
           access_months?: number | null
+          activation_email_attempted_at?: string | null
+          activation_email_error?: string | null
+          activation_email_sent_at?: string | null
+          activation_email_status?: string
           created_at?: string
           discord_role_env?: string | null
           discord_role_granted?: boolean
@@ -634,6 +792,78 @@ export type Database = {
           status?: string
           stripe_session_id?: string | null
           stripe_subscription_id?: string | null
+        }
+        Relationships: []
+      }
+      withdrawal_requests: {
+        Row: {
+          acknowledgement_sent_at: string | null
+          acknowledgement_status: string
+          customer_name: string
+          declaration_text: string
+          declaration_version: string
+          email: string
+          email_delivery_attempts: number
+          email_delivery_error: string | null
+          id: string
+          last_delivery_attempt_at: string | null
+          message: string | null
+          notification_sent_at: string | null
+          notification_status: string
+          offer: string
+          order_date: string | null
+          order_reference: string
+          request_reference: string
+          status: string
+          submitted_at: string
+          technical_fingerprint_hash: string | null
+          updated_at: string
+        }
+        Insert: {
+          acknowledgement_sent_at?: string | null
+          acknowledgement_status?: string
+          customer_name: string
+          declaration_text: string
+          declaration_version: string
+          email: string
+          email_delivery_attempts?: number
+          email_delivery_error?: string | null
+          id?: string
+          last_delivery_attempt_at?: string | null
+          message?: string | null
+          notification_sent_at?: string | null
+          notification_status?: string
+          offer: string
+          order_date?: string | null
+          order_reference: string
+          request_reference: string
+          status?: string
+          submitted_at?: string
+          technical_fingerprint_hash?: string | null
+          updated_at?: string
+        }
+        Update: {
+          acknowledgement_sent_at?: string | null
+          acknowledgement_status?: string
+          customer_name?: string
+          declaration_text?: string
+          declaration_version?: string
+          email?: string
+          email_delivery_attempts?: number
+          email_delivery_error?: string | null
+          id?: string
+          last_delivery_attempt_at?: string | null
+          message?: string | null
+          notification_sent_at?: string | null
+          notification_status?: string
+          offer?: string
+          order_date?: string | null
+          order_reference?: string
+          request_reference?: string
+          status?: string
+          submitted_at?: string
+          technical_fingerprint_hash?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -652,6 +882,7 @@ export type Database = {
           health_score: number | null
           id: string
           job_id: string | null
+          launch_started_at: string | null
           newsletter_requested: boolean | null
           newsletter_subscribed: boolean | null
           result_data: Json | null

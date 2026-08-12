@@ -1,40 +1,45 @@
-import { lazy, Suspense, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { lazy, Suspense, useEffect, type ReactNode } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { SEOHead } from "@/components/SEOHead";
 import ScrollToTop from "@/components/ScrollToTop";
 import { CookieConsent } from "@/components/CookieConsent";
 import { capturePageview } from "@/lib/posthog";
 import { captureUtmParams, syncAttributionToPostHog } from "@/lib/tracking";
-import { trackPageView, setupBeforeUnloadTracking } from "@/lib/page-tracker";
+import { CLIENT_ONLY_ROUTES, LEGACY_REDIRECTS, SSG_ROUTES, manifestRouteForPath } from "@/config/routes";
+import type { ClientBoundary } from "@/config/seo";
 import { DiagnosticProvider } from "./contexts/DiagnosticContext";
 
 function PostHogPageTracker() {
   const location = useLocation();
-  // 1. Capture l'attribution AVANT tout pageview (effet déclaré en premier = exécuté
-  //    en premier au montage), sinon la 1re page_view d'un lien UTM part avec des UTM nuls.
+
   useEffect(() => {
-    captureUtmParams();
-    syncAttributionToPostHog();
-    setupBeforeUnloadTracking();
+    if (localStorage.getItem("cookie_consent") === "accepted") {
+      captureUtmParams();
+      syncAttributionToPostHog();
+      void import("@/lib/page-tracker").then(({ setupBeforeUnloadTracking }) => {
+        setupBeforeUnloadTracking();
+      });
+    }
   }, []);
-  // 2. Pageview à chaque changement de route.
+
   useEffect(() => {
     capturePageview();
-    trackPageView(location.pathname);
+
+    if (localStorage.getItem("cookie_consent") === "accepted") {
+      void import("@/lib/page-tracker").then(({ trackPageView }) => {
+        void trackPageView(location.pathname);
+      });
+    }
   }, [location.pathname]);
+
   return null;
 }
 
-// Home importée statiquement — critique path pour le FCP
-import Home from "./pages/Home";
-
-// Autres pages - lazy loaded
+const Home = lazy(() => import("./pages/Home"));
 const APropos = lazy(() => import("./pages/APropos"));
 const Preuves = lazy(() => import("./pages/Preuves"));
 const Contact = lazy(() => import("./pages/Contact"));
@@ -54,8 +59,13 @@ const Mail = lazy(() => import("./pages/Mail"));
 const HooksTikTok = lazy(() => import("./pages/HooksTikTok"));
 const WavAcademy = lazy(() => import("./pages/WavAcademy"));
 const Claim = lazy(() => import("./pages/Claim"));
+const GoRedirect = lazy(() => import("./pages/GoRedirect"));
+const Ressources = lazy(() => import("./pages/Ressources"));
+const RessourceStatistiquesTikTok = lazy(() => import("./pages/RessourceStatistiquesTikTok"));
+const RessourceVuesTikTok = lazy(() => import("./pages/RessourceVuesTikTok"));
+const RessourceRetentionTikTok = lazy(() => import("./pages/RessourceRetentionTikTok"));
+const Retractation = lazy(() => import("./pages/Retractation"));
 
-// Admin pages - lazy loaded
 const AdminSettings = lazy(() => import("./pages/admin/Settings"));
 const AdminExpressAnalyses = lazy(() => import("./pages/admin/ExpressAnalyses"));
 const AdminApplications = lazy(() => import("./pages/admin/Applications"));
@@ -63,136 +73,164 @@ const AdminMarketing = lazy(() => import("./pages/admin/Marketing"));
 const AdminDeepLinks = lazy(() => import("./pages/admin/DeepLinks"));
 const AdminTestimonials = lazy(() => import("./pages/admin/Testimonials"));
 const AdminWavAcademyConsents = lazy(() => import("./pages/admin/WavAcademyConsents"));
-const GoRedirect = lazy(() => import("./pages/GoRedirect"));
-
-// Atelier de mise au point du rapport PDF. `import.meta.env.DEV` est remplacé par
-// une constante au build : la branche est éliminée et le chunk n'est jamais émis.
-const DevPdfPreview = import.meta.env.DEV ? lazy(() => import("./pages/dev/PdfPreview")) : null;
-
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <CookieConsent />
-        <ScrollToTop />
-        <PostHogPageTracker />
-        <DiagnosticProvider>
-        <AuthProvider>
-          <Suspense fallback={null}>
-          <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<Home />} />
-            <Route path="/offres" element={<Navigate to="/" replace />} />
-            <Route path="/45-jours" element={<Navigate to="/reserverunappel" replace />} />
-            <Route path="/offres/45-jours" element={<Navigate to="/reserverunappel" replace />} />
-            <Route path="/offres/vip" element={<Navigate to="/wavacademy" replace />} />
-            <Route path="/one-shot" element={<Navigate to="/reserverunappel" replace />} />
-            {/* Pages Accompagnement retirées — redirigées vers l'accueil (comparateur d'offres). */}
-            <Route path="/accompagnement-reseaux-sociaux" element={<Navigate to="/" replace />} />
-            <Route path="/accompagnement-tiktok" element={<Navigate to="/" replace />} />
-            <Route path="/one-shot/success" element={<Navigate to="/" replace />} />
-            <Route path="/a-propos" element={<APropos />} />
-            <Route path="/preuves" element={<Preuves />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/auth/reset-password" element={<ResetPassword />} />
-            <Route path="/mentions-legales" element={<MentionsLegales />} />
-            <Route path="/politique-de-confidentialite" element={<PolitiqueConfidentialite />} />
-            <Route path="/cgv" element={<CGV />} />
-            <Route path="/newsletter" element={<Mail />} />
-            <Route path="/mail" element={<Navigate to="/newsletter" replace />} />
-            <Route path="/hooks-tiktok" element={<HooksTikTok />} />
-            <Route path="/analyse-express" element={<AnalyseExpress />} />
-            <Route path="/analyse-express/result" element={<AnalyseExpressResult />} />
-            <Route path="/reserverunappel" element={<ReserverUnAppel />} />
-            {/* Legacy URL — kept as redirect for backwards compat (old inbound links, emails, ads) */}
-            <Route path="/wav-premium/candidature" element={<Navigate to="/reserverunappel" replace />} />
-            <Route path="/wavacademy" element={<WavAcademy />} />
-            <Route path="/claim/error" element={<Claim />} />
-            <Route path="/claim/:token" element={<Claim />} />
-
-            {/* Deep link redirect */}
-            <Route path="/go/:slug" element={<GoRedirect />} />
-
-            {/* Diagnostic funnel - wrapped outside Routes for shared state */}
-            <Route path="/start" element={<DiagnosticStart />} />
-            <Route path="/processing" element={<DiagnosticProcessing />} />
-            <Route path="/result" element={<DiagnosticResult />} />
-
-            {/* Admin routes */}
-            <Route path="/admin" element={<Navigate to="/admin/marketing" replace />} />
-            <Route
-              path="/admin/settings"
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <AdminSettings />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/analyses"
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <AdminExpressAnalyses />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/applications"
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <AdminApplications />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/marketing"
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <AdminMarketing />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/deep-links"
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <AdminDeepLinks />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/testimonials"
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <AdminTestimonials />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/wavacademy-consents"
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <AdminWavAcademyConsents />
-                </ProtectedRoute>
-              }
-            />
-
-            {DevPdfPreview && <Route path="/dev/pdf" element={<DevPdfPreview />} />}
-
-            {/* 404 */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          </Suspense>
-        </AuthProvider>
-        </DiagnosticProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+const AuthProviderOutlet = lazy(() =>
+  import("./components/auth/AuthRouteBoundary").then(({ AuthProviderOutlet: Component }) => ({ default: Component })),
+);
+const AdminProtectedOutlet = lazy(() =>
+  import("./components/auth/AuthRouteBoundary").then(({ AdminProtectedOutlet: Component }) => ({ default: Component })),
 );
 
-export default App;
+const DevPdfPreview = import.meta.env.DEV ? lazy(() => import("./pages/dev/PdfPreview")) : null;
+
+const SSG_ROUTE_ELEMENTS: Record<string, ReactNode> = {
+  "/": <Home />,
+  "/wavacademy": <WavAcademy />,
+  "/analyse-express": <AnalyseExpress />,
+  "/reserverunappel": <ReserverUnAppel />,
+  "/preuves": <Preuves />,
+  "/hooks-tiktok": <HooksTikTok />,
+  "/ressources": <Ressources />,
+  "/ressources/statistiques-tiktok": <RessourceStatistiquesTikTok />,
+  "/ressources/vues-tiktok": <RessourceVuesTikTok />,
+  "/ressources/retention-tiktok": <RessourceRetentionTikTok />,
+  "/a-propos": <APropos />,
+  "/newsletter": <Mail />,
+  "/contact": <Contact />,
+  "/cgv": <CGV />,
+  "/mentions-legales": <MentionsLegales />,
+  "/politique-de-confidentialite": <PolitiqueConfidentialite />,
+};
+
+/** Le manifeste décide quelles routes CSR existent ; cette map ne fournit que leur vue. */
+const CSR_ROUTE_ELEMENTS: Record<string, ReactNode> = {
+  "/start": <DiagnosticStart />,
+  "/auth": <Auth />,
+  "/auth/reset-password": <ResetPassword />,
+  "/admin": <Navigate to="/admin/marketing" replace />,
+  "/admin/settings": <AdminSettings />,
+  "/admin/analyses": <AdminExpressAnalyses />,
+  "/admin/applications": <AdminApplications />,
+  "/admin/marketing": <AdminMarketing />,
+  "/admin/deep-links": <AdminDeepLinks />,
+  "/admin/testimonials": <AdminTestimonials />,
+  "/admin/wavacademy-consents": <AdminWavAcademyConsents />,
+  "/analyse-express/result": <AnalyseExpressResult />,
+  "/processing": <DiagnosticProcessing />,
+  "/result": <DiagnosticResult />,
+  "/claim/error": <Claim />,
+  "/claim/:token": <Claim />,
+  "/go/:slug": <GoRedirect />,
+  "/retractation": <Retractation />,
+};
+
+/**
+ * Le head de la coquille CSR est déjà `noindex`. Ce composant maintient cette
+ * consigne lors des navigations SPA et passe après le head éventuel de la page.
+ */
+function NoIndexRoute({ children }: { children: ReactNode }) {
+  const location = useLocation();
+  const route = manifestRouteForPath(location.pathname);
+
+  return (
+    <>
+      {children}
+      <SEOHead
+        title={route?.title ?? "Espace privé | Fred Wav"}
+        description={route?.description ?? "Cette page fonctionnelle n'est pas destinée aux résultats de recherche."}
+        path={location.pathname}
+        canonical={route?.canonical ?? false}
+        noindex
+      />
+    </>
+  );
+}
+
+function csrRouteElements(boundary: ClientBoundary) {
+  return CLIENT_ONLY_ROUTES.filter((route) => route.clientBoundary === boundary).map((route) => {
+    const element = CSR_ROUTE_ELEMENTS[route.path];
+    if (!element) {
+      throw new Error(`[routes] Aucun composant associé à la route CSR ${route.path}.`);
+    }
+
+    return (
+      <Route
+        key={route.path}
+        path={route.path}
+        element={<NoIndexRoute>{element}</NoIndexRoute>}
+      />
+    );
+  });
+}
+
+function createAppQueryClient() {
+  return new QueryClient();
+}
+
+export function AppProviders({ queryClient, children }: { queryClient: QueryClient; children: ReactNode }) {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        {children}
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
+
+/** Arbre partagé par BrowserRouter (client) et StaticRouter (SSG). */
+export function AppRouterContent() {
+  return (
+    <>
+      <CookieConsent />
+      <ScrollToTop />
+      <PostHogPageTracker />
+      <DiagnosticProvider>
+        <Suspense fallback={null}>
+          <Routes>
+              {SSG_ROUTES.map((route) => {
+                const element = SSG_ROUTE_ELEMENTS[route.path];
+                if (!element) {
+                  throw new Error(`[routes] Aucun composant associé à la route SSG ${route.path}.`);
+                }
+                return <Route key={route.path} path={route.path} element={element} />;
+              })}
+
+              {LEGACY_REDIRECTS.map(({ from, to }) => (
+                <Route key={from} path={from} element={<Navigate to={to} replace />} />
+              ))}
+
+              {csrRouteElements("none")}
+              <Route element={<AuthProviderOutlet />}>{csrRouteElements("auth")}</Route>
+              <Route element={<AdminProtectedOutlet />}>{csrRouteElements("admin")}</Route>
+
+              {DevPdfPreview && (
+                <Route
+                  path="/dev/pdf"
+                  element={
+                    <NoIndexRoute>
+                      <DevPdfPreview />
+                    </NoIndexRoute>
+                  }
+                />
+              )}
+
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </DiagnosticProvider>
+    </>
+  );
+}
+
+const browserQueryClient = createAppQueryClient();
+
+export default function App() {
+  return (
+    <AppProviders queryClient={browserQueryClient}>
+      <BrowserRouter>
+        <AppRouterContent />
+      </BrowserRouter>
+    </AppProviders>
+  );
+}

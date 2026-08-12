@@ -2,24 +2,30 @@ import { useState, useEffect } from "react";
 import { Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-function isTikTokBrowser() {
-  const ua = navigator.userAgent || "";
-  return /TikTok|BytedanceWebview|ByteLocale/i.test(ua);
+function isTikTokBrowser(userAgent: string) {
+  return /TikTok|BytedanceWebview|ByteLocale/i.test(userAgent);
 }
 
 export function TikTokBrowserBanner() {
   const [visible, setVisible] = useState(false);
   const [copied, setCopied] = useState(false);
-
-  const url = typeof window !== "undefined" ? window.location.href : "";
-  const isAndroid = /android/i.test(navigator.userAgent);
+  const [url, setUrl] = useState("");
+  const [isAndroid, setIsAndroid] = useState(false);
 
   useEffect(() => {
-    if (!isTikTokBrowser()) return;
+    if (typeof window === "undefined" || typeof navigator === "undefined") return;
 
-    if (isAndroid) {
+    const currentUrl = window.location.href;
+    const userAgent = navigator.userAgent || "";
+    const android = /android/i.test(userAgent);
+    if (!isTikTokBrowser(userAgent)) return;
+
+    setUrl(currentUrl);
+    setIsAndroid(android);
+
+    if (android) {
       // Auto-redirect Android to Chrome via intent
-      window.location.href = `intent://${url.replace(/^https?:\/\//, "")}#Intent;scheme=https;package=com.android.chrome;end`;
+      window.location.href = `intent://${currentUrl.replace(/^https?:\/\//, "")}#Intent;scheme=https;package=com.android.chrome;end`;
       // Show overlay as fallback if intent doesn't work after 1s
       const timer = setTimeout(() => setVisible(true), 1000);
       return () => clearTimeout(timer);
@@ -27,7 +33,7 @@ export function TikTokBrowserBanner() {
 
     // iOS: try googlechrome:// scheme, then show blocking overlay
     try {
-      const chromeUrl = url.replace(/^https/, "googlechrome");
+      const chromeUrl = currentUrl.replace(/^https/, "googlechrome");
       window.location.href = chromeUrl;
     } catch {
       // ignore

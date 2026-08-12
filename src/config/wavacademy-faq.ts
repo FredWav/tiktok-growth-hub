@@ -1,8 +1,8 @@
 /**
  * FAQ de la page /wavacademy.
  *
- * Source unique partagée entre le composant WavAcademy.tsx (affichage) et
- * src/config/seo.ts (schema JSON-LD FAQPage pour le prerender).
+ * Source unique utilisée par le composant WavAcademy.tsx pour l'affichage.
+ * La FAQ reste visible, mais n'est volontairement pas balisée en FAQPage.
  *
  * Ce fichier ne doit contenir que des données pures — pas d'import React.
  */

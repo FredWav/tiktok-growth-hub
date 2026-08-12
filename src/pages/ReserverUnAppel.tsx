@@ -4,7 +4,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle2, Clock, Mail } from "lucide-react";
-import { trackEvent, getStoredUtmSource } from "@/lib/tracking";
+import {
+  ATTRIBUTION_UPDATED_EVENT,
+  trackEvent,
+  getStoredUtmSource,
+} from "@/lib/tracking";
 import { getPostHogId } from "@/lib/posthog";
 import { cn } from "@/lib/utils";
 import { Layout } from "@/components/layout/Layout";
@@ -173,16 +177,31 @@ export default function ReserverUnAppel() {
       help_topics: [],
       availability: "",
       budget: "",
-      origin_source: getStoredUtmSource(),
+      origin_source: "",
       follower_since: "",
       conversion_trigger: "",
     },
   });
 
+  useEffect(() => {
+    const syncAttribution = () => {
+      form.setValue("origin_source", getStoredUtmSource(), {
+        shouldDirty: false,
+        shouldTouch: false,
+        shouldValidate: false,
+      });
+    };
+
+    syncAttribution();
+    window.addEventListener(ATTRIBUTION_UPDATED_EVENT, syncAttribution);
+    return () => window.removeEventListener(ATTRIBUTION_UPDATED_EVENT, syncAttribution);
+  }, [form]);
+
   const handleFormFocus = () => {
     if (!formStarted) {
       setFormStarted(true);
       trackEvent("reserverunappel_form_start", { page: "wav_premium" });
+      trackEvent("premium_application_start", { source_page: "reserverunappel" });
     }
   };
 
@@ -237,6 +256,11 @@ export default function ReserverUnAppel() {
       if (notifyResult.error) console.error("Notification error (DB insert succeeded):", notifyResult.error);
 
       trackEvent("reserverunappel_submit", {
+        profil: data.profil,
+        budget: data.budget,
+        platform_count: String(networkCount),
+      });
+      trackEvent("premium_application_submit", {
         profil: data.profil,
         budget: data.budget,
         platform_count: String(networkCount),
@@ -358,6 +382,21 @@ export default function ReserverUnAppel() {
           <p className="font-medium">
             L'accompagnement peut concerner TikTok, Instagram, YouTube, Facebook ou une stratégie qui combine plusieurs plateformes.
           </p>
+        </div>
+        <div className="max-w-4xl mx-auto mt-10 grid gap-4 sm:grid-cols-3 text-left">
+          {[
+            ["1", "Tu présentes ta situation", "Le formulaire me permet de comprendre tes réseaux, ton objectif et ce que tu as déjà tenté."],
+            ["2", "Je lis chaque demande", "Je te réponds personnellement par email sous 48 h ouvrées, que je puisse t'aider ou non."],
+            ["3", "On échange si c'est pertinent", "Si le besoin correspond au Wav Premium, je te propose un échange avant toute décision ou paiement."],
+          ].map(([step, title, text]) => (
+            <div key={step} className="rounded-2xl border border-border bg-background/80 p-5">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold mb-3">
+                {step}
+              </span>
+              <h2 className="font-display text-lg font-semibold mb-2">{title}</h2>
+              <p className="text-sm text-muted-foreground leading-relaxed">{text}</p>
+            </div>
+          ))}
         </div>
       </Section>
 

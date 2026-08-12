@@ -18,7 +18,7 @@ export function VideoCard({ id, alt, location = "home" }: VideoCardProps) {
     return (
       <div className="aspect-video rounded-xl overflow-hidden shadow-lg">
         <iframe
-          src={`https://www.youtube.com/embed/${id}?autoplay=1`}
+          src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1`}
           title={alt}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen

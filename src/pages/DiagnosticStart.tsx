@@ -1,8 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
-import { SEOHead } from "@/components/SEOHead";
-import { seoFor } from "@/config/seo";
 import { recommendedOfferForBudget } from "@/config/offers";
 import { z } from "zod";
 import { Mail } from "lucide-react";
@@ -230,8 +228,6 @@ const DiagnosticStart = () => {
 
   return (
     <Layout>
-      <SEOHead {...seoFor("/start")} />
-
       {step > 0 && step <= TOTAL_STEPS && (
         <div className="fixed top-16 md:top-20 left-0 right-0 z-40">
           <Progress value={progress} className="h-1.5 rounded-none" />

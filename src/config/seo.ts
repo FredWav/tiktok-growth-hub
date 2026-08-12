@@ -184,7 +184,11 @@ const ROUTES: RouteSeo[] = [
       jobTitle: "Stratège contenu et réseaux sociaux",
       description:
         "Fred Wav accompagne les créateurs et entrepreneurs sur leur stratégie de contenu et de réseaux sociaux, à partir de leurs statistiques réelles.",
-      sameAs: SOCIAL_PROFILES,
+      sameAs: [
+        "https://www.tiktok.com/@fredwav",
+        "https://www.instagram.com/levraifredwav/",
+        "https://www.youtube.com/@Fredwavconseils",
+      ],
     },
     sitemap: 1.0,
     llms: "Stratégie de contenu et réseaux sociaux avec Fred Wav : Wav Academy comme offre principale, Analyse Express automatisée uniquement pour TikTok, et Wav Premium individuel sur TikTok, Instagram, YouTube ou Facebook.",

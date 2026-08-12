@@ -175,6 +175,17 @@ const ROUTES: RouteSeo[] = [
     // Pas de fil d'Ariane sur l'accueil : c'est la racine. Le précédent
     // annonçait Accueil > Academy > Témoignages, un chemin de navigation
     // qui n'existe nulle part sur le site.
+    // Identité de l'auteur sur la racine : seul noeud JSON-LD de l'accueil.
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      name: "Fred Wav",
+      url: `${BASE_URL}/`,
+      jobTitle: "Stratège contenu et réseaux sociaux",
+      description:
+        "Fred Wav accompagne les créateurs et entrepreneurs sur leur stratégie de contenu et de réseaux sociaux, à partir de leurs statistiques réelles.",
+      sameAs: SOCIAL_PROFILES,
+    },
     sitemap: 1.0,
     llms: "Stratégie de contenu et réseaux sociaux avec Fred Wav : Wav Academy comme offre principale, Analyse Express automatisée uniquement pour TikTok, et Wav Premium individuel sur TikTok, Instagram, YouTube ou Facebook.",
     llmsSection: "principales",

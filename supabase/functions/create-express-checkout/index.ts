@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import { normalizeTikTokUsername } from "../_shared/tiktok-username.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -81,11 +82,13 @@ serve(async (req) => {
       return jsonResponse({ error: "Lien de paiement test non configuré" }, 503);
     }
 
-    if (!username || typeof username !== "string" || username.trim().length < 2) {
+    // Le pseudo est ramené à sa forme canonique TikTok (minuscules) avant toute
+    // validation, tout stockage et tout appel WavStats.
+    const cleanUsername = normalizeTikTokUsername(username);
+    if (cleanUsername.length < 2) {
       return jsonResponse({ error: "Nom d'utilisateur TikTok invalide" }, 400);
     }
 
-    const cleanUsername = username.trim().replace(/^@/, "");
     const cleanEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail) || cleanEmail.length > 254) {
       return jsonResponse({ error: "Adresse email invalide" }, 400);

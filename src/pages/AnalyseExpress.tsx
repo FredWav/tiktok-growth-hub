@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
+import { normalizeTikTokUsername } from "@/lib/tiktok-username";
 import { toast } from "sonner";
 import tiktokExample from "@/assets/tiktok-username-example.png";
 
@@ -87,7 +88,9 @@ export default function AnalyseExpress() {
     setExistingSessionId(window.localStorage.getItem("express_session_id"));
   }, []);
 
-  const cleanUsername = username.trim().replace(/^@/, "");
+  // Forme canonique TikTok (minuscules) : c'est celle qui part au checkout puis
+  // vers WavStats, donc c'est aussi celle qu'on affiche en confirmation.
+  const cleanUsername = normalizeTikTokUsername(username);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -21,6 +21,7 @@ import { Download, Loader2, RefreshCw, Search, Mail, Copy, Check } from "lucide-
 import { toast } from "sonner";
 import { downloadExpressReport } from "@/lib/pdf";
 import { supabase } from "@/integrations/supabase/client";
+import { normalizeTikTokUsername } from "@/lib/tiktok-username";
 import { useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 
@@ -183,7 +184,9 @@ const ExpressAnalyses = () => {
   };
 
   const handleManualLaunch = async () => {
-    const username = manualUsername.replace(/^@/, "").trim();
+    // Même forme canonique que côté fonction : le toast doit annoncer le pseudo
+    // réellement envoyé à WavStats.
+    const username = normalizeTikTokUsername(manualUsername);
     if (!username) {
       toast.error("Entre un nom d'utilisateur TikTok");
       return;

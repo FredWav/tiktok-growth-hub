@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import { normalizeTikTokUsername } from "../_shared/tiktok-username.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -17,6 +18,14 @@ serve(async (req) => {
     const { tiktok_username, analysis_id } = await req.json();
     if (!tiktok_username || !analysis_id) {
       throw new Error("tiktok_username et analysis_id requis");
+    }
+
+    // Le pseudo arrive brut d'une ligne existante, potentiellement saisie avec
+    // une majuscule avant la normalisation à l'inscription. On le recanonise ici,
+    // sinon le retry rejouerait exactement l'échec d'origine.
+    const cleanUsername = normalizeTikTokUsername(tiktok_username);
+    if (cleanUsername.length < 2) {
+      throw new Error("tiktok_username invalide");
     }
 
     // Verify admin role
@@ -71,7 +80,7 @@ serve(async (req) => {
     if (!apiKey) throw new Error("Clé API WavStats non configurée");
 
     const analyzeRes = await fetch(
-      `${API_BASE}/accounts/${encodeURIComponent(tiktok_username)}/analyze`,
+      `${API_BASE}/accounts/${encodeURIComponent(cleanUsername)}/analyze`,
       {
         method: "POST",
         headers: {
@@ -95,6 +104,7 @@ serve(async (req) => {
     const { error: updateError } = await supabaseAdmin
       .from("express_analyses")
       .update({
+        tiktok_username: cleanUsername,
         status: "processing",
         job_id: jobId,
         error_message: null,

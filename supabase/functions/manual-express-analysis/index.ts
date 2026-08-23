@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import { normalizeTikTokUsername } from "../_shared/tiktok-username.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -64,8 +65,12 @@ serve(async (req) => {
       });
     }
 
-    // Clean username
-    const cleanUsername = tiktok_username.replace(/^@/, "").trim();
+    // Forme canonique TikTok (minuscules) : WavStats fait une correspondance
+    // exacte sur l'identifiant, une majuscule ferait échouer l'analyse.
+    const cleanUsername = normalizeTikTokUsername(tiktok_username);
+    if (cleanUsername.length < 2) {
+      throw new Error("tiktok_username invalide");
+    }
 
     // Call WavStats API
     // Repli sur l'ancien nom de secret tant que WAVSTATS_API_KEY n'existe pas côté dashboard.

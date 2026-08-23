@@ -3,6 +3,7 @@ import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 import { getStripeSecretKey } from "../_shared/stripe-config.ts";
 import { notifySuccess, notifyError } from "../_shared/itpush.ts";
+import { normalizeTikTokUsername } from "../_shared/tiktok-username.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -117,7 +118,10 @@ serve(async (req) => {
     if (!row) throw new Error("Intention d'analyse introuvable pour cette session");
 
     analysisId = row.id;
-    username = row.tiktok_username;
+    // Filet pour les lignes créées avant la normalisation à l'inscription : WavStats
+    // fait une correspondance exacte sur l'identifiant TikTok, qui est en minuscules.
+    username = normalizeTikTokUsername(row.tiktok_username);
+    if (!username) throw new Error("Nom d'utilisateur TikTok invalide sur l'intention d'analyse");
     customerEmail = row.email || session.customer_details?.email || null;
     wantsNewsletter = row.newsletter_requested === true;
 
@@ -230,7 +234,7 @@ serve(async (req) => {
     if (analysisId) {
       await supabase
         .from("express_analyses")
-        .update({ job_id: jobId, status: "processing", launch_started_at: null })
+        .update({ tiktok_username: username, job_id: jobId, status: "processing", launch_started_at: null })
         .eq("id", analysisId);
     }
 

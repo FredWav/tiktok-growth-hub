@@ -7,7 +7,8 @@ import { normalizeWavStatsResult, extractHealthScoreNumber, hasAiInsights } from
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+    "authorization, x-client-info, apikey, content-type, x-cron-secret",
+
 };
 
 const API_BASE = "https://wavstats.com/api/v1";
@@ -70,15 +71,22 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Cron-only endpoint: require service-role bearer token.
+  // Cron-only endpoint : accepte soit le service-role, soit le secret de cron
+  // (pg_cron ne peut pas lire le service-role key côté SQL).
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+  const cronSecret = Deno.env.get("RECONCILE_CRON_SECRET") ?? "";
   const authHeader = req.headers.get("Authorization") ?? "";
-  if (!serviceKey || !authHeader.includes(serviceKey)) {
+  const cronHeader = req.headers.get("x-cron-secret") ?? "";
+  const authorized =
+    (serviceKey && authHeader.includes(serviceKey)) ||
+    (cronSecret && (cronHeader === cronSecret || authHeader === `Bearer ${cronSecret}`));
+  if (!authorized) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
+
 
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL") || "",

@@ -19,7 +19,7 @@ function CookieSettingsButton() {
 const navLinks = [
   { label: "Accueil", href: "/", section: "navigation" },
   { label: "Wav Academy", href: "/wavacademy", section: "navigation" },
-  { label: "Candidater au Wav Premium", href: "/reserverunappel", section: "navigation" },
+  { label: "Réserver un appel stratégique", href: "/reserverunappel", section: "navigation" },
   { label: "Analyse Express", href: "/analyse-express", section: "navigation" },
   { label: "Diagnostic TikTok gratuit", href: "/start", section: "navigation" },
   { label: "Témoignages", href: "/preuves", section: "navigation" },

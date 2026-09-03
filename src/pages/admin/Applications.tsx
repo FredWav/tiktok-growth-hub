@@ -24,8 +24,42 @@ const budgetLabels: Record<string, string> = {
   "1000_plus": "1000€ et +",
 };
 
+const routeLabels: Record<string, string> = {
+  wavstats: "WavStats",
+  express: "Analyse Express",
+  call: "Appel stratégique",
+};
+
+const offerLabels: Record<string, string> = {
+  wavstats: "WavStats",
+  express: "Analyse Express",
+  academy: "Wav Academy",
+  sprint: "Sprint stratégique",
+  one_shot: "Sprint stratégique",
+  premium: "Wav Premium",
+};
+
+const goalLabels: Record<string, string> = {
+  comprendre_contenus: "Comprendre quels contenus fonctionnent et pourquoi",
+  gagner_visibilite: "Développer la visibilité et l'audience",
+  attirer_clients: "Attirer davantage de prospects ou de clients",
+  mieux_vendre: "Mieux transformer l'audience en revenus",
+  structurer_strategie: "Structurer un lancement ou une stratégie plus ambitieuse",
+};
+
+const workModeLabels: Record<string, string> = {
+  outils_autonomes: "Décider seul avec des outils et des données",
+  plan_ponctuel: "Construire un plan avec Fred, puis avancer seul",
+  suivi_collectif: "Recevoir des retours réguliers en collectif",
+  suivi_individuel: "Être suivi personnellement pendant l'exécution",
+  autonome: "Avancer seul à partir de données claires",
+  regard_strategique: "Décider avec un regard stratégique humain",
+  a_definir: "Besoin à définir",
+};
+
 function applicationNetworks(application: WavPremiumApplication) {
   return [
+    application.account_url && ["Compte principal", application.account_url],
     application.tiktok_username && ["TikTok", application.tiktok_username],
     application.instagram_username && ["Instagram", application.instagram_username],
     application.youtube_url && ["YouTube", application.youtube_url],
@@ -49,7 +83,7 @@ const Applications = () => {
     <AdminLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="font-display text-3xl text-primary">Candidatures Wav Premium</h1>
+          <h1 className="font-display text-3xl text-primary">Demandes d'accompagnement</h1>
           {!confirmPurge ? (
             <Button
               variant="outline"
@@ -85,20 +119,15 @@ const Applications = () => {
               <p className="text-2xl font-bold text-cream">{applications.length}</p>
             </div>
             <div className="bg-noir-light border border-green-500/20 rounded-lg p-4">
-              <p className="text-cream/60 text-sm">Avec source</p>
+              <p className="text-cream/60 text-sm">Vers un appel</p>
               <p className="text-2xl font-bold text-green-400">
-                {applications.filter((a) => a.origin_source).length}
+                {applications.filter((a) => a.qualification_route === "call").length}
               </p>
             </div>
             <div className="bg-noir-light border border-yellow-500/20 rounded-lg p-4">
-              <p className="text-cream/60 text-sm">Cette semaine</p>
+              <p className="text-cream/60 text-sm">Vers les offres automatiques</p>
               <p className="text-2xl font-bold text-yellow-400">
-                {applications.filter((a) => {
-                  const d = new Date(a.created_at);
-                  const now = new Date();
-                  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-                  return d >= weekAgo;
-                }).length}
+                {applications.filter((a) => ["wavstats", "express"].includes(a.qualification_route ?? "")).length}
               </p>
             </div>
           </div>
@@ -109,7 +138,7 @@ const Applications = () => {
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : !applications?.length ? (
-          <p className="text-cream/60 text-center py-12">Aucune candidature pour le moment.</p>
+          <p className="text-cream/60 text-center py-12">Aucune demande pour le moment.</p>
         ) : (
           <div className="bg-noir-light border border-primary/20 rounded-lg overflow-hidden">
             <Table>
@@ -120,6 +149,7 @@ const Applications = () => {
                   <TableHead className="text-cream/70">Email</TableHead>
                   <TableHead className="text-cream/70">Réseaux</TableHead>
                   <TableHead className="text-cream/70">Profil</TableHead>
+                  <TableHead className="text-cream/70">Orientation</TableHead>
                   <TableHead className="text-cream/70">Source</TableHead>
                 </TableRow>
               </TableHeader>
@@ -146,6 +176,16 @@ const Applications = () => {
                       {app.profil || "-"}
                     </TableCell>
                     <TableCell className="text-cream/80">
+                      {app.qualification_route ? (
+                        <div className="space-y-1">
+                          <Badge variant="outline">{routeLabels[app.qualification_route] ?? app.qualification_route}</Badge>
+                          {app.recommended_offer && (
+                            <p className="text-xs text-primary">{offerLabels[app.recommended_offer] ?? app.recommended_offer}</p>
+                          )}
+                        </div>
+                      ) : "-"}
+                    </TableCell>
+                    <TableCell className="text-cream/80">
                       {app.origin_source || "-"}
                     </TableCell>
                   </TableRow>
@@ -165,7 +205,7 @@ const Applications = () => {
                   {selected.first_name} {selected.last_name}
                 </DialogTitle>
                 <DialogDescription className="text-cream/60">
-                  Candidature du {format(new Date(selected.created_at), "dd MMMM yyyy à HH:mm", { locale: fr })}
+                  Demande du {format(new Date(selected.created_at), "dd MMMM yyyy à HH:mm", { locale: fr })}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 mt-4">
@@ -190,7 +230,37 @@ const Applications = () => {
                     <p className="text-cream/50 text-sm">Quel contenu t'a décidé</p>
                     <p>{selected.conversion_trigger || "-"}</p>
                   </div>
+                  <div>
+                    <p className="text-cream/50 text-sm">Orientation</p>
+                    <p>{selected.qualification_route ? (routeLabels[selected.qualification_route] ?? selected.qualification_route) : "-"}</p>
+                  </div>
+                  <div>
+                    <p className="text-cream/50 text-sm">Offre pressentie</p>
+                    <p>{selected.recommended_offer ? (offerLabels[selected.recommended_offer] ?? selected.recommended_offer) : "-"}</p>
+                  </div>
+                  <div>
+                    <p className="text-cream/50 text-sm">Score de qualification</p>
+                    <p>{selected.qualification_score ?? "-"}</p>
+                  </div>
                 </div>
+
+                {selected.form_version === "orientation_v2" && (
+                  <div className="space-y-3 border-t border-primary/10 pt-4">
+                    <p className="text-cream/40 text-xs uppercase tracking-wide">Qualification automatique</p>
+                    <div>
+                      <p className="text-cream/50 text-sm">Objectif prioritaire</p>
+                      <p>{selected.primary_goal ? (goalLabels[selected.primary_goal] ?? selected.primary_goal) : "-"}</p>
+                    </div>
+                    <div>
+                      <p className="text-cream/50 text-sm">Manière d'avancer</p>
+                      <p>{selected.work_mode ? (workModeLabels[selected.work_mode] ?? selected.work_mode) : "-"}</p>
+                    </div>
+                    <div>
+                      <p className="text-cream/50 text-sm mb-1">Blocage principal</p>
+                      <p className="bg-noir rounded-lg p-3 whitespace-pre-wrap text-sm">{selected.main_blocker || selected.goals}</p>
+                    </div>
+                  </div>
+                )}
 
                 <div className="space-y-3">
                   <div>

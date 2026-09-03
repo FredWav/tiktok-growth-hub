@@ -8,6 +8,9 @@ const corsHeaders = {
 };
 
 const DISCORD_WEBHOOK_URL = Deno.env.get("DISCORD_WEBHOOK_URL") ?? "";
+const WAVSTATS_URL = "https://wavstats.com";
+const ANALYSE_EXPRESS_URL = "https://fredwav.com/analyse-express";
+const CALL_BOOKING_URL = "https://calendar.app.google/UZC5UY38shFuSqmy6";
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX = 3;
 const rateLimitStore = new Map<string, number[]>();
@@ -20,11 +23,46 @@ const PREMIUM_BUDGET_CODES = new Set([
 ]);
 const PREMIUM_BUDGET_LABELS: Record<string, string> = {
   total_no_budget: "Pas de budget total",
-  total_15_a_100: "15 € à 100 € au total",
-  total_100_a_300: "100 € à 300 € au total",
+  total_15_a_100: "100 € maximum au total",
+  total_100_a_300: "Plus de 100 € à 300 € au total",
   total_300_a_900: "300 € à 900 € au total",
   total_900_plus: "900 € et + au total",
 };
+const BUSINESS_STAGE_LABELS: Record<string, string> = {
+  debut: "Je commence à publier",
+  irregulier: "Je publie, mais je manque de régularité",
+  stagnation: "Je publie régulièrement, mais mes résultats stagnent",
+  visibilite_sans_revenus: "J'ai de la visibilité, mais elle génère peu de revenus",
+  activite_a_accelerer: "Mon activité génère déjà des revenus et je veux accélérer",
+};
+const PRIMARY_GOAL_LABELS: Record<string, string> = {
+  comprendre_contenus: "Comprendre quels contenus fonctionnent et pourquoi",
+  gagner_visibilite: "Développer ma visibilité et mon audience",
+  attirer_clients: "Attirer davantage de prospects ou de clients",
+  mieux_vendre: "Mieux transformer mon audience en revenus",
+  structurer_strategie: "Structurer un lancement ou une stratégie plus ambitieuse",
+};
+const WORK_MODE_LABELS: Record<string, string> = {
+  outils_autonomes: "Des outils et des données pour décider entièrement seul",
+  plan_ponctuel: "Construire un plan clair avec Fred, puis l'appliquer seul",
+  suivi_collectif: "Avancer avec des retours réguliers en collectif",
+  suivi_individuel: "Être accompagné personnellement pendant la mise en œuvre",
+  a_definir: "Je ne sais pas encore ce qui serait le plus utile",
+  autonome: "Des données claires pour décider et appliquer seul",
+  regard_strategique: "Un regard stratégique humain pour décider avec moi",
+};
+const OFFER_LABELS: Record<string, string> = {
+  wavstats: "WavStats",
+  express: "Analyse Express",
+  academy: "Wav Academy",
+  sprint: "Sprint stratégique",
+  one_shot: "Sprint stratégique",
+  premium: "Wav Premium",
+};
+
+type QualificationRoute = "wavstats" | "express" | "call";
+type RecommendedOffer = "wavstats" | "express" | "academy" | "sprint" | "premium";
+type QualificationResult = { route: QualificationRoute; offer: RecommendedOffer; score: number };
 
 type ApplicationPayload = {
   first_name?: unknown;
@@ -47,7 +85,89 @@ type ApplicationPayload = {
   follower_since?: unknown;
   conversion_trigger?: unknown;
   posthog_id?: unknown;
+  form_version?: unknown;
+  account_url?: unknown;
+  business_stage?: unknown;
+  primary_goal?: unknown;
+  main_blocker?: unknown;
+  work_mode?: unknown;
+  qualification_route?: unknown;
+  recommended_offer?: unknown;
+  qualification_score?: unknown;
 };
+
+function qualify(businessStage: string, primaryGoal: string, workMode: string, budget: string): QualificationResult {
+  const normalizedWorkMode = workMode === "autonome"
+    ? "outils_autonomes"
+    : workMode === "regard_strategique"
+      ? "plan_ponctuel"
+      : workMode;
+  const situationScores: Record<string, number> = {
+    debut: 0,
+    irregulier: 0,
+    stagnation: 1,
+    visibilite_sans_revenus: 2,
+    activite_a_accelerer: 2,
+  };
+  const goalScores: Record<string, number> = {
+    comprendre_contenus: 0,
+    gagner_visibilite: 0,
+    attirer_clients: 2,
+    mieux_vendre: 2,
+    structurer_strategie: 2,
+  };
+  const workModeScores: Record<string, number> = {
+    outils_autonomes: 0,
+    suivi_collectif: 1,
+    plan_ponctuel: 2,
+    suivi_individuel: 3,
+    a_definir: 1,
+  };
+  const budgetScores: Record<string, number> = {
+    total_no_budget: 0,
+    total_15_a_100: 0,
+    total_100_a_300: 1,
+    total_300_a_900: 2,
+    total_900_plus: 2,
+  };
+  const score =
+    (situationScores[businessStage] ?? 0) +
+    (goalScores[primaryGoal] ?? 0) +
+    (workModeScores[normalizedWorkMode] ?? 0) +
+    (budgetScores[budget] ?? 0);
+  const canInvestInHumanHelp = !["total_no_budget", "total_15_a_100"].includes(budget);
+  const hasPremiumBudget = budget === "total_900_plus";
+  const hasCommercialNeed =
+    ["stagnation", "visibilite_sans_revenus", "activite_a_accelerer"].includes(businessStage) &&
+    ["attirer_clients", "mieux_vendre", "structurer_strategie"].includes(primaryGoal);
+
+  if (!canInvestInHumanHelp) {
+    return budget === "total_no_budget"
+      ? { score, route: "wavstats", offer: "wavstats" }
+      : { score, route: "express", offer: "express" };
+  }
+  if (normalizedWorkMode === "outils_autonomes") {
+    return { score, route: "wavstats", offer: "wavstats" };
+  }
+  if (normalizedWorkMode === "plan_ponctuel") {
+    return { score, route: "call", offer: "sprint" };
+  }
+  if (normalizedWorkMode === "suivi_collectif") {
+    return { score, route: "call", offer: "academy" };
+  }
+  if (normalizedWorkMode === "suivi_individuel") {
+    return hasPremiumBudget
+      ? { score, route: "call", offer: "premium" }
+      : { score, route: "call", offer: "academy" };
+  }
+  if (budget === "total_100_a_300") {
+    return { score, route: "call", offer: "academy" };
+  }
+  if (hasCommercialNeed) {
+    return { score, route: "call", offer: "sprint" };
+  }
+  return { score, route: "call", offer: "academy" };
+}
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
@@ -142,10 +262,30 @@ Deno.serve(async (req) => {
     const followerSince = cleanText(raw.follower_since, 100);
     const conversionTrigger = cleanText(raw.conversion_trigger, 500);
     const posthogId = cleanText(raw.posthog_id, 200);
+    const formVersion = cleanText(raw.form_version, 50);
+    const accountUrl = cleanText(raw.account_url, 500);
+    const businessStage = cleanText(raw.business_stage, 100);
+    const primaryGoal = cleanText(raw.primary_goal, 100);
+    const mainBlocker = cleanText(raw.main_blocker, 2000);
+    const workMode = cleanText(raw.work_mode, 100);
+    const isOrientationV2 = formVersion === "orientation_v2";
 
     const hasNetwork = Boolean(tiktok || instagram || youtube || facebook || otherNetwork);
-    if (!firstName || !lastName || !email || !profile || !blocker || !success30Days || !whyNow || !availability || !budget || !PREMIUM_BUDGET_CODES.has(budget) || !hasNetwork || objectives.length === 0 || helpTopics.length === 0) {
-      await notifyError("Demande Wav Premium", "Champs de qualification obligatoires manquants");
+    const legacyPayloadValid = Boolean(
+      profile && blocker && success30Days && whyNow && availability && hasNetwork && objectives.length > 0 && helpTopics.length > 0,
+    );
+    const orientationPayloadValid = Boolean(
+      accountUrl &&
+      businessStage && BUSINESS_STAGE_LABELS[businessStage] &&
+      primaryGoal && PRIMARY_GOAL_LABELS[primaryGoal] &&
+      mainBlocker && mainBlocker.length >= 20 &&
+      workMode && WORK_MODE_LABELS[workMode],
+    );
+    if (
+      !firstName || !lastName || !email || !budget || !PREMIUM_BUDGET_CODES.has(budget) ||
+      (isOrientationV2 ? !orientationPayloadValid : !legacyPayloadValid)
+    ) {
+      await notifyError("Demande d'accompagnement", "Champs de qualification obligatoires manquants");
       return new Response(JSON.stringify({ error: "Champs obligatoires manquants" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -159,18 +299,69 @@ Deno.serve(async (req) => {
       });
     }
 
-    const networks = [
-      tiktok && `TikTok : ${tiktok}`,
-      instagram && `Instagram : ${instagram}`,
-      youtube && `YouTube : ${youtube}`,
-      facebook && `Facebook : ${facebook}`,
-      otherNetwork && `Autre : ${otherNetwork}`,
-    ].filter((value): value is string => Boolean(value));
+    const networks = isOrientationV2
+      ? [`Compte principal : ${accountUrl}`]
+      : [
+          tiktok && `TikTok : ${tiktok}`,
+          instagram && `Instagram : ${instagram}`,
+          youtube && `YouTube : ${youtube}`,
+          facebook && `Facebook : ${facebook}`,
+          otherNetwork && `Autre : ${otherNetwork}`,
+        ].filter((value): value is string => Boolean(value));
     const budgetLabel = PREMIUM_BUDGET_LABELS[budget] ?? budget;
+    const qualification = isOrientationV2
+      ? qualify(businessStage!, primaryGoal!, workMode!, budget)
+      : null;
+    const qualificationRouteLabel = qualification?.route === "call"
+      ? "Appel stratégique"
+      : qualification?.route === "express"
+        ? "Analyse Express"
+        : "WavStats";
+    const recommendedOfferLabel = qualification ? OFFER_LABELS[qualification.offer] : "";
+    const discordQualificationFields = isOrientationV2
+      ? [
+          { name: "🧭 Orientation", value: discordValue(qualificationRouteLabel), inline: true },
+          { name: "💡 Offre pressentie", value: discordValue(recommendedOfferLabel), inline: true },
+          { name: "🔢 Score", value: discordValue(String(qualification?.score ?? 0)), inline: true },
+          { name: "📍 Situation", value: discordValue(BUSINESS_STAGE_LABELS[businessStage!] ?? businessStage) },
+          { name: "🎯 Objectif prioritaire", value: discordValue(PRIMARY_GOAL_LABELS[primaryGoal!] ?? primaryGoal) },
+          { name: "🧱 Blocage principal", value: discordValue(mainBlocker) },
+          { name: "🤝 Manière d'avancer", value: discordValue(WORK_MODE_LABELS[workMode!] ?? workMode) },
+        ]
+      : [
+          { name: "👤 Profil", value: discordValue(profile) },
+          { name: "🎯 Objectifs", value: discordValue(objectives.join("\n")) },
+          { name: "🧱 Blocage principal", value: discordValue(blocker) },
+          { name: "📅 Résultat attendu à 30 jours", value: discordValue(success30Days) },
+          { name: "⏱️ Pourquoi maintenant", value: discordValue(whyNow) },
+          { name: "🤝 Aides recherchées", value: discordValue(helpTopics.join("\n")) },
+          { name: "🕒 Disponibilité", value: discordValue(availability) },
+        ];
+    const adminQualificationRows = isOrientationV2
+      ? [
+          tableRow("Orientation", qualificationRouteLabel),
+          tableRow("Offre pressentie", recommendedOfferLabel),
+          tableRow("Score", String(qualification?.score ?? 0)),
+          tableRow("Situation", BUSINESS_STAGE_LABELS[businessStage!] ?? businessStage),
+          tableRow("Objectif prioritaire", PRIMARY_GOAL_LABELS[primaryGoal!] ?? primaryGoal),
+          tableRow("Blocage principal", mainBlocker),
+          tableRow("Manière d'avancer", WORK_MODE_LABELS[workMode!] ?? workMode),
+        ].join("")
+      : [
+          tableRow("Profil", profile),
+          tableRow("Objectifs", objectives.join("\n")),
+          tableRow("Blocage principal", blocker),
+          tableRow("Résultat attendu à 30 jours", success30Days),
+          tableRow("Pourquoi maintenant", whyNow),
+          tableRow("Aides recherchées", helpTopics.join("\n")),
+          tableRow("Disponibilité", availability),
+        ].join("");
 
     if (DISCORD_WEBHOOK_URL) {
       const discordPayload = {
-        content: "<@967099537439227965> <@826133033069051954> 📋 **Nouvelle demande Wav Premium !**",
+        content: isOrientationV2
+          ? `<@967099537439227965> <@826133033069051954> 📋 **Nouvelle qualification - ${discordValue(recommendedOfferLabel)} !**`
+          : "<@967099537439227965> <@826133033069051954> 📋 **Nouvelle demande d'accompagnement !**",
         allowed_mentions: { users: ["967099537439227965", "826133033069051954"] },
         embeds: [{
           title: discordValue(`${firstName} ${lastName}`),
@@ -179,16 +370,12 @@ Deno.serve(async (req) => {
             { name: "📧 Email", value: discordValue(email), inline: true },
             { name: "💰 Budget total", value: discordValue(budgetLabel), inline: true },
             { name: "🌐 Réseaux", value: discordValue(networks.join("\n")) },
-            { name: "👤 Profil", value: discordValue(profile) },
-            { name: "🎯 Objectifs", value: discordValue(objectives.join("\n")) },
-            { name: "🧱 Blocage principal", value: discordValue(blocker) },
-            { name: "📅 Résultat attendu à 30 jours", value: discordValue(success30Days) },
-            { name: "⏱️ Pourquoi maintenant", value: discordValue(whyNow) },
-            { name: "🤝 Aides recherchées", value: discordValue(helpTopics.join("\n")) },
-            { name: "🕒 Disponibilité", value: discordValue(availability) },
+            ...discordQualificationFields,
             { name: "📍 Source", value: discordValue(originSource), inline: true },
-            { name: "⌛ Suit Fred depuis", value: discordValue(followerSince), inline: true },
-            { name: "🔥 Déclencheur", value: discordValue(conversionTrigger) },
+            ...(!isOrientationV2 ? [
+              { name: "⌛ Suit Fred depuis", value: discordValue(followerSince), inline: true },
+              { name: "🔥 Déclencheur", value: discordValue(conversionTrigger) },
+            ] : []),
             { name: "📊 PostHog", value: posthogId ? `[Voir](https://us.posthog.com/person/${encodeURIComponent(posthogId)})` : "-", inline: true },
           ],
           timestamp: new Date().toISOString(),
@@ -202,7 +389,7 @@ Deno.serve(async (req) => {
       });
       if (!discordResponse.ok) {
         console.error("Discord webhook error:", discordResponse.status, await discordResponse.text());
-        await notifyError("Demande Wav Premium Discord", `Webhook échoué (${discordResponse.status}) • ${firstName} ${lastName}`);
+        await notifyError("Demande d'accompagnement Discord", `Webhook échoué (${discordResponse.status}) • ${firstName} ${lastName}`);
       }
     }
 
@@ -211,22 +398,16 @@ Deno.serve(async (req) => {
       if (smtpPassword) {
         const adminHtml = `
           <div style="font-family:Arial,sans-serif;max-width:680px;margin:0 auto;padding:20px">
-            <h1 style="color:#333;border-bottom:2px solid #c8a97e;padding-bottom:10px">Nouvelle demande Wav Premium</h1>
+            <h1 style="color:#333;border-bottom:2px solid #c8a97e;padding-bottom:10px">Nouvelle demande d'accompagnement</h1>
             <table style="width:100%;border-collapse:collapse;margin-top:20px">
               ${tableRow("Nom", `${firstName} ${lastName}`)}
               ${tableRow("Email", email)}
               ${tableRow("Réseaux", networks.join("\n"))}
-              ${tableRow("Profil", profile)}
-              ${tableRow("Objectifs", objectives.join("\n"))}
-              ${tableRow("Blocage principal", blocker)}
-              ${tableRow("Résultat attendu à 30 jours", success30Days)}
-              ${tableRow("Pourquoi maintenant", whyNow)}
-              ${tableRow("Aides recherchées", helpTopics.join("\n"))}
-              ${tableRow("Disponibilité", availability)}
+              ${adminQualificationRows}
               ${tableRow("Budget total", budgetLabel)}
               ${tableRow("Source", originSource)}
-              ${tableRow("Suit Fred depuis", followerSince)}
-              ${tableRow("Contenu ou expérience déclencheur", conversionTrigger)}
+              ${!isOrientationV2 ? tableRow("Suit Fred depuis", followerSince) : ""}
+              ${!isOrientationV2 ? tableRow("Contenu ou expérience déclencheur", conversionTrigger) : ""}
             </table>
           </div>`;
 
@@ -240,14 +421,39 @@ Deno.serve(async (req) => {
         await transporter.sendMail({
           from: "noreply@fredwav.com",
           to: "fredwavcm@gmail.com",
-          subject: `Nouvelle demande Wav Premium - ${firstName} ${lastName}`,
+          subject: isOrientationV2
+            ? `[${qualification?.route === "call" ? "APPEL" : "AUTOMATIQUE"} - ${recommendedOfferLabel.toUpperCase()}] ${firstName} ${lastName}`
+            : `Nouvelle demande d'accompagnement - ${firstName} ${lastName}`,
           html: adminHtml,
         });
 
-        const candidateHtml = `
+        const orientationHtml = qualification?.route === "call" ? `
+          <p style="color:#555;font-size:16px;line-height:1.6">Ton objectif, ton niveau de maturité et ton besoin justifient un échange stratégique.</p>
+          <div style="background:#faf7f2;border-left:4px solid #c8a97e;padding:20px;margin:24px 0;border-radius:8px">
+            <p style="color:#333;font-size:16px;line-height:1.6;margin:0 0 18px"><strong>Prochaine étape :</strong> réserve ton appel stratégique.</p>
+            <a href="${CALL_BOOKING_URL}" style="display:inline-block;background:#9b7510;color:#fff;padding:13px 24px;border-radius:8px;text-decoration:none;font-weight:bold">Choisir mon créneau</a>
+          </div>` : qualification?.route === "express" ? `
+          <p style="color:#555;font-size:16px;line-height:1.6">L'Analyse Express est la prochaine étape la plus adaptée à ta situation. Elle est entièrement automatique et ne comprend pas d'analyse humaine réalisée par Fred.</p>
+          <div style="background:#faf7f2;border-left:4px solid #c8a97e;padding:20px;margin:24px 0;border-radius:8px">
+            <p style="color:#333;font-size:16px;line-height:1.6;margin:0 0 8px"><strong>Analyse Express - 11,90 €</strong></p>
+            <p style="color:#555;font-size:15px;line-height:1.6;margin:0 0 18px">Un audit TikTok automatique et ponctuel avec un rapport et des priorités d'action.</p>
+            <a href="${ANALYSE_EXPRESS_URL}" style="display:inline-block;background:#9b7510;color:#fff;padding:13px 24px;border-radius:8px;text-decoration:none;font-weight:bold">Lancer mon Analyse Express</a>
+          </div>` : `
+          <p style="color:#555;font-size:16px;line-height:1.6">WavStats est la prochaine étape la plus adaptée à ta situation. C'est un outil autonome qui ne comprend pas d'analyse humaine réalisée par Fred.</p>
+          <div style="background:#faf7f2;border-left:4px solid #c8a97e;padding:20px;margin:24px 0;border-radius:8px">
+            <p style="color:#333;font-size:16px;line-height:1.6;margin:0 0 8px"><strong>WavStats</strong></p>
+            <p style="color:#555;font-size:15px;line-height:1.6;margin:0 0 18px">Analyse tes contenus et suis ce qui fonctionne dans la durée.</p>
+            <a href="${WAVSTATS_URL}" style="display:inline-block;background:#9b7510;color:#fff;padding:13px 24px;border-radius:8px;text-decoration:none;font-weight:bold">Découvrir WavStats</a>
+          </div>`;
+        const candidateHtml = isOrientationV2 ? `
+          <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px">
+            <h1 style="color:#333;border-bottom:2px solid #c8a97e;padding-bottom:10px">Ta prochaine étape, ${escapeHtml(firstName)}</h1>
+            ${orientationHtml}
+            <p style="color:#555;font-size:16px;margin-top:24px">À très vite,<br><strong>Fred Wav</strong></p>
+          </div>` : `
           <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px">
             <h1 style="color:#333;border-bottom:2px solid #c8a97e;padding-bottom:10px">Merci pour ta demande, ${escapeHtml(firstName)} !</h1>
-            <p style="color:#555;font-size:16px;line-height:1.6">Ta demande Wav Premium a bien été reçue. Je prends le temps de la lire en détail.</p>
+            <p style="color:#555;font-size:16px;line-height:1.6">Ta demande a bien été reçue. Je vais regarder ta situation et la forme d'aide qui serait réellement pertinente.</p>
             <div style="background:#faf7f2;border-left:4px solid #c8a97e;padding:20px;margin:24px 0;border-radius:8px">
               <p style="color:#333;font-size:16px;line-height:1.6;margin:0"><strong>Prochaine étape :</strong> je te recontacte personnellement par email sous <strong>48 h ouvrées</strong>.</p>
             </div>
@@ -259,23 +465,26 @@ Deno.serve(async (req) => {
           from: "noreply@fredwav.com",
           replyTo: "fredwavcm@gmail.com",
           to: email,
-          subject: `${firstName}, ta demande Wav Premium est bien reçue`,
+          subject: isOrientationV2 ? `${firstName}, voici ta prochaine étape` : `${firstName}, ta demande est bien reçue`,
           html: candidateHtml,
         });
       }
     } catch (emailError) {
       console.error("Email send failed:", emailError);
-      await notifyError("Demande Wav Premium Email", `Exception • ${firstName} ${lastName}`);
+      await notifyError("Demande d'accompagnement Email", `Exception • ${firstName} ${lastName}`);
     }
 
-    await notifySuccess("Demande Wav Premium", `${firstName} ${lastName} • ${email}`);
-    return new Response(JSON.stringify({ success: true }), {
+    await notifySuccess(
+      "Demande d'accompagnement",
+      `${firstName} ${lastName} • ${email}${qualification ? ` • ${qualification.route} (${qualification.score})` : ""}`,
+    );
+    return new Response(JSON.stringify({ success: true, route: qualification?.route, score: qualification?.score }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
     console.error("Error:", error);
     const message = error instanceof Error ? error.message : "Erreur inconnue";
-    await notifyError("Demande Wav Premium", `Erreur: ${message}`);
+    await notifyError("Demande d'accompagnement", `Erreur: ${message}`);
     return new Response(JSON.stringify({ error: "Erreur interne du serveur" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

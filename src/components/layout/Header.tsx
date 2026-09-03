@@ -8,7 +8,7 @@ import { FUNNEL_EVENTS, trackFunnelEvent } from "@/lib/funnel-events";
 const navItems = [
   { label: "Wav Academy", href: "/wavacademy" },
   { label: "Analyse Express", href: "/analyse-express" },
-  { label: "Wav Premium", href: "/reserverunappel" },
+  { label: "Appel stratégique", href: "/reserverunappel" },
   { label: "Résultats", href: "/preuves" },
   { label: "Ressources", href: "/ressources" },
   { label: "À propos", href: "/a-propos" },

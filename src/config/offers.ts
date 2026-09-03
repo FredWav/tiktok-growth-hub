@@ -110,8 +110,8 @@ export const BUDGET_LABELS: Record<string, string> = Object.fromEntries(
  */
 export const PREMIUM_BUDGET_TIERS = [
   { value: "total_no_budget", label: "Je n'ai pas de budget pour me faire accompagner", short: "Pas de budget total" },
-  { value: "total_15_a_100", label: "Entre 15 € et 100 €", short: "15 € à 100 € au total" },
-  { value: "total_100_a_300", label: "De 100 € à 300 €", short: "100 € à 300 € au total" },
+  { value: "total_15_a_100", label: "100 € maximum", short: "100 € maximum au total" },
+  { value: "total_100_a_300", label: "Plus de 100 € et jusqu'à 300 €", short: "Plus de 100 € à 300 € au total" },
   { value: "total_300_a_900", label: "De 300 € à 900 €", short: "300 € à 900 € au total" },
   { value: "total_900_plus", label: "900 € et +", short: "900 € et + au total" },
 ] as const;

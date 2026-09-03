@@ -165,7 +165,7 @@ const ROUTES: RouteSeo[] = [
       links: [
         { href: "/wavacademy", label: "Wav Academy — dès 299 €" },
         { href: "/analyse-express", label: "Analyse Express — 11,90 €" },
-        { href: "/reserverunappel", label: "Wav Premium — sur candidature" },
+        { href: "/reserverunappel", label: "Appel stratégique - sur qualification" },
         { href: "/preuves", label: "Témoignages et résultats" },
         { href: "/a-propos", label: "À propos de Fred Wav" },
         { href: "/newsletter", label: "Guide gratuit des hooks" },
@@ -254,17 +254,17 @@ const ROUTES: RouteSeo[] = [
   },
   {
     path: "/reserverunappel",
-    title: "Wav Premium — accompagnement réseaux sociaux | Fred Wav",
+    title: "Réserver un appel stratégique réseaux sociaux | Fred Wav",
     description:
-      `Wav Premium : ${PREMIUM_DURATION_DAYS} jours d'accompagnement individuel avec Fred Wav sur TikTok, Instagram, YouTube, Facebook ou une stratégie multiréseaux.`,
+      "Tes contenus avancent mais pas tes résultats ? Réponds à quelques questions pour choisir une solution automatique ou réserver un appel stratégique avec Fred Wav.",
 
     noscript: {
-      h1: `Wav Premium — ${PREMIUM_DURATION_DAYS} jours d'accompagnement individuel`,
-      body: "Présente ta situation, tes réseaux, tes objectifs, ton blocage et le résultat que tu attends. L'accompagnement peut porter sur TikTok, Instagram, YouTube, Facebook ou une stratégie qui combine plusieurs plateformes. Fred lit chaque demande avant de proposer un appel.",
-      links: [{ href: "/reserverunappel", label: "Envoyer ma demande Wav Premium" }],
+      h1: "Tes contenus avancent, mais pas tes résultats ?",
+      body: "Présente ton compte, ton objectif, ton blocage et ton niveau de maturité. Le formulaire t'oriente immédiatement vers l'Analyse Express, WavStats ou la réservation d'un appel stratégique avec Fred Wav.",
+      links: [{ href: "/reserverunappel", label: "Obtenir ma prochaine étape" }],
     },
     sitemap: 0.8,
-    llms: `Wav Premium : formulaire de qualification pour ${PREMIUM_DURATION_DAYS} jours d'accompagnement individuel avec Fred Wav sur TikTok, Instagram, YouTube, Facebook ou une stratégie multiréseaux.`,
+    llms: "Qualification immédiate pour orienter un projet vers l'Analyse Express, WavStats ou un appel stratégique avec Fred Wav.",
     llmsSection: "offres",
   },
   {

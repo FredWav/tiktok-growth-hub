@@ -3,25 +3,21 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle2, Clock, Mail } from "lucide-react";
+import { BarChart3, CalendarDays, CheckCircle2, ExternalLink } from "lucide-react";
 import {
   ATTRIBUTION_UPDATED_EVENT,
   trackEvent,
   getStoredUtmSource,
 } from "@/lib/tracking";
 import { getPostHogId } from "@/lib/posthog";
-import { cn } from "@/lib/utils";
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { SEOHead } from "@/components/SEOHead";
 import { seoFor } from "@/config/seo";
-import { PREMIUM_BUDGET_TIERS } from "@/config/offers";
+import { EXPRESS_PRICE_LABEL, PREMIUM_BUDGET_TIERS } from "@/config/offers";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
@@ -34,128 +30,147 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 
-const profilOptions = [
-  {
-    value: "createur",
-    title: "Créateur / créatrice",
-    description: "Je développe principalement une audience autour de mes contenus.",
-  },
-  {
-    value: "entrepreneur",
-    title: "Entrepreneur / indépendante / professionnel",
-    description: "Mes réseaux servent principalement à développer mon activité, mes produits ou mes services.",
-  },
-  {
-    value: "les_deux",
-    title: "Les deux",
-    description: "Je développe une audience et une activité commerciale autour de mon contenu.",
-  },
+const FORM_VERSION = "orientation_v2";
+const WAVSTATS_URL = "https://wavstats.com";
+const ANALYSE_EXPRESS_URL = "/analyse-express";
+const CALL_BOOKING_URL = "https://calendar.app.google/UZC5UY38shFuSqmy6";
+
+const situationOptions = [
+  { value: "debut", label: "Je commence à publier" },
+  { value: "irregulier", label: "Je publie, mais je manque de régularité" },
+  { value: "stagnation", label: "Je publie régulièrement, mais mes résultats stagnent" },
+  { value: "visibilite_sans_revenus", label: "J'ai de la visibilité, mais elle génère peu de revenus" },
+  { value: "activite_a_accelerer", label: "Mon activité génère déjà des revenus et je veux accélérer" },
 ] as const;
 
-const objectiveOptions = [
-  { value: "audience_qualifiee", label: "Construire une audience réellement qualifiée" },
-  { value: "visibilite", label: "Gagner en visibilité" },
-  { value: "clients_prospects", label: "Attirer des clients ou des prospects" },
-  { value: "vendre", label: "Vendre mes produits ou mes services" },
-  { value: "credibilite", label: "Renforcer ma crédibilité sur mon sujet" },
-  { value: "revenus_contenu", label: "Générer des revenus grâce à mon contenu" },
-  { value: "partenariats", label: "Développer des partenariats avec des marques" },
-  { value: "reproduire", label: "Comprendre ce qui fonctionne dans mes contenus pour pouvoir le reproduire" },
-  { value: "multireseaux", label: "Structurer une stratégie cohérente entre plusieurs plateformes" },
+const goalOptions = [
+  { value: "comprendre_contenus", label: "Comprendre quels contenus fonctionnent et pourquoi" },
+  { value: "gagner_visibilite", label: "Développer ma visibilité et mon audience" },
+  { value: "attirer_clients", label: "Attirer davantage de prospects ou de clients" },
+  { value: "mieux_vendre", label: "Mieux transformer mon audience en revenus" },
+  { value: "structurer_strategie", label: "Structurer un lancement ou une stratégie plus ambitieuse" },
 ] as const;
 
-const helpOptions = [
-  { value: "strategie_globale", label: "Clarifier ma stratégie globale" },
-  { value: "positionnement", label: "Revoir mon positionnement" },
-  { value: "statistiques", label: "Comprendre mes statistiques" },
-  { value: "formats", label: "Trouver ou améliorer mes formats" },
-  { value: "hooks_scripts", label: "Travailler mes hooks et mes scripts" },
-  { value: "audience_clients", label: "Mieux transformer mon audience en clients" },
-  { value: "strategie_multireseaux", label: "Construire une stratégie multiréseaux" },
-  { value: "regard_exterieur", label: "Avoir un regard extérieur régulier sur mes décisions" },
-  { value: "identifier_blocage", label: "Identifier ce qui bloque sans réussir à le voir seul" },
-] as const;
-
-const availabilityOptions = [
-  { value: "disponible", label: "Oui, je peux appliquer et tester régulièrement." },
-  { value: "temps_limite", label: "Oui, mais mon temps est limité et j'ai besoin qu'on structure mes priorités." },
-  { value: "delegation", label: "Non, je cherche surtout quelqu'un qui fasse le travail à ma place." },
-] as const;
-
-const followerSinceOptions = [
-  "Moins d'1 mois",
-  "1-3 mois",
-  "3-6 mois",
-  "6+ mois",
-  "Je ne te suivais pas",
+const workModeOptions = [
+  { value: "outils_autonomes", label: "Des outils et des données pour décider entièrement seul" },
+  { value: "plan_ponctuel", label: "Construire un plan clair avec Fred, puis l'appliquer seul" },
+  { value: "suivi_collectif", label: "Avancer avec des retours réguliers en collectif" },
+  { value: "suivi_individuel", label: "Être accompagné personnellement pendant la mise en œuvre" },
+  { value: "a_definir", label: "Je ne sais pas encore ce qui serait le plus utile" },
 ] as const;
 
 const optionalText = (max: number) => z.string().trim().max(max).optional().or(z.literal(""));
+const allowedValue = <T extends readonly { value: string }[]>(options: T, message: string) =>
+  z.string().refine((value) => options.some((option) => option.value === value), message);
 
 const contactSchema = z.object({
   first_name: z.string().trim().min(1, "Prénom requis").max(100),
   last_name: z.string().trim().min(1, "Nom requis").max(100),
   email: z.string().trim().email("Email invalide").max(255),
-  tiktok_username: optionalText(100),
-  instagram_username: optionalText(100),
-  youtube_url: optionalText(500),
-  facebook_url: optionalText(500),
-  other_social_url: optionalText(500),
-  profil: z.string().min(1, "Sélectionne ton profil"),
-  objectives: z.array(z.string()).min(1, "Sélectionne au moins un objectif").max(9),
-  main_blocker: z.string().trim().min(10, "Décris ton blocage (10 caractères min.)").max(3000),
-  success_30_days: z.string().trim().min(10, "Décris le résultat attendu (10 caractères min.)").max(3000),
-  why_now: z.string().trim().min(10, "Explique pourquoi maintenant (10 caractères min.)").max(3000),
-  help_topics: z.array(z.string()).min(1, "Sélectionne au moins un sujet").max(9),
-  availability: z.string().min(1, "Sélectionne ta disponibilité"),
+  account_url: z.string().trim().min(2, "Ajoute le lien ou l'identifiant de ton compte").max(500),
+  situation: allowedValue(situationOptions, "Sélectionne ta situation"),
+  primary_goal: allowedValue(goalOptions, "Sélectionne ton objectif prioritaire"),
+  blocker_context: z.string().trim().min(20, "Décris le blocage avec un peu plus de précision").max(2000),
+  work_mode: allowedValue(workModeOptions, "Sélectionne la manière dont tu souhaites avancer"),
   budget: z.string().refine(
     (value) => PREMIUM_BUDGET_TIERS.some((tier) => tier.value === value),
     "Sélectionne ton budget total",
   ),
   origin_source: optionalText(500),
-  follower_since: optionalText(100),
-  conversion_trigger: optionalText(500),
-}).superRefine((data, ctx) => {
-  const networks = [
-    data.tiktok_username,
-    data.instagram_username,
-    data.youtube_url,
-    data.facebook_url,
-    data.other_social_url,
-  ];
-  if (!networks.some((value) => value?.trim())) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ["tiktok_username"],
-      message: "Renseigne au moins un réseau, un lien ou un identifiant",
-    });
-  }
 });
 
 type ContactForm = z.infer<typeof contactSchema>;
+type QualificationRoute = "wavstats" | "express" | "call";
+type RecommendedOffer = "wavstats" | "express" | "academy" | "sprint" | "premium";
+type QualificationResult = { route: QualificationRoute; offer: RecommendedOffer; score: number };
 
-function optionLabel<T extends readonly { value: string; label?: string; title?: string }[]>(
-  options: T,
-  value: string,
-) {
-  const option = options.find((item) => item.value === value);
-  return option?.label ?? option?.title ?? value;
+function optionLabel(options: readonly { value: string; label: string }[], value: string) {
+  return options.find((option) => option.value === value)?.label ?? value;
+}
+
+function qualify(data: ContactForm): QualificationResult {
+  const situationScores: Record<string, number> = {
+    debut: 0,
+    irregulier: 0,
+    stagnation: 1,
+    visibilite_sans_revenus: 2,
+    activite_a_accelerer: 2,
+  };
+  const goalScores: Record<string, number> = {
+    comprendre_contenus: 0,
+    gagner_visibilite: 0,
+    attirer_clients: 2,
+    mieux_vendre: 2,
+    structurer_strategie: 2,
+  };
+  const workModeScores: Record<string, number> = {
+    outils_autonomes: 0,
+    suivi_collectif: 1,
+    plan_ponctuel: 2,
+    suivi_individuel: 3,
+    a_definir: 1,
+  };
+  const budgetScores: Record<string, number> = {
+    total_no_budget: 0,
+    total_15_a_100: 0,
+    total_100_a_300: 1,
+    total_300_a_900: 2,
+    total_900_plus: 2,
+  };
+  const score =
+    (situationScores[data.situation] ?? 0) +
+    (goalScores[data.primary_goal] ?? 0) +
+    (workModeScores[data.work_mode] ?? 0) +
+    (budgetScores[data.budget] ?? 0);
+  const canInvestInHumanHelp = !["total_no_budget", "total_15_a_100"].includes(data.budget);
+  const hasPremiumBudget = data.budget === "total_900_plus";
+  const hasCommercialNeed =
+    ["stagnation", "visibilite_sans_revenus", "activite_a_accelerer"].includes(data.situation) &&
+    ["attirer_clients", "mieux_vendre", "structurer_strategie"].includes(data.primary_goal);
+
+  if (!canInvestInHumanHelp) {
+    return data.budget === "total_no_budget"
+      ? { score, route: "wavstats", offer: "wavstats" }
+      : { score, route: "express", offer: "express" };
+  }
+
+  if (data.work_mode === "outils_autonomes") {
+    return { score, route: "wavstats", offer: "wavstats" };
+  }
+  if (data.work_mode === "plan_ponctuel") {
+    return { score, route: "call", offer: "sprint" };
+  }
+  if (data.work_mode === "suivi_collectif") {
+    return { score, route: "call", offer: "academy" };
+  }
+  if (data.work_mode === "suivi_individuel") {
+    return hasPremiumBudget
+      ? { score, route: "call", offer: "premium" }
+      : { score, route: "call", offer: "academy" };
+  }
+
+  if (data.budget === "total_100_a_300") {
+    return { score, route: "call", offer: "academy" };
+  }
+  if (hasCommercialNeed) {
+    return { score, route: "call", offer: "sprint" };
+  }
+  return { score, route: "call", offer: "academy" };
 }
 
 export default function ReserverUnAppel() {
-  const [submitted, setSubmitted] = useState(false);
+  const [result, setResult] = useState<QualificationResult | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formStarted, setFormStarted] = useState(false);
 
   useEffect(() => {
-    trackEvent("reserverunappel_form_open", { page: "wav_premium" });
+    trackEvent("reserverunappel_form_open", { page: FORM_VERSION });
   }, []);
 
   const form = useForm<ContactForm>({
@@ -164,22 +179,13 @@ export default function ReserverUnAppel() {
       first_name: "",
       last_name: "",
       email: "",
-      tiktok_username: "",
-      instagram_username: "",
-      youtube_url: "",
-      facebook_url: "",
-      other_social_url: "",
-      profil: "",
-      objectives: [],
-      main_blocker: "",
-      success_30_days: "",
-      why_now: "",
-      help_topics: [],
-      availability: "",
+      account_url: "",
+      situation: "",
+      primary_goal: "",
+      blocker_context: "",
+      work_mode: "",
       budget: "",
       origin_source: "",
-      follower_since: "",
-      conversion_trigger: "",
     },
   });
 
@@ -200,8 +206,7 @@ export default function ReserverUnAppel() {
   const handleFormFocus = () => {
     if (!formStarted) {
       setFormStarted(true);
-      trackEvent("reserverunappel_form_start", { page: "wav_premium" });
-      trackEvent("premium_application_start", { source_page: "reserverunappel" });
+      trackEvent("reserverunappel_form_start", { page: FORM_VERSION });
     }
   };
 
@@ -209,114 +214,158 @@ export default function ReserverUnAppel() {
     if (isSubmitting) return;
     setIsSubmitting(true);
 
-    const objectives = data.objectives.map((value) => optionLabel(objectiveOptions, value));
-    const helpTopics = data.help_topics.map((value) => optionLabel(helpOptions, value));
-    const profileLabel = profilOptions.find((option) => option.value === data.profil);
-    const networkCount = [
-      data.tiktok_username,
-      data.instagram_username,
-      data.youtube_url,
-      data.facebook_url,
-      data.other_social_url,
-    ].filter(Boolean).length;
+    const qualification = qualify(data);
+    const situationLabel = optionLabel(situationOptions, data.situation);
+    const goalLabel = optionLabel(goalOptions, data.primary_goal);
+    const workModeLabel = optionLabel(workModeOptions, data.work_mode);
 
     const dbPayload = {
       first_name: data.first_name,
       last_name: data.last_name,
       email: data.email,
-      tiktok_username: data.tiktok_username || null,
-      instagram_username: data.instagram_username || null,
-      youtube_url: data.youtube_url || null,
-      facebook_url: data.facebook_url || null,
-      other_social_url: data.other_social_url || null,
-      profil: profileLabel ? `${profileLabel.title} — ${profileLabel.description}` : data.profil,
-      objectives,
-      goals: data.main_blocker,
-      success_30_days: data.success_30_days,
-      why_now: data.why_now,
-      help_topics: helpTopics,
-      availability: optionLabel(availabilityOptions, data.availability),
+      tiktok_username: null,
+      instagram_username: null,
+      youtube_url: null,
+      facebook_url: null,
+      other_social_url: null,
+      profil: situationLabel,
+      objectives: null,
+      goals: data.blocker_context,
+      success_30_days: null,
+      why_now: null,
+      help_topics: null,
+      availability: null,
       budget: data.budget,
       origin_source: data.origin_source || null,
-      follower_since: data.follower_since || null,
-      conversion_trigger: data.conversion_trigger || null,
+      follower_since: null,
+      conversion_trigger: null,
       posthog_id: getPostHogId(),
+      form_version: FORM_VERSION,
+      account_url: data.account_url,
+      business_stage: data.situation,
+      primary_goal: data.primary_goal,
+      main_blocker: data.blocker_context,
+      work_mode: data.work_mode,
+      qualification_route: qualification.route,
+      recommended_offer: qualification.offer,
+      qualification_score: qualification.score,
     };
 
     try {
-      const notifyPromise = supabase.functions.invoke("notify-application", { body: dbPayload });
+      const notifyPromise = supabase.functions.invoke("notify-application", {
+        body: {
+          ...dbPayload,
+          business_stage_label: situationLabel,
+          primary_goal_label: goalLabel,
+          work_mode_label: workModeLabel,
+        },
+      });
       const { error: dbError } = await supabase.from("wav_premium_applications").insert(dbPayload);
       const notifyResult = await notifyPromise.catch((error) => ({ error }));
 
       if (dbError && notifyResult.error) {
-        console.error("Premium application errors:", { dbError, notifyError: notifyResult.error });
-        throw new Error("La demande n'a pas pu être enregistrée");
+        console.error("Qualification errors:", { dbError, notifyError: notifyResult.error });
+        throw new Error("La qualification n'a pas pu être enregistrée");
       }
       if (dbError) console.error("DB insert error (notification sent):", dbError);
       if (notifyResult.error) console.error("Notification error (DB insert succeeded):", notifyResult.error);
 
-      trackEvent("reserverunappel_submit", {
-        profil: data.profil,
+      const trackingProperties = {
+        form_version: FORM_VERSION,
+        route: qualification.route,
+        recommended_offer: qualification.offer,
+        score: String(qualification.score),
+        situation: data.situation,
+        primary_goal: data.primary_goal,
+        work_mode: data.work_mode,
         budget: data.budget,
-        platform_count: String(networkCount),
-      });
-      trackEvent("premium_application_submit", {
-        profil: data.profil,
-        budget: data.budget,
-        platform_count: String(networkCount),
-      });
-      setSubmitted(true);
+      };
+      trackEvent("reserverunappel_submit", trackingProperties);
+      trackEvent("qualification_result", trackingProperties);
+      setResult(qualification);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error) {
       console.error("Submission error:", error);
-      trackEvent("reserverunappel_submit_error", { stage: "network" });
+      trackEvent("reserverunappel_submit_error", { stage: "network", form_version: FORM_VERSION });
       toast.error("Une erreur est survenue. Réessaie ou contacte-nous directement.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (submitted) {
+  const trackDestinationClick = (destination: QualificationRoute) => {
+    trackEvent("qualification_destination_click", {
+      form_version: FORM_VERSION,
+      route: result?.route,
+      recommended_offer: result?.offer,
+      destination,
+      score: String(result?.score ?? 0),
+    });
+  };
+
+  if (result) {
+    const isCall = result.route === "call";
+    const isExpress = result.route === "express";
+    const resultTitle = isCall
+      ? "Un appel stratégique est pertinent"
+      : isExpress
+        ? "Commence par l'Analyse Express"
+        : "Commence par WavStats";
+    const resultDescription = isCall
+      ? "Ton objectif, ton niveau de maturité et ton besoin justifient un regard stratégique humain. Choisis directement le créneau qui te convient."
+      : isExpress
+        ? "Obtiens un audit TikTok automatique et ponctuel avec un rapport et des priorités d'action."
+        : "Analyse tes contenus et suis ce qui fonctionne dans la durée, sans réserver un appel.";
+    const resultNote = isCall
+      ? "Pendant l'appel, on identifie le vrai blocage et la forme d'intervention cohérente : Sprint stratégique, Academy ou accompagnement individuel."
+      : isExpress
+        ? "L'Analyse Express est entièrement automatique. Elle ne comprend pas d'analyse humaine réalisée par Fred."
+        : "WavStats est un outil autonome. Il ne comprend pas d'analyse humaine réalisée par Fred.";
+
     return (
       <Layout>
         <SEOHead
           {...seoFor("/reserverunappel")}
-          title="Demande Wav Premium envoyée | Fred Wav"
-          description="Ta demande a bien été envoyée. Fred te recontacte par email sous 48 h ouvrées."
+          title="Ta prochaine étape | Fred Wav"
+          description="Ta qualification est terminée. Découvre la prochaine étape adaptée à ta situation."
           noindex
         />
         <Section variant="cream" size="lg">
           <div className="max-w-xl mx-auto text-center">
-            <CheckCircle2 className="h-16 w-16 text-primary mx-auto mb-6" />
-            <h1 className="font-display text-3xl md:text-4xl font-semibold mb-4">Demande envoyée !</h1>
-            <p className="text-lg text-muted-foreground mb-8">
-              Merci pour ta demande. Je l'ai bien reçue et je prends le temps de la lire en détail.
-            </p>
-            <div className="bg-background border border-primary/20 rounded-2xl p-6 mb-8 text-left">
-              <div className="flex items-start gap-4 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                  <Mail className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-semibold mb-1">Je te recontacte par email</p>
-                  <p className="text-sm text-muted-foreground">
-                    Sous <strong>48 h ouvrées</strong> à l'adresse que tu viens de me communiquer.
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                  <Clock className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-semibold mb-1">En attendant</p>
-                  <p className="text-sm text-muted-foreground">
-                    Vérifie tes spams et prépare tes questions. On fait d'abord le point par écrit avant d'éventuellement caler un échange.
-                  </p>
-                </div>
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              {isCall ? <CalendarDays className="h-8 w-8" /> : <BarChart3 className="h-8 w-8" />}
+            </div>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary mb-3">Ta prochaine étape</p>
+            <h1 className="font-display text-3xl md:text-4xl font-semibold mb-5">{resultTitle}</h1>
+            <p className="text-lg text-muted-foreground mb-8">{resultDescription}</p>
+            <div className="rounded-2xl border border-primary/20 bg-background p-6 mb-8 text-left">
+              <div className="flex items-start gap-3">
+                <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                <p className="text-sm leading-relaxed">{resultNote}</p>
               </div>
             </div>
-            <Button variant="outline" size="lg" asChild>
-              <Link to="/">← Retour à l'accueil</Link>
+            {isExpress ? (
+              <Button variant="hero" size="xl" className="w-full sm:w-auto" asChild>
+                <Link to={ANALYSE_EXPRESS_URL} onClick={() => trackDestinationClick("express")}>
+                  Lancer l'analyse - {EXPRESS_PRICE_LABEL}
+                </Link>
+              </Button>
+            ) : (
+              <Button variant="hero" size="xl" className="w-full sm:w-auto" asChild>
+                <a
+                  href={isCall ? CALL_BOOKING_URL : WAVSTATS_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => trackDestinationClick(result.route)}
+                >
+                  {isCall ? "Choisir mon créneau" : "Découvrir WavStats"}
+                  <ExternalLink className="ml-2 h-5 w-5" />
+                </a>
+              </Button>
+            )}
+            <p className="text-sm text-muted-foreground mt-4">Cette recommandation vient aussi de t'être envoyée par email.</p>
+            <Button variant="link" asChild className="mt-4">
+              <Link to="/">Retour à l'accueil</Link>
             </Button>
           </div>
         </Section>
@@ -324,93 +373,39 @@ export default function ReserverUnAppel() {
     );
   }
 
-  const renderCheckboxGroup = (
-    name: "objectives" | "help_topics",
-    options: readonly { value: string; label: string }[],
-  ) => (
-    <FormField
-      control={form.control}
-      name={name}
-      render={({ field }) => (
-        <FormItem>
-          <div className="space-y-3 mt-3">
-            {options.map((option) => {
-              const checked = field.value.includes(option.value);
-              return (
-                <Label
-                  key={option.value}
-                  htmlFor={`${name}-${option.value}`}
-                  className={cn(
-                    "flex items-start gap-3 rounded-xl border p-4 cursor-pointer font-normal leading-snug transition-colors",
-                    checked ? "border-primary bg-primary/5" : "border-border hover:bg-accent/50",
-                  )}
-                >
-                  <Checkbox
-                    id={`${name}-${option.value}`}
-                    checked={checked}
-                    onCheckedChange={(next) => {
-                      field.onChange(
-                        next
-                          ? [...field.value, option.value]
-                          : field.value.filter((value) => value !== option.value),
-                      );
-                    }}
-                    className="mt-0.5"
-                  />
-                  <span>{option.label}</span>
-                </Label>
-              );
-            })}
-          </div>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  );
-
   return (
     <Layout>
       <SEOHead {...seoFor("/reserverunappel")} />
       <Section variant="cream" size="lg">
         <div className="max-w-3xl mx-auto text-center">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary mb-4">Appel stratégique</p>
           <h1 className="font-display text-3xl md:text-5xl font-semibold tracking-tight mb-5">
-            Wav Premium — <span className="text-gold-gradient">30 jours d'accompagnement individuel</span>
+            Tes contenus avancent, mais pas <span className="text-gold-gradient">tes résultats ?</span>
           </h1>
           <p className="text-muted-foreground text-lg mb-4">
-            Avant de réserver quoi que ce soit, j'ai besoin de comprendre où tu en es, ce que tu cherches à développer et ce qui bloque aujourd'hui. Plus tu es précis, plus je peux te dire rapidement si je suis la bonne personne pour t'aider.
+            Réponds à quelques questions pour identifier la prochaine étape qui peut réellement débloquer ta situation.
           </p>
           <p className="font-medium">
-            L'accompagnement peut concerner TikTok, Instagram, YouTube, Facebook ou une stratégie qui combine plusieurs plateformes.
+            Si un échange stratégique est pertinent, tu accèdes directement à mon calendrier. Sinon, tu repars avec une solution pour avancer sans attendre.
           </p>
-        </div>
-        <div className="max-w-4xl mx-auto mt-10 grid gap-4 sm:grid-cols-3 text-left">
-          {[
-            ["1", "Tu présentes ta situation", "Le formulaire me permet de comprendre tes réseaux, ton objectif et ce que tu as déjà tenté."],
-            ["2", "Je lis chaque demande", "Je te réponds personnellement par email sous 48 h ouvrées, que je puisse t'aider ou non."],
-            ["3", "On échange si c'est pertinent", "Si le besoin correspond au Wav Premium, je te propose un échange avant toute décision ou paiement."],
-          ].map(([step, title, text]) => (
-            <div key={step} className="rounded-2xl border border-border bg-background/80 p-5">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold mb-3">
-                {step}
-              </span>
-              <h2 className="font-display text-lg font-semibold mb-2">{title}</h2>
-              <p className="text-sm text-muted-foreground leading-relaxed">{text}</p>
-            </div>
-          ))}
         </div>
       </Section>
 
       <Section variant="default" size="lg">
         <div className="max-w-2xl mx-auto">
+          <div className="mb-10">
+            <h2 className="font-display text-3xl font-semibold mb-3">Vérifions la prochaine étape</h2>
+            <p className="text-muted-foreground">Quelques réponses courtes. Le résultat s'affiche immédiatement.</p>
+          </div>
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit, (errors) => {
                 const fields = Object.keys(errors);
-                trackEvent("reserverunappel_form_error", { fields: fields.join(",") });
-                toast.error("Vérifie les champs en rouge avant d'envoyer.");
+                trackEvent("reserverunappel_form_error", { fields: fields.join(","), form_version: FORM_VERSION });
+                toast.error("Vérifie les champs en rouge avant de continuer.");
                 const first = fields[0] as keyof ContactForm | undefined;
                 if (first) {
-                  try { form.setFocus(first); } catch { /* Les groupes ne sont pas toujours focusables. */ }
+                  try { form.setFocus(first); } catch { /* Les listes ne sont pas toujours focusables. */ }
                   requestAnimationFrame(() => {
                     const element = document.querySelector(`[name="${first}"]`) as HTMLElement | null;
                     (element ?? document.getElementById(`${first}-section`))?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -418,10 +413,10 @@ export default function ReserverUnAppel() {
                 }
               })}
               onFocus={handleFormFocus}
-              className="space-y-12 [&_label[for$='-form-item']]:text-lg [&_label[for$='-form-item']]:font-semibold"
+              className="space-y-8 [&_label[for$='-form-item']]:text-base [&_label[for$='-form-item']]:font-semibold"
             >
               <fieldset className="space-y-5">
-                <legend className="font-display text-2xl font-semibold mb-5">Informations</legend>
+                <legend className="font-display text-xl font-semibold mb-4">Tes coordonnées</legend>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <FormField control={form.control} name="first_name" render={({ field }) => (
                     <FormItem><FormLabel>Prénom *</FormLabel><FormControl><Input autoComplete="given-name" placeholder="Ton prénom" {...field} /></FormControl><FormMessage /></FormItem>
@@ -435,117 +430,82 @@ export default function ReserverUnAppel() {
                 )} />
               </fieldset>
 
-              <fieldset className="space-y-5" id="tiktok_username-section">
-                <legend className="font-display text-2xl font-semibold">Où est-ce qu'on peut voir ton travail ?</legend>
-                <p className="text-sm text-muted-foreground">Les champs sont facultatifs individuellement, mais renseigne au moins un lien ou identifiant.</p>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <FormField control={form.control} name="tiktok_username" render={({ field }) => (
-                    <FormItem><FormLabel>TikTok</FormLabel><FormControl><Input placeholder="@toncompte ou lien" {...field} /></FormControl><FormMessage /></FormItem>
-                  )} />
-                  <FormField control={form.control} name="instagram_username" render={({ field }) => (
-                    <FormItem><FormLabel>Instagram</FormLabel><FormControl><Input placeholder="@toncompte ou lien" {...field} /></FormControl><FormMessage /></FormItem>
-                  )} />
-                  <FormField control={form.control} name="youtube_url" render={({ field }) => (
-                    <FormItem><FormLabel>YouTube</FormLabel><FormControl><Input placeholder="Lien de ta chaîne" {...field} /></FormControl><FormMessage /></FormItem>
-                  )} />
-                  <FormField control={form.control} name="facebook_url" render={({ field }) => (
-                    <FormItem><FormLabel>Facebook</FormLabel><FormControl><Input placeholder="Lien de ta page ou profil" {...field} /></FormControl><FormMessage /></FormItem>
-                  )} />
-                </div>
-                <FormField control={form.control} name="other_social_url" render={({ field }) => (
-                  <FormItem><FormLabel>Autre site / réseau</FormLabel><FormControl><Input placeholder="Site, LinkedIn, podcast…" {...field} /></FormControl><FormMessage /></FormItem>
-                )} />
-              </fieldset>
-
-              <FormField control={form.control} name="profil" render={({ field }) => (
-                <FormItem id="profil-section">
-                  <FormLabel>Tu te reconnais le plus dans quel profil ? *</FormLabel>
-                  <FormControl>
-                    <RadioGroup onValueChange={field.onChange} value={field.value} className="space-y-3 mt-3">
-                      {profilOptions.map((option) => (
-                        <Label key={option.value} htmlFor={`profil-${option.value}`} className={cn("flex items-start gap-3 rounded-xl border p-4 cursor-pointer font-normal transition-colors", field.value === option.value ? "border-primary bg-primary/5" : "border-border hover:bg-accent/50")}>
-                          <RadioGroupItem value={option.value} id={`profil-${option.value}`} className="mt-0.5" />
-                          <span><strong className="block mb-1">{option.title}</strong><span className="text-sm text-muted-foreground">{option.description}</span></span>
-                        </Label>
-                      ))}
-                    </RadioGroup>
-                  </FormControl>
+              <FormField control={form.control} name="account_url" render={({ field }) => (
+                <FormItem id="account_url-section">
+                  <FormLabel>Lien principal de ton compte, ton site ou ton projet *</FormLabel>
+                  <FormControl><Input placeholder="@toncompte ou https://..." {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
 
-              <div id="objectives-section">
-                <FormLabel>Qu'est-ce que tes réseaux doivent t'apporter concrètement ? *</FormLabel>
-                <FormDescription>Plusieurs réponses possibles.</FormDescription>
-                {renderCheckboxGroup("objectives", objectiveOptions)}
-              </div>
-
-              <FormField control={form.control} name="main_blocker" render={({ field }) => (
-                <FormItem><FormLabel>Aujourd'hui, qu'est-ce qui te bloque le plus ? *</FormLabel><FormControl><Textarea placeholder="Explique-moi ce que tu as déjà essayé, ce qui fonctionne, ce qui ne fonctionne pas et ce que tu n'arrives pas à comprendre." rows={6} {...field} /></FormControl><FormMessage /></FormItem>
+              <FormField control={form.control} name="situation" render={({ field }) => (
+                <FormItem id="situation-section">
+                  <FormLabel>Où en es-tu aujourd'hui ? *</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl><SelectTrigger><SelectValue placeholder="Sélectionne ta situation" /></SelectTrigger></FormControl>
+                    <SelectContent>{situationOptions.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
               )} />
 
-              <FormField control={form.control} name="success_30_days" render={({ field }) => (
-                <FormItem><FormLabel>À la fin de ces 30 jours, qu'est-ce qui te ferait dire : « OK, cet accompagnement m'a vraiment servi » ? *</FormLabel><FormControl><Textarea placeholder="Le résultat concret que tu aimerais observer ou la décision que tu voudrais savoir prendre." rows={5} {...field} /></FormControl><FormMessage /></FormItem>
+              <FormField control={form.control} name="primary_goal" render={({ field }) => (
+                <FormItem id="primary_goal-section">
+                  <FormLabel>Quel résultat est prioritaire dans les 90 prochains jours ? *</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl><SelectTrigger><SelectValue placeholder="Sélectionne ton objectif prioritaire" /></SelectTrigger></FormControl>
+                    <SelectContent>{goalOptions.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
               )} />
 
-              <FormField control={form.control} name="why_now" render={({ field }) => (
-                <FormItem><FormLabel>Pourquoi tu cherches un accompagnement individuel maintenant ? *</FormLabel><FormControl><Textarea placeholder="Ce qui rend ce moment différent ou important pour toi." rows={4} {...field} /></FormControl><FormMessage /></FormItem>
+              <FormField control={form.control} name="blocker_context" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Qu'est-ce qui t'empêche d'obtenir ce résultat aujourd'hui ? *</FormLabel>
+                  <FormControl><Textarea placeholder="Le principal blocage, ce que tu as déjà tenté et pourquoi la situation doit changer maintenant." rows={5} {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
               )} />
 
-              <div id="help_topics-section">
-                <FormLabel>Sur quoi attends-tu le plus mon aide ? *</FormLabel>
-                <FormDescription>Plusieurs réponses possibles.</FormDescription>
-                {renderCheckboxGroup("help_topics", helpOptions)}
-              </div>
-
-              <FormField control={form.control} name="availability" render={({ field }) => (
-                <FormItem id="availability-section">
-                  <FormLabel>Est-ce que tu peux réellement consacrer du temps à tes contenus pendant les 30 jours ? *</FormLabel>
-                  <FormControl>
-                    <RadioGroup onValueChange={field.onChange} value={field.value} className="space-y-3 mt-3">
-                      {availabilityOptions.map((option) => (
-                        <Label key={option.value} htmlFor={`availability-${option.value}`} className={cn("flex items-start gap-3 rounded-xl border p-4 cursor-pointer font-normal leading-snug transition-colors", field.value === option.value ? "border-primary bg-primary/5" : "border-border hover:bg-accent/50")}>
-                          <RadioGroupItem value={option.value} id={`availability-${option.value}`} className="mt-0.5" />
-                          <span>{option.label}</span>
-                        </Label>
+              <FormField control={form.control} name="work_mode" render={({ field }) => (
+                <FormItem id="work_mode-section">
+                  <FormLabel>Après avoir clarifié ta stratégie, de quoi auras-tu surtout besoin ? *</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl><SelectTrigger><SelectValue placeholder="Sélectionne la manière d'avancer" /></SelectTrigger></FormControl>
+                    <SelectContent className="w-[var(--radix-select-trigger-width)] max-w-[calc(100vw-2rem)]">
+                      {workModeOptions.map((option) => (
+                        <SelectItem
+                          key={option.value}
+                          value={option.value}
+                          className="items-start py-2 pl-8 pr-3 [&>span:last-child]:whitespace-normal [&>span:last-child]:leading-snug"
+                        >
+                          {option.label}
+                        </SelectItem>
                       ))}
-                    </RadioGroup>
-                  </FormControl>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )} />
 
               <FormField control={form.control} name="budget" render={({ field }) => (
                 <FormItem id="budget-section">
-                  <FormLabel>Quel budget total es-tu prêt à investir dans un accompagnement individuel ? *</FormLabel>
+                  <FormLabel>Si une solution adaptée existe, quel budget total peux-tu investir maintenant ? *</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl><SelectTrigger><SelectValue placeholder="Sélectionne ton budget total" /></SelectTrigger></FormControl>
                     <SelectContent>{PREMIUM_BUDGET_TIERS.map((tier) => <SelectItem key={tier.value} value={tier.value}>{tier.label}</SelectItem>)}</SelectContent>
                   </Select>
-                  <FormDescription>Cette réponse sert uniquement à qualifier ta demande.</FormDescription>
+                  <p className="text-sm text-muted-foreground">Cette réponse évite de te proposer une prochaine étape hors sujet.</p>
                   <FormMessage />
                 </FormItem>
               )} />
 
-              <fieldset className="bg-accent/50 border border-border rounded-xl p-6 space-y-5">
-                <legend className="font-semibold text-sm text-muted-foreground uppercase tracking-wide px-2">Pour mieux te connaître</legend>
-                <FormField control={form.control} name="origin_source" render={({ field }) => (
-                  <FormItem><FormLabel>Comment m'as-tu découvert ?</FormLabel><FormControl><Input placeholder="TikTok, Instagram, YouTube, recommandation, Google…" {...field} /></FormControl><FormMessage /></FormItem>
-                )} />
-                <FormField control={form.control} name="follower_since" render={({ field }) => (
-                  <FormItem><FormLabel>Depuis combien de temps me suis-tu ?</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Sélectionne une durée" /></SelectTrigger></FormControl><SelectContent>{followerSinceOptions.map((option) => <SelectItem key={option} value={option}>{option}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>
-                )} />
-                <FormField control={form.control} name="conversion_trigger" render={({ field }) => (
-                  <FormItem><FormLabel>Quel contenu ou quelle expérience t'a poussé à me contacter aujourd'hui ?</FormLabel><FormControl><Input placeholder="Une vidéo, un témoignage, l'Analyse Express…" {...field} /></FormControl><FormMessage /></FormItem>
-                )} />
-              </fieldset>
-
               <div>
                 <Button type="submit" variant="hero" size="xl" className="w-full" disabled={isSubmitting}>
-                  {isSubmitting ? "Envoi en cours…" : "Envoyer ma demande à Fred"}
-                  {!isSubmitting && <ArrowRight className="ml-2 h-5 w-5" />}
+                  {isSubmitting ? "Analyse en cours..." : "Obtenir ma prochaine étape"}
                 </Button>
-                <p className="text-sm text-muted-foreground text-center mt-3">Je lis personnellement chaque demande avant de proposer un appel.</p>
+                <p className="text-sm text-muted-foreground text-center mt-3">Résultat immédiat après l'envoi.</p>
               </div>
             </form>
           </Form>

@@ -551,8 +551,10 @@ export type Database = {
         Row: {
           accompagnement_critere: string | null
           accompagnement_type: string | null
+          account_url: string | null
           availability: string | null
           blockers: string | null
+          business_stage: string | null
           budget: string | null
           conversion_trigger: string | null
           created_at: string
@@ -561,27 +563,36 @@ export type Database = {
           facebook_url: string | null
           first_name: string
           follower_since: string | null
+          form_version: string | null
           goals: string
           help_topics: string[] | null
           id: string
           instagram_username: string | null
           last_name: string
           motivation: string | null
+          main_blocker: string | null
           objectives: string[] | null
           origin_source: string | null
           other_social_url: string | null
           posthog_id: string | null
           profil: string | null
+          primary_goal: string | null
+          qualification_route: string | null
+          recommended_offer: string | null
+          qualification_score: number | null
           success_30_days: string | null
           tiktok_username: string | null
           why_now: string | null
+          work_mode: string | null
           youtube_url: string | null
         }
         Insert: {
           accompagnement_critere?: string | null
           accompagnement_type?: string | null
+          account_url?: string | null
           availability?: string | null
           blockers?: string | null
+          business_stage?: string | null
           budget?: string | null
           conversion_trigger?: string | null
           created_at?: string
@@ -590,27 +601,36 @@ export type Database = {
           facebook_url?: string | null
           first_name: string
           follower_since?: string | null
+          form_version?: string | null
           goals: string
           help_topics?: string[] | null
           id?: string
           instagram_username?: string | null
           last_name: string
           motivation?: string | null
+          main_blocker?: string | null
           objectives?: string[] | null
           origin_source?: string | null
           other_social_url?: string | null
           posthog_id?: string | null
           profil?: string | null
+          primary_goal?: string | null
+          qualification_route?: string | null
+          recommended_offer?: string | null
+          qualification_score?: number | null
           success_30_days?: string | null
           tiktok_username?: string | null
           why_now?: string | null
+          work_mode?: string | null
           youtube_url?: string | null
         }
         Update: {
           accompagnement_critere?: string | null
           accompagnement_type?: string | null
+          account_url?: string | null
           availability?: string | null
           blockers?: string | null
+          business_stage?: string | null
           budget?: string | null
           conversion_trigger?: string | null
           created_at?: string
@@ -619,20 +639,27 @@ export type Database = {
           facebook_url?: string | null
           first_name?: string
           follower_since?: string | null
+          form_version?: string | null
           goals?: string
           help_topics?: string[] | null
           id?: string
           instagram_username?: string | null
           last_name?: string
           motivation?: string | null
+          main_blocker?: string | null
           objectives?: string[] | null
           origin_source?: string | null
           other_social_url?: string | null
           posthog_id?: string | null
           profil?: string | null
+          primary_goal?: string | null
+          qualification_route?: string | null
+          recommended_offer?: string | null
+          qualification_score?: number | null
           success_30_days?: string | null
           tiktok_username?: string | null
           why_now?: string | null
+          work_mode?: string | null
           youtube_url?: string | null
         }
         Relationships: []

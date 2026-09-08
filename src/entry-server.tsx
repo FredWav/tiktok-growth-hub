@@ -2,7 +2,7 @@ import React from "react";
 import { PassThrough } from "node:stream";
 import { QueryClient } from "@tanstack/react-query";
 import { renderToPipeableStream } from "react-dom/server";
-import { StaticRouter } from "react-router";
+import { StaticRouter } from "react-router-dom";
 import { AppProviders, AppRouterContent } from "./App";
 import { BASE_URL } from "./config/seo";
 import { CLIENT_ONLY_ROUTE_PATTERNS, LEGACY_REDIRECTS, SSG_ROUTES } from "./config/routes";

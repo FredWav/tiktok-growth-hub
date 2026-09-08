@@ -45,14 +45,9 @@ export default function WavAcademy() {
           <Button asChild variant="hero" size="xl">
             <a href="#programme">Découvrir le programme</a>
           </Button>
-          <p className="mt-4 text-sm text-muted-foreground">
-            {ACADEMY_FROM}{" "}
-            € TTC pour six mois, sans reconduction. Inscription après un échange
-            avec Fred.
-          </p>
         </div>
       </Section>
-      <Section size="lg">
+      <Section id="programme" size="lg">
         <SectionHeader
           title="Tu montres. On analyse. Tu mets en pratique."
           subtitle="Ce que tu achètes, c’est un accompagnement. Pas une promesse de vues."
@@ -202,9 +197,22 @@ export default function WavAcademy() {
           ))}
         </div>
       </Section>
+      <Section variant="cream" size="lg">
+        <SectionHeader title="Les questions utiles avant l’appel" />
+        <Accordion type="single" collapsible className="max-w-3xl mx-auto">
+          {WAVACADEMY_FAQ.map((f, i) => (
+            <AccordionItem key={f.question} value={String(i)}>
+              <AccordionTrigger className="text-left">
+                {f.question}
+              </AccordionTrigger>
+              <AccordionContent>{f.answer}</AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </Section>
       <Section size="lg">
         <div
-          id="programme"
+          id="inscription"
           className="scroll-mt-24 max-w-2xl mx-auto border-2 border-primary rounded-2xl p-6 md:p-10"
         >
           <h2 className="font-display text-3xl mb-4">
@@ -252,19 +260,6 @@ export default function WavAcademy() {
             engagements. Aucun paiement à cette étape.
           </p>
         </div>
-      </Section>
-      <Section variant="cream" size="lg">
-        <SectionHeader title="Les questions utiles avant l’appel" />
-        <Accordion type="single" collapsible className="max-w-3xl mx-auto">
-          {WAVACADEMY_FAQ.map((f, i) => (
-            <AccordionItem key={f.question} value={String(i)}>
-              <AccordionTrigger className="text-left">
-                {f.question}
-              </AccordionTrigger>
-              <AccordionContent>{f.answer}</AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
       </Section>
     </Layout>
   );

@@ -12,7 +12,7 @@ const corsHeaders = {
 const LIVE_PAYMENT_LINK = Deno.env.get("STRIPE_EXPRESS_PAYMENT_LINK_LIVE") ||
   "https://buy.stripe.com/bJe3cu4WU4uZ8z81DacMM0y";
 // Versions conservées avec la preuve d'acceptation. À modifier à chaque changement matériel.
-const CGV_VERSION = "2026-08-11";
+const CGV_VERSION = "2026-09-08";
 const IMMEDIATE_DELIVERY_NOTICE_VERSION = "2026-08-11";
 const CGV_ACCEPTED_TEXT = "J'ai lu et j'accepte les Conditions Générales de Vente.";
 const IMMEDIATE_DELIVERY_ACCEPTED_TEXT = "Je demande expressément l'exécution immédiate de l'Analyse Express avant la fin du délai de 14 jours et je reconnais perdre mon droit de rétractation lorsque la prestation est pleinement exécutée et le rapport mis à disposition.";
@@ -65,6 +65,7 @@ serve(async (req) => {
   }
 
   try {
+    if (Deno.env.get("EXPRESS_SAMPLE_CONTRACT_VERIFIED") !== "true") return jsonResponse({ error: "Les nouvelles analyses sont temporairement suspendues. Contacte Fred pour être prévenu de la réouverture." }, 503);
     const body = await req.json();
     const {
       username,

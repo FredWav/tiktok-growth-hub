@@ -38,7 +38,7 @@ export const VIDEO_META: Record<string, VideoMeta> = {
   XMMmmLLKue4: {
     name: "PlotBreaker",
     niche: "Analyse films & séries",
-    result: "+3 000 abonnés en moins d'un mois",
+    result: "+3 000 abonnés · période à confirmer",
   },
 
   // Jérôme "Le Sapac" — streamer/créateur jeux vidéo (accompagnement) · multi-réseaux :

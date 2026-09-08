@@ -1,5 +1,16 @@
 project_id = "rdpykyvqcckxpygwblxf"
 
+[functions.submit-academy-application]
+verify_jwt = false
+[functions.submit-premium-application]
+verify_jwt = false
+[functions.commerce-admin]
+verify_jwt = false
+[functions.enrollment]
+verify_jwt = false
+[functions.commerce-process]
+verify_jwt = false
+
 [functions.admin-assistant]
 verify_jwt = false
 

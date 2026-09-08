@@ -159,7 +159,7 @@ export default function Home() {
             </Button>
           </div>
           <p className="text-sm text-muted-foreground mt-4">
-            Academy dès {ACADEMY_FROM} € pour {ACADEMY_ENTRY.duration} — paiement unique, sans reconduction.
+            Academy {ACADEMY_FROM} € pour {ACADEMY_ENTRY.duration} — paiement unique, sans reconduction.
           </p>
         </div>
       </Section>
@@ -356,7 +356,7 @@ export default function Home() {
             </Link>
           </Button>
           <p className="text-xs text-cream/50 mt-4">
-            {ACADEMY_ENTRY.duration} dès {ACADEMY_FROM} € — paiement unique — aucune reconduction automatique.
+            {ACADEMY_ENTRY.duration} {ACADEMY_FROM} € — paiement unique — aucune reconduction automatique.
           </p>
           <div className="mt-8 pt-8 border-t border-cream/10">
             <p className="text-sm text-cream/60 mb-3">Tu préfères commencer par un diagnostic de ton compte TikTok ?</p>

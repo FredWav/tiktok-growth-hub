@@ -22,6 +22,7 @@ interface AdminLayoutProps {
 }
 
 const navItems = [
+  { label: "Commandes & demandes", href: "/admin/commandes", icon: ClipboardList },
   { label: "Analyses Express", href: "/admin/analyses", icon: Zap },
   { label: "Candidatures", href: "/admin/applications", icon: ClipboardList },
   { label: "Marketing", href: "/admin/marketing", icon: BarChart3 },

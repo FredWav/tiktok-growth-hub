@@ -1,9 +1,10 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 import { getStripeSecretKey } from "../_shared/stripe-config.ts";
 import { notifySuccess, notifyError } from "../_shared/itpush.ts";
 import { normalizeTikTokUsername } from "../_shared/tiktok-username.ts";
+import { checkoutMismatch } from "../_shared/checkout-validation.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -17,7 +18,7 @@ const API_BASE = "https://wavstats.com/api/v1";
  * Updates express_analyses.newsletter_subscribed on success.
  */
 async function subscribeToNewsletter(
-  supabase: ReturnType<typeof createClient>,
+  supabase: SupabaseClient,
   analysisId: string | null,
   email: string,
 ): Promise<void> {
@@ -80,6 +81,10 @@ serve(async (req) => {
     if (!session.livemode && Deno.env.get("ALLOW_TEST_FULFILLMENT") !== "true") {
       throw new Error("Exécution des paiements test désactivée");
     }
+    const items = await stripe.checkout.sessions.listLineItems(session.id, { limit: 2 });
+    const expectedPrice = Deno.env.get(session.livemode ? "STRIPE_EXPRESS_PRICE_ID_LIVE" : "STRIPE_EXPRESS_PRICE_ID_TEST");
+    const mismatch = checkoutMismatch(session, items.data, expectedPrice, 1190);
+    if (mismatch) throw new Error(mismatch);
 
     // ── 1. Résoudre la ligne express_analyses ──
     // Soit déjà liée à cette session Stripe (retry), soit via client_reference_id
@@ -109,10 +114,11 @@ serve(async (req) => {
       row = (byRef as ExpressAnalysisRow | null) ?? null;
       if (row) {
         // Lie définitivement la session Stripe à cette ligne d'intention.
-        await supabase
+        const { data: linked, error: linkError } = await supabase
           .from("express_analyses")
           .update({ stripe_session_id: session_id })
-          .eq("id", row.id);
+          .eq("id", row.id).is("stripe_session_id", null).select("id").maybeSingle();
+        if (linkError || !linked) throw new Error("Cette intention est déjà rattachée à un autre paiement");
       }
     }
     if (!row) throw new Error("Intention d'analyse introuvable pour cette session");
@@ -144,33 +150,17 @@ serve(async (req) => {
       throw new Error("Incohérence entre le mode Stripe et le registre de consentement");
     }
 
-    // Verrou idempotent : completed et async_payment_succeeded peuvent arriver
-    // presque simultanément. Un seul appel lance WavStats ; les autres constatent
-    // l'état de démarrage. Un verrou interrompu redevient récupérable après 10 min.
+    // One launch only: an interrupted remote call has an unknown outcome.
+    // Do not create a second paid job automatically; the support outbox handles recovery.
     const launchAt = new Date().toISOString();
-    const staleBefore = new Date(Date.now() - 10 * 60 * 1_000).toISOString();
-    let { data: launchLock, error: launchLockError } = await supabase
+    const { data: launchLock, error: launchLockError } = await supabase
       .from("express_analyses")
-      .update({ status: "starting", launch_started_at: launchAt, error_message: null })
+      .update({ status: "starting", launch_started_at: launchAt, processing_started_at: launchAt, error_message: null })
       .eq("id", analysisId)
       .is("job_id", null)
-      .in("status", ["pending", "awaiting_payment", "failed"])
+      .in("status", ["pending", "awaiting_payment"])
       .select("id")
       .maybeSingle();
-
-    if (!launchLock && !launchLockError) {
-      const staleLock = await supabase
-        .from("express_analyses")
-        .update({ status: "starting", launch_started_at: launchAt, error_message: null })
-        .eq("id", analysisId)
-        .is("job_id", null)
-        .eq("status", "starting")
-        .lt("launch_started_at", staleBefore)
-        .select("id")
-        .maybeSingle();
-      launchLock = staleLock.data;
-      launchLockError = staleLock.error;
-    }
 
     if (launchLockError) throw new Error(`Verrou de lancement impossible : ${launchLockError.message}`);
     if (!launchLock) {
@@ -232,10 +222,17 @@ serve(async (req) => {
 
     // ── 4. Update DB row with job_id + status=processing ──
     if (analysisId) {
-      await supabase
+      const { error: jobSaveError } = await supabase
         .from("express_analyses")
-        .update({ tiktok_username: username, job_id: jobId, status: "processing", launch_started_at: null })
+        .update({
+          tiktok_username: username,
+          job_id: jobId,
+          status: "processing",
+          launch_started_at: null,
+          processing_started_at: launchAt,
+        })
         .eq("id", analysisId);
+      if (jobSaveError) throw new Error("Enregistrement du traitement impossible : intervention nécessaire");
     }
 
     await notifySuccess("Analyse Express", `Lancée • @${username} • job ${jobId}${customerEmail ? " • " + customerEmail : ""}`);
@@ -251,13 +248,15 @@ serve(async (req) => {
         .update({
           status: "failed",
           launch_started_at: null,
+          support_requested_at: new Date().toISOString(),
           error_message: error instanceof Error ? error.message.slice(0, 1_000) : String(error).slice(0, 1_000),
         })
         .eq("id", analysisId)
         .is("job_id", null);
     }
-    await notifyError("Analyse Express", `${error.message}${customerEmail ? " • " + customerEmail : ""}${username ? " • @" + username : ""}`);
-    return new Response(JSON.stringify({ error: error.message }), {
+    const message = error instanceof Error ? error.message : String(error);
+    await notifyError("Analyse Express", `${message}${customerEmail ? " • " + customerEmail : ""}${username ? " • @" + username : ""}`);
+    return new Response(JSON.stringify({ error: message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

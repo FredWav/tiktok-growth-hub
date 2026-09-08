@@ -223,7 +223,7 @@ export default function APropos() {
               </Link>
             </Button>
             <Button variant="outline" size="lg" asChild onClick={() => trackEvent("cta_contact_click", { location: "apropos" })}>
-              <Link to="/reserverunappel" onClick={() => trackEvent("cta_premium_click", { location: "apropos" })}>
+              <Link to="/wav-premium" onClick={() => trackEvent("cta_premium_click", { location: "apropos" })}>
                 Réserve ton appel
               </Link>
             </Button>

@@ -20,8 +20,8 @@ export const CLIENT_RESULTS: ClientResult[] = [
     avatarUrl: "/plotbreaker.jpg",
     niche: "Analyse films & séries",
     metric: "+3 000",
-    result: "abonnés en moins d'un mois",
-    detail: "cap des 10 000 franchi",
+    result: "abonnés supplémentaires",
+    detail: "cap des 10 000 franchi · période à confirmer",
   },
   {
     name: "Antoine au Vietnam",

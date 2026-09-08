@@ -5,7 +5,7 @@
  * au moment du build (génération du sitemap, de llms.txt et des coquilles HTML).
  * Il doit donc rester du **pur data** : aucun import React, aucune API navigateur.
  *
- * Grille figée jusqu'au 31/12/2026. Aucun autre prix ne doit apparaître sur le site.
+ * Nouvelle gamme 2026-09 ; ne jamais valoriser les encaissements historiques avec cette grille.
  */
 
 export type AcademyPlan = {
@@ -25,19 +25,8 @@ export type AcademyPlan = {
 };
 
 export const ACADEMY_PLANS: AcademyPlan[] = [
-  {
-    term: "3m", months: 3, total: 299, monthly: 100, label: "Fondation", duration: "3 mois",
-    save: null, note: "Pour poser des bases solides et trouver ton format.",
-  },
-  {
-    term: "6m", months: 6, total: 499, monthly: 83, label: "Accélération", duration: "6 mois",
-    save: "≈ 1 mois offert", note: "Le temps d'ancrer la méthode et de tenir le rythme.",
-    highlight: true, badge: "Recommandé",
-  },
-  {
-    term: "12m", months: 12, total: 899, monthly: 75, label: "Maîtrise", duration: "12 mois",
-    save: "≈ 3 mois offerts", note: "Un an complet pour installer un système de création durable.",
-  },
+  { term: "6m", months: 6, total: 749, monthly: 749 / 6, label: "Wav Academy", duration: "6 mois",
+    save: null, note: "Six mois à partir de la date convenue ensemble.", highlight: true },
 ];
 
 /**
@@ -63,24 +52,26 @@ export const EXPRESS_PRICE = 11.9;
 export const EXPRESS_PRICE_LABEL = "11,90 €";
 
 /**
- * Wav Premium — pas de prix public (décision produit).
+ * Wav Premium — prix public, candidature étudiée personnellement.
  * L'accès passe par une candidature qualifiée sur /reserverunappel.
  */
 export const PREMIUM_DURATION_DAYS = 30;
+export const PREMIUM_PRICE_LABEL = "1 990 €";
 
 /** Créneau du live hebdomadaire — engagement contractuel, il ne saute pas. */
-export const ACADEMY_LIVE_SLOT = "le jeudi de 14h à 16h";
-export const ACADEMY_SUPPORT_DAYS = "5 jours sur 7";
+export const ACADEMY_LIVE_SLOT = "le mardi de 18h à 19h30 et le jeudi de 14h à 16h";
+export const ACADEMY_SUPPORT_DAYS = "du lundi au vendredi, réponse sous deux jours ouvrés";
 export const ACADEMY_MODULES_COUNT = 6;
 export const ACADEMY_GUIDES_COUNT = 19;
 
 /** Ce que les trois Pass ont en commun. */
 export const ACADEMY_FEATURES = [
-  `Live hebdomadaire ${ACADEMY_LIVE_SLOT}`,
-  `Suivi ${ACADEMY_SUPPORT_DAYS}, tes questions vérifiées chaque jour`,
-  "Feedback sur n'importe lequel de tes contenus, sur demande",
-  "Discord premium (canaux avancés) et accès direct",
-  `${ACADEMY_MODULES_COUNT} modules de formation et ${ACADEMY_GUIDES_COUNT} guides téléchargeables`,
+  "Deux lives en accès libre : mardi 18 h–19 h 30 et jeudi 14 h–16 h (Paris)",
+  "Lives maintenus ou délégués pendant les congés ; résumé, sans replay",
+  "Discord collectif du lundi au vendredi, réponse sous deux jours ouvrés",
+  "TikTok, Instagram et YouTube ; débutants avec un projet concret acceptés",
+  "6 modules et 19 guides téléchargeables",
+  "Six dotations mensuelles de 3 000 crédits WavStats, non cumulables",
 ];
 
 // ── Budget déclaré → offre recommandée ──────────────────────────────────────
@@ -175,6 +166,14 @@ export type OfferTier = {
 
 export const OFFER_TIERS: OfferTier[] = [
   {
+    need: "Je veux analyser et travailler seul.",
+    name: "WavStats",
+    description: "L’outil d’analyse pour observer tes contenus, comparer tes essais et avancer en autonomie.",
+    note: "Service distinct. Tarifs et compatibilités sur WavStats.",
+    href: "https://wavstats.com",
+    cta: "Découvrir WavStats",
+  },
+  {
     need: "Je veux comprendre ce qui bloque maintenant.",
     name: "Analyse Express",
     price: EXPRESS_PRICE_LABEL,
@@ -186,7 +185,7 @@ export const OFFER_TIERS: OfferTier[] = [
   {
     need: "Je veux progresser dans un cadre régulier.",
     name: "Wav Academy",
-    price: "3, 6 ou 12 mois",
+    price: "749 € TTC · 6 mois",
     description: "Des ressources, des outils, des lives et une communauté pour apprendre à analyser tes contenus et prendre de meilleures décisions semaine après semaine.",
     href: "/wavacademy",
     cta: "Rejoindre la Wav Academy",
@@ -196,7 +195,8 @@ export const OFFER_TIERS: OfferTier[] = [
     need: "Je veux travailler directement avec Fred.",
     name: "Wav Premium",
     description: `${PREMIUM_DURATION_DAYS} jours d'accompagnement individuel pour travailler directement sur ta stratégie, tes contenus et tes objectifs réseaux sociaux.`,
-    href: "/reserverunappel",
-    cta: "Réserve ton appel",
+    price: "1 990 € TTC · 30 jours",
+    href: "/wav-premium",
+    cta: "Découvrir le Premium",
   },
 ];

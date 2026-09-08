@@ -36,6 +36,7 @@ export interface ReportModel {
     nicheConfidence?: number;
     creatorLevel?: string;
     generatedAtLabel: string;
+    sampleLabel?: string;
   };
   health?: {
     total: number;

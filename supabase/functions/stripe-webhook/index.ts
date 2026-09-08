@@ -1,9 +1,11 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import nodemailer from "npm:nodemailer@6.9.16";
+import { db, enqueue } from "../_shared/commerce.ts";
 import { getStripeSecretKey } from "../_shared/stripe-config.ts";
 import { notifySuccess, notifyError } from "../_shared/itpush.ts";
+import { commerceCheckout } from "../_shared/commerce-stripe.ts";
+import { checkoutMismatch } from "../_shared/checkout-validation.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -21,15 +23,6 @@ function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
 type ExpressConsentConfirmation = {
   email: string;
   tiktok_username: string;
@@ -44,9 +37,6 @@ async function sendExpressOrderConfirmation(
   consent: ExpressConsentConfirmation,
   session: Stripe.Checkout.Session,
 ): Promise<void> {
-  const smtpPassword = Deno.env.get("SMTP_PASSWORD") || "";
-  if (!smtpPassword) throw new Error("SMTP_PASSWORD non configuré");
-
   const siteUrl = Deno.env.get("SITE_URL") || "https://fredwav.com";
   const acceptedAt = new Intl.DateTimeFormat("fr-FR", {
     dateStyle: "long",
@@ -59,22 +49,6 @@ async function sendExpressOrderConfirmation(
         currency: (session.currency || "eur").toUpperCase(),
       }).format(session.amount_total / 100)
     : "montant indiqué sur votre reçu Stripe";
-
-  const html = `
-    <div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#1a1a1a;line-height:1.6">
-      <h1 style="font-size:22px">Confirmation de votre commande Analyse Express</h1>
-      <p>Votre paiement de <strong>${escapeHtml(amount)}</strong> est confirmé pour l'analyse du compte <strong>@${escapeHtml(consent.tiktok_username)}</strong>.</p>
-      <h2 style="font-size:18px">Consentements enregistrés avant paiement</h2>
-      <p><strong>Acceptés le :</strong> ${escapeHtml(acceptedAt)}</p>
-      <p><strong>Version des CGV :</strong> ${escapeHtml(consent.cgv_version)}</p>
-      <blockquote style="margin:12px 0;padding:12px;border-left:3px solid #c8a97e;background:#f7f3ed">${escapeHtml(consent.cgv_accepted_text)}</blockquote>
-      <p><strong>Version de l'information sur l'exécution immédiate :</strong> ${escapeHtml(consent.immediate_delivery_notice_version)}</p>
-      <blockquote style="margin:12px 0;padding:12px;border-left:3px solid #c8a97e;background:#f7f3ed">${escapeHtml(consent.immediate_delivery_accepted_text)}</blockquote>
-      <p><strong>Référence Stripe :</strong> ${escapeHtml(session.id)}</p>
-      <p>Vous pouvez consulter les CGV applicables sur <a href="${siteUrl}/cgv">${siteUrl}/cgv</a> et exercer en ligne votre droit de rétractation sur <a href="${siteUrl}/retractation">${siteUrl}/retractation</a>, sous réserve des conditions et exceptions légales rappelées ci-dessus.</p>
-      <p>Conservez cet email avec votre reçu Stripe.</p>
-      <p style="color:#666;font-size:12px">Fred Wav · Frédéric Olalde EI · SIRET 921 749 727 00019</p>
-    </div>`;
 
   const text = [
     "Confirmation de votre commande Analyse Express",
@@ -90,21 +64,8 @@ async function sendExpressOrderConfirmation(
     `Rétractation : ${siteUrl}/retractation`,
   ].join("\n\n");
 
-  const transporter = nodemailer.createTransport({
-    host: "ssl0.ovh.net",
-    port: 465,
-    secure: true,
-    auth: { user: "noreply@fredwav.com", pass: smtpPassword },
-  });
-
-  await transporter.sendMail({
-    from: "Fred Wav <noreply@fredwav.com>",
-    to: consent.email,
-    replyTo: "contact@fredwav.com",
-    subject: `Commande Analyse Express confirmée — ${session.id}`,
-    text,
-    html,
-  });
+  await enqueue(db(), `express-contract:${session.id}`, consent.email,
+    `Commande Analyse Express confirmée — ${session.id}`, text);
 }
 
 async function safeNotifyError(title: string, message: string): Promise<void> {
@@ -192,13 +153,13 @@ serve(async (req) => {
     if (!stripeSecretKey) {
       console.error("Stripe secret key missing. Webhook event ignored.");
       await safeNotifyError("Stripe Webhook", "Clé Stripe manquante - événement ignoré");
-      return jsonResponse({ received: true, ignored: true, reason: "stripe_secret_key_missing" });
+      return jsonResponse({ error: "stripe_secret_key_missing" }, 500);
     }
 
     if (webhookSecrets.length === 0) {
       console.error("Stripe webhook signing secret missing. Webhook event ignored, but acknowledged to avoid retry storms.");
       await safeNotifyError("Stripe Webhook", "Secret de signature webhook manquant - événement ignoré");
-      return jsonResponse({ received: true, ignored: true, reason: "webhook_secret_missing" });
+      return jsonResponse({ error: "webhook_secret_missing" }, 500);
     }
 
     const stripe = new Stripe(stripeSecretKey, {
@@ -211,7 +172,7 @@ serve(async (req) => {
     if (!supabaseUrl || !serviceRoleKey) {
       console.error("Backend service credentials missing. Webhook event ignored.");
       await safeNotifyError("Stripe Webhook", "Credentials backend manquants - événement ignoré");
-      return jsonResponse({ received: true, ignored: true, reason: "backend_credentials_missing" });
+      return jsonResponse({ error: "backend_credentials_missing" }, 500);
     }
 
     const supabase = createClient(supabaseUrl, serviceRoleKey, {
@@ -242,6 +203,9 @@ serve(async (req) => {
     ) {
       const session = event.data.object as Stripe.Checkout.Session;
       const metadata = session.metadata;
+      if (await commerceCheckout(stripe, session, event.created)) {
+        return jsonResponse({ received: true, product: "commerce_v3" });
+      }
 
       // Analyse Express : le client_reference_id pointe vers express_analyses.
       // On rattache la preuve de consentement à la session même si le client
@@ -263,6 +227,17 @@ serve(async (req) => {
         }
 
         if (expressConsent) {
+          const items = await stripe.checkout.sessions.listLineItems(session.id, { limit: 2 });
+          const expectedPrice = Deno.env.get(session.livemode ? "STRIPE_EXPRESS_PRICE_ID_LIVE" : "STRIPE_EXPRESS_PRICE_ID_TEST");
+          const mismatch = checkoutMismatch(session, items.data, expectedPrice, 1190);
+          if (mismatch) {
+            if (session.payment_status === "paid") {
+              const { error } = await supabase.from("commerce_unmatched_payments").upsert({ session_id: session.id, reason: `Express : ${mismatch}`, amount_cents: session.amount_total, currency: session.currency, email: session.customer_details?.email, received_at: new Date(event.created * 1000).toISOString() }, { onConflict: "session_id", ignoreDuplicates: true });
+              if (error) throw error;
+            }
+            await safeNotifyError("Analyse Express Webhook", `${mismatch} • ${session.id} • aucun rapport rattaché`);
+            return jsonResponse({ received: true, reconciliation_required: true });
+          }
           const checkoutIsTest = expressConsent.checkout_mode === "test";
           if (checkoutIsTest === event.livemode) {
             await safeNotifyError(
@@ -273,16 +248,17 @@ serve(async (req) => {
           }
 
           const linkedAt = new Date().toISOString();
-          const { error: consentUpdateError } = await supabase
+          const { data: consentLinked, error: consentUpdateError } = await supabase
             .from("express_purchase_consents")
             .update({
               stripe_session_id: session.id,
               stripe_payment_status: session.payment_status,
               stripe_linked_at: linkedAt,
             })
-            .eq("id", expressConsent.id);
+            .eq("id", expressConsent.id)
+            .or(`stripe_session_id.is.null,stripe_session_id.eq.${session.id}`).select("id").maybeSingle();
 
-          if (consentUpdateError) {
+          if (consentUpdateError || !consentLinked) {
             console.error("Express consent Stripe link failed:", consentUpdateError);
             await safeNotifyError(
               "Analyse Express Webhook",
@@ -294,12 +270,13 @@ serve(async (req) => {
           // Ne marque l'analyse comme payée que lorsque Stripe le confirme.
           // express-analysis conserve sa propre vérification avant de lancer le rapport.
           if (session.payment_status === "paid") {
-            const { error: analysisUpdateError } = await supabase
+            const { data: analysisLinked, error: analysisUpdateError } = await supabase
               .from("express_analyses")
               .update({ stripe_session_id: session.id })
-              .eq("id", session.client_reference_id);
+              .eq("id", session.client_reference_id)
+              .or(`stripe_session_id.is.null,stripe_session_id.eq.${session.id}`).select("id").maybeSingle();
 
-            if (analysisUpdateError) {
+            if (analysisUpdateError || !analysisLinked) {
               console.error("Express analysis Stripe link failed:", analysisUpdateError);
               await safeNotifyError(
                 "Analyse Express Webhook",
@@ -318,44 +295,10 @@ serve(async (req) => {
               });
             }
 
+            // Durable queue: SMTP downtime must not prevent a paid analysis from starting.
+            // The historical sent marker avoids re-mailing already confirmed orders.
             if (!expressConsent.confirmation_sent_at) {
-              try {
-                await sendExpressOrderConfirmation(
-                  expressConsent as ExpressConsentConfirmation,
-                  session,
-                );
-                const confirmationSentAt = new Date().toISOString();
-                const { error: confirmationUpdateError } = await supabase
-                  .from("express_purchase_consents")
-                  .update({
-                    confirmation_email: expressConsent.email,
-                    confirmation_sent_at: confirmationSentAt,
-                    confirmation_delivery_error: null,
-                  })
-                  .eq("id", expressConsent.id)
-                  .is("confirmation_sent_at", null);
-
-                if (confirmationUpdateError) {
-                  console.error("Express confirmation marker failed:", confirmationUpdateError);
-                  await safeNotifyError(
-                    "Analyse Express Webhook",
-                    `Email envoyé mais marqueur DB en échec • session=${session.id}`,
-                  );
-                }
-              } catch (confirmationError) {
-                const message = getErrorMessage(confirmationError).slice(0, 1_000);
-                await supabase
-                  .from("express_purchase_consents")
-                  .update({ confirmation_delivery_error: message })
-                  .eq("id", expressConsent.id);
-                await safeNotifyError(
-                  "Analyse Express Webhook",
-                  `Échec confirmation contractuelle • session=${session.id} • ${message}`,
-                );
-                // Une réponse 5xx demande à Stripe de rejouer l'événement. Le guard
-                // confirmation_sent_at empêche un nouvel envoi après un succès.
-                return jsonResponse({ error: "Express confirmation email failed" }, 500);
-              }
+              await sendExpressOrderConfirmation(expressConsent as ExpressConsentConfirmation, session);
             }
 
             try {
@@ -448,6 +391,11 @@ serve(async (req) => {
       }
 
       if (!plan || !discordRoleEnv || !email) {
+        if (session.payment_status === "paid") {
+          const {error:unmatchedError}=await supabase.from("commerce_unmatched_payments").upsert({session_id:session.id,reason:"Paiement non rattaché à une commande reconnue",amount_cents:session.amount_total,currency:session.currency,email:session.customer_details?.email,received_at:new Date(event.created*1000).toISOString()},{onConflict:"session_id",ignoreDuplicates:true});
+          if(unmatchedError) throw unmatchedError;
+          await safeNotifyError("Stripe Webhook",`Paiement à rapprocher : ${session.id}. Aucun nouvel accès ouvert.`);
+        }
         console.log("Checkout session is not a Wav Academy purchase, skipping");
         return jsonResponse({ received: true });
       }
@@ -911,12 +859,10 @@ serve(async (req) => {
 
         await supabase
           .from("wavacademy_subscriptions")
-          .update({ status: "cancelled", discord_role_granted: false })
+          .update({ status: "active", access_expires_at: new Date().toISOString() })
           .eq("stripe_subscription_id", subscription.id);
 
-        if (subRow.discord_user_id && subRow.discord_role_env) {
-          await assignDiscordRole(subRow.discord_user_id, subRow.discord_role_env, "revoke");
-        }
+        // Expiration worker preserves another active entitlement and retries Discord errors.
 
         await safeNotifySuccess("WavAcademy", `Résiliation abonnement • ${subscription.id}`);
       }

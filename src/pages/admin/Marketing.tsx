@@ -13,7 +13,8 @@ import { Badge } from "@/components/ui/badge";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { BUDGET_LABELS, ACADEMY_PLANS, EXPRESS_PRICE } from "@/config/offers";
+import { commerceCall } from "@/lib/commerce";
+import { BUDGET_LABELS } from "@/config/offers";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid,
   PieChart as RechartsPie, Pie, Cell, Tooltip as RechartsTooltip,
@@ -73,11 +74,6 @@ const FUNNEL_STEPS: { label: string; reached: (d: DiagStep) => boolean }[] = [
   { label: "Email", reached: (d) => d.current_step >= 6 },
   { label: "Complété", reached: (d) => d.completed === true },
 ];
-
-// Prix Academy par durée d'accès (access_months), pour dériver le CA.
-const ACADEMY_PRICE_BY_MONTHS: Record<number, number> = Object.fromEntries(
-  ACADEMY_PLANS.map((p) => [p.months, p.total]),
-);
 
 export default function AdminMarketing() {
   // UTM Generator state
@@ -246,25 +242,10 @@ export default function AdminMarketing() {
     };
   }, [pageViews]);
 
-  // ---- CA du mois (dérivé de la base, à recouper avec Stripe) ----
-  // Interim : la vérité financière doit venir de Stripe. En attendant, on additionne
-  //  - bookings payés (legacy)
-  //  - Academy : 1 abonnement actif créé ce mois = 1 achat, prix selon access_months
-  //  - Express confirmés : lignes avec un stripe_session_id (exclut les lancements manuels admin)
-  const { data: revenue = { total: 0, bookings: 0, academy: 0, express: 0 } } = useQuery({
-    queryKey: ["marketing-real-revenue"],
-    queryFn: async () => {
-      const monthStart = startOfMonth(new Date()).toISOString();
-      const [bookingsRes, academyRes, expressRes] = await Promise.all([
-        supabase.from("bookings").select("amount_cents").eq("payment_status", "paid").gte("paid_at", monthStart),
-        supabase.from("wavacademy_subscriptions" as any).select("access_months").eq("status", "active").gte("created_at", monthStart),
-        supabase.from("express_analyses").select("id", { count: "exact", head: true }).not("stripe_session_id", "is", null).gte("created_at", monthStart),
-      ]);
-      const bookings = ((bookingsRes.data as unknown as { amount_cents: number | null }[]) || []).reduce((s, b) => s + (b.amount_cents || 0), 0) / 100;
-      const academy = ((academyRes.data as unknown as { access_months: number | null }[]) || []).reduce((s, r) => s + (ACADEMY_PRICE_BY_MONTHS[r.access_months ?? 0] || 0), 0);
-      const express = (expressRes.count || 0) * EXPRESS_PRICE;
-      return { total: bookings + academy + express, bookings, academy, express };
-    },
+  // Encaissements réels du registre, par date bancaire et non par activation.
+  const { data: revenue, isError: revenueError } = useQuery({
+    queryKey: ["marketing-commerce-revenue"],
+    queryFn: () => commerceCall<{ total: number; academy: number; premium: number }>("commerce-admin", { action: "revenue" }),
   });
 
   // ---- Existing leads query ----
@@ -585,7 +566,7 @@ export default function AdminMarketing() {
                   className="flex h-10 w-full rounded-md border bg-noir border-primary/20 text-cream px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                 >
                   <option value="https://fredwav.com">Accueil</option>
-                  <option value="https://fredwav.com/start">Diagnostic (/start)</option>
+                  <option value="https://fredwav.com/wav-premium">Wav Premium</option>
                   <option value="https://fredwav.com/analyse-express">Analyse Express</option>
                   <option value="https://fredwav.com/reserverunappel">Réserver un appel</option>
                   <option value="https://fredwav.com/wavacademy">Wav Academy</option>
@@ -644,12 +625,12 @@ export default function AdminMarketing() {
                 <div className="bg-noir rounded-lg p-4 border border-primary/10 text-center">
                   <div className="flex items-center justify-center gap-1.5 mb-1">
                     <DollarSign className="h-4 w-4 text-primary" />
-                    <p className="text-2xl font-bold text-primary">{revenue.total > 0 ? `${revenue.total.toLocaleString("fr-FR")} €` : "-"}</p>
+                    <p className="text-2xl font-bold text-primary">{revenue ? `${revenue.total.toLocaleString("fr-FR")} €` : revenueError ? "Indisponible" : "…"}</p>
                   </div>
-                  <p className="text-xs text-cream/60">CA du mois (à recouper Stripe)</p>
-                  {revenue.total > 0 && (
+                  <p className="text-xs text-cream/60">Encaissements nets du mois · nouvelle gamme</p>
+                  {revenue && (
                     <p className="text-[10px] text-cream/40 mt-1">
-                      Academy {revenue.academy.toLocaleString("fr-FR")} € · Express {revenue.express.toLocaleString("fr-FR")} € · Bookings {revenue.bookings.toLocaleString("fr-FR")} €
+                      Academy {revenue.academy.toLocaleString("fr-FR")} € · Premium {revenue.premium.toLocaleString("fr-FR")} € · Historique et Express exclus (montants non vérifiés)
                     </p>
                   )}
                 </div>

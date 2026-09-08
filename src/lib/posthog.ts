@@ -35,6 +35,10 @@ export function initPostHog(): Promise<void> {
           capture_pageleave: true,
           autocapture: true,
           persistence: "localStorage+cookie",
+          before_send: (event) => {
+            if (typeof window !== "undefined" && /^\/(inscription|claim|admin)(\/|$)|^\/analyse-express\/result/.test(window.location.pathname)) return null;
+            return event;
+          },
         });
         client = posthog;
         return posthog;

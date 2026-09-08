@@ -43,6 +43,7 @@ type AccountData = ComponentProps<typeof MetricsGrids>["account"] & Partial<Comp
 };
 
 type ExpressAnalysisData = {
+  sample?: { count: number; from: string; to: string; limited: boolean; methodology: string };
   account?: AccountData;
   ai_analysis?: ComponentProps<typeof AIAnalysisSection>["ai"];
   publication_pattern?: ComponentProps<typeof PublicationPatternSection>["pp"];
@@ -77,18 +78,18 @@ export default function AnalyseExpressResult() {
   }, []);
 
   const checkStatus = useCallback(async () => {
-    if (!sessionId || !jobIdRef.current) return;
+    if (!sessionId) return;
     if (Date.now() - startTimeRef.current > MAX_POLL_DURATION) {
       stopPolling();
-      setError("L'analyse prend plus de temps que prévu. Réessayez dans quelques instants.");
+      setError("L’analyse prend plus de temps que prévu. Tu peux fermer cette page et revenir depuis ton e-mail. Fred intervient sous deux jours ouvrés ; si la résolution échoue, il valide le remboursement intégral.");
       setLoading(false);
       return;
     }
     try {
       const { data: result, error: fnError } = await supabase.functions.invoke("express-analysis-status", {
-        body: { session_id: sessionId, job_id: jobIdRef.current },
+        body: { session_id: sessionId },
       });
-      if (fnError || result?.error) return;
+      if (fnError || !result) return;
       if (result.username) setUsername(result.username);
       if (result.progress !== undefined) setProgress(result.progress);
       if (result.current_step) setCurrentStep(result.current_step);
@@ -119,6 +120,17 @@ export default function AnalyseExpressResult() {
     setCurrentStep(null);
     launchedRef.current = true;
     try {
+      // Read archived reports before attempting a launch with today's Stripe price.
+      const { data: saved, error: readError } = await supabase.functions.invoke("express-analysis-status", {
+        body: { session_id: sessionId },
+      });
+      if (!readError && saved?.status === "complete" && saved.data) {
+        setData(saved.data as ExpressAnalysisData);
+        setUsername(saved.username || "");
+        setLoading(false);
+        return;
+      }
+      if (!readError && saved?.status === "failed") throw new Error(saved.error || "Fred intervient sous deux jours ouvrés.");
       const { data: result, error: fnError } = await supabase.functions.invoke("express-analysis", {
         body: { session_id: sessionId },
       });
@@ -154,54 +166,9 @@ export default function AnalyseExpressResult() {
       return;
     }
 
-    // Step 1: Check database for existing results before launching
-    const checkDatabaseFirst = async () => {
-      try {
-        const { data: existing, error: dbError } = await supabase
-          .from("express_analyses")
-          .select("*")
-          .eq("stripe_session_id", sessionId)
-          .maybeSingle();
-
-        if (!dbError && existing) {
-          // Set username from DB
-          if (existing.tiktok_username) setUsername(existing.tiktok_username);
-
-          if ((existing.status === "complete" || existing.status === "completed") && existing.result_data) {
-            // Results already available — display directly
-            setData(existing.result_data as ExpressAnalysisData);
-            setLoading(false);
-            trackExpressResult(sessionId, "existing_analysis");
-            return;
-          }
-
-          if (existing.status === "processing" && existing.job_id) {
-            // Analysis in progress — resume polling with existing job_id
-            jobIdRef.current = existing.job_id;
-            localStorage.setItem(`express_job_${sessionId}`, existing.job_id);
-            startTimeRef.current = Date.now();
-            pollingRef.current = setInterval(checkStatus, POLL_INTERVAL);
-            setTimeout(checkStatus, 500);
-            return;
-          }
-        }
-      } catch (err) {
-        console.warn("DB check failed, falling back to launch:", err);
-      }
-
-      // Fallback: check localStorage, then launch
-      const cachedJobId = localStorage.getItem(`express_job_${sessionId}`);
-      if (cachedJobId) {
-        jobIdRef.current = cachedJobId;
-        startTimeRef.current = Date.now();
-        pollingRef.current = setInterval(checkStatus, POLL_INTERVAL);
-        setTimeout(checkStatus, 500);
-      } else {
-        launchAnalysis();
-      }
-    };
-
-    checkDatabaseFirst();
+    // Paid-session endpoint is the only reader; no public database query or browser job id.
+    startTimeRef.current = Date.now();
+    void launchAnalysis();
 
     return () => stopPolling();
   }, [sessionId, launchAnalysis, checkStatus, stopPolling]);
@@ -253,7 +220,7 @@ export default function AnalyseExpressResult() {
               </div>
               <h2 className="font-display text-2xl font-semibold">Analyse en cours...</h2>
               <p className="text-muted-foreground">
-                Nous analysons le compte @{username || "..."} – cela prend environ 2 minutes.
+                Nous analysons le compte @{username || "..."} – jusqu’à cinq minutes en fonctionnement normal après confirmation du paiement.
               </p>
               <div className="bg-card border border-border rounded-xl p-5 max-w-sm mx-auto space-y-3">
                 <Progress value={progress} className="h-3" />
@@ -280,7 +247,7 @@ export default function AnalyseExpressResult() {
                   Réessayer
                 </Button>
                 <Button asChild>
-                  <Link to="/analyse-express" onClick={() => trackPostHogEvent("click_analyse_express_new", { location: "error" })}>Nouvelle analyse</Link>
+                  <a href="mailto:contact@fredwav.com">Contacter Fred, sans repayer</a>
                 </Button>
               </div>
             </div>
@@ -299,6 +266,11 @@ export default function AnalyseExpressResult() {
                 verified={account?.verified}
               />
 
+              <div className="border border-border rounded-xl p-5 space-y-3">
+                <h2 className="font-semibold">Périmètre et méthode</h2>
+                <p>Analyse automatisée. Les observations chiffrées sont distinctes des hypothèses et objectifs de test. Aucun résultat n’est garanti.</p>
+                {data.sample ? <><p>{data.sample.count} vidéos réellement exploitées, du {new Date(data.sample.from).toLocaleDateString("fr-FR")} au {new Date(data.sample.to).toLocaleDateString("fr-FR")}. Les compteurs du profil portent sur l’ensemble du compte.</p>{data.sample.limited && <p role="status">Historique limité : les tendances sont fragiles et doivent être confirmées par de nouveaux essais.</p>}<p className="text-sm text-muted-foreground">{data.sample.methodology}</p></> : <p>Rapport historique : son périmètre ne démontre pas l’usage uniforme de 120 vidéos.</p>}
+              </div>
               {/* Health Score */}
               {healthScore && <HealthScoreSection healthScore={healthScore} />}
 
@@ -319,7 +291,7 @@ export default function AnalyseExpressResult() {
                 <div className="bg-amber-50 border border-amber-300 rounded-xl p-6 flex flex-col sm:flex-row items-center gap-4">
                   <div className="flex-1">
                     <p className="font-semibold text-amber-900">
-                      Ta régularité freine ta progression. Ton rapport te montre le signal ; il te faut maintenant un cadre pour le corriger.
+                      La régularité est une piste à tester. Ton rapport te montre le signal ; il te faut maintenant un cadre pour le corriger.
                     </p>
                     <p className="text-sm text-amber-800 mt-1">
                       Dans la Wav Academy, tu testes, compares tes résultats et obtiens du feedback sans rester seul face à tes statistiques.
@@ -358,7 +330,7 @@ export default function AnalyseExpressResult() {
               {/* Default continuation after the report */}
               <div className="rounded-2xl bg-foreground text-cream border border-gold/30 p-6 md:p-8 space-y-5">
                 <div className="space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold">La suite logique</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold">Trois suites, à ton choix</p>
                   <h2 className="font-display text-2xl md:text-3xl font-semibold">
                     Un rapport éclaire le problème. Un cadre t'aide à le corriger.
                   </h2>
@@ -366,7 +338,8 @@ export default function AnalyseExpressResult() {
                     Rejoins la Wav Academy pour appliquer ton plan, faire relire tes contenus et suivre l'évolution de tes statistiques avec Fred et d'autres créateurs.
                   </p>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex flex-col gap-3">
+                  <Button asChild variant="outline" size="lg" className="border-cream/30 bg-transparent text-cream hover:bg-cream/10 hover:text-cream"><a href="https://wavstats.com">WavStats — travailler en autonomie</a></Button>
                   <Button asChild variant="hero" size="lg">
                     <Link
                       to="/wavacademy"
@@ -378,7 +351,7 @@ export default function AnalyseExpressResult() {
                   </Button>
                   <Button asChild variant="outline" size="lg" className="border-cream/30 bg-transparent text-cream hover:bg-cream/10 hover:text-cream">
                     <Link
-                      to="/reserverunappel"
+                      to="/wav-premium"
                       onClick={() => trackEvent("premium_application_start", { source_page: "express_result", position: "continuation" })}
                     >
                       Besoin d'un suivi individuel ?

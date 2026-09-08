@@ -349,9 +349,13 @@ export function buildReportModel(input: unknown): ReportModel {
       verified: Boolean(account.verified),
       bio: account.bio ? String(account.bio).trim() : undefined,
       niche: account.detected_niche ? String(account.detected_niche).trim() : undefined,
-      nicheConfidence: toNumber(account.niche_confidence) ?? undefined,
       creatorLevel: account.creator_level ? String(account.creator_level).trim() : undefined,
       generatedAtLabel: fmtDateFr(),
+      sampleLabel: (() => {
+        const sample = asRecord(raw.sample);
+        if (!sample.count) return "Rapport historique : périmètre uniforme non documenté.";
+        return `${sample.count} vidéos exploitées · du ${fmtDateFr(String(sample.from))} au ${fmtDateFr(String(sample.to))}. ${sample.limited ? "Historique limité : tendances à confirmer." : ""} Compteurs du profil : ensemble du compte.`;
+      })(),
     },
     health,
     stats: { primary, rates, averages, medians },

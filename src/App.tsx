@@ -27,6 +27,7 @@ function PostHogPageTracker() {
   }, []);
 
   useEffect(() => {
+    if (location.pathname.startsWith("/inscription/") || location.pathname.startsWith("/claim/") || location.pathname === "/analyse-express/result" || location.pathname.startsWith("/admin")) return;
     capturePageview();
 
     if (localStorage.getItem("cookie_consent") === "accepted") {
@@ -52,7 +53,10 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const AnalyseExpress = lazy(() => import("./pages/AnalyseExpress"));
 const AnalyseExpressResult = lazy(() => import("./pages/AnalyseExpressResult"));
 const ReserverUnAppel = lazy(() => import("./pages/ReserverUnAppel"));
-const DiagnosticStart = lazy(() => import("./pages/DiagnosticStart"));
+const WavPremium = lazy(() => import("./pages/WavPremium"));
+const AcademyAppel = lazy(() => import("./pages/AcademyAppel"));
+const Enrollment = lazy(() => import("./pages/Enrollment"));
+const AdminCommerce = lazy(() => import("./pages/admin/Commerce"));
 const DiagnosticProcessing = lazy(() => import("./pages/DiagnosticProcessing"));
 const DiagnosticResult = lazy(() => import("./pages/DiagnosticResult"));
 const Mail = lazy(() => import("./pages/Mail"));
@@ -86,7 +90,7 @@ const SSG_ROUTE_ELEMENTS: Record<string, ReactNode> = {
   "/": <Home />,
   "/wavacademy": <WavAcademy />,
   "/analyse-express": <AnalyseExpress />,
-  "/reserverunappel": <ReserverUnAppel />,
+  "/wav-premium": <WavPremium />,
   "/preuves": <Preuves />,
   "/hooks-tiktok": <HooksTikTok />,
   "/ressources": <Ressources />,
@@ -103,7 +107,10 @@ const SSG_ROUTE_ELEMENTS: Record<string, ReactNode> = {
 
 /** Le manifeste décide quelles routes CSR existent ; cette map ne fournit que leur vue. */
 const CSR_ROUTE_ELEMENTS: Record<string, ReactNode> = {
-  "/start": <DiagnosticStart />,
+  "/reserverunappel": <ReserverUnAppel />,
+  "/wavacademy/appel": <AcademyAppel />,
+  "/inscription/:token": <Enrollment />,
+  "/admin/commandes": <AdminCommerce />,
   "/auth": <Auth />,
   "/auth/reset-password": <ResetPassword />,
   "/admin": <Navigate to="/admin/marketing" replace />,
@@ -143,6 +150,11 @@ function NoIndexRoute({ children }: { children: ReactNode }) {
       />
     </>
   );
+}
+
+function CampaignRedirect({ to }: { to: string }) {
+  const location = useLocation();
+  return <Navigate to={`${to}${location.search}${location.hash}`} replace />;
 }
 
 function csrRouteElements(boundary: ClientBoundary) {
@@ -197,7 +209,7 @@ export function AppRouterContent() {
               })}
 
               {LEGACY_REDIRECTS.map(({ from, to }) => (
-                <Route key={from} path={from} element={<Navigate to={to} replace />} />
+                <Route key={from} path={from} element={<CampaignRedirect to={to} />} />
               ))}
 
               {csrRouteElements("none")}

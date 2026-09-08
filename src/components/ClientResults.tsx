@@ -66,6 +66,7 @@ export function ClientResults({ className = "", limit }: { className?: string; l
 
   return (
     <div className={`grid sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto ${className}`}>
+      <p className="sm:col-span-2 lg:col-span-3 text-sm text-muted-foreground">Résultats historiques d’accompagnements avec Fred. Leurs modalités peuvent différer des programmes actuels ; ils ne garantissent pas tes résultats.</p>
       {items.map((r) => (
         <ClientResultCard key={r.name} result={r} avatarUrl={avatarFor(r)} />
       ))}

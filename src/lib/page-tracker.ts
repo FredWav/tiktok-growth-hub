@@ -27,6 +27,7 @@ function hasConsent(): boolean {
 }
 
 export async function trackPageView(path: string) {
+  if (/^\/(inscription|claim|admin)(\/|$)|^\/analyse-express\/result/.test(path)) return;
   if (!hasConsent()) return;
 
   // Update duration of previous page view

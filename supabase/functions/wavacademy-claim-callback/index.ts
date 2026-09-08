@@ -64,6 +64,14 @@ serve(async (req) => {
     if (claimErr || !claim) return errorRedirect(siteUrl, "invalid_token");
     if (claim.claimed_at) return redirectTo(`${siteUrl}/wavacademy?claimed=already`);
     if (new Date(claim.expires_at).getTime() < Date.now()) return errorRedirect(siteUrl, "expired");
+    const { data: entitlement, error: entitlementError } = await supabase
+      .from("wavacademy_subscriptions").select("status, access_expires_at, access_starts_at")
+      .eq("id", claim.subscription_id).maybeSingle();
+    if (entitlementError || !entitlement || entitlement.status !== "active" ||
+      (entitlement.access_starts_at && new Date(entitlement.access_starts_at).getTime() > Date.now()) ||
+      (entitlement.access_expires_at && new Date(entitlement.access_expires_at).getTime() <= Date.now())) {
+      return errorRedirect(siteUrl, "inactive_access");
+    }
 
     // Resolve role id
     const roleId = Deno.env.get(claim.discord_role_env);
@@ -107,6 +115,17 @@ serve(async (req) => {
     const me = await meRes.json();
     const discordUserId: string = me.id;
 
+    // Bind the claim before external effects. Two Discord accounts cannot consume it concurrently.
+    const {data:bound,error:bindError}=await supabase.from("wavacademy_claims")
+      .update({discord_user_id:discordUserId}).eq("token",token).is("claimed_at",null)
+      .or(`discord_user_id.is.null,discord_user_id.eq.${discordUserId}`).select("token").maybeSingle();
+    if(bindError||!bound) return errorRedirect(siteUrl,"already_bound");
+    // Record a potentially granted role before the external call so a crash is recoverable by expiration.
+    const {data:stillActive,error:activeError}=await supabase.from("wavacademy_subscriptions")
+      .update({discord_user_id:discordUserId,discord_role_granted:true}).eq("id",claim.subscription_id).eq("status","active")
+      .or(`access_expires_at.is.null,access_expires_at.gt.${new Date().toISOString()}`).select("id").maybeSingle();
+    if(activeError||!stillActive) return errorRedirect(siteUrl,"inactive_access");
+
     // Add member to guild with the role pre-assigned (works whether or not the user is already a member)
     const joinRes = await fetch(
       `https://discord.com/api/v10/guilds/${guildId}/members/${discordUserId}`,
@@ -148,16 +167,19 @@ serve(async (req) => {
     }
 
     // Mark claim as completed and update subscription
-    await supabase
+    const {error:completedError}=await supabase
       .from("wavacademy_claims")
       .update({ claimed_at: new Date().toISOString(), discord_user_id: discordUserId })
       .eq("token", token);
+    if(completedError) throw completedError;
 
     if (claim.subscription_id) {
       await supabase
         .from("wavacademy_subscriptions")
         .update({ discord_user_id: discordUserId, discord_role_granted: true })
         .eq("id", claim.subscription_id);
+      const {error:orderError}=await supabase.from("commerce_orders").update({discord_status:"active"}).eq("subscription_id",claim.subscription_id);
+      if(orderError) throw orderError;
     }
 
     await notifySuccess(
@@ -168,7 +190,7 @@ serve(async (req) => {
     return redirectTo(`${siteUrl}/wavacademy?claimed=true`);
   } catch (error) {
     console.error("claim-callback error:", error);
-    await notifyError("Claim Callback", error.message);
+    await notifyError("Claim Callback", error instanceof Error?error.message:String(error));
     return errorRedirect(siteUrl, "exception");
   }
 });

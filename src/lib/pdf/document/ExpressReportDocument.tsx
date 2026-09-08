@@ -27,7 +27,7 @@ const s = StyleSheet.create({
 });
 
 export function ExpressReportDocument({ model }: { model: ReportModel }) {
-  // Une page par bloc de recommandations. C'est ce qui remplace les anciens
+  // Des groupes de contenu paginables remplacent les anciens
   // `break` : une `<Page>` démarre à froid par construction, sans dépendre de
   // l'algorithme de pagination — donc sans le risque de boucle infinie qu'un
   // saut forcé en première position déclenchait.
@@ -57,29 +57,15 @@ export function ExpressReportDocument({ model }: { model: ReportModel }) {
         <PageFooter />
       </Page>
 
-      {/* Recommandations : chacune ouvre sa propre page, c'est le repère
-          éditorial du rapport. Les gardes évitent d'émettre une page blanche
+      {/* Recommandations : un groupe fluide évite les pages presque vides.
+          Les gardes évitent d'émettre une page blanche
           quand l'IA n'a rien renvoyé pour un bloc. */}
-      {hasStrengths(model) ? (
+      {hasStrengths(model) || hasActionPlan(model) || hasBranding(model) ? (
         <Page size="A4" style={s.page} wrap>
           {chrome}
-          <StrengthsSection model={model} />
-          <PageFooter />
-        </Page>
-      ) : null}
-
-      {hasActionPlan(model) ? (
-        <Page size="A4" style={s.page} wrap>
-          {chrome}
-          <ActionPlanSection model={model} />
-          <PageFooter />
-        </Page>
-      ) : null}
-
-      {hasBranding(model) ? (
-        <Page size="A4" style={s.page} wrap>
-          {chrome}
-          <BrandingSection model={model} />
+          {hasStrengths(model) && <StrengthsSection model={model} />}
+          {hasActionPlan(model) && <ActionPlanSection model={model} />}
+          {hasBranding(model) && <BrandingSection model={model} />}
           <PageFooter />
         </Page>
       ) : null}

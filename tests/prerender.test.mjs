@@ -20,6 +20,15 @@ test("gamme publique cohérente et aucune ancienne formule Academy", async () =>
   assert.match(academy, /sans sacrifier ton expertise/);
   assert.match(academy, /TikTok et ChatGPT/);
   assert.match(academy, /Les vues ne sont pas l’objectif final/);
+  const academyBody = academy.slice(academy.indexOf("<body"));
+  assert.ok(
+    academyBody.indexOf("Pas de recette magique") < academyBody.indexOf("749"),
+    "les objections Academy doivent précéder le prix visible",
+  );
+  assert.ok(
+    academyBody.indexOf("Les questions utiles avant l’appel") < academyBody.indexOf("749"),
+    "la FAQ Academy doit précéder le prix visible",
+  );
   assert.doesNotMatch(
     academy.replace(/<[^>]*>/g, " "),
     /\b(?:299|499|899)\s*€|trois formules|replays/,
@@ -29,7 +38,12 @@ test("gamme publique cohérente et aucune ancienne formule Academy", async () =>
   assert.match(premium, /WhatsApp/);
   assert.match(premium, /Je ne veux pas devenir un influenceur/);
   assert.match(premium, /Les vues ne paient pas mes factures/);
-  assert.match(premium, /Pourquoi 1 990 €/);
+  assert.match(premium, /Qu’est-ce qui justifie cet investissement/);
+  const premiumBody = premium.slice(premium.indexOf("<body"));
+  assert.ok(
+    premiumBody.indexOf("Les questions à trancher avant de candidater") < premiumBody.indexOf("1 990"),
+    "la FAQ Premium doit précéder le prix visible",
+  );
   const express = await page("analyse-express");
   assert.match(express, /ni un ChatGPT avec un autre logo/);
   assert.match(express, /Les vues ne disent rien sur mon chiffre d’affaires/);

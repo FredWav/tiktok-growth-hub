@@ -24,7 +24,7 @@ const premiumFaq = [
       "Non, et ce n’est pas la promesse. Les trente jours servent à analyser, choisir les priorités, réaliser des essais et ajuster une première séquence. La progression dépend ensuite de ta capacité à créer et à mettre en pratique entre les rendez-vous.",
   },
   {
-    question: "Pourquoi 1 990 € ?",
+    question: "Qu’est-ce qui justifie cet investissement ?",
     answer:
       "Le prix correspond à l’analyse complète, au cadrage de 1 h 30, aux trois rendez-vous hebdomadaires et au suivi WhatsApp direct pendant trente jours. Cette formule est destinée aux personnes pour qui l’accès individuel et la vitesse de décision justifient ce niveau d’investissement.",
   },
@@ -171,6 +171,21 @@ export default function WavPremium() {
           </p>
         </div>
       </Section>
+      <Section variant="cream" size="lg">
+        <SectionHeader title="Les questions à trancher avant de candidater" />
+        <div className="mx-auto max-w-3xl space-y-3">
+          {premiumFaq.map((item) => (
+            <details key={item.question} className="rounded-xl border border-border bg-background p-5">
+              <summary className="cursor-pointer list-none pr-8 font-semibold marker:content-none">
+                {item.question}
+              </summary>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                {item.answer}
+              </p>
+            </details>
+          ))}
+        </div>
+      </Section>
       <Section size="lg">
         <div className="max-w-2xl mx-auto border-2 border-primary rounded-2xl p-6 md:p-10">
           <h2 className="font-display text-3xl mb-4">Le Wav Premium</h2>
@@ -203,21 +218,6 @@ export default function WavPremium() {
             Réponse personnelle sous deux jours ouvrés. Aucun paiement lors de
             la candidature.
           </p>
-        </div>
-      </Section>
-      <Section variant="cream" size="lg">
-        <SectionHeader title="Les questions à trancher avant de candidater" />
-        <div className="mx-auto max-w-3xl space-y-3">
-          {premiumFaq.map((item) => (
-            <details key={item.question} className="rounded-xl border border-border bg-background p-5">
-              <summary className="cursor-pointer list-none pr-8 font-semibold marker:content-none">
-                {item.question}
-              </summary>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                {item.answer}
-              </p>
-            </details>
-          ))}
         </div>
       </Section>
     </Layout>

@@ -17,7 +17,7 @@ const ScoreCircle = ({ score }: { score: number }) => {
   const radius = 54;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (score / 100) * circumference;
-  const color = score < 40 ? "hsl(0 84% 60%)" : score <= 70 ? "hsl(43 61% 58%)" : "hsl(142 71% 45%)";
+  const color = score < 40 ? "hsl(0 84% 60%)" : score <= 70 ? "hsl(46 67% 55%)" : "hsl(142 71% 45%)";
 
   return (
     <div className="relative w-36 h-36 mx-auto">

@@ -108,7 +108,8 @@ export function SummarySection({ model }: { model: ReportModel }) {
   const { ai, meta } = model;
   return (
     <>
-      <SectionTitle subtitle="Ce qui ressort de l'analyse de ton compte.">Ce qu'il faut retenir</SectionTitle>
+      <SectionTitle subtitle="Interprétations automatisées : hypothèses à vérifier, pas des certitudes.">Ce qu'il faut retenir</SectionTitle>
+      <Paragraph>{meta.sampleLabel}</Paragraph>
       {ai?.summary ? (
         <View style={s.lead} minPresenceAhead={70}>
           <Text style={s.leadText} orphans={3} widows={3}>
@@ -224,6 +225,7 @@ export function HealthSection({ model }: { model: ReportModel }) {
 /* ── Statistiques ────────────────────────────────────────────────────────── */
 
 function StatRow({ items, small }: { items: { label: string; value: string }[]; small?: boolean }) {
+  if (items.length > 4) return <><StatRow items={items.slice(0, 3)} small={small} /><StatRow items={items.slice(3)} small={small} /></>;
   return (
     <Row style={{ marginHorizontal: -3, marginBottom: 8 }}>
       {items.map((it) => (
@@ -256,8 +258,8 @@ export function StatsSection({ model }: { model: ReportModel }) {
               marginBottom: 6,
             }}
           >
-            Part de ton audience qui réagit, et part qui enregistre la vidéo pour y revenir.
-            L'enregistrement est le signal le plus fort pour TikTok.
+            Interactions et enregistrements rapportés aux vues de l'échantillon.
+            Ces taux ne mesurent pas une proportion de personnes uniques.
           </Text>
           <StatRow items={rates} small />
         </View>
@@ -282,8 +284,7 @@ export function StatsSection({ model }: { model: ReportModel }) {
               marginBottom: 6,
             }}
           >
-            Ce que fait la moitié de tes vidéos. Plus fiable que la moyenne, qu'une seule vidéo
-            exceptionnelle suffit à fausser.
+            La valeur centrale de tes vidéos, moins sensible que la moyenne aux résultats extrêmes.
           </Text>
           <StatRow items={medians} small />
         </View>

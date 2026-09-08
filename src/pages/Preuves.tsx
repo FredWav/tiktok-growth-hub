@@ -32,7 +32,7 @@ const chooseOffers = [
     icon: Crown,
     title: "La Wav Academy",
     description: "L'accompagnement pour ne plus poster seul",
-    price: "dès 299 € / 3 mois",
+    price: "749 € TTC / 6 mois",
     cta: "Découvrir la Wav Academy",
     href: "/wavacademy",
     trackEvent: "cta_academy_click",
@@ -42,9 +42,9 @@ const chooseOffers = [
     icon: Target,
     title: "Wav Premium",
     description: "30 jours de travail individuel sur ta stratégie réseaux sociaux",
-    price: null,
-    cta: "Réserve ton appel",
-    href: "/reserverunappel",
+    price: "1 990 € TTC / 30 jours",
+    cta: "Découvrir le Premium",
+    href: "/wav-premium",
     trackEvent: "cta_premium_click",
     legacyTrackEvent: "cta_contact_click",
     highlighted: false,
@@ -123,7 +123,7 @@ export default function Preuves() {
                   trackEvent("cta_contact_click", { location: "preuves_mid" });
                 }}
               >
-                <Link to="/reserverunappel">
+                <Link to="/wav-premium">
                   Réserve ton appel
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>

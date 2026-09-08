@@ -102,7 +102,7 @@ export function CoverPage({ model }: { model: ReportModel }) {
       <Text style={s.brand}>FredWav</Text>
       <Text style={s.kicker}>ANALYSE EXPRESS</Text>
 
-      <Text style={s.title}>Ce qui fonctionne sur ton compte,{"\n"}ce qui ne fonctionne pas, et pourquoi.</Text>
+      <Text style={s.title}>Tes données observées,{"\n"}des hypothèses à tester.</Text>
       <Text style={s.subtitle}>
         Tes chiffres, ton rythme de publication, tes meilleures vidéos et ce qu'il faut corriger en
         priorité. Sans jargon : chaque terme est expliqué.
@@ -120,7 +120,6 @@ export function CoverPage({ model }: { model: ReportModel }) {
               <View style={s.chip}>
                 <Text style={s.chipText}>
                   {meta.niche}
-                  {meta.nicheConfidence !== undefined ? ` · fiabilité ${meta.nicheConfidence} %` : ""}
                 </Text>
               </View>
             ) : null}

@@ -181,7 +181,7 @@ function renderPermanentRedirectDocument(template, route) {
   const destination = absoluteUrl(route.to);
   const relativeDestination = route.to === "/" ? "/" : route.to;
   const body = `<main><h1>Cette page a été déplacée</h1><p>Vous allez être redirigé vers <a href="${escapeAttribute(relativeDestination)}">la nouvelle page</a>.</p></main>`;
-  const redirectScript = `<script data-static-redirect="true">window.location.replace(${JSON.stringify(relativeDestination).replace(/</g, "\\u003c")});</script>`;
+  const redirectScript = `<script data-static-redirect="true">window.location.replace(${JSON.stringify(relativeDestination).replace(/</g, "\\u003c")} + window.location.search + window.location.hash);</script>`;
 
   let html = removeAllSchemas(template);
   html = setTitle(html, "Page déplacée | Fred Wav");
@@ -368,5 +368,5 @@ await writeFile(path.join(clientDist, "ssg-manifest.json"), `${JSON.stringify(ma
 
 await rm(serverDist, { recursive: true, force: true });
 console.log(
-  `[ssg] ${SSG_ROUTES.length} pages marketing, ${new Set(staticNoIndexPaths).size} coquilles noindex, ${permanentRedirects.length} redirections permanentes compatibles Lovable, app.html, 404.html, sitemap.xml et llms.txt générés.`,
+  `[ssg] ${SSG_ROUTES.length} pages marketing, ${new Set(staticNoIndexPaths).size} coquilles noindex, ${permanentRedirects.length} redirections HTML (statut HTTP à vérifier sur l'hébergement), app.html, 404.html, sitemap.xml et llms.txt générés.`,
 );

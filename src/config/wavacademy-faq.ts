@@ -1,46 +1,14 @@
-/**
- * FAQ de la page /wavacademy.
- *
- * Source unique utilisée par le composant WavAcademy.tsx pour l'affichage.
- * La FAQ reste visible, mais n'est volontairement pas balisée en FAQPage.
- *
- * Ce fichier ne doit contenir que des données pures — pas d'import React.
- */
-
 export const WAVACADEMY_FAQ = [
-  {
-    question: "Je débute totalement, c'est pour moi ?",
-    answer:
-      "Oui. Le principe de la Wav Academy, c'est justement de ne plus avancer seul. Tu montres ton travail, tu obtiens des retours, et tu progresses avec un cadre — que tu en sois à ta 3e ou à ta 300e vidéo.",
-  },
-  {
-    question: "Concrètement, qu'est-ce que je reçois une fois inscrit ?",
-    answer:
-      "Un accompagnement : le live du jeudi de 14h à 16h, un suivi 5 jours sur 7, du feedback sur tes contenus à la demande, et le Discord premium. Plus les ressources : 6 modules de formation, 19 guides téléchargeables et 3 000 crédits WavStats par mois.",
-  },
-  {
-    question: "Combien de temps ça me prend par semaine ?",
-    answer:
-      "Le système est fait pour les créateurs déjà occupés. Le live dure deux heures chaque jeudi, et tu poses tes questions quand tu veux : elles sont vérifiées 5 jours sur 7. Tu peux en faire autant ou aussi peu que tu veux.",
-  },
-  {
-    question: "Le WavStats est-il vraiment inclus ?",
-    answer:
-      "Oui. Il coûte normalement de 14,90 €/mois (Starter) à 149 €/mois (Agency). En tant que membre, tu reçois 3 000 crédits gratuits chaque mois, inclus dans ta formule.",
-  },
-  {
-    question: "Tu me garantis des vues ?",
-    answer:
-      "Non, et personne ne peut le garantir. Je garantis ma présence, mes réponses, mes analyses, mes feedbacks et les ressources. Ce que je peux tenir, c'est que tu ne restes plus seul face à tes questions et à tes contenus.",
-  },
-  {
-    question: "C'est un abonnement ? Je peux annuler ?",
-    answer:
-      "Non, ce n'est pas un abonnement. Les trois formules (3, 6 et 12 mois) sont des paiements uniques, sans reconduction : il n'y a rien à résilier. Tu paies une fois, tu accèdes à tout pendant la durée choisie, et l'accès s'arrête simplement au terme.",
-  },
-  {
-    question: "Comment je reçois mes accès après le paiement ?",
-    answer:
-      "Juste après le paiement, tu reçois un email avec ton lien d'activation Discord (valable 7 jours). Tu te connectes avec ton compte Discord et ton rôle est attribué automatiquement. Pense à vérifier tes spams.",
-  },
+  { question: "Je débute : puis-je rejoindre l’Academy ?", answer: "Oui, avec un projet concret et la volonté de mettre en pratique. Aucun minimum d’abonnés ou de vidéos n’est imposé." },
+  { question: "Quand les six mois commencent-ils ?", answer: "À la date convenue directement avec Fred pendant l’appel, après règlement intégral et validation de l’inscription. Payer plus tôt n’ouvre pas les accès plus tôt. Si le paiement arrive après la date prévue, une nouvelle date est convenue ensemble." },
+  { question: "Faut-il choisir un seul live ?", answer: "Non. Les deux sont en accès libre : mardi 18 h–19 h 30 et jeudi 14 h–16 h, heure de Paris. Ils sont maintenus ou délégués pendant les congés. Un résumé est fourni, sans replay." },
+  { question: "Quel délai pour mes questions Discord ?", answer: "Deux jours ouvrés maximum, du lundi au vendredi. Le week-end est off." },
+  { question: "Comment fonctionnent les crédits WavStats ?", answer: "Six dotations de 3 000 crédits : au démarrage, puis aux cinq anniversaires mensuels. Les crédits Academy inutilisés sont perdus à chaque renouvellement. Si le jour n’existe pas dans un mois, son dernier jour est retenu. L’avantage Academy expire à la fin des six mois." },
+  { question: "Est-ce un abonnement ?", answer: "Non : 749 € TTC pour six mois, en un paiement en ligne ou par virement. Pas de reconduction automatique. Les droits légaux, notamment de rétractation, restent applicables selon les CGV." },
+  { question: "L’appel comprend-il un diagnostic gratuit ?", answer: "Non. Cet échange commercial permet de vérifier l’adéquation du programme avec ton projet, de répondre aux questions sur l’inscription et de convenir de la date de début." },
+  { question: "Combien de temps dois-je prévoir chaque semaine ?", answer: "Il n’y a pas de volume horaire identique pour tous : tu choisis librement les lives utiles, tu disposes de leurs résumés et tu peux poser tes questions sur Discord. En revanche, l’Academy n’exécute pas à ta place : prévois du temps pour créer, publier et tester les ajustements retenus." },
+  { question: "Est-ce adapté à un métier complexe ou à une petite niche ?", answer: "Le travail part de ton projet, de tes contenus et de ce que tu veux obtenir. Il ne consiste pas à appliquer une recette identique à tous ni à simplifier ton expertise jusqu’à la rendre fausse." },
+  { question: "Pourquoi payer si TikTok fournit déjà des statistiques et si j’ai ChatGPT ?", answer: "Les statistiques restent des mesures et une IA généraliste dépend du contexte que tu lui donnes. L’Academy ajoute un suivi dans le temps, des retours humains, la confrontation avec tes essais réels et un cadre pour choisir quoi tester ensuite. WavStats reste un outil d’observation, pas un oracle." },
+  { question: "Est-ce que l’Academy cherche uniquement à faire plus de vues ?", answer: "Non. Selon ton projet, un contenu peut servir l’autorité, la qualification de l’audience, la confiance, les demandes ou les ventes. La portée est un signal parmi d’autres et aucune performance commerciale n’est garantie." },
+  { question: "Qu’est-ce qui justifie les 749 € ?", answer: "Le prix couvre six mois de cadre collectif : deux lives accessibles chaque semaine, les résumés, les réponses Discord en semaine, les ressources et six dotations WavStats. La valeur recherchée est la continuité des retours et des décisions pendant tes essais, pas une quantité de vidéos ou un résultat promis." },
 ];

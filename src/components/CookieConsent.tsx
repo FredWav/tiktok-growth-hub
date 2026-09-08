@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { initPostHog, trackPostHogEvent, optOutPostHog, optInPostHog, capturePageview } from "@/lib/posthog";
 import { captureUtmParams, clearAttribution, syncAttributionToPostHog } from "@/lib/tracking";
@@ -8,10 +8,12 @@ import { COOKIE_SETTINGS_EVENT } from "@/lib/cookie-consent";
 const GA_ID = "G-E361JPZX7D";
 
 function enableGA() {
+  if (/^\/(inscription|claim|admin)(\/|$)|^\/analyse-express\/result/.test(window.location.pathname)) { disableGA(); return; }
   (window as unknown as Record<string, boolean>)[`ga-disable-${GA_ID}`] = false;
 
   if (window.gtag) {
     window.gtag("consent", "update", { analytics_storage: "granted" });
+    window.gtag("event", "page_view", { page_location: window.location.origin + window.location.pathname });
     return;
   }
 
@@ -25,7 +27,8 @@ function enableGA() {
     window.dataLayer!.push(args);
   };
   window.gtag("js", new Date());
-  window.gtag("config", GA_ID);
+  window.gtag("config", GA_ID, { send_page_view: false });
+  window.gtag("event", "page_view", { page_location: window.location.origin + window.location.pathname });
 }
 
 /** Coupe la collecte GA après un retrait de consentement (déjà chargé ou non). */
@@ -37,6 +40,7 @@ function disableGA() {
 }
 
 export function CookieConsent() {
+  const { pathname } = useLocation();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -54,7 +58,7 @@ export function CookieConsent() {
     const onOpen = () => setVisible(true);
     window.addEventListener(COOKIE_SETTINGS_EVENT, onOpen);
     return () => window.removeEventListener(COOKIE_SETTINGS_EVENT, onOpen);
-  }, []);
+  }, [pathname]);
 
   const accept = async () => {
     localStorage.setItem("cookie_consent", "accepted");

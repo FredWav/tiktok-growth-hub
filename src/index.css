@@ -37,9 +37,10 @@
     --radius: 0.5rem;
 
     /* Custom tokens */
-    --gold: 43 72% 30%;
+    /* Or de marque (#C49A3C), distinct du primary plus sombre utilisé pour le texte. */
+    --gold: 42 54% 50%;
     --gold-light: 43 61% 70%;
-    --gold-dark: 43 70% 25%;
+    --gold-dark: 42 58% 40%;
     --noir: 0 0% 6%;
     --noir-light: 0 0% 15%;
     --cream: 45 29% 97%;
@@ -54,7 +55,7 @@
     --shadow-sm: 0 1px 2px hsl(0 0% 0% / 0.05);
     --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.1);
     --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.1);
-    --shadow-gold: 0 4px 20px hsl(43 72% 30% / 0.25);
+    --shadow-gold: 0 4px 20px hsl(42 54% 50% / 0.3);
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 0 0% 6%;

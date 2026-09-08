@@ -65,6 +65,7 @@ serve(async (req) => {
   }
 
   try {
+    if (Deno.env.get("LEGACY_ACADEMY_CHECKOUT_ENABLED") !== "true") return new Response(JSON.stringify({ error: "Ces anciennes formules ne sont plus proposées. Passe par la page Wav Academy pour préparer ton inscription." }), { status: 410, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     const body = await req.json();
     const { term, email, consent_cgv, consent_renonciation } = body ?? {};
 

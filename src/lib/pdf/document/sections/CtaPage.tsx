@@ -72,7 +72,7 @@ export function CtaPage({ model }: { model: ReportModel }) {
       <PageHeader username={model.meta.username} dateLabel={model.meta.generatedAtLabel} />
 
       <View style={s.box}>
-        <Text style={s.title}>Ce rapport te dit quoi corriger.{"\n"}L'étape suivante, c'est de le faire.</Text>
+        <Text style={s.title}>Des pistes à tester. À toi de choisir la suite.</Text>
         <Text style={s.intro}>
           Cette analyse est une photo de ton compte aujourd'hui. Ce qui fait la différence ensuite,
           c'est de retravailler tes vidéos semaine après semaine sans rester seul devant tes chiffres.
@@ -84,16 +84,18 @@ export function CtaPage({ model }: { model: ReportModel }) {
           </View>
         ))}
 
-        <Link src="https://fredwav.com/reserverunappel" style={{ textDecoration: "none" }}>
+        <Link src="https://wavstats.com" style={{ textDecoration: "none" }}>
           <View style={s.button}>
-            <Text style={s.buttonText}>Parler de ton compte avec Fred</Text>
+            <Text style={s.buttonText}>WavStats — continuer en autonomie</Text>
           </View>
         </Link>
-        <Text style={s.buttonSub}>fredwav.com/reserverunappel</Text>
+        <Link src="https://fredwav.com/wavacademy" style={{ textDecoration: "none" }}><View style={s.button}><Text style={s.buttonText}>Academy — le collectif · 749 € TTC / 6 mois</Text></View></Link>
+        <Link src="https://fredwav.com/wav-premium" style={{ textDecoration: "none" }}><View style={s.button}><Text style={s.buttonText}>Premium — l’individuel · 1 990 € TTC / 30 jours</Text></View></Link>
+        <Text style={s.buttonSub}>Trois suites volontaires. Les appels d’inscription ne sont pas des audits gratuits.</Text>
       </View>
 
       <Text style={s.outro}>
-        Analyse réalisée par Fred Wav ·{" "}
+        Analyse automatisée, sans relecture individuelle ·{" "}
         <Link src="https://fredwav.com" style={s.link}>
           fredwav.com
         </Link>

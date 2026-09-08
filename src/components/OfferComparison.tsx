@@ -14,6 +14,7 @@ import { OFFER_TIERS } from "@/config/offers";
 export function OfferComparison({ location = "home" }: { location?: string }) {
   const trackOfferClick = (name: string) => {
     trackEvent("click_offer_compare", { offer: name, location });
+    if (name === "WavStats") { trackEvent("wavstats_cta_click", { location }); return; }
     const event = name === "Wav Academy"
       ? "cta_academy_click"
       : name === "Wav Premium"
@@ -29,7 +30,7 @@ export function OfferComparison({ location = "home" }: { location?: string }) {
   };
 
   return (
-    <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto items-stretch">
+    <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6 max-w-6xl mx-auto items-stretch">
       {OFFER_TIERS.map((tier) => (
         <div
           key={tier.name}

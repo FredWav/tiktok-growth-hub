@@ -15,10 +15,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { normalizeTikTokUsername } from "@/lib/tiktok-username";
 import { toast } from "sonner";
 import tiktokExample from "@/assets/tiktok-username-example.png";
+import { ObjectionCards } from "@/components/ObjectionCards";
 
 const features = [
   { icon: BarChart3, title: "Audit profil complet", description: "Photo, bio, positionnement : analyse technique et recommandations concrètes de réécriture" },
-  { icon: TrendingUp, title: "Analyse de tes 30 vidéos", description: "Vues, rétention, engagement, hooks — chaque vidéo passée au crible avec métriques" },
+  { icon: TrendingUp, title: "Jusqu’à 120 vidéos disponibles", description: "Vues et interactions publiques sur le même échantillon ; pas d’accès aux courbes de rétention privées" },
   { icon: Search, title: "Stratégie & hashtags", description: "Hashtags à tester, plan d'action 30 jours et stratégie 3-6 mois personnalisés" },
   { icon: FileText, title: "Rapport PDF complet", description: "Résumé exécutif, points forts, axes d'amélioration et actions immédiates en PDF" },
 ];
@@ -30,7 +31,7 @@ const steps = [
   },
   {
     title: "L'outil analyse les données publiques",
-    description: "Le profil et jusqu'à 30 vidéos récentes sont examinés à partir des métriques publiquement disponibles.",
+    description: "Le profil et jusqu’à 120 vidéos récentes sont examinés à partir des métriques publiquement disponibles.",
   },
   {
     title: "Tu récupères ton rapport",
@@ -41,7 +42,7 @@ const steps = [
 const faqs = [
   {
     question: "Quelles données sont analysées ?",
-    answer: "Les informations publiques du profil TikTok et jusqu'à 30 vidéos récentes : présentation du compte, vues et interactions visibles, thèmes, hooks et régularité de publication. L'outil n'accède ni à ton mot de passe ni à tes statistiques privées.",
+    answer: "Les informations publiques du profil TikTok et jusqu’à 120 vidéos récentes : présentation du compte, vues et interactions visibles, thèmes, hooks et régularité de publication. L'outil n'accède ni à ton mot de passe ni à tes statistiques privées.",
   },
   {
     question: "Est-ce que cela fonctionne avec un compte privé ?",
@@ -49,7 +50,7 @@ const faqs = [
   },
   {
     question: "En combien de temps le rapport est-il disponible ?",
-    answer: "Le rapport est généralement généré en moins de deux minutes après le paiement. Un ralentissement de TikTok ou du service d'analyse peut exceptionnellement prolonger ce délai.",
+    answer: "Cinq minutes maximum en fonctionnement normal après confirmation du paiement. En cas de dépassement, Fred est prévenu et intervient sous deux jours ouvrés.",
   },
   {
     question: "L'analyse est-elle réalisée par Fred ?",
@@ -61,7 +62,19 @@ const faqs = [
   },
   {
     question: "Que faire si mon rapport ne se génère pas ?",
-    answer: "Conserve l'email de confirmation et la référence Stripe, puis écris à contact@fredwav.com. La commande pourra être retrouvée et le rapport relancé si nécessaire.",
+    answer: "Fred intervient sous deux jours ouvrés en cas de dépassement ou d’échec. Si la résolution échoue, il valide le remboursement intégral. Un compte privé ou sans vidéo exploitable ne produit pas un rapport présenté comme complet ; un historique limité est signalé.",
+  },
+  {
+    question: "Pourquoi payer alors que TikTok affiche déjà mes statistiques ?",
+    answer: "TikTok reste la meilleure source pour ses statistiques natives, notamment celles qui ne sont pas publiques. L’Analyse Express rassemble les données publiques disponibles dans un périmètre cohérent, compare les vidéos et transforme ces observations en hypothèses et priorités. Elle ne prétend pas remplacer les données privées de TikTok.",
+  },
+  {
+    question: "Quelle différence avec une question posée à ChatGPT ?",
+    answer: "Une IA généraliste ne connaît que les chiffres et les contenus que tu lui transmets. L’Analyse Express récupère elle-même les données publiques disponibles du compte et applique une méthode de rapport structurée. Elle reste toutefois automatisée : pour confronter les conclusions à ton métier, à ton offre ou à tes statistiques privées, il faut une analyse humaine.",
+  },
+  {
+    question: "Mon marché est très particulier : les conseils seront-ils pertinents ?",
+    answer: "Le rapport est contextualisé par les contenus et résultats publics du compte, mais il ne peut pas connaître tout ton métier, tes clients ni tes contraintes commerciales. Il formule donc des hypothèses à tester, pas des vérités universelles. Si cette contextualisation métier est décisive, l’Academy ou le Premium sont plus adaptés.",
   },
 ];
 
@@ -159,15 +172,18 @@ export default function AnalyseExpress() {
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
             <Zap className="h-4 w-4" />
-            Résultats généralement en moins de 2 minutes
+            Cinq minutes en fonctionnement normal après paiement
           </div>
 
           <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">
-            <span className="text-gold-gradient">Analyse Express</span> — l'audit TikTok automatisé de ton compte
+            Tes chiffres sont visibles. Mais que dois-tu tester ensuite ?
           </h1>
 
           <p className="text-lg text-muted-foreground max-w-xl mx-auto mb-4">
-            Audit de ton profil, analyse de tes 30 dernières vidéos, stratégie hashtags et plan d'action personnalisé. Rapport PDF complet pour 11,90€.
+            <span className="font-semibold text-foreground">Analyse Express</span>{" "}
+            rassemble les données publiques de ton profil et de tes vidéos
+            disponibles — 120 maximum — pour produire un diagnostic automatisé,
+            des hypothèses et un plan d’action. Rapport PDF à 11,90 €.
           </p>
           <p className="text-sm text-muted-foreground/70 mb-10">
             Disponible uniquement pour TikTok pour le moment, d'autres plateformes arrivent bientôt.
@@ -248,6 +264,41 @@ export default function AnalyseExpress() {
         </ol>
       </Section>
 
+      <Section variant="dark" size="lg">
+        <div className="mx-auto max-w-5xl">
+          <SectionHeader
+            title="Ce n’est ni un oracle, ni un ChatGPT avec un autre logo."
+            subtitle="La valeur vient du périmètre réel de ton compte, de la comparaison de tes contenus et d’une méthode de lecture explicite. Les limites restent visibles."
+            className="[&_h2]:text-cream [&_p]:text-cream/70"
+          />
+          <ObjectionCards
+            tone="dark"
+            items={[
+              {
+                question: "Personne ne peut prédire TikTok.",
+                answer:
+                  "Exact. Le rapport ne prédit pas la prochaine vidéo virale. Il sépare les observations des hypothèses et propose des tests pour prendre une décision moins aveugle.",
+              },
+              {
+                question: "J’ai déjà les statistiques dans TikTok.",
+                answer:
+                  "TikTok fournit des mesures natives plus riches que les données publiques. L’Express apporte une lecture transversale de l’échantillon disponible ; il ne remplace pas tes courbes privées de rétention ni leur interprétation métier.",
+              },
+              {
+                question: "Une IA va me donner des conseils génériques.",
+                answer:
+                  "Le rapport est construit à partir des vidéos effectivement exploitées et indique leur nombre ainsi que la période couverte. S’il ne peut pas attester ce périmètre, il n’est pas présenté comme complet.",
+              },
+              {
+                question: "Les vues ne disent rien sur mon chiffre d’affaires.",
+                answer:
+                  "C’est vrai. Les données publiques ne permettent pas de mesurer tes prospects ou tes ventes. Le rapport aide à lire la diffusion et les réactions visibles ; la décision commerciale doit être confrontée à tes propres données.",
+              },
+            ]}
+          />
+        </div>
+      </Section>
+
       {/* Données et limites */}
       <Section className="pb-20">
         <div className="mx-auto grid max-w-4xl gap-6 md:grid-cols-2">
@@ -255,7 +306,7 @@ export default function AnalyseExpress() {
             <h2 className="font-display text-2xl font-semibold">Ce que l'outil utilise</h2>
             <ul className="mt-4 space-y-3 text-sm leading-relaxed text-muted-foreground">
               <li>• Les informations visibles sur ton profil TikTok public.</li>
-              <li>• Jusqu'à 30 vidéos récentes et leurs métriques publiques disponibles.</li>
+              <li>• Jusqu’à 120 vidéos récentes et leurs métriques publiques disponibles.</li>
               <li>• Les signaux de contenu utiles au diagnostic : hooks, sujets, formats et régularité.</li>
               <li>• Aucun mot de passe, aucune connexion à ton compte et aucune statistique privée.</li>
             </ul>
@@ -276,7 +327,7 @@ export default function AnalyseExpress() {
       <Section className="pb-20">
         <SectionHeader
           title="Ce que tu obtiens"
-          subtitle="Un diagnostic stratégique complet de ton compte TikTok, au même niveau que les audits réalisés pour les clients Wav Premium"
+          subtitle="Un premier diagnostic automatisé pour organiser les observations et choisir des pistes à tester — sans le présenter comme l’équivalent d’un audit humain"
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
           {features.map((f) => (

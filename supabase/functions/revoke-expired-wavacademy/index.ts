@@ -48,7 +48,7 @@ serve(async (req) => {
   // Cron-only endpoint: require service-role bearer token.
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
   const authHeader = req.headers.get("Authorization") ?? "";
-  if (!serviceKey || !authHeader.includes(serviceKey)) {
+  if (!serviceKey || authHeader !== `Bearer ${serviceKey}`) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -80,18 +80,31 @@ serve(async (req) => {
     for (const row of rows || []) {
       try {
         if (row.discord_role_granted && row.discord_user_id && row.discord_role_env) {
-          const ok = await revokeDiscordRole(row.discord_user_id, row.discord_role_env);
-          if (ok) summary.revoked++;
+          const { data: otherRights, error: rightsError } = await supabase
+            .from("wavacademy_subscriptions").select("id")
+            .eq("discord_user_id", row.discord_user_id).eq("discord_role_env", row.discord_role_env)
+            .eq("status", "active").neq("id", row.id)
+            .or(`access_expires_at.is.null,access_expires_at.gt.${nowIso}`).limit(1);
+          if (rightsError) throw rightsError;
+          if (!otherRights?.length) {
+            const ok = await revokeDiscordRole(row.discord_user_id, row.discord_role_env);
+            if (!ok) throw new Error("Retrait Discord échoué : nouvelle tentative nécessaire");
+            summary.revoked++;
+          }
         } else {
           // Accès expiré mais jamais réclamé (pas de compte Discord lié) : rien à révoquer.
           summary.expired_unclaimed++;
         }
 
-        await supabase
+        const { error: updateError } = await supabase
           .from("wavacademy_subscriptions")
           .update({ status: "expired", discord_role_granted: false })
           .eq("id", row.id);
+        if (updateError) throw updateError;
+        const {error:orderError}=await supabase.from("commerce_orders").update({discord_status:"expired"}).eq("subscription_id",row.id);
+        if(orderError) throw orderError;
       } catch (e) {
+        await supabase.from("commerce_orders").update({discord_status:"revoke_failed",last_error:String(e).slice(0,500)}).eq("subscription_id",row.id);
         console.error(`Error expiring subscription ${row.id}:`, e);
         summary.errors++;
       }
@@ -110,8 +123,9 @@ serve(async (req) => {
     });
   } catch (e) {
     console.error("revoke-expired-wavacademy fatal:", e);
-    await notifyError("Revoke Expired WavAcademy", e.message);
-    return new Response(JSON.stringify({ error: e.message, summary }), {
+    const message=e instanceof Error?e.message:String(e);
+    await notifyError("Revoke Expired WavAcademy", message);
+    return new Response(JSON.stringify({ error: message, summary }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

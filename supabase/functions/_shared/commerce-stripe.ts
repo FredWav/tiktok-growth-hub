@@ -19,7 +19,12 @@ export async function commerceCheckout(
     ? await client.from("commerce_orders").select("*").eq("id", reference)
       .maybeSingle()
     : { data: null, error: null };
-  if (lookup.error) throw lookup.error;
+  // Tant que le socle commerce v3 n'est pas déployé en base, la table est absente :
+  // on laisse alors la branche historique (Analyse Express) traiter la session.
+  if (lookup.error) {
+    if ((lookup.error as { code?: string }).code === "42P01") return false;
+    throw lookup.error;
+  }
   const o = lookup.data;
   if (!knownLink && !o) return false; // Historical checkout handled by the existing branch.
   if (session.payment_status !== "paid") return true;

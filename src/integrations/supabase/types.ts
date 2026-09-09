@@ -221,9 +221,15 @@ export type Database = {
           launch_started_at: string | null
           newsletter_requested: boolean | null
           newsletter_subscribed: boolean | null
+          processing_started_at: string | null
+          refund_reference: string | null
+          refunded_at: string | null
+          report_version: string
           result_data: Json | null
+          result_email_sent_at: string | null
           status: string
           stripe_session_id: string | null
+          support_requested_at: string | null
           tiktok_username: string
         }
         Insert: {
@@ -237,9 +243,15 @@ export type Database = {
           launch_started_at?: string | null
           newsletter_requested?: boolean | null
           newsletter_subscribed?: boolean | null
+          processing_started_at?: string | null
+          refund_reference?: string | null
+          refunded_at?: string | null
+          report_version?: string
           result_data?: Json | null
+          result_email_sent_at?: string | null
           status?: string
           stripe_session_id?: string | null
+          support_requested_at?: string | null
           tiktok_username: string
         }
         Update: {
@@ -253,9 +265,15 @@ export type Database = {
           launch_started_at?: string | null
           newsletter_requested?: boolean | null
           newsletter_subscribed?: boolean | null
+          processing_started_at?: string | null
+          refund_reference?: string | null
+          refunded_at?: string | null
+          report_version?: string
           result_data?: Json | null
+          result_email_sent_at?: string | null
           status?: string
           stripe_session_id?: string | null
+          support_requested_at?: string | null
           tiktok_username?: string
         }
         Relationships: []
@@ -885,9 +903,15 @@ export type Database = {
           launch_started_at: string | null
           newsletter_requested: boolean | null
           newsletter_subscribed: boolean | null
+          processing_started_at: string | null
+          refund_reference: string | null
+          refunded_at: string | null
+          report_version: string
           result_data: Json | null
+          result_email_sent_at: string | null
           status: string
           stripe_session_id: string | null
+          support_requested_at: string | null
           tiktok_username: string
         }
         SetofOptions: {

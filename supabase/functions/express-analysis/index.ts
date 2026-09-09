@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
-import { getStripeSecretKey } from "../_shared/stripe-config.ts";
+import { getStripePricesForMode, getStripeSecretKey } from "../_shared/stripe-config.ts";
 import { notifySuccess, notifyError } from "../_shared/itpush.ts";
 import { normalizeTikTokUsername } from "../_shared/tiktok-username.ts";
 import { checkoutMismatch } from "../_shared/checkout-validation.ts";
@@ -12,6 +12,12 @@ const corsHeaders = {
 };
 
 const API_BASE = "https://wavstats.com/api/v1";
+
+function getExpectedExpressPriceId(livemode: boolean): string {
+  const mode = livemode ? "live" : "test";
+  return Deno.env.get(livemode ? "STRIPE_EXPRESS_PRICE_ID_LIVE" : "STRIPE_EXPRESS_PRICE_ID_TEST") ||
+    getStripePricesForMode(mode).analyse_express;
+}
 
 /**
  * Fire-and-forget call to mailerlite-subscribe.
@@ -82,7 +88,7 @@ serve(async (req) => {
       throw new Error("Exécution des paiements test désactivée");
     }
     const items = await stripe.checkout.sessions.listLineItems(session.id, { limit: 2 });
-    const expectedPrice = Deno.env.get(session.livemode ? "STRIPE_EXPRESS_PRICE_ID_LIVE" : "STRIPE_EXPRESS_PRICE_ID_TEST");
+    const expectedPrice = getExpectedExpressPriceId(session.livemode);
     const mismatch = checkoutMismatch(session, items.data, expectedPrice, 1190);
     if (mismatch) throw new Error(mismatch);
 

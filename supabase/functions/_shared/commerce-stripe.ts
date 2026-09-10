@@ -59,15 +59,14 @@ export async function commerceCheckout(
     ) reason = "Prix Stripe non reconnu";
   }
   if (reason) {
-    const { error } = await client.from("commerce_unmatched_payments").upsert({
+    await logUnmatchedPayment(client, {
       session_id: session.id,
       reason,
       amount_cents: session.amount_total,
       currency: session.currency,
       email: session.customer_details?.email,
       received_at: new Date(receivedAt * 1000).toISOString(),
-    }, { onConflict: "session_id", ignoreDuplicates: true });
-    if (error) throw error;
+    });
     await enqueue(
       client,
       `unmatched:${session.id}`,

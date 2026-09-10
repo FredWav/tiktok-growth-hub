@@ -1,5 +1,5 @@
 import type Stripe from "https://esm.sh/stripe@18.5.0?target=deno";
-import { db, enqueue } from "./commerce.ts";
+import { db, enqueue, logUnmatchedPayment } from "./commerce.ts";
 
 export async function commerceCheckout(
   stripe: Stripe,

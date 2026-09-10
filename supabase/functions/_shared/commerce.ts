@@ -155,3 +155,27 @@ export async function deliverMail(client: Database) {
     }
   }
 }
+
+// Le socle commerce v3 n'est pas encore en base : consigner un paiement à rapprocher
+// ne doit jamais faire échouer le webhook (Stripe retenterait en boucle).
+export function missingCommerceTable(error: unknown) {
+  const code = (error as { code?: string } | null)?.code;
+  return code === "42P01" || code === "PGRST205";
+}
+export async function logUnmatchedPayment(client: Database, payload: {
+  session_id: string;
+  reason: string;
+  amount_cents: number | null;
+  currency: string | null;
+  email?: string | null;
+  received_at: string;
+}) {
+  const { error } = await client.from("commerce_unmatched_payments").upsert(
+    payload,
+    { onConflict: "session_id", ignoreDuplicates: true },
+  );
+  if (error && !missingCommerceTable(error)) throw error;
+  if (error) {
+    console.error("commerce_unmatched_payments absente:", payload.session_id, payload.reason);
+  }
+}

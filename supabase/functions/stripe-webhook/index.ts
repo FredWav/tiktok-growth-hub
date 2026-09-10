@@ -20,8 +20,22 @@ function jsonResponse(body: Record<string, unknown>, status = 200): Response {
 }
 
 function getErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
+  if (error instanceof Error) return error.message;
+  if (error && typeof error === "object") {
+    const e = error as { message?: unknown; code?: unknown; details?: unknown; hint?: unknown };
+    const parts = [e.code, e.message, e.details, e.hint]
+      .filter((v): v is string | number => typeof v === "string" || typeof v === "number")
+      .map(String);
+    if (parts.length) return parts.join(" • ").slice(0, 500);
+    try {
+      return JSON.stringify(error).slice(0, 500);
+    } catch {
+      return "Erreur non sérialisable";
+    }
+  }
+  return String(error);
 }
+
 
 type ExpressConsentConfirmation = {
   email: string;

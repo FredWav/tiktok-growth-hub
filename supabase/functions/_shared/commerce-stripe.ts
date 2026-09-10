@@ -22,9 +22,12 @@ export async function commerceCheckout(
   // Tant que le socle commerce v3 n'est pas déployé en base, la table est absente :
   // on laisse alors la branche historique (Analyse Express) traiter la session.
   if (lookup.error) {
-    if ((lookup.error as { code?: string }).code === "42P01") return false;
+    const code = (lookup.error as { code?: string }).code;
+    // 42P01 (Postgres) et PGRST205 (cache de schéma PostgREST) = table absente.
+    if (code === "42P01" || code === "PGRST205") return false;
     throw lookup.error;
   }
+
   const o = lookup.data;
   if (!knownLink && !o) return false; // Historical checkout handled by the existing branch.
   if (session.payment_status !== "paid") return true;

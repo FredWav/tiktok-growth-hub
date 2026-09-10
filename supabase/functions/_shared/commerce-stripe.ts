@@ -84,14 +84,14 @@ export async function commerceCheckout(
     p_received: new Date(receivedAt * 1000).toISOString(),
   });
   if (error) {
-    await client.from("commerce_unmatched_payments").upsert({
+    await logUnmatchedPayment(client, {
       session_id: session.id,
       reason: error.message,
       amount_cents: session.amount_total,
       currency: session.currency,
       email: session.customer_details?.email,
       received_at: new Date(receivedAt * 1000).toISOString(),
-    }, { onConflict: "session_id", ignoreDuplicates: true });
+    });
     throw error;
   }
   await enqueue(

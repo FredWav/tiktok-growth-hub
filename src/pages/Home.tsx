@@ -155,11 +155,11 @@ export default function Home() {
                 })
               }
             >
-              <Link to="/analyse-express">Commencer par l’Analyse Express — {EXPRESS_PRICE_LABEL}</Link>
+              <Link to="/analyse-express">Commencer par l’Analyse Express : {EXPRESS_PRICE_LABEL}</Link>
             </Button>
           </div>
           <p className="text-sm text-muted-foreground mt-4">
-            Academy {ACADEMY_FROM} € pour {ACADEMY_ENTRY.duration} — paiement unique, sans reconduction.
+            Academy {ACADEMY_FROM} € pour {ACADEMY_ENTRY.duration}, paiement unique et sans reconduction.
           </p>
         </div>
       </Section>
@@ -356,7 +356,7 @@ export default function Home() {
             </Link>
           </Button>
           <p className="text-xs text-cream/50 mt-4">
-            {ACADEMY_ENTRY.duration} {ACADEMY_FROM} € — paiement unique — aucune reconduction automatique.
+            {ACADEMY_ENTRY.duration} {ACADEMY_FROM} €, paiement unique et aucune reconduction automatique.
           </p>
           <div className="mt-8 pt-8 border-t border-cream/10">
             <p className="text-sm text-cream/60 mb-3">Tu préfères commencer par un diagnostic de ton compte TikTok ?</p>
@@ -372,7 +372,7 @@ export default function Home() {
                 })
               }
             >
-              <Link to="/analyse-express">Faire mon Analyse Express — {EXPRESS_PRICE_LABEL}</Link>
+              <Link to="/analyse-express">Faire mon Analyse Express : {EXPRESS_PRICE_LABEL}</Link>
             </Button>
           </div>
         </div>

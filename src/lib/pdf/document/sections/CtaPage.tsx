@@ -79,18 +79,18 @@ export function CtaPage({ model }: { model: ReportModel }) {
         </Text>
         {BENEFITS.map((b) => (
           <View key={b} style={s.bulletRow}>
-            <Text style={s.bulletMark}>—</Text>
+            <Text style={s.bulletMark}>•</Text>
             <Text style={s.bulletText}>{b}</Text>
           </View>
         ))}
 
         <Link src="https://wavstats.com" style={{ textDecoration: "none" }}>
           <View style={s.button}>
-            <Text style={s.buttonText}>WavStats — continuer en autonomie</Text>
+            <Text style={s.buttonText}>WavStats : continuer en autonomie</Text>
           </View>
         </Link>
-        <Link src="https://fredwav.com/wavacademy" style={{ textDecoration: "none" }}><View style={s.button}><Text style={s.buttonText}>Academy — le collectif · 749 € TTC / 6 mois</Text></View></Link>
-        <Link src="https://fredwav.com/wav-premium" style={{ textDecoration: "none" }}><View style={s.button}><Text style={s.buttonText}>Premium — l’individuel · 1 990 € TTC / 30 jours</Text></View></Link>
+        <Link src="https://fredwav.com/wavacademy" style={{ textDecoration: "none" }}><View style={s.button}><Text style={s.buttonText}>Academy : le collectif · 749 € TTC / 6 mois</Text></View></Link>
+        <Link src="https://fredwav.com/wav-premium" style={{ textDecoration: "none" }}><View style={s.button}><Text style={s.buttonText}>Premium : l’individuel · 1 990 € TTC / 30 jours</Text></View></Link>
         <Text style={s.buttonSub}>Trois suites volontaires. Les appels d’inscription ne sont pas des audits gratuits.</Text>
       </View>
 

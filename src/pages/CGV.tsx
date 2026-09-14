@@ -11,11 +11,11 @@ export default function CGV() {
       <SEOHead {...seoFor("/cgv")} />
       <Section variant="default" size="lg">
         <div className="max-w-3xl mx-auto prose prose-neutral">
-          <h1 className="font-display text-3xl md:text-4xl font-semibold mb-2">Conditions Générales de Vente (CGV) — Fred Wav</h1>
-          <p className="text-sm text-muted-foreground mb-10">Dernière mise à jour : 8 septembre 2026 — version 2026-09-08</p>
+          <h1 className="font-display text-3xl md:text-4xl font-semibold mb-2">Conditions Générales de Vente (CGV) : Fred Wav</h1>
+          <p className="text-sm text-muted-foreground mb-10">Dernière mise à jour : 8 septembre 2026, version 2026-09-08</p>
 
           {/* ARTICLE 1 */}
-          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 1 — Identification du vendeur</h2>
+          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 1 : Identification du vendeur</h2>
           <ul className="text-muted-foreground mb-4 list-none pl-0 space-y-1">
             <li><strong>Éditeur et vendeur :</strong> Frédéric Olalde, Entrepreneur Individuel (EI), exploitant sous le nom commercial Fred Wav.</li>
             <li><strong>SIRET :</strong> 921 749 727 00019</li>
@@ -25,13 +25,13 @@ export default function CGV() {
           </ul>
 
           {/* ARTICLE 2 */}
-          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 2 — Objet</h2>
+          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 2 : Objet</h2>
           <p className="text-muted-foreground mb-4">
             Les présentes CGV encadrent la vente à distance des prestations de conseil et d'accompagnement stratégique en formats courts, ainsi que la vente d'analyses automatisées de comptes TikTok (Analyse Express).
           </p>
 
           {/* ARTICLE 3 */}
-          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 3 — Champ d'application</h2>
+          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 3 : Champ d'application</h2>
           <h3 className="font-display text-lg font-medium mt-4 mb-2">3.1 Clients consommateurs (B2C)</h3>
           <p className="text-muted-foreground mb-4">
             Les clients consommateurs bénéficient des dispositions du Code de la consommation, notamment concernant le droit de rétractation et la médiation de la consommation.
@@ -44,7 +44,7 @@ export default function CGV() {
           </p>
 
           {/* ARTICLE 4 */}
-          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 4 — Définitions</h2>
+          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 4 : Définitions</h2>
           <ul className="text-muted-foreground mb-4 space-y-1">
             <li><strong>Prestations :</strong> Wav Premium (accompagnement 30 jours), Wav Academy (accès communauté Discord + contenus numériques) et Analyse Express (rapport d'analyse automatisé).</li>
             <li><strong>Contenus numériques :</strong> rapports PDF, ressources, checklists et templates éventuellement remis dans le cadre de la prestation.</li>
@@ -52,7 +52,7 @@ export default function CGV() {
           </ul>
 
           {/* ARTICLE 5 */}
-          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 5 — Description des offres</h2>
+          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 5 : Description des offres</h2>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">5.1 Wav Premium (30 jours)</h3>
           <p className="text-muted-foreground mb-4">
@@ -81,7 +81,7 @@ export default function CGV() {
           </p>
 
           {/* ARTICLE 6 */}
-          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 6 — Commande et candidature</h2>
+          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 6 : Commande et candidature</h2>
           <p className="text-muted-foreground mb-4">
             Le processus de commande suit la règle du "double clic" (sélection, validation des CGV, confirmation de paiement).
             Pour Wav Premium, la validation finale est soumise à l'acceptation de la candidature par Fred Wav. En cas de refus, aucun débit n'est effectué.
@@ -91,7 +91,7 @@ export default function CGV() {
           </p>
 
           {/* ARTICLE 7 */}
-          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 7 — Prix et paiement</h2>
+          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 7 : Prix et paiement</h2>
           <p className="text-muted-foreground mb-4">
             <strong>Tarifs :</strong> exprimés en euros TTC. Fred Wav se réserve le droit de modifier ses prix à tout moment pour l'avenir. Le tarif applicable est celui affiché au moment de la commande.
           </p>
@@ -109,7 +109,7 @@ export default function CGV() {
           </p>
 
           {/* ARTICLE 8 */}
-          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 8 — Exécution, retards, annulation, report</h2>
+          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 8 : Exécution, retards, annulation, report</h2>
           <p className="text-muted-foreground mb-4">
             <strong>Planification :</strong> les sessions visio sont fixées d'un commun accord.
           </p>
@@ -128,7 +128,7 @@ export default function CGV() {
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">8.1 Caractère forfaitaire et non-remboursement</h3>
           <p className="text-muted-foreground mb-4">
-            Toute prestation payée auprès du Vendeur — qu'il s'agisse de Wav Premium, de la Wav Academy ou de l'Analyse Express — constitue un forfait global et indivisible, correspondant à un dispositif construit, réservé et planifié dans son ensemble. Le prix n'est pas décomposable par session, par ressource, par fonctionnalité, par semaine ou par période entamée.
+            Toute prestation payée auprès du Vendeur, qu'il s'agisse de Wav Premium, de la Wav Academy ou de l'Analyse Express, constitue un forfait global et indivisible, correspondant à un dispositif construit, réservé et planifié dans son ensemble. Le prix n'est pas décomposable par session, par ressource, par fonctionnalité, par semaine ou par période entamée.
           </p>
           <p className="text-muted-foreground mb-4">
             Sous réserve des droits impératifs du Client, après l'expiration du délai de rétractation ou après sa perte valable dans les conditions de l'Article 9, toute interruption, suspension ou arrêt de la prestation à la seule initiative du Client, pour convenance personnelle, ne donne lieu à aucun remboursement, total ou partiel.
@@ -137,7 +137,7 @@ export default function CGV() {
             <strong>Accompagnements individuels (Wav Premium) :</strong> les sessions et ressources déjà délivrées sont définitivement dues. Les sessions non encore consommées restent acquises au Client et disponibles dans la limite de la durée de validité prévue à l'article 8.2 ci-dessous, sans pouvoir donner lieu à un remboursement en numéraire.
           </p>
           <p className="text-muted-foreground mb-4">
-            <strong>Wav Academy — six mois prépayés :</strong> le forfait est réglé intégralement avant démarrage, sans reconduction. Hors droits impératifs du client, une interruption pour convenance personnelle n’entraîne pas de remboursement au prorata du niveau d’utilisation. Cette clause ne limite ni la rétractation prévue à l’article 9.3 ni les recours en cas de manquement du vendeur.
+            <strong>Wav Academy : six mois prépayés :</strong> le forfait est réglé intégralement avant démarrage, sans reconduction. Hors droits impératifs du client, une interruption pour convenance personnelle n’entraîne pas de remboursement au prorata du niveau d’utilisation. Cette clause ne limite ni la rétractation prévue à l’article 9.3 ni les recours en cas de manquement du vendeur.
           </p>
           <p className="text-muted-foreground mb-4">
             <strong>Prestations à livraison numérique immédiate (Analyse Express) :</strong> le rapport et les contenus délivrés sont définitivement dus dès leur mise à disposition lorsque le Client a expressément demandé l'exécution immédiate et préalablement reconnu la perte de son droit de rétractation dans les conditions de l'article 9.2.
@@ -166,7 +166,7 @@ export default function CGV() {
           </p>
 
           {/* ARTICLE 9 */}
-          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 9 — Droit de rétractation (B2C uniquement)</h2>
+          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 9 : Droit de rétractation (B2C uniquement)</h2>
           <p className="text-muted-foreground mb-4">
             Conformément à l'article L221-18 du Code de la consommation, le client consommateur dispose de 14 jours pour se rétracter, sauf exceptions.
           </p>
@@ -219,7 +219,7 @@ export default function CGV() {
           </p>
 
           {/* ARTICLE 10 */}
-          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 10 — Responsabilité et limitation</h2>
+          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 10 : Responsabilité et limitation</h2>
           <p className="text-muted-foreground mb-4">
             Fred Wav est tenu à une obligation de moyens, pas de résultat.
             Il ne peut être tenu responsable des changements d'algorithme, des bannissements de compte, des décisions de modération, des pannes de plateformes tierces, ni du manque de mise en application des conseils par le client.
@@ -230,14 +230,14 @@ export default function CGV() {
           </p>
 
           {/* ARTICLE 11 */}
-          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 11 — Propriété intellectuelle</h2>
+          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 11 : Propriété intellectuelle</h2>
           <p className="text-muted-foreground mb-4">
             L'ensemble des ressources (méthodes, rapports, PDF, templates) est la propriété exclusive de Fred Wav. Le client dispose d'un droit d'usage personnel et non cessible.
             La revente ou la diffusion des méthodes et contenus entraîne une résiliation immédiate sans remboursement. Le vendeur se réserve le droit d'engager toute action utile (civile et, le cas échéant, pénale) en fonction des faits constatés.
           </p>
 
           {/* ARTICLE 12 */}
-          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 12 — Wav Academy (formules, reconduction, résiliation, suspension)</h2>
+          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 12 : Wav Academy (formules, reconduction, résiliation, suspension)</h2>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">12.1 Formules disponibles</h3>
           <p className="text-muted-foreground mb-2">
@@ -271,7 +271,7 @@ export default function CGV() {
           </p>
 
           {/* ARTICLE 13 */}
-          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 13 — Médiation (B2C)</h2>
+          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 13 : Médiation (B2C)</h2>
           <p className="text-muted-foreground mb-2">
             En cas de litige non résolu par le service client (<a href="mailto:contact@fredwav.com" className="text-primary underline">contact@fredwav.com</a>), et après réclamation écrite préalable, le client consommateur peut saisir le médiateur :
           </p>
@@ -286,7 +286,7 @@ export default function CGV() {
           </p>
 
           {/* ARTICLE 14 */}
-          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 14 — Droit applicable et juridiction</h2>
+          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 14 : Droit applicable et juridiction</h2>
           <p className="text-muted-foreground mb-4">
             Les CGV sont soumises au droit français.
             En cas de litige avec un professionnel, le Tribunal de Commerce de Poitiers (86) sera seul compétent.
@@ -294,13 +294,13 @@ export default function CGV() {
           </p>
 
           {/* ARTICLE 15 */}
-          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 15 — Plateforme européenne de règlement en ligne des litiges (ODR/RLL)</h2>
+          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 15 : Plateforme européenne de règlement en ligne des litiges (ODR/RLL)</h2>
           <p className="text-muted-foreground mb-4">
             La plateforme européenne de règlement en ligne des litiges (ODR/RLL) est fermée depuis le 20 juillet 2025.
           </p>
 
           {/* ANNEXE 1 */}
-          <h2 className="font-display text-xl font-semibold mt-14 mb-3 border-t pt-8">Annexe 1 — Formulaire de rétractation (modèle)</h2>
+          <h2 className="font-display text-xl font-semibold mt-14 mb-3 border-t pt-8">Annexe 1 : Formulaire de rétractation (modèle)</h2>
           <p className="text-muted-foreground mb-4 text-sm italic">
             (À utiliser si vous souhaitez vous rétracter dans le délai légal, sous réserve des exceptions applicables. Vous pouvez l'envoyer à <a href="mailto:contact@fredwav.com" className="text-primary underline">contact@fredwav.com</a> ou utiliser la <Link to="/retractation" className="text-primary underline">fonctionnalité en ligne</Link>.)
           </p>
@@ -315,7 +315,7 @@ export default function CGV() {
           </div>
 
           {/* ANNEXE 2 */}
-          <h2 className="font-display text-xl font-semibold mt-14 mb-3 border-t pt-8">Annexe 2 — Consentements express (cases à cocher au checkout)</h2>
+          <h2 className="font-display text-xl font-semibold mt-14 mb-3 border-t pt-8">Annexe 2 : Consentements express (cases à cocher au checkout)</h2>
           <div className="bg-muted/50 rounded-lg p-4 mb-4 space-y-3 text-sm text-muted-foreground">
             <p>☐ J'ai lu et j'accepte les Conditions Générales de Vente.</p>
             <p>☐ (Wav Premium) Je demande expressément l'exécution de la prestation avant la fin du délai légal de rétractation de 14 jours. En cas de rétractation après le début de l'exécution, je resterai redevable du montant proportionné au service effectivement fourni ; si la prestation est pleinement exécutée, je reconnais perdre mon droit de rétractation.</p>

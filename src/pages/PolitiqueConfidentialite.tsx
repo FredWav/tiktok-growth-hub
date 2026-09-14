@@ -34,7 +34,7 @@ export default function PolitiqueConfidentialite() {
             <li><strong>Identité :</strong> Nom, prénom.</li>
             <li><strong>Contact :</strong> Adresse email, numéro de téléphone (obligatoire pour le suivi WhatsApp Wav Premium).</li>
             <li><strong>Données professionnelles :</strong> Identifiant de compte TikTok, statistiques publiques et données de profil nécessaires au diagnostic stratégique.</li>
-            <li><strong>Données de formulaire :</strong> Niveau actuel, points de blocage, objectifs, budget envisagé, source de découverte, durée de suivi et élément déclencheur — collectés via le formulaire de contact pour qualifier la demande.</li>
+            <li><strong>Données de formulaire :</strong> Niveau actuel, points de blocage, objectifs, budget envisagé, source de découverte, durée de suivi et élément déclencheur, collectés via le formulaire de contact pour qualifier la demande.</li>
             <li><strong>Paiement :</strong> Les transactions sont gérées par Stripe. Fred Wav n'a jamais accès à vos coordonnées bancaires complètes, mais conserve les références de commande et de session nécessaires au suivi contractuel.</li>
             <li><strong>Preuves contractuelles :</strong> Version et texte exact des CGV et consentements acceptés, date et heure d'acceptation, empreinte technique pseudonymisée et référence Stripe associée.</li>
             <li><strong>Rétractation :</strong> Nom, email, prestation et référence de commande, date de commande déclarée, message facultatif, texte et version de la déclaration, horodatage, état des accusés email, nombre de tentatives de livraison et empreinte technique pseudonymisée nécessaires à la preuve de dépôt, au suivi de l'accusé de réception et à la prévention des abus.</li>
@@ -75,7 +75,7 @@ export default function PolitiqueConfidentialite() {
             <li><strong>Site et base de données :</strong> Lovable Labs Incorporated (États-Unis) pour l'hébergement et la publication du site, et Supabase Inc. (États-Unis) pour la base de données et les fonctions serveur connectées à Lovable.</li>
             <li><strong>Emails transactionnels :</strong> OVHcloud, via la messagerie noreply@fredwav.com.</li>
             <li><strong>Mesure d'audience :</strong> Google Analytics (Google LLC, États-Unis), activé uniquement avec votre consentement.</li>
-            <li><strong>Analyse comportementale :</strong> PostHog Inc. (San Francisco, USA) — utilisé pour comprendre l'usage du site et améliorer l'expérience, activé uniquement avec votre consentement.</li>
+            <li><strong>Analyse comportementale :</strong> PostHog Inc. (San Francisco, USA), utilisé pour comprendre l'usage du site et améliorer l'expérience, activé uniquement avec votre consentement.</li>
             <li><strong>Vidéos :</strong> YouTube (Google LLC, États-Unis). Les aperçus sont chargés depuis les serveurs YouTube et le lecteur en mode confidentialité renforcée n'est chargé qu'après votre clic.</li>
           </ul>
           <p className="text-muted-foreground mb-4">

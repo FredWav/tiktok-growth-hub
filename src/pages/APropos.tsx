@@ -52,9 +52,9 @@ const stats = [
   { value: CREATORS_COUNT, label: "Créateurs accompagnés" },
   { value: `${yearsSince(VIDEO_START_YEAR)} ans`, label: "D'expérience en création vidéo" },
   { value: `${yearsSince(MUSIC_START_YEAR)} ans`, label: "Dans la musique et la création artistique" },
-  { value: "330K+", label: "Abonnés cumulés — mai 2026" },
-  { value: "35K", label: "Abonnés Instagram — mai 2026" },
-  { value: "30K", label: "Abonnés YouTube — mai 2026" },
+  { value: "330K+", label: "Abonnés cumulés, mai 2026" },
+  { value: "35K", label: "Abonnés Instagram, mai 2026" },
+  { value: "30K", label: "Abonnés YouTube, mai 2026" },
 ];
 
 export default function APropos() {

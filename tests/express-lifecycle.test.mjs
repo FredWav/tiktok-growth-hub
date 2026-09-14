@@ -232,3 +232,9 @@ test("les emails Express utilisent une file durable avec déduplication et cinq 
   assert.match(migration, /express-result:'\|\|NEW\.id/);
   assert.match(scheduler, /cron\.schedule\('express-v3-minute','\* \* \* \* \*'/);
 });
+
+test("la page Express annonce jusqu’à 120 vidéos sans tiret cadratin", () => {
+  const source = readFileSync(new URL("../src/pages/AnalyseExpress.tsx", import.meta.url), "utf8");
+  assert.match(source, /jusqu’à 120 vidéos/);
+  assert.doesNotMatch(source, /120 maximum|max 120|\u2014/i);
+});

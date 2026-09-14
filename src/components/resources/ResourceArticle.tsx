@@ -228,7 +228,7 @@ export function ResourceArticle({
               }
             >
               <Link to="/analyse-express">
-                Analyser mon compte — {EXPRESS_PRICE_LABEL}
+                Analyser mon compte : {EXPRESS_PRICE_LABEL}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
@@ -357,7 +357,7 @@ export function InlineExpressCta({
           }
         >
           <Link to="/analyse-express">
-            Faire mon analyse — {EXPRESS_PRICE_LABEL}
+            Faire mon analyse : {EXPRESS_PRICE_LABEL}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </Button>
@@ -379,7 +379,7 @@ export function ExampleDataChart({
     <figure className="my-8 rounded-2xl border border-border bg-background p-6 md:p-8" aria-label={`${title}. ${description}`}>
       <figcaption className="mb-6">
         <span className="text-xs font-semibold uppercase tracking-wider text-primary">
-          Exemple pédagogique — données fictives
+          Exemple pédagogique : données fictives
         </span>
         <h3 className="font-display text-xl md:text-2xl font-semibold mt-2 mb-2">{title}</h3>
         <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>

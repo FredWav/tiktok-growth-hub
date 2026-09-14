@@ -39,7 +39,7 @@ export function Header({ minimal = false }: { minimal?: boolean }) {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <Link to="/" className="flex min-h-11 items-center gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label="FredWav — Accueil">
+          <Link to="/" className="flex min-h-11 items-center gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label="FredWav : Accueil">
             <span className="font-display text-xl md:text-2xl font-semibold tracking-tight">
               <span className="text-foreground">Fred</span>
               <span className="text-primary">Wav</span>

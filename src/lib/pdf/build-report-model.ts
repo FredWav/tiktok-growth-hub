@@ -272,11 +272,11 @@ export function buildReportModel(input: unknown): ReportModel {
         // URL brute à ce stade : elle est remplacée par un data URI avant le
         // rendu (le navigateur ne peut pas lire ces images directement).
         cover: cover ? String(cover) : undefined,
-        views: fmtCompact(pickVideoMetric(video, ["views", "playCount", "play_count"])) ?? "—",
-        likes: fmtCompact(pickVideoMetric(video, ["likes", "diggCount", "like_count"])) ?? "—",
-        comments: fmtCompact(pickVideoMetric(video, ["comments", "commentCount", "comment_count"])) ?? "—",
-        shares: fmtCompact(pickVideoMetric(video, ["shares", "shareCount", "share_count"])) ?? "—",
-        saves: fmtCompact(pickVideoMetric(video, ["saves", "collectCount", "save_count"])) ?? "—",
+        views: fmtCompact(pickVideoMetric(video, ["views", "playCount", "play_count"])) ?? "Non disponible",
+        likes: fmtCompact(pickVideoMetric(video, ["likes", "diggCount", "like_count"])) ?? "Non disponible",
+        comments: fmtCompact(pickVideoMetric(video, ["comments", "commentCount", "comment_count"])) ?? "Non disponible",
+        shares: fmtCompact(pickVideoMetric(video, ["shares", "shareCount", "share_count"])) ?? "Non disponible",
+        saves: fmtCompact(pickVideoMetric(video, ["saves", "collectCount", "save_count"])) ?? "Non disponible",
         erLabel: er !== null ? fmtPercent(er, 2) ?? undefined : undefined,
         saveRateLabel: sr !== null ? fmtPercent(sr, 2) ?? undefined : undefined,
       };

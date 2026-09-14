@@ -74,7 +74,7 @@ function buildAiInsightsMarkdown(ai: Any): string {
   if (Array.isArray(ai.strengths) && ai.strengths.length) {
     lines.push("## Forces");
     for (const s of ai.strengths) {
-      lines.push(`- **${s.title}** — ${s.description}`);
+      lines.push(`- **${s.title}** : ${s.description}`);
     }
     lines.push("");
   }
@@ -82,7 +82,7 @@ function buildAiInsightsMarkdown(ai: Any): string {
   if (Array.isArray(ai.improvements) && ai.improvements.length) {
     lines.push("## Axes d'amélioration");
     for (const s of ai.improvements) {
-      lines.push(`- **${s.title}** — ${s.description}`);
+      lines.push(`- **${s.title}** : ${s.description}`);
     }
     lines.push("");
   }
@@ -215,7 +215,7 @@ function normalizePublicationPattern(pp: Any) {
 
 /**
  * Detect whether a result is already in the legacy/normalized shape
- * (defensive — allows re-runs after migration without double-normalizing).
+ * (defensive : allows re-runs after migration without double-normalizing).
  */
 function isAlreadyNormalized(result: Any): boolean {
   return !!(result?.account && (

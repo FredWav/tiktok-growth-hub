@@ -83,7 +83,7 @@ export function PageHeader({ username, dateLabel }: { username: string; dateLabe
     <View style={s.header} fixed>
       <View style={s.headerLeft}>
         <Monogram initials="FW" boxSize={14} background={color.noir} textColor={color.goldBright} />
-        <Text style={[s.brand, { marginLeft: 6 }]}>FRED WAV — ANALYSE EXPRESS</Text>
+        <Text style={[s.brand, { marginLeft: 6 }]}>FRED WAV : ANALYSE EXPRESS</Text>
       </View>
       <Text style={s.headerRight}>
         @{username} · {dateLabel}

@@ -58,7 +58,7 @@ export default function HooksTikTok() {
               reste de ta vidéo dépend de cette poignée de secondes : si elles ratent, personne ne verra le reste.
             </p>
             <p>
-              Un bon hook ne raconte pas encore ton sujet. Il donne une <strong>raison de rester</strong> — une
+              Un bon hook ne raconte pas encore ton sujet. Il donne une <strong>raison de rester</strong> : une
               question ouverte, une promesse de surprise, un chiffre qui intrigue. Le corps de la vidéo, lui, tient
               cette promesse. Hook et contenu forment un couple : l'un ouvre la porte, l'autre décide si on entre.
             </p>
@@ -92,7 +92,7 @@ export default function HooksTikTok() {
               <div className="flex items-start gap-2.5 rounded-xl bg-amber-50 border border-amber-200/70 px-4 py-3">
                 <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
                 <p className="text-sm text-amber-900/90 leading-relaxed">
-                  <strong className="font-semibold">À surveiller —</strong> {c.watchOut}
+                  <strong className="font-semibold">À surveiller :</strong> {c.watchOut}
                 </p>
               </div>
             </div>
@@ -139,7 +139,7 @@ export default function HooksTikTok() {
             <p>
               Ne pars pas de la formule, pars de ton spectateur. Qu'est-ce qui l'arrêterait, lui, dans son fil ? Une
               accroche efficace parle à quelqu'un de précis, pas à tout le monde. Choisis ensuite la famille qui sert
-              ton sujet — la curiosité pour un tuto, l'émotion pour un récit, le chiffre pour une démonstration.
+              ton sujet : la curiosité pour un tuto, l'émotion pour un récit, le chiffre pour une démonstration.
             </p>
             <p>
               Puis vérifie une seule chose : est-ce que le reste de la vidéo <strong>tient la promesse</strong> du
@@ -210,7 +210,7 @@ export default function HooksTikTok() {
           </p>
           <Button variant="hero" size="lg" asChild>
             <Link to="/wavacademy">
-              Découvrir la Wav Academy — dès {ACADEMY_FROM} €
+              Découvrir la Wav Academy : dès {ACADEMY_FROM} €
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>

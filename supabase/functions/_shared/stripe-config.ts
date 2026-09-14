@@ -24,11 +24,16 @@ const PRICE_IDS = {
   },
 } as const;
 
+/** Returns the default Stripe prices for a specific mode, without reading env. */
+export function getStripePricesForMode(mode: StripeMode) {
+  return PRICE_IDS[mode];
+}
+
 /** Returns prices matching the current Stripe key mode. Called at request time. */
 export function getStripePrices() {
   const mode = getStripeMode();
   console.log(`[stripe-config] mode=${mode}`);
-  return PRICE_IDS[mode];
+  return getStripePricesForMode(mode);
 }
 
 export function getStripeMode(): StripeMode {

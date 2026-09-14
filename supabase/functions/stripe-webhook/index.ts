@@ -1,8 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { db, enqueue } from "../_shared/commerce.ts";
-import { getStripeSecretKey } from "../_shared/stripe-config.ts";
+import { db, enqueue, logUnmatchedPayment } from "../_shared/commerce.ts";
+import { getStripePricesForMode, getStripeSecretKey } from "../_shared/stripe-config.ts";
 import { notifySuccess, notifyError } from "../_shared/itpush.ts";
 import { commerceCheckout } from "../_shared/commerce-stripe.ts";
 import { checkoutMismatch } from "../_shared/checkout-validation.ts";
@@ -20,8 +20,22 @@ function jsonResponse(body: Record<string, unknown>, status = 200): Response {
 }
 
 function getErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
+  if (error instanceof Error) return error.message;
+  if (error && typeof error === "object") {
+    const e = error as { message?: unknown; code?: unknown; details?: unknown; hint?: unknown };
+    const parts = [e.code, e.message, e.details, e.hint]
+      .filter((v): v is string | number => typeof v === "string" || typeof v === "number")
+      .map(String);
+    if (parts.length) return parts.join(" • ").slice(0, 500);
+    try {
+      return JSON.stringify(error).slice(0, 500);
+    } catch {
+      return "Erreur non sérialisable";
+    }
+  }
+  return String(error);
 }
+
 
 type ExpressConsentConfirmation = {
   email: string;
@@ -82,6 +96,12 @@ async function safeNotifySuccess(title: string, message: string): Promise<void> 
   } catch (notifyErr) {
     console.error(`Failed to send success notification for ${title}:`, notifyErr);
   }
+}
+
+function getExpectedExpressPriceId(livemode: boolean): string {
+  const mode = livemode ? "live" : "test";
+  return Deno.env.get(livemode ? "STRIPE_EXPRESS_PRICE_ID_LIVE" : "STRIPE_EXPRESS_PRICE_ID_TEST") ||
+    getStripePricesForMode(mode).analyse_express;
 }
 
 async function triggerExpressAnalysis(sessionId: string): Promise<void> {
@@ -228,12 +248,11 @@ serve(async (req) => {
 
         if (expressConsent) {
           const items = await stripe.checkout.sessions.listLineItems(session.id, { limit: 2 });
-          const expectedPrice = Deno.env.get(session.livemode ? "STRIPE_EXPRESS_PRICE_ID_LIVE" : "STRIPE_EXPRESS_PRICE_ID_TEST");
+          const expectedPrice = getExpectedExpressPriceId(session.livemode);
           const mismatch = checkoutMismatch(session, items.data, expectedPrice, 1190);
           if (mismatch) {
             if (session.payment_status === "paid") {
-              const { error } = await supabase.from("commerce_unmatched_payments").upsert({ session_id: session.id, reason: `Express : ${mismatch}`, amount_cents: session.amount_total, currency: session.currency, email: session.customer_details?.email, received_at: new Date(event.created * 1000).toISOString() }, { onConflict: "session_id", ignoreDuplicates: true });
-              if (error) throw error;
+              await logUnmatchedPayment(supabase, { session_id: session.id, reason: `Express : ${mismatch}`, amount_cents: session.amount_total, currency: session.currency, email: session.customer_details?.email, received_at: new Date(event.created * 1000).toISOString() });
             }
             await safeNotifyError("Analyse Express Webhook", `${mismatch} • ${session.id} • aucun rapport rattaché`);
             return jsonResponse({ received: true, reconciliation_required: true });
@@ -392,8 +411,7 @@ serve(async (req) => {
 
       if (!plan || !discordRoleEnv || !email) {
         if (session.payment_status === "paid") {
-          const {error:unmatchedError}=await supabase.from("commerce_unmatched_payments").upsert({session_id:session.id,reason:"Paiement non rattaché à une commande reconnue",amount_cents:session.amount_total,currency:session.currency,email:session.customer_details?.email,received_at:new Date(event.created*1000).toISOString()},{onConflict:"session_id",ignoreDuplicates:true});
-          if(unmatchedError) throw unmatchedError;
+          await logUnmatchedPayment(supabase,{session_id:session.id,reason:"Paiement non rattaché à une commande reconnue",amount_cents:session.amount_total,currency:session.currency,email:session.customer_details?.email,received_at:new Date(event.created*1000).toISOString()});
           await safeNotifyError("Stripe Webhook",`Paiement à rapprocher : ${session.id}. Aucun nouvel accès ouvert.`);
         }
         console.log("Checkout session is not a Wav Academy purchase, skipping");

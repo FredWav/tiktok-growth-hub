@@ -1,5 +1,5 @@
 import type Stripe from "https://esm.sh/stripe@18.5.0?target=deno";
-import { db, enqueue } from "./commerce.ts";
+import { db, enqueue, logUnmatchedPayment } from "./commerce.ts";
 
 export async function commerceCheckout(
   stripe: Stripe,
@@ -19,7 +19,15 @@ export async function commerceCheckout(
     ? await client.from("commerce_orders").select("*").eq("id", reference)
       .maybeSingle()
     : { data: null, error: null };
-  if (lookup.error) throw lookup.error;
+  // Tant que le socle commerce v3 n'est pas déployé en base, la table est absente :
+  // on laisse alors la branche historique (Analyse Express) traiter la session.
+  if (lookup.error) {
+    const code = (lookup.error as { code?: string }).code;
+    // 42P01 (Postgres) et PGRST205 (cache de schéma PostgREST) = table absente.
+    if (code === "42P01" || code === "PGRST205") return false;
+    throw lookup.error;
+  }
+
   const o = lookup.data;
   if (!knownLink && !o) return false; // Historical checkout handled by the existing branch.
   if (session.payment_status !== "paid") return true;
@@ -51,15 +59,14 @@ export async function commerceCheckout(
     ) reason = "Prix Stripe non reconnu";
   }
   if (reason) {
-    const { error } = await client.from("commerce_unmatched_payments").upsert({
+    await logUnmatchedPayment(client, {
       session_id: session.id,
       reason,
       amount_cents: session.amount_total,
       currency: session.currency,
       email: session.customer_details?.email,
       received_at: new Date(receivedAt * 1000).toISOString(),
-    }, { onConflict: "session_id", ignoreDuplicates: true });
-    if (error) throw error;
+    });
     await enqueue(
       client,
       `unmatched:${session.id}`,
@@ -77,14 +84,14 @@ export async function commerceCheckout(
     p_received: new Date(receivedAt * 1000).toISOString(),
   });
   if (error) {
-    await client.from("commerce_unmatched_payments").upsert({
+    await logUnmatchedPayment(client, {
       session_id: session.id,
       reason: error.message,
       amount_cents: session.amount_total,
       currency: session.currency,
       email: session.customer_details?.email,
       received_at: new Date(receivedAt * 1000).toISOString(),
-    }, { onConflict: "session_id", ignoreDuplicates: true });
+    });
     throw error;
   }
   await enqueue(

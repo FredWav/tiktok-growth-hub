@@ -55,7 +55,7 @@ const Auth: React.FC = () => {
       } else if (role === "admin") {
         navigate("/admin", { replace: true });
       } else {
-        navigate("/app", { replace: true });
+        navigate("/", { replace: true });
       }
     }
   }, [user, role, navigate, location]);

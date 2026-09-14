@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "react-router-dom";
-import { ArrowRight, BarChart3, CalendarDays, CheckCircle2, Sparkles } from "lucide-react";
+import { ArrowRight, CheckCircle2, MailCheck, Sparkles } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -51,7 +51,7 @@ const schema = z.object({
   first_name: z.string().trim().min(1, "Prénom requis").max(100),
   last_name: z.string().trim().min(1, "Nom requis").max(100),
   email: z.string().trim().email("E-mail invalide").max(254),
-  account_url: z.string().trim().min(2, "Ajoute ton compte ou ton projet").max(500),
+  account_url: z.string().trim().min(2, "Ajoute ton compte principal").max(500),
   business_stage: allowed(situations, "Sélectionne ta situation"),
   primary_goal: allowed(goals, "Sélectionne ton objectif"),
   main_blocker: z.string().trim().min(20, "Donne un peu plus de contexte (20 caractères minimum)").max(2000),
@@ -64,15 +64,7 @@ const schema = z.object({
 type OrientationForm = z.infer<typeof schema>;
 type OrientationResult = {
   id: string;
-  route: "express" | "call";
-  recommended_offer: "express" | "academy" | "one_shot" | "premium";
-};
-
-const offerNames: Record<OrientationResult["recommended_offer"], string> = {
-  express: "l’Analyse Express",
-  one_shot: "une analyse stratégique ponctuelle",
-  academy: "la Wav Academy",
-  premium: "le Wav Premium",
+  notification: "queued";
 };
 
 export default function ReserverUnAppel() {
@@ -111,8 +103,6 @@ export default function ReserverUnAppel() {
       setResult(response);
       trackEvent("orientation_form_submitted", {
         form_version: FORM_VERSION,
-        route: response.route,
-        recommended_offer: response.recommended_offer,
         budget: values.budget,
       });
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -124,35 +114,25 @@ export default function ReserverUnAppel() {
   }
 
   if (result) {
-    const express = result.route === "express";
     return (
       <Layout>
         <SEOHead {...seoFor("/reserverunappel")} />
         <Section variant="cream" size="lg">
           <div className="mx-auto max-w-2xl text-center">
             <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-              {express ? <BarChart3 className="h-8 w-8" /> : <CalendarDays className="h-8 w-8" />}
+              <MailCheck className="h-8 w-8" />
             </div>
-            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-primary">Ta prochaine étape</p>
+            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-primary">Demande envoyée</p>
             <h1 className="mb-5 font-display text-3xl font-semibold md:text-5xl">
-              {express ? "Commence par une Analyse Express" : "Regardons ensemble l’offre la plus juste"}
+              Merci, j’ai bien reçu tes informations
             </h1>
             <p className="mx-auto mb-7 max-w-xl text-lg text-muted-foreground">
-              {express
-                ? "Ton budget est inférieur à 399 €. Je t’envoie par e-mail le lien pour réserver ton Analyse Express. Elle te donnera un premier diagnostic, puis WavStats t’aidera à suivre et améliorer tes contenus en autonomie."
-                : `Au vu de tes réponses, ${offerNames[result.recommended_offer]} est la piste la plus cohérente. Un e-mail avec le lien pour réserver un échange est en cours d’envoi afin de la confirmer avec Fred.`}
+              Je vais lire ta demande et te répondre personnellement par e-mail si je peux t’aider.
             </p>
             <div className="mb-8 rounded-2xl border border-primary/20 bg-background p-6 text-left">
-              <div className="flex gap-3"><CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" /><p className="text-sm leading-relaxed">Ta demande est bien enregistrée. La recommandation et le lien sont envoyés à ton adresse ; pense à vérifier les courriers indésirables.</p></div>
+              <div className="flex gap-3"><CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" /><p className="text-sm leading-relaxed">Tu n’as rien d’autre à faire pour le moment. Tes réponses m’ont été transmises.</p></div>
             </div>
-            {express ? (
-              <div className="flex flex-col justify-center gap-3 sm:flex-row">
-                <Button asChild variant="hero" size="xl"><Link to="/analyse-express">Réserver mon Analyse Express</Link></Button>
-                <Button asChild variant="outline" size="xl"><a href="https://wavstats.com" target="_blank" rel="noreferrer">Découvrir WavStats</a></Button>
-              </div>
-            ) : (
-              <Button asChild variant="hero" size="xl"><a href="https://calendar.app.google/UZC5UY38shFuSqmy6" target="_blank" rel="noreferrer">Réserver mon échange</a></Button>
-            )}
+            <Button asChild variant="outline" size="xl"><Link to="/">Retour à l’accueil</Link></Button>
           </div>
         </Section>
       </Layout>
@@ -165,11 +145,11 @@ export default function ReserverUnAppel() {
       <Section variant="cream" size="lg">
         <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
           <div className="lg:sticky lg:top-28">
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-semibold text-primary"><Sparkles className="h-4 w-4" /> Orientation gratuite · 3 minutes</div>
-            <h1 className="mb-5 font-display text-4xl font-semibold tracking-tight md:text-5xl">Quelle offre peut vraiment <span className="text-gold-gradient">t’aider maintenant ?</span></h1>
-            <p className="mb-8 text-lg leading-relaxed text-muted-foreground">Ce formulaire ne pousse pas automatiquement vers le Premium. Il tient compte de ta situation, du type d’aide recherché et de ton budget pour t’orienter vers l’Analyse Express, une intervention ponctuelle, la Wav Academy ou le Wav Premium.</p>
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-semibold text-primary"><Sparkles className="h-4 w-4" /> Demande de contact · 3 minutes</div>
+            <h1 className="mb-5 font-display text-4xl font-semibold tracking-tight md:text-5xl">Parle-moi de ton compte et de ce que tu veux <span className="text-gold-gradient">débloquer</span></h1>
+            <p className="mb-8 text-lg leading-relaxed text-muted-foreground">Donne-moi le contexte utile sur ton compte, tes objectifs et tes difficultés. Je pourrai comprendre ta situation avant de te répondre personnellement.</p>
             <div className="space-y-4 text-sm">
-              {["Une recommandation claire, sans appel imposé", "Moins de 399 € : Analyse Express, puis WavStats", "À partir de 399 € : échange avec Fred si une offre humaine est pertinente"].map((text) => <div key={text} className="flex gap-3"><CheckCircle2 className="h-5 w-5 shrink-0 text-primary" /><span>{text}</span></div>)}
+              {["Ta demande est lue personnellement", "Une réponse adaptée à ton besoin", "Aucun appel ni engagement imposé"].map((text) => <div key={text} className="flex gap-3"><CheckCircle2 className="h-5 w-5 shrink-0 text-primary" /><span>{text}</span></div>)}
             </div>
           </div>
 
@@ -183,7 +163,7 @@ export default function ReserverUnAppel() {
                     <FormField control={form.control} name="last_name" render={({ field }) => <FormItem><FormLabel>Nom *</FormLabel><FormControl><Input autoComplete="family-name" {...field} /></FormControl><FormMessage /></FormItem>} />
                   </div>
                   <FormField control={form.control} name="email" render={({ field }) => <FormItem><FormLabel>E-mail *</FormLabel><FormControl><Input type="email" autoComplete="email" {...field} /></FormControl><FormMessage /></FormItem>} />
-                  <FormField control={form.control} name="account_url" render={({ field }) => <FormItem><FormLabel>Compte, site ou projet principal *</FormLabel><FormControl><Input placeholder="@toncompte ou https://…" {...field} /></FormControl><FormMessage /></FormItem>} />
+                  <FormField control={form.control} name="account_url" render={({ field }) => <FormItem><FormLabel>Ton compte principal *</FormLabel><FormControl><Input placeholder="@toncompte" {...field} /></FormControl><FormMessage /></FormItem>} />
                   <FormField control={form.control} name="business_stage" render={({ field }) => <FormItem><FormLabel>Où en es-tu aujourd’hui ? *</FormLabel><Select value={field.value} onValueChange={field.onChange}><FormControl><SelectTrigger><SelectValue placeholder="Sélectionne ta situation" /></SelectTrigger></FormControl><SelectContent>{situations.map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>} />
                 </fieldset>
 
@@ -196,13 +176,13 @@ export default function ReserverUnAppel() {
 
                 <fieldset className="space-y-5 border-t border-border pt-8">
                   <legend className="mb-5 font-display text-2xl font-semibold"><span className="mr-3 text-primary">03</span>Un budget réaliste</legend>
-                  <FormField control={form.control} name="budget" render={({ field }) => <FormItem><FormLabel>Quel budget total peux-tu investir maintenant ? *</FormLabel><Select value={field.value} onValueChange={field.onChange}><FormControl><SelectTrigger><SelectValue placeholder="Sélectionne ton budget" /></SelectTrigger></FormControl><SelectContent>{ORIENTATION_BUDGET_TIERS.map((tier) => <SelectItem key={tier.value} value={tier.value}>{tier.label}</SelectItem>)}</SelectContent></Select><p className="text-sm text-muted-foreground">Cette réponse sert à ne jamais te proposer une solution hors budget.</p><FormMessage /></FormItem>} />
+                  <FormField control={form.control} name="budget" render={({ field }) => <FormItem><FormLabel>Quel budget total peux-tu investir maintenant ? *</FormLabel><Select value={field.value} onValueChange={field.onChange}><FormControl><SelectTrigger><SelectValue placeholder="Sélectionne ton budget" /></SelectTrigger></FormControl><SelectContent>{ORIENTATION_BUDGET_TIERS.map((tier) => <SelectItem key={tier.value} value={tier.value}>{tier.label}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>} />
                 </fieldset>
 
                 <div className="hidden" aria-hidden="true"><Input tabIndex={-1} autoComplete="off" {...form.register("website")} /></div>
                 {error && <p role="alert" className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">{error}</p>}
-                <p className="text-sm text-muted-foreground">Tes réponses servent uniquement à traiter et orienter ta demande. <Link to="/politique-de-confidentialite" className="underline">Confidentialité</Link></p>
-                <Button type="submit" variant="hero" size="xl" className="h-auto min-h-14 w-full whitespace-normal" disabled={busy}>{busy ? "Orientation en cours…" : <>Recevoir ma recommandation <ArrowRight className="ml-2 h-5 w-5" /></>}</Button>
+                <p className="text-sm text-muted-foreground">Tes réponses servent uniquement à traiter ta demande. <Link to="/politique-de-confidentialite" className="underline">Confidentialité</Link></p>
+                <Button type="submit" variant="hero" size="xl" className="h-auto min-h-14 w-full whitespace-normal" disabled={busy}>{busy ? "Envoi en cours…" : <>Envoyer ma demande <ArrowRight className="ml-2 h-5 w-5" /></>}</Button>
               </form>
             </Form>
           </div>

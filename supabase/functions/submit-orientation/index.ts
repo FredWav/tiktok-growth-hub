@@ -1,5 +1,4 @@
 import {
-  CALENDAR,
   db,
   deliverMail,
   email,
@@ -7,15 +6,9 @@ import {
   fingerprint,
   headers,
   json,
-  site,
   text,
   uuid,
 } from "../_shared/commerce.ts";
-import {
-  type OrientationOffer,
-  qualifyOrientation,
-} from "../_shared/orientation.ts";
-
 const FORM_VERSION = "orientation_v3";
 const BUDGETS = new Set(["under_399", "399_748", "749_1989", "1990_plus"]);
 const STAGES = new Set([
@@ -62,13 +55,6 @@ const labels: Record<string, string> = {
   "1990_plus": "1 990 € et plus",
 };
 
-const offerLabels: Record<OrientationOffer, string> = {
-  express: "Analyse Express",
-  one_shot: "Analyse stratégique ponctuelle",
-  academy: "Wav Academy",
-  premium: "Wav Premium",
-};
-
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers });
   if (req.method !== "POST") {
@@ -106,15 +92,13 @@ Deno.serve(async (req) => {
 
     const client = db();
     const existing = await client.from("wav_premium_applications").select(
-      "id,qualification_route,recommended_offer",
+      "id",
     )
       .eq("orientation_request_id", requestId).maybeSingle();
     if (existing.error) throw existing.error;
     if (existing.data) {
       return json({
         id: existing.data.id,
-        route: existing.data.qualification_route,
-        recommended_offer: existing.data.recommended_offer,
         notification: "queued",
       });
     }
@@ -141,7 +125,6 @@ Deno.serve(async (req) => {
       return json({ error: "Trop de demandes. Réessaie dans une heure." }, 429);
     }
 
-    const result = qualifyOrientation(budget, workMode);
     const { data: saved, error: insertError } = await client.from(
       "wav_premium_applications",
     ).insert({
@@ -159,15 +142,12 @@ Deno.serve(async (req) => {
       primary_goal: primaryGoal,
       main_blocker: mainBlocker,
       work_mode: workMode,
-      qualification_route: result.route,
-      recommended_offer: result.offer,
-      qualification_score: result.score,
       orientation_request_id: requestId,
       orientation_fingerprint: visitorFingerprint,
     }).select("id").single();
     if (insertError || !saved) {
       const retry = await client.from("wav_premium_applications").select(
-        "id,qualification_route,recommended_offer",
+        "id",
       )
         .eq("orientation_request_id", requestId).maybeSingle();
       if (!retry.data) {
@@ -175,20 +155,17 @@ Deno.serve(async (req) => {
       }
       return json({
         id: retry.data.id,
-        route: retry.data.qualification_route,
-        recommended_offer: retry.data.recommended_offer,
         notification: "queued",
       });
     }
 
     const details = [
       `${firstName} ${lastName} · ${cleanEmail}`,
-      `Compte/projet : ${accountUrl}`,
+      `Compte principal : ${accountUrl}`,
       `Situation : ${labels[businessStage]}`,
       `Objectif : ${labels[primaryGoal]}`,
       `Besoin : ${labels[workMode]}`,
       `Budget : ${labels[budget]}`,
-      `Orientation : ${offerLabels[result.offer]}`,
       `Blocage : ${mainBlocker}`,
       originSource ? `Source : ${originSource}` : "",
     ].filter(Boolean).join("\n");
@@ -196,30 +173,13 @@ Deno.serve(async (req) => {
       client,
       `orientation:${saved.id}:owner`,
       "contact@fredwav.com",
-      `Nouvelle orientation · ${offerLabels[result.offer]}`,
+      `Nouvelle demande de contact · ${firstName} ${lastName}`,
       details,
-    );
-
-    const clientBody = result.route === "express"
-      ? `Bonjour ${firstName},\n\nAvec un budget inférieur à 399 €, la prochaine étape la plus cohérente est une Analyse Express. Elle te donnera un diagnostic immédiat de ton compte TikTok et des priorités concrètes.\n\nRéserve ton Analyse Express : ${site()}/analyse-express\n\nUne fois le diagnostic posé, tu pourras continuer à mesurer et améliorer tes contenus en autonomie avec WavStats : https://wavstats.com\n\nÀ très vite,\nFred Wav`
-      : `Bonjour ${firstName},\n\nAu vu de tes réponses, ${
-        offerLabels[result.offer]
-      } est la piste la plus cohérente. Réserve un échange avec moi pour confirmer le format adapté à ta situation : ${CALENDAR}\n\nCet échange sert à choisir la bonne offre ; il ne constitue pas un audit gratuit.\n\nÀ très vite,\nFred Wav`;
-    await enqueue(
-      client,
-      `orientation:${saved.id}:client`,
-      cleanEmail,
-      result.route === "express"
-        ? "Ta prochaine étape : réserver ton Analyse Express"
-        : "Ta prochaine étape avec Fred Wav",
-      clientBody,
     );
     await deliverMail(client);
 
     return json({
       id: saved.id,
-      route: result.route,
-      recommended_offer: result.offer,
       notification: "queued",
     });
   } catch (error) {

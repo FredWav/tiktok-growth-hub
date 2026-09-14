@@ -1,13 +1,14 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
-import { normalizeTikTokUsername } from "../_shared/tiktok-username.ts";
+import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { canRetryExpress } from "../_shared/express-state.ts";
+import { updateExpressAttempt, type ExpressRow } from "../_shared/express-finalize.ts";
+import { launchExpressJob } from "../_shared/express-launch.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const API_BASE = "https://wavstats.com/api/v1";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -15,18 +16,8 @@ serve(async (req) => {
   }
 
   try {
-    const { tiktok_username, analysis_id } = await req.json();
-    if (!tiktok_username || !analysis_id) {
-      throw new Error("tiktok_username et analysis_id requis");
-    }
-
-    // Le pseudo arrive brut d'une ligne existante, potentiellement saisie avec
-    // une majuscule avant la normalisation à l'inscription. On le recanonise ici,
-    // sinon le retry rejouerait exactement l'échec d'origine.
-    const cleanUsername = normalizeTikTokUsername(tiktok_username);
-    if (cleanUsername.length < 2) {
-      throw new Error("tiktok_username invalide");
-    }
+    const { analysis_id } = await req.json();
+    if (!analysis_id) throw new Error("analysis_id requis");
 
     // Verify admin role
     const authHeader = req.headers.get("Authorization");
@@ -74,60 +65,32 @@ serve(async (req) => {
       });
     }
 
-    // Call WavStats API to re-trigger analysis
-    // Repli sur l'ancien nom de secret tant que WAVSTATS_API_KEY n'existe pas côté dashboard.
-    const apiKey = Deno.env.get("WAVSTATS_API_KEY") ?? Deno.env.get("WAV_SOCIAL_SCAN_API_KEY");
+    const { data: row, error: readError } = await supabaseAdmin
+      .from("express_analyses").select("*").eq("id", analysis_id).single();
+    if (readError || !row) throw new Error("Analyse introuvable");
+    if (!canRetryExpress(row as ExpressRow)) {
+      return new Response(JSON.stringify({ error: "Cette analyse ne peut pas être relancée dans son état actuel" }), {
+        status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const apiKey = Deno.env.get("WAVSTATS_API_KEY") || Deno.env.get("WAV_SOCIAL_SCAN_API_KEY");
     if (!apiKey) throw new Error("Clé API WavStats non configurée");
-
-    const analyzeRes = await fetch(
-      `${API_BASE}/accounts/${encodeURIComponent(cleanUsername)}/analyze`,
-      {
-        method: "POST",
-        headers: {
-          "X-API-Key": apiKey,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!analyzeRes.ok) {
-      const errText = await analyzeRes.text();
-      console.error("Analyze error:", errText);
-      throw new Error(`Erreur lors du lancement de l'analyse: ${analyzeRes.status}`);
+    const launchAt = new Date().toISOString();
+    const locked = await updateExpressAttempt(supabaseAdmin, row as ExpressRow, {
+      status: "starting", job_id: null, launch_started_at: launchAt,
+      processing_started_at: launchAt, updated_at: launchAt, error_message: null,
+    });
+    if (!locked) {
+      return new Response(JSON.stringify({ error: "Une autre action a déjà modifié cette analyse. Actualise la liste." }), {
+        status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
-
-    const analyzeData = await analyzeRes.json();
-    const jobId = analyzeData.jobId ?? analyzeData.job_id;
-    if (!jobId) throw new Error("job_id non retourné par l'API");
-
-    // Update the express_analyses record
-    const { error: updateError } = await supabaseAdmin
-      .from("express_analyses")
-      .update({
-        tiktok_username: cleanUsername,
-        status: "processing",
-        job_id: jobId,
-        error_message: null,
-        result_data: null,
-        health_score: null,
-        completed_at: null,
-      })
-      .eq("id", analysis_id);
-
-    if (updateError) {
-      console.error("DB update error:", updateError);
-      throw new Error("Erreur lors de la mise à jour en base");
-    }
-
-    return new Response(
-      JSON.stringify({ job_id: jobId, status: "processing" }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      }
-    );
+    const saved = await launchExpressJob(supabaseAdmin, locked, apiKey);
+    return new Response(JSON.stringify({ job_id: saved.job_id, status: saved.status }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : String(error) }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

@@ -1,13 +1,12 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
-import { normalizeWavStatsResult, extractHealthScoreNumber, hasAiInsights } from "../_shared/wavstats-normalizer.ts";
+import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { pollExpress, type ExpressRow } from "../_shared/express-finalize.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const API_BASE = "https://wavstats.com/api/v1";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -15,9 +14,9 @@ serve(async (req) => {
   }
 
   try {
-    const { job_id, analysis_id } = await req.json();
-    if (!job_id || !analysis_id) {
-      throw new Error("job_id et analysis_id requis");
+    const { analysis_id } = await req.json();
+    if (!analysis_id) {
+      throw new Error("analysis_id requis");
     }
 
     // Verify admin
@@ -65,63 +64,17 @@ serve(async (req) => {
       });
     }
 
-    // Check job status on WavStats API
-    // Repli sur l'ancien nom de secret tant que WAVSTATS_API_KEY n'existe pas côté dashboard.
-    const apiKey = Deno.env.get("WAVSTATS_API_KEY") ?? Deno.env.get("WAV_SOCIAL_SCAN_API_KEY");
-    if (!apiKey) throw new Error("Clé API WavStats non configurée");
-
-    const jobRes = await fetch(`${API_BASE}/jobs/${encodeURIComponent(job_id)}`, {
-      headers: { "X-API-Key": apiKey },
-    });
-
-    if (!jobRes.ok) {
-      const errText = await jobRes.text();
-      console.error("Job status check error:", errText);
-      return new Response(JSON.stringify({ status: "processing" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const job = await jobRes.json();
-
-    if (job.status === "completed" && job.result) {
-      const normalized = normalizeWavStatsResult(job.result);
-      const missingAi = !hasAiInsights(normalized);
-      const healthScore = extractHealthScoreNumber(job.result);
-
-      await supabaseAdmin.from("express_analyses").update({
-        status: "complete",
-        health_score: typeof healthScore === "number" ? healthScore : null,
-        result_data: normalized,
-        completed_at: new Date().toISOString(),
-        error_message: missingAi ? "Analyse IA (ai_insights) absente" : null,
-      }).eq("id", analysis_id);
-
-      return new Response(JSON.stringify({ status: "complete" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    if (job.status === "failed") {
-      await supabaseAdmin.from("express_analyses").update({
-        status: "failed",
-        error_message: job.error || "L'analyse a échoué",
-        completed_at: new Date().toISOString(),
-      }).eq("id", analysis_id);
-
-      return new Response(JSON.stringify({ status: "failed" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    return new Response(JSON.stringify({
-      status: "processing",
-      progress: job.progress || 0,
-    }), {
+    // The stored row owns the job and report version, including after a retry.
+    const { data: row, error: readError } = await supabaseAdmin
+      .from("express_analyses").select("*").eq("id", analysis_id).single();
+    if (readError || !row) throw new Error("Analyse introuvable");
+    const result = await pollExpress(row as ExpressRow, supabaseAdmin);
+    // PDF data is fetched separately on demand.
+    return new Response(JSON.stringify({ status: result.status }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : String(error) }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

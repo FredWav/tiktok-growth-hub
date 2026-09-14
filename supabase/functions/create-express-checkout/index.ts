@@ -65,7 +65,12 @@ serve(async (req) => {
   }
 
   try {
-    if (Deno.env.get("EXPRESS_SAMPLE_CONTRACT_VERIFIED") !== "true") return jsonResponse({ error: "Les nouvelles analyses sont temporairement suspendues. Contacte Fred pour être prévenu de la réouverture." }, 503);
+    // Le contrat sample-v3 est activé uniquement après validation avec WavStats.
+    // Tant que ce n'est pas le cas, l'achat reste ouvert avec le format historique
+    // réellement pris en charge, au lieu de bloquer tous les clients par un 503.
+    const reportVersion = Deno.env.get("EXPRESS_SAMPLE_CONTRACT_VERIFIED") === "true"
+      ? "sample-v3"
+      : "legacy";
     const body = await req.json();
     const {
       username,
@@ -179,6 +184,7 @@ serve(async (req) => {
         email: cleanEmail,
         newsletter_requested: wantsNewsletter,
         status: "awaiting_payment",
+        report_version: reportVersion,
       })
       .select("id")
       .single();

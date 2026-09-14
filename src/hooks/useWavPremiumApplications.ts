@@ -21,6 +21,8 @@ export interface WavPremiumApplication {
   qualification_route: "wavstats" | "express" | "call" | null;
   recommended_offer: "wavstats" | "express" | "academy" | "sprint" | "one_shot" | "premium" | null;
   qualification_score: number | null;
+  orientation_request_id?: string | null;
+  orientation_fingerprint?: string | null;
   objectives: string[] | null;
   success_30_days: string | null;
   why_now: string | null;

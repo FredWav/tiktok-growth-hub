@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
  */
 export interface ExpressAnalysis {
   id: string;
-  stripe_session_id: string;
+  stripe_session_id: string | null;
   tiktok_username: string;
   email: string | null;
   newsletter_requested: boolean;
@@ -54,9 +54,8 @@ export function useExpressAnalyses() {
       if (error) throw error;
       return data as unknown as ExpressAnalysis[];
     },
-    // Le polling de relance invalide cette requête : sans palier, chaque tick
-    // relançait un aller-retour complet.
-    staleTime: 30_000,
+    staleTime: 5_000,
+    refetchInterval: 10_000,
   });
 }
 

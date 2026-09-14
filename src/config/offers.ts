@@ -111,6 +111,18 @@ export const PREMIUM_BUDGET_LABELS: Record<string, string> = Object.fromEntries(
   PREMIUM_BUDGET_TIERS.map((t) => [t.value, t.short]),
 );
 
+/** Tranches du formulaire d'orientation commercial. */
+export const ORIENTATION_BUDGET_TIERS = [
+  { value: "under_399", label: "Moins de 399 €", short: "Moins de 399 €" },
+  { value: "399_748", label: "De 399 € à 748 €", short: "399 € à 748 €" },
+  { value: "749_1989", label: "De 749 € à 1 989 €", short: "749 € à 1 989 €" },
+  { value: "1990_plus", label: "1 990 € et plus", short: "1 990 € et plus" },
+] as const;
+
+export const ORIENTATION_BUDGET_LABELS: Record<string, string> = Object.fromEntries(
+  ORIENTATION_BUDGET_TIERS.map((tier) => [tier.value, tier.short]),
+);
+
 export type RecommendedOffer = "express" | "academy" | "premium";
 
 /**

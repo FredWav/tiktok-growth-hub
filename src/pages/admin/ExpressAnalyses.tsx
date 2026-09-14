@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import {
   fetchAnalysisResultData,
@@ -24,9 +24,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { normalizeTikTokUsername } from "@/lib/tiktok-username";
 import { useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
+import { canRetryExpress, isExpressActive, isExpressComplete } from "../../../supabase/functions/_shared/express-state";
 
 const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
-  pending: { label: "En attente", variant: "outline" },
+  pending: { label: "En attente de lancement", variant: "outline" },
+  awaiting_payment: { label: "Paiement attendu", variant: "outline" },
+  starting: { label: "Démarrage", variant: "secondary" },
+  refunded: { label: "Remboursée", variant: "outline" },
+  completed: { label: "Terminée", variant: "default" },
   processing: { label: "En cours", variant: "secondary" },
   complete: { label: "Terminée", variant: "default" },
   failed: { label: "Échouée", variant: "destructive" },
@@ -50,24 +55,29 @@ async function downloadPDF(analysis: ExpressAnalysis) {
   }
 }
 
-/**
- * Ne s'appuie que sur des colonnes légères.
- *
- * L'ancienne version fouillait `result_data` pour repérer les analyses
- * « terminées mais sans conseil IA ». Ce champ n'est plus chargé dans la liste,
- * et une analyse terminée sans note de santé est précisément le symptôme de ce
- * cas-là.
- */
-function canRetry(analysis: ExpressAnalysis): boolean {
-  if (analysis.status === "failed") return true;
-  return analysis.status === "complete" && analysis.health_score === null;
+async function checkAnalysisStatus(analysisId: string, signal: AbortSignal) {
+  const { data: sessionData } = await supabase.auth.getSession();
+  const token = sessionData?.session?.access_token;
+  if (!token) throw new Error("Session expirée : reconnecte-toi pour suivre les analyses.");
+  const res = await fetch(
+    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/check-express-job`, {
+      method: "POST", signal,
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`, apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+      body: JSON.stringify({ analysis_id: analysisId }),
+    });
+  const result = await res.json();
+  if (!res.ok || result.error) throw new Error(result.error || "Consultation du traitement indisponible");
 }
 
 const ExpressAnalyses = () => {
-  const { data: analyses, isLoading } = useExpressAnalyses();
+  const { data: analyses, isLoading, error: listError } = useExpressAnalyses();
   const queryClient = useQueryClient();
   const [retryingIds, setRetryingIds] = useState<Set<string>>(new Set());
-  const pollingRefs = useRef<Record<string, ReturnType<typeof setInterval>>>({});
+  const analysesRef = useRef(analyses);
+  const pollingAttempts = useRef(new Map<string, { job: string | null; started: number; checked: number }>());
+  const [pollingError, setPollingError] = useState<string | null>(null);
+  const launchInFlight = useRef(false);
+  const retryInFlight = useRef(new Set<string>());
   const [manualUsername, setManualUsername] = useState("");
   const [isLaunching, setIsLaunching] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
@@ -83,67 +93,60 @@ const ExpressAnalyses = () => {
     }
   };
 
-  // Sans ce nettoyage, quitter la page laissait les intervalles tourner : ils
-  // continuaient d'interroger check-express-job et d'invalider la liste toutes
-  // les 5 secondes, indéfiniment et en s'empilant à chaque relance.
+  useEffect(() => { analysesRef.current = analyses; }, [analyses]);
+
+  // Resume existing jobs on arrival, serialize rounds, and stop requests on unmount.
   useEffect(() => {
-    const timers = pollingRefs.current;
-    return () => {
-      Object.values(timers).forEach(clearInterval);
-    };
-  }, []);
-
-  const stopPolling = useCallback((analysisId: string) => {
-    if (pollingRefs.current[analysisId]) {
-      clearInterval(pollingRefs.current[analysisId]);
-      delete pollingRefs.current[analysisId];
-    }
-    setRetryingIds((prev) => {
-      const next = new Set(prev);
-      next.delete(analysisId);
-      return next;
-    });
-  }, []);
-
-  const startPolling = useCallback((analysisId: string, jobId: string) => {
-    const poll = setInterval(async () => {
-      try {
-        const { data: sessionData } = await supabase.auth.getSession();
-        const token = sessionData?.session?.access_token;
-
-        const res = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/check-express-job`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            },
-            body: JSON.stringify({ job_id: jobId, analysis_id: analysisId }),
-          }
-        );
-
-        const result = await res.json();
-
-        if (result.status === "complete" || result.status === "failed") {
-          stopPolling(analysisId);
-          queryClient.invalidateQueries({ queryKey: ["express-analyses"] });
-          if (result.status === "complete") {
-            toast.success("Analyse relancée avec succès !");
-          } else {
-            toast.error("L'analyse a échoué après relance");
-          }
+    let disposed = false;
+    let timer: ReturnType<typeof setTimeout>;
+    const controller = new AbortController();
+    const tick = async () => {
+      if (document.hidden) { timer = setTimeout(tick, 5_000); return; }
+      const now = Date.now();
+      let roundError: string | null = null;
+      const active = (analysesRef.current || []).filter(isExpressActive).filter((row) => {
+        let attempt = pollingAttempts.current.get(row.id);
+        if (!attempt || attempt.job !== row.job_id) {
+          attempt = { job: row.job_id, started: now, checked: 0 };
+          pollingAttempts.current.set(row.id, attempt);
         }
-      } catch {
-        // continue polling
-      }
-    }, 5000);
+        if (now - attempt.started > 10 * 60_000) {
+          roundError = "Suivi automatique limité à dix minutes. Utilise Vérifier pour consulter à nouveau le traitement ; le suivi serveur continue.";
+          return false;
+        }
+        return true;
+      }).sort((a, b) => pollingAttempts.current.get(a.id)!.checked - pollingAttempts.current.get(b.id)!.checked).slice(0, 3);
+      await Promise.all(active.map(async (row) => {
+        pollingAttempts.current.get(row.id)!.checked = now;
+        try {
+          await checkAnalysisStatus(row.id, AbortSignal.any([controller.signal, AbortSignal.timeout(20_000)]));
+        } catch (error) {
+          roundError = error instanceof Error ? error.message : "Suivi temporairement indisponible";
+        }
+      }));
+      if (disposed) return;
+      setPollingError(roundError);
+      if (active.length) void queryClient.invalidateQueries({ queryKey: ["express-analyses"] });
+      timer = setTimeout(tick, 5_000);
+    };
+    void tick();
+    return () => { disposed = true; controller.abort(); clearTimeout(timer); };
+  }, [queryClient]);
 
-    pollingRefs.current[analysisId] = poll;
-  }, [stopPolling, queryClient]);
+  const handleCheck = async (analysisId: string) => {
+    try {
+      await checkAnalysisStatus(analysisId, AbortSignal.timeout(20_000));
+      pollingAttempts.current.delete(analysisId);
+      setPollingError(null);
+      await queryClient.invalidateQueries({ queryKey: ["express-analyses"] });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Consultation impossible");
+    }
+  };
 
-  const handleRetry = async (analysis: any) => {
+  const handleRetry = async (analysis: ExpressAnalysis) => {
+    if (retryInFlight.current.has(analysis.id)) return;
+    retryInFlight.current.add(analysis.id);
     try {
       setRetryingIds((prev) => new Set(prev).add(analysis.id));
 
@@ -154,6 +157,7 @@ const ExpressAnalyses = () => {
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/retry-express-analysis`,
         {
           method: "POST",
+          signal: AbortSignal.timeout(45_000),
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -169,12 +173,15 @@ const ExpressAnalyses = () => {
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || "Erreur");
 
-      toast.info("Analyse relancée, polling en cours...");
+      toast.info("Analyse relancée, suivi en cours…");
       queryClient.invalidateQueries({ queryKey: ["express-analyses"] });
-      startPolling(analysis.id, result.job_id);
-    } catch (err: any) {
+      pollingAttempts.current.delete(analysis.id);
+    } catch (err: unknown) {
       console.error("Retry error:", err);
-      toast.error(err.message || "Erreur lors de la relance");
+      toast.error(err instanceof Error ? err.message : "Erreur lors de la relance");
+    } finally {
+      retryInFlight.current.delete(analysis.id);
+      void queryClient.invalidateQueries({ queryKey: ["express-analyses"] });
       setRetryingIds((prev) => {
         const next = new Set(prev);
         next.delete(analysis.id);
@@ -184,6 +191,7 @@ const ExpressAnalyses = () => {
   };
 
   const handleManualLaunch = async () => {
+    if (launchInFlight.current) return;
     // Même forme canonique que côté fonction : le toast doit annoncer le pseudo
     // réellement envoyé à WavStats.
     const username = normalizeTikTokUsername(manualUsername);
@@ -191,6 +199,7 @@ const ExpressAnalyses = () => {
       toast.error("Entre un nom d'utilisateur TikTok");
       return;
     }
+    launchInFlight.current = true;
     try {
       setIsLaunching(true);
       const { data: sessionData } = await supabase.auth.getSession();
@@ -200,6 +209,7 @@ const ExpressAnalyses = () => {
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/manual-express-analysis`,
         {
           method: "POST",
+          signal: AbortSignal.timeout(45_000),
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -215,11 +225,13 @@ const ExpressAnalyses = () => {
       toast.info(`Analyse lancée pour @${username}`);
       setManualUsername("");
       queryClient.invalidateQueries({ queryKey: ["express-analyses"] });
-      startPolling(result.analysis_id, result.job_id);
-    } catch (err: any) {
+      pollingAttempts.current.delete(result.analysis_id);
+    } catch (err: unknown) {
       console.error("Manual launch error:", err);
-      toast.error(err.message || "Erreur lors du lancement");
+      toast.error(err instanceof Error ? err.message : "Erreur lors du lancement");
     } finally {
+      launchInFlight.current = false;
+      void queryClient.invalidateQueries({ queryKey: ["express-analyses"] });
       setIsLaunching(false);
     }
   };
@@ -230,9 +242,9 @@ const ExpressAnalyses = () => {
     if (!analyses) return null;
     return {
       total: analyses.length,
-      complete: analyses.filter((a) => a.status === "complete").length,
+      complete: analyses.filter(isExpressComplete).length,
       failed: analyses.filter((a) => a.status === "failed").length,
-      processing: analyses.filter((a) => a.status === "processing" || a.status === "pending").length,
+      processing: analyses.filter(isExpressActive).length,
     };
   }, [analyses]);
 
@@ -263,6 +275,10 @@ const ExpressAnalyses = () => {
             </Button>
           </div>
         </div>
+
+        {(listError || pollingError) && (
+          <p role="alert" className="text-amber-300 text-sm">{listError ? "Impossible de charger les analyses. Actualise la page ou reconnecte-toi." : pollingError}</p>
+        )}
 
         {stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -308,13 +324,13 @@ const ExpressAnalyses = () => {
               </TableHeader>
               <TableBody>
                 {analyses.map((analysis) => {
-                  const config = statusConfig[analysis.status] || statusConfig.pending;
+                  const config = statusConfig[analysis.status] || { label: "Statut inconnu", variant: "outline" as const };
                   // `result_data` n'est plus dans la liste : le statut suffit à
                   // savoir s'il y a quelque chose à exporter, et le clic vérifie.
-                  const canDownload = analysis.status === "complete";
+                  const canDownload = isExpressComplete(analysis);
                   const isRetrying = retryingIds.has(analysis.id);
-                  const showRetry = canRetry(analysis) && !isRetrying;
-                  const isProcessing = analysis.status === "processing" || analysis.status === "pending" || isRetrying;
+                  const showRetry = canRetryExpress(analysis) && !isRetrying;
+                  const isProcessing = isExpressActive(analysis) || isRetrying;
 
                   return (
                     <TableRow key={analysis.id} className="border-primary/10">
@@ -381,7 +397,7 @@ const ExpressAnalyses = () => {
                       <TableCell className="text-cream/80">
                         {analysis.health_score != null ? `${analysis.health_score}/100` : "-"}
                       </TableCell>
-                      <TableCell className="text-red-400 text-sm max-w-[200px] truncate">
+                      <TableCell className="text-red-400 text-sm max-w-[320px] whitespace-normal break-words">
                         {analysis.error_message || "-"}
                       </TableCell>
                       <TableCell>
@@ -407,7 +423,9 @@ const ExpressAnalyses = () => {
                             </Button>
                           )}
                           {isProcessing && !isRetrying && (
-                            <Loader2 className="h-4 w-4 animate-spin text-cream/40" />
+                            <Button variant="ghost" size="sm" onClick={() => handleCheck(analysis.id)} title="Vérifier le traitement existant">
+                              <RefreshCw className="h-4 w-4 mr-1" /> Vérifier
+                            </Button>
                           )}
                           {!canDownload && !showRetry && !isProcessing && !isRetrying && (
                             <span className="text-cream/30">-</span>

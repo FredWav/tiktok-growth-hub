@@ -16,6 +16,6 @@ Deno.serve(async req => {
     if (error) throw error;
     if (!data) return json({ status: "starting" });
     // No browser-provided job id is read. The paid order owns the only authorized job.
-    return json(await pollExpress(data as ExpressRow));
+    return json(await pollExpress(data as ExpressRow, db()));
   } catch (e) { console.error(e); return json({ error: "Consultation temporairement indisponible. Réessaie sans repayer." },500); }
 });

@@ -167,7 +167,7 @@ export function CoverPage({ model }: { model: ReportModel }) {
           <Text style={s.contentsTitle}>CE QUE CONTIENT CE RAPPORT</Text>
           {contents.slice(0, 8).map((item) => (
             <View key={item} style={s.contentsRow}>
-              <Text style={s.contentsMark}>—</Text>
+              <Text style={s.contentsMark}>•</Text>
               <Text style={s.contentsText}>{item}</Text>
             </View>
           ))}

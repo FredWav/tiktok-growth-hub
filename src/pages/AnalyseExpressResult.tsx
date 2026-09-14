@@ -354,7 +354,7 @@ export default function AnalyseExpressResult() {
                     Satisfait de ton analyse express&nbsp;?
                   </h2>
                   <p className="text-cream/75 leading-relaxed max-w-2xl">
-                    Obtiens des retours sur toutes tes vidéos avec la méthode de Fred Wav grâce à WavStats — l’outil qui propulse tes analyses, pensé pour les créateurs de contenu et les solopreneurs.
+                    Obtiens des retours sur toutes tes vidéos avec la méthode de Fred Wav grâce à WavStats, l’outil qui propulse tes analyses, pensé pour les créateurs de contenu et les solopreneurs.
                   </p>
                 </div>
                 <Button asChild variant="hero" size="lg" className="w-full sm:w-auto">

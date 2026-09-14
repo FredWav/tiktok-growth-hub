@@ -93,7 +93,7 @@ export default function WavAcademy() {
             tone="dark"
             items={[
               {
-                question: "Je ne veux pas simplifier au point de devenir faux — mes pairs le verraient.",
+                question: "Je ne veux pas simplifier au point de devenir faux, mes pairs le verraient.",
                 answer:
                   "Le travail ne consiste pas à retirer la nuance de ton sujet, mais à choisir l’angle, l’exemple et le format qui la rendent compréhensible. Tu restes responsable du fond ; les retours portent sur la manière de le transmettre.",
               },
@@ -188,7 +188,7 @@ export default function WavAcademy() {
           {[
             ["TikTok et Instagram", "Les plateformes montrent leurs propres statistiques. Elles ne choisissent pas à ta place l’objectif, l’hypothèse à tester ni la priorité suivante."],
             ["Une IA généraliste", "Elle peut produire des idées à partir du contexte que tu lui fournis. Elle ne remplace ni la connaissance suivie de tes essais ni la discussion critique sur ce que tu veux préserver."],
-            ["La Wav Academy", "Tu confrontes tes contenus réels à un regard humain, à un collectif et à une méthode de test régulière, avec WavStats comme outil d’observation — sans promesse de résultat automatique."],
+            ["La Wav Academy", "Tu confrontes tes contenus réels à un regard humain, à un collectif et à une méthode de test régulière, avec WavStats comme outil d’observation, sans promesse de résultat automatique."],
           ].map(([title, text]) => (
             <article key={title} className="rounded-2xl border border-border bg-background p-6">
               <h2 className="font-display text-xl">{title}</h2>

@@ -71,7 +71,7 @@ export default function RessourceRetentionTikTok() {
       slug="retention_tiktok"
       eyebrow="Rétention TikTok"
       title="Rétention TikTok : comprendre le taux de complétion et l’améliorer"
-      introduction="La rétention ne te dit pas seulement combien de temps une vidéo a été regardée. Elle montre le moment où la promesse cesse de tenir l’attention — et t’aide à choisir la séquence précise à retravailler."
+      introduction="La rétention ne te dit pas seulement combien de temps une vidéo a été regardée. Elle montre le moment où la promesse cesse de tenir l’attention et t’aide à choisir la séquence précise à retravailler."
       readingTime="11 min"
       experienceNote="Pour relire une courbe de rétention, je replace le script et le montage à côté des données. Une chute devient utile seulement quand on peut la relier à une phrase, une transition ou une information arrivée trop tard, puis tester une version différente."
       faq={faq}

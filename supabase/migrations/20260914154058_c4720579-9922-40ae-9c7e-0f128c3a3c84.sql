@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.express_notification_outbox() FROM PUBLIC, anon, authenticated;

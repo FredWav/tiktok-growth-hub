@@ -116,6 +116,318 @@ export type Database = {
         }
         Relationships: []
       }
+      commerce_applications: {
+        Row: {
+          account_or_project: string
+          commitments: Json
+          created_at: string
+          email: string
+          fingerprint: string
+          first_name: string
+          id: string
+          objective: string
+          offer: string
+          request_id: string
+          stage: string
+          timing: string
+        }
+        Insert: {
+          account_or_project: string
+          commitments: Json
+          created_at?: string
+          email: string
+          fingerprint: string
+          first_name: string
+          id?: string
+          objective: string
+          offer: string
+          request_id: string
+          stage?: string
+          timing?: string
+        }
+        Update: {
+          account_or_project?: string
+          commitments?: Json
+          created_at?: string
+          email?: string
+          fingerprint?: string
+          first_name?: string
+          id?: string
+          objective?: string
+          offer?: string
+          request_id?: string
+          stage?: string
+          timing?: string
+        }
+        Relationships: []
+      }
+      commerce_audit: {
+        Row: {
+          action: string
+          actor: string | null
+          created_at: string
+          details: Json
+          id: string
+          order_id: string | null
+        }
+        Insert: {
+          action: string
+          actor?: string | null
+          created_at?: string
+          details?: Json
+          id?: string
+          order_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor?: string | null
+          created_at?: string
+          details?: Json
+          id?: string
+          order_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commerce_audit_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "commerce_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commerce_mail: {
+        Row: {
+          attempts: number
+          body: string
+          created_at: string
+          dedupe_key: string
+          error: string | null
+          id: string
+          locked_until: string | null
+          recipient: string
+          sent_at: string | null
+          state: string
+          subject: string
+        }
+        Insert: {
+          attempts?: number
+          body: string
+          created_at?: string
+          dedupe_key: string
+          error?: string | null
+          id?: string
+          locked_until?: string | null
+          recipient: string
+          sent_at?: string | null
+          state?: string
+          subject: string
+        }
+        Update: {
+          attempts?: number
+          body?: string
+          created_at?: string
+          dedupe_key?: string
+          error?: string | null
+          id?: string
+          locked_until?: string | null
+          recipient?: string
+          sent_at?: string | null
+          state?: string
+          subject?: string
+        }
+        Relationships: []
+      }
+      commerce_orders: {
+        Row: {
+          amount_cents: number
+          amount_received: number
+          application_id: string | null
+          claim_token: string
+          consent: Json | null
+          consent_at: string | null
+          created_at: string
+          currency: string
+          discord_status: string
+          email: string
+          ends_at: string
+          first_name: string
+          id: string
+          invoice_reference: string | null
+          last_error: string | null
+          last_processed_at: string
+          lock_until: string | null
+          offer: string
+          offer_version: string
+          paid_at: string | null
+          start_date: string
+          start_time: string
+          starts_at: string
+          status: string
+          subscription_id: string | null
+          token: string
+          wavstats_activation_url: string | null
+          wavstats_status: string
+        }
+        Insert: {
+          amount_cents: number
+          amount_received?: number
+          application_id?: string | null
+          claim_token?: string
+          consent?: Json | null
+          consent_at?: string | null
+          created_at?: string
+          currency?: string
+          discord_status?: string
+          email: string
+          ends_at: string
+          first_name: string
+          id?: string
+          invoice_reference?: string | null
+          last_error?: string | null
+          last_processed_at?: string
+          lock_until?: string | null
+          offer: string
+          offer_version?: string
+          paid_at?: string | null
+          start_date: string
+          start_time?: string
+          starts_at: string
+          status?: string
+          subscription_id?: string | null
+          token?: string
+          wavstats_activation_url?: string | null
+          wavstats_status?: string
+        }
+        Update: {
+          amount_cents?: number
+          amount_received?: number
+          application_id?: string | null
+          claim_token?: string
+          consent?: Json | null
+          consent_at?: string | null
+          created_at?: string
+          currency?: string
+          discord_status?: string
+          email?: string
+          ends_at?: string
+          first_name?: string
+          id?: string
+          invoice_reference?: string | null
+          last_error?: string | null
+          last_processed_at?: string
+          lock_until?: string | null
+          offer?: string
+          offer_version?: string
+          paid_at?: string | null
+          start_date?: string
+          start_time?: string
+          starts_at?: string
+          status?: string
+          subscription_id?: string | null
+          token?: string
+          wavstats_activation_url?: string | null
+          wavstats_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commerce_orders_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "commerce_applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commerce_orders_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: true
+            referencedRelation: "wavacademy_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commerce_receipts: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          id: string
+          method: string
+          order_id: string
+          received_at: string
+          recorded_by: string | null
+          reference: string
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          id?: string
+          method: string
+          order_id: string
+          received_at: string
+          recorded_by?: string | null
+          reference: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          id?: string
+          method?: string
+          order_id?: string
+          received_at?: string
+          recorded_by?: string | null
+          reference?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commerce_receipts_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "commerce_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commerce_unmatched_payments: {
+        Row: {
+          amount_cents: number | null
+          created_at: string
+          currency: string | null
+          email: string | null
+          reason: string
+          received_at: string | null
+          resolved_order_id: string | null
+          session_id: string
+        }
+        Insert: {
+          amount_cents?: number | null
+          created_at?: string
+          currency?: string | null
+          email?: string | null
+          reason: string
+          received_at?: string | null
+          resolved_order_id?: string | null
+          session_id: string
+        }
+        Update: {
+          amount_cents?: number | null
+          created_at?: string
+          currency?: string | null
+          email?: string | null
+          reason?: string
+          received_at?: string | null
+          resolved_order_id?: string | null
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commerce_unmatched_payments_resolved_order_id_fkey"
+            columns: ["resolved_order_id"]
+            isOneToOne: false
+            referencedRelation: "commerce_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deep_links: {
         Row: {
           clicks_count: number
@@ -231,6 +543,7 @@ export type Database = {
           stripe_session_id: string | null
           support_requested_at: string | null
           tiktok_username: string
+          updated_at: string
         }
         Insert: {
           completed_at?: string | null
@@ -253,6 +566,7 @@ export type Database = {
           stripe_session_id?: string | null
           support_requested_at?: string | null
           tiktok_username: string
+          updated_at?: string
         }
         Update: {
           completed_at?: string | null
@@ -275,6 +589,7 @@ export type Database = {
           stripe_session_id?: string | null
           support_requested_at?: string | null
           tiktok_username?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -760,10 +1075,12 @@ export type Database = {
         Row: {
           access_expires_at: string | null
           access_months: number | null
+          access_starts_at: string | null
           activation_email_attempted_at: string | null
           activation_email_error: string | null
           activation_email_sent_at: string | null
           activation_email_status: string
+          commerce_order_id: string | null
           created_at: string
           discord_role_env: string | null
           discord_role_granted: boolean
@@ -778,10 +1095,12 @@ export type Database = {
         Insert: {
           access_expires_at?: string | null
           access_months?: number | null
+          access_starts_at?: string | null
           activation_email_attempted_at?: string | null
           activation_email_error?: string | null
           activation_email_sent_at?: string | null
           activation_email_status?: string
+          commerce_order_id?: string | null
           created_at?: string
           discord_role_env?: string | null
           discord_role_granted?: boolean
@@ -796,10 +1115,12 @@ export type Database = {
         Update: {
           access_expires_at?: string | null
           access_months?: number | null
+          access_starts_at?: string | null
           activation_email_attempted_at?: string | null
           activation_email_error?: string | null
           activation_email_sent_at?: string | null
           activation_email_status?: string
+          commerce_order_id?: string | null
           created_at?: string
           discord_role_env?: string | null
           discord_role_granted?: boolean
@@ -811,7 +1132,15 @@ export type Database = {
           stripe_session_id?: string | null
           stripe_subscription_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "wavacademy_subscriptions_commerce_order_id_fkey"
+            columns: ["commerce_order_id"]
+            isOneToOne: true
+            referencedRelation: "commerce_orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       withdrawal_requests: {
         Row: {
@@ -890,6 +1219,28 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      commerce_accept: {
+        Args: {
+          p_consent: Json
+          p_early: boolean
+          p_start: string
+          p_token: string
+        }
+        Returns: undefined
+      }
+      commerce_record_payment: {
+        Args: {
+          p_actor?: string
+          p_amount: number
+          p_method: string
+          p_order: string
+          p_received: string
+          p_reference: string
+        }
+        Returns: undefined
+      }
+      commerce_revenue: { Args: never; Returns: Json }
+      commerce_submit_application: { Args: { v: Json }; Returns: string }
       get_express_analysis_by_session: {
         Args: { p_session_id: string }
         Returns: {
@@ -913,6 +1264,7 @@ export type Database = {
           stripe_session_id: string | null
           support_requested_at: string | null
           tiktok_username: string
+          updated_at: string
         }
         SetofOptions: {
           from: "*"

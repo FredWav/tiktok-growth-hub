@@ -49,10 +49,10 @@ const labels: Record<string, string> = {
   suivi_collectif: "Avancer dans un cadre collectif",
   suivi_individuel: "Être accompagné individuellement",
   a_definir: "Définir le bon format avec Fred",
-  under_399: "Moins de 399 €",
-  "399_748": "399 € à 748 €",
-  "749_1989": "749 € à 1 989 €",
-  "1990_plus": "1 990 € et plus",
+  under_399: "0 - 398 €",
+  "399_748": "399 - 998 €",
+  "749_1989": "998 - 1 499 €",
+  "1990_plus": "+ de 1 499 €",
 };
 
 Deno.serve(async (req) => {

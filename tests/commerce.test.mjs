@@ -96,6 +96,12 @@ test("le formulaire de contact transmet les réponses à Fred sans recommandatio
   assert.match(page, /Envoyer ma demande/);
   assert.doesNotMatch(page, /Compte, site ou projet principal|Recevoir ma recommandation|Ton budget est inférieur|Moins de 399 € :|À partir de 399 € :/);
 
+  const offers = readFileSync(new URL("../src/config/offers.ts", import.meta.url), "utf8");
+  for (const tier of ["0 - 398 €", "399 - 998 €", "998 - 1 499 €", "+ de 1 499 €"]) {
+    assert.match(offers, new RegExp(tier.replace(/[+]/g, "\\+")));
+    assert.match(handler, new RegExp(tier.replace(/[+]/g, "\\+")));
+  }
+
   assert.match(handler, /Nouvelle demande de contact/);
   assert.match(handler, /Compte principal :/);
   assert.doesNotMatch(handler, /orientation:\$\{saved\.id\}:client|clientBody|qualifyOrientation/);

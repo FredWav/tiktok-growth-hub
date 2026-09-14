@@ -561,6 +561,7 @@ export type Database = {
           facebook_url: string | null
           first_name: string
           follower_since: string | null
+          form_version: string | null
           goals: string
           help_topics: string[] | null
           id: string
@@ -569,12 +570,22 @@ export type Database = {
           motivation: string | null
           objectives: string[] | null
           origin_source: string | null
+          account_url: string | null
+          business_stage: string | null
+          main_blocker: string | null
+          orientation_fingerprint: string | null
+          orientation_request_id: string | null
           other_social_url: string | null
           posthog_id: string | null
           profil: string | null
+          primary_goal: string | null
+          qualification_route: string | null
+          qualification_score: number | null
+          recommended_offer: string | null
           success_30_days: string | null
           tiktok_username: string | null
           why_now: string | null
+          work_mode: string | null
           youtube_url: string | null
         }
         Insert: {
@@ -590,6 +601,7 @@ export type Database = {
           facebook_url?: string | null
           first_name: string
           follower_since?: string | null
+          form_version?: string | null
           goals: string
           help_topics?: string[] | null
           id?: string
@@ -598,12 +610,22 @@ export type Database = {
           motivation?: string | null
           objectives?: string[] | null
           origin_source?: string | null
+          account_url?: string | null
+          business_stage?: string | null
+          main_blocker?: string | null
+          orientation_fingerprint?: string | null
+          orientation_request_id?: string | null
           other_social_url?: string | null
           posthog_id?: string | null
           profil?: string | null
+          primary_goal?: string | null
+          qualification_route?: string | null
+          qualification_score?: number | null
+          recommended_offer?: string | null
           success_30_days?: string | null
           tiktok_username?: string | null
           why_now?: string | null
+          work_mode?: string | null
           youtube_url?: string | null
         }
         Update: {
@@ -619,6 +641,7 @@ export type Database = {
           facebook_url?: string | null
           first_name?: string
           follower_since?: string | null
+          form_version?: string | null
           goals?: string
           help_topics?: string[] | null
           id?: string
@@ -627,12 +650,22 @@ export type Database = {
           motivation?: string | null
           objectives?: string[] | null
           origin_source?: string | null
+          account_url?: string | null
+          business_stage?: string | null
+          main_blocker?: string | null
+          orientation_fingerprint?: string | null
+          orientation_request_id?: string | null
           other_social_url?: string | null
           posthog_id?: string | null
           profil?: string | null
+          primary_goal?: string | null
+          qualification_route?: string | null
+          qualification_score?: number | null
+          recommended_offer?: string | null
           success_30_days?: string | null
           tiktok_username?: string | null
           why_now?: string | null
+          work_mode?: string | null
           youtube_url?: string | null
         }
         Relationships: []

@@ -12,13 +12,14 @@ import {
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Loader2, Trash2 } from "lucide-react";
-import { BUDGET_LABELS, PREMIUM_BUDGET_LABELS } from "@/config/offers";
+import { BUDGET_LABELS, ORIENTATION_BUDGET_LABELS, PREMIUM_BUDGET_LABELS } from "@/config/offers";
 
 const budgetLabels: Record<string, string> = {
   // Grille actuelle — dérivée de config/offers.ts pour qu'aucune tranche ne
   // s'affiche jamais en code brut dans l'admin.
   ...BUDGET_LABELS,
   ...PREMIUM_BUDGET_LABELS,
+  ...ORIENTATION_BUDGET_LABELS,
   // Anciennes valeurs (candidatures historiques)
   "10_a_100": "De 10€ à 100€",
   "1000_plus": "1000€ et +",

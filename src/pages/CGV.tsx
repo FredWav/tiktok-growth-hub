@@ -66,7 +66,7 @@ export default function CGV() {
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">5.3 Wav Academy</h3>
           <p className="text-muted-foreground mb-4">
-            Accompagnement collectif sur TikTok, Instagram et YouTube : communauté Discord, 6 modules, 19 guides et avantage WavStats. Offre unique de six mois à 749 € TTC. Les débutants avec un projet concret sont acceptés.
+            Accompagnement collectif sur TikTok, Instagram et YouTube : communauté Discord, 6 modules, 19 guides et avantage WavStats. Offre unique de six mois à 749 € TTC. Les débutants avec un projet concret sont acceptés. Les services d’accompagnement sont limités à ces six mois ; l’accès aux contenus numériques suit les règles de l’article 12.3.
           </p>
           <p className="text-muted-foreground mb-4">
             L’accompagnement comprend deux lives en accès libre, {ACADEMY_LIVE_SLOT} (heure de Paris), et des retours sur le Discord collectif {ACADEMY_SUPPORT_DAYS}. Le week-end est off. Les membres peuvent participer aux deux créneaux.
@@ -194,14 +194,14 @@ export default function CGV() {
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">9.3 Contenu numérique et service (Wav Academy)</h3>
           <p className="text-muted-foreground mb-2">
-            La Wav Academy combine un <strong>contenu numérique</strong> (ressources et espace Discord accessibles à la date convenue) et une <strong>prestation de service</strong> exécutée pendant la durée souscrite (lives, accompagnement, animation de la communauté). Le démarrage intervient à la date convenue avec Fred, après règlement intégral et acceptation des modalités. Si cette date précède la fin du délai de 14 jours, le Client demande expressément le commencement anticipé du service et l’accès au contenu numérique à cette date. À défaut, le démarrage est fixé après le délai légal. En conséquence, conformément aux articles L221-28, 1° et 13° du Code de la consommation :
+            La Wav Academy combine un <strong>contenu numérique</strong> (modules, guides et ressources accessibles à la date convenue) et une <strong>prestation de service</strong> exécutée pendant la durée souscrite (lives, accompagnement, animation de la communauté Discord). Le démarrage intervient à la date convenue avec Fred, après règlement intégral et acceptation des modalités. Si cette date précède la fin du délai de 14 jours, le Client demande expressément le commencement anticipé du service et l’accès au contenu numérique à cette date. À défaut, le démarrage est fixé après le délai légal. En conséquence, conformément aux articles L221-28, 1° et 13° du Code de la consommation :
           </p>
           <ul className="text-muted-foreground mb-4 space-y-1">
             <li>pour la part de <strong>contenu numérique</strong>, le Client perd son droit de rétractation dès le début de l'accès, après l'avoir expressément demandé et avoir expressément reconnu la perte de ce droit ;</li>
             <li>pour la part de <strong>service</strong>, en cas de rétractation dans le délai de 14 jours, le Client reste redevable du prix au prorata du service déjà fourni à la date de sa demande.</li>
           </ul>
           <p className="text-muted-foreground mb-4">
-            Les formules Wav Academy étant des paiements uniques prépayés (six mois), elles ne sont pas reconduites : l'accès court jusqu'au terme souscrit puis cesse automatiquement. Cette règle reste sans préjudice du droit de rétractation et du prorata légal décrits ci-dessus.
+            La formule Wav Academy est un paiement unique prépayé, sans reconduction. Les services d’accompagnement cessent au terme des six mois ; l’accès aux contenus numériques achetés se poursuit selon l’article 12.3. Cette règle reste sans préjudice du droit de rétractation et du prorata légal décrits ci-dessus.
           </p>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">9.4 Confirmation sur support durable</h3>
@@ -248,17 +248,26 @@ export default function CGV() {
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">12.2 Absence de reconduction</h3>
           <p className="text-muted-foreground mb-4">
-            La Wav Academy n’est pas un abonnement : l’offre de six mois est un paiement unique prépayé, sans reconduction automatique. L'accès cesse de plein droit au terme de la durée souscrite, sauf souscription volontaire d'une nouvelle formule.
+            La Wav Academy n’est pas un abonnement : l’offre de six mois est un paiement unique prépayé, sans reconduction automatique. Les lives, la communauté, l’accompagnement, le support et l’avantage WavStats cessent de plein droit au terme des six mois, sauf nouvelle souscription volontaire. L’accès aux contenus numériques achetés est régi séparément par l’article 12.3.
           </p>
 
-          <h3 className="font-display text-lg font-medium mt-4 mb-2">12.3 Fin de l'accès</h3>
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">12.3 Durée et périmètre de l’accès</h3>
           <p className="text-muted-foreground mb-4">
-            Les six mois sont payés intégralement avant le démarrage. Hors exercice d'un droit impératif, notamment le droit de rétractation dans les conditions de l'article 9.3, elles ne donnent lieu à aucune résiliation anticipée ni remboursement. L'accès reste ouvert jusqu'au terme souscrit, puis prend fin automatiquement — il n'y a aucune démarche de résiliation à effectuer.
+            L’achat du programme Wav Academy confère au Client un droit d’accès personnel, nominatif et non transférable aux contenus numériques compris dans l’offre au jour de la commande.
+          </p>
+          <p className="text-muted-foreground mb-4">
+            Cet accès est garanti pendant une durée de cinq ans à compter de la commande. À l’issue de cette période, il demeure accessible sans paiement supplémentaire aussi longtemps que Wav Academy poursuit l’exploitation du programme concerné.
+          </p>
+          <p className="text-muted-foreground mb-4">
+            Cette offre n’inclut pas automatiquement les futurs programmes, formations ou services commercialisés séparément. Sauf indication contraire figurant dans l’offre, l’accès à la communauté, aux séances en direct, à l’accompagnement individuel ou collectif et au support renforcé est limité à douze mois. Pour l’offre Wav Academy décrite à l’article 12.1, cette durée est expressément limitée à six mois.
+          </p>
+          <p className="text-muted-foreground mb-4">
+            En cas d’arrêt définitif du programme pendant la période garantie, Wav Academy proposera, lorsque cela est techniquement et juridiquement possible, un accès alternatif ou une copie téléchargeable des contenus concernés. À défaut, une solution compensatoire adaptée à la période d’accès restant à courir sera proposée.
           </p>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">12.4 Suspension</h3>
           <p className="text-muted-foreground mb-4">
-            En cas d'impayé, de rejet de paiement, de rétrofacturation, ou de violation des règles de communauté (harcèlement, spam, diffusion de contenus réservés, comportements abusifs), l'accès peut être suspendu ou résilié sans remboursement.
+            L’accès peut être suspendu en cas de partage de compte, de reproduction ou diffusion non autorisée des contenus, de fraude ou de manquement grave aux présentes conditions, après information du Client lorsque les circonstances le permettent. Les mesures prises restent proportionnées au manquement et sans préjudice des droits impératifs du Client.
           </p>
 
           {/* ARTICLE 13 */}

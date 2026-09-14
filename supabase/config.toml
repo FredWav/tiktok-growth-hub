@@ -4,6 +4,8 @@ project_id = "rdpykyvqcckxpygwblxf"
 verify_jwt = false
 [functions.submit-premium-application]
 verify_jwt = false
+[functions.submit-orientation]
+verify_jwt = false
 [functions.commerce-admin]
 verify_jwt = false
 [functions.enrollment]

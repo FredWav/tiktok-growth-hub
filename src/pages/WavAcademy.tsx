@@ -233,9 +233,11 @@ export default function WavAcademy() {
             {ACADEMY_FROM} € <span className="text-base">TTC</span>
           </p>
           <p className="my-4 text-muted-foreground">
-            Un seul règlement, en ligne ou par virement. Six mois de date à
-            date, à partir du jour convenu ensemble lors de l’appel. Aucun accès
-            anticipé, aucun abonnement.
+            Un seul règlement, en ligne ou par virement. L’accompagnement, les
+            lives, la communauté et l’avantage WavStats durent six mois, à
+            partir du jour convenu ensemble lors de l’appel. Les contenus
+            numériques achetés restent accessibles au moins cinq ans. Aucun
+            accès anticipé, aucun abonnement.
           </p>
           <p className="mb-5 font-medium">
             Tu ne paies pas pour accumuler davantage de conseils : tu paies

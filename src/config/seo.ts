@@ -594,7 +594,7 @@ type CsrDefinition = {
 };
 
 const csrManifest: CsrRouteManifestEntry[] = ([
-  { path: "/reserverunappel", title: "Candidature Wav Premium | Fred Wav" },
+  { path: "/reserverunappel", title: "Trouver l’offre adaptée | Fred Wav" },
   { path: "/wavacademy/appel", title: "Appel Wav Academy | Fred Wav" },
   { path: "/inscription/:token", title: "Inscription personnelle | Fred Wav", private: true },
   { path: "/admin/commandes", title: "Commandes et demandes | Fred Wav", private: true, clientBoundary: "admin" },

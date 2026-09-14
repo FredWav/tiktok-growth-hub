@@ -163,7 +163,7 @@ export default function AnalyseExpress() {
 
       {testMode && (
         <div className="bg-amber-500 px-4 py-2 text-center text-sm font-semibold text-black">
-          Mode test Stripe — aucun paiement réel.
+          Mode test Stripe. Aucun paiement réel.
         </div>
       )}
 
@@ -181,8 +181,8 @@ export default function AnalyseExpress() {
 
           <p className="text-lg text-muted-foreground max-w-xl mx-auto mb-4">
             <span className="font-semibold text-foreground">Analyse Express</span>{" "}
-            rassemble les données publiques de ton profil et de tes vidéos
-            disponibles — 120 maximum — pour produire un diagnostic automatisé,
+            rassemble les données publiques de ton profil et de jusqu’à 120 vidéos
+            disponibles pour produire un diagnostic automatisé,
             des hypothèses et un plan d’action. Rapport PDF à 11,90 €.
           </p>
           <p className="text-sm text-muted-foreground/70 mb-10">
@@ -327,7 +327,7 @@ export default function AnalyseExpress() {
       <Section className="pb-20">
         <SectionHeader
           title="Ce que tu obtiens"
-          subtitle="Un premier diagnostic automatisé pour organiser les observations et choisir des pistes à tester — sans le présenter comme l’équivalent d’un audit humain"
+          subtitle="Un premier diagnostic automatisé pour organiser les observations et choisir des pistes à tester, sans le présenter comme l’équivalent d’un audit humain"
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
           {features.map((f) => (

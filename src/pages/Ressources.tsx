@@ -109,7 +109,7 @@ export default function Ressources() {
             }
           >
             <Link to="/analyse-express">
-              Analyser mon compte — {EXPRESS_PRICE_LABEL}
+              Analyser mon compte : {EXPRESS_PRICE_LABEL}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
@@ -227,7 +227,7 @@ export default function Ressources() {
             }
           >
             <Link to="/analyse-express">
-              Faire mon Analyse Express — {EXPRESS_PRICE_LABEL}
+              Faire mon Analyse Express : {EXPRESS_PRICE_LABEL}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>

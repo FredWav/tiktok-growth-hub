@@ -56,7 +56,7 @@ export default function WavPremium() {
           <p className="text-xl text-muted-foreground">
             Trente jours directement avec Fred pour transformer ton compte, ton
             projet et tes contraintes en décisions concrètes sur TikTok,
-            Instagram et YouTube — sans t’imposer de devenir quelqu’un d’autre.
+            Instagram et YouTube, sans t’imposer de devenir quelqu’un d’autre.
           </p>
         </div>
       </Section>

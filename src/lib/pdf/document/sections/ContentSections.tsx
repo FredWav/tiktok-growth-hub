@@ -196,7 +196,7 @@ export function HealthSection({ model }: { model: ReportModel }) {
                 flex: 1,
               }}
             >
-              Visibilité de tes vidéos{sb.ratioLabel ? ` — ${sb.ratioLabel}` : ""}
+              Visibilité de tes vidéos{sb.ratioLabel ? ` : ${sb.ratioLabel}` : ""}
             </Text>
           </View>
         ) : null}
@@ -417,7 +417,7 @@ export function TopVideosSection({ model }: { model: ReportModel }) {
               ) : null}
             </View>
             <Text style={[s.td, { width: NUM_COL, color: color.gold, fontWeight: 700 }]}>
-              {v.erLabel ?? "—"}
+              {v.erLabel ?? "Non disponible"}
             </Text>
           </View>
         ))}

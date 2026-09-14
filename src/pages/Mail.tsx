@@ -20,7 +20,7 @@ export default function MailPage() {
         <div className="max-w-lg mx-auto">
           <div className="bg-card border border-border rounded-xl overflow-hidden shadow-lg">
             <div className="bg-primary text-primary-foreground text-center py-2.5 px-4">
-              <span className="text-sm font-semibold tracking-wide">GRATUIT — Guide offert à l'inscription</span>
+              <span className="text-sm font-semibold tracking-wide">GRATUIT : Guide offert à l'inscription</span>
             </div>
 
             <div className="p-8">

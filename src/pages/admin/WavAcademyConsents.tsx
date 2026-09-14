@@ -21,7 +21,7 @@ const formuleLabel = (c: WavAcademyConsent): string => {
     case 3: return "3 mois"; // historique : anciens consentements pré-refonte (formule 3 mois retirée)
     case 6: return "6 mois";
     case 12: return "1 an";
-    default: return c.access_months ? `${c.access_months} mois` : "—";
+    default: return c.access_months ? `${c.access_months} mois` : "Non renseigné";
   }
 };
 
@@ -207,7 +207,7 @@ const WavAcademyConsents = () => {
                       {c.stripe_session_id ? (
                         <span className="text-green-400 text-xs font-semibold">Payé</span>
                       ) : (
-                        <span className="text-cream/40 text-xs">—</span>
+                        <span className="text-cream/40 text-xs">Non renseigné</span>
                       )}
                     </TableCell>
                   </TableRow>
@@ -223,7 +223,7 @@ const WavAcademyConsents = () => {
           {selected && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-primary text-xl">Consentement — {selected.email}</DialogTitle>
+                <DialogTitle className="text-primary text-xl">Consentement : {selected.email}</DialogTitle>
                 <DialogDescription className="text-cream/60">
                   {format(new Date(selected.created_at), "dd MMMM yyyy 'à' HH:mm:ss", { locale: fr })}
                 </DialogDescription>
@@ -236,12 +236,12 @@ const WavAcademyConsents = () => {
                   <Field label="Renonciation rétractation" value={selected.consent_renonciation ? "Oui" : "Non"} />
                   <Field label="Version CGV" value={selected.cgv_version} />
                   <Field label="Statut paiement" value={selected.stripe_session_id ? "Payé" : "Non finalisé"} />
-                  <Field label="Adresse IP" value={selected.ip_address ?? "—"} />
-                  <Field label="ID session Stripe" value={selected.stripe_session_id ?? "—"} />
+                  <Field label="Adresse IP" value={selected.ip_address ?? "Non renseigné"} />
+                  <Field label="ID session Stripe" value={selected.stripe_session_id ?? "Non renseigné"} />
                 </div>
                 <div>
                   <p className="text-cream/50 text-sm mb-1">User-agent</p>
-                  <p className="bg-noir rounded-lg p-3 break-all text-xs">{selected.user_agent ?? "—"}</p>
+                  <p className="bg-noir rounded-lg p-3 break-all text-xs">{selected.user_agent ?? "Non renseigné"}</p>
                 </div>
                 <div>
                   <p className="text-cream/50 text-sm mb-1">Horodatage (ISO)</p>

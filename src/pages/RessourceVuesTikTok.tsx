@@ -82,7 +82,7 @@ export default function RessourceVuesTikTok() {
         intro="Une vidéo est peu diffusée pour des raisons qui peuvent se cumuler. Ton travail consiste à éliminer les explications une par une, avec des éléments visibles et testables."
       >
         <p>
-          Le piège le plus fréquent consiste à partir du résultat — « seulement quelques centaines de vues » — puis à inventer une cause invisible. Or ce nombre ne dit pas si l’ouverture était claire, si les personnes sont restées, si le sujet correspondait à ton audience ou si la vidéo était éligible à la recommandation. Il faut remonter la chaîne.
+          Le piège le plus fréquent consiste à partir du résultat (« seulement quelques centaines de vues »), puis à inventer une cause invisible. Or ce nombre ne dit pas si l’ouverture était claire, si les personnes sont restées, si le sujet correspondait à ton audience ou si la vidéo était éligible à la recommandation. Il faut remonter la chaîne.
         </p>
         <DiagnosticGrid
           items={[

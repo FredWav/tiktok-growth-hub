@@ -156,16 +156,16 @@ function breadcrumbSchema(path: string, name: string) {
 const ROUTES: RouteSeo[] = [
   {
     path: "/",
-    title: "Fred Wav — stratégie réseaux sociaux et contenus",
+    title: "Fred Wav : stratégie réseaux sociaux et contenus",
     description:
       "Comprends ce que racontent tes contenus et prends de meilleures décisions sur TikTok, Instagram et YouTube avec Fred Wav.",
     noscript: {
       h1: "Arrête de poster seul. Tes stats disent déjà ce qui bloque.",
       body: "Pas de hack ni de promesse de viralité. Fred Wav part de tes contenus, de tes statistiques, de ton positionnement et de tes objectifs pour travailler ta stratégie sur TikTok, Instagram et YouTube. Trois besoins : l'Analyse Express TikTok, la Wav Academy et le Wav Premium multiréseaux.",
       links: [
-        { href: "/wavacademy", label: "Wav Academy — 749 € TTC pour six mois" },
-        { href: "/analyse-express", label: "Analyse Express — 11,90 €" },
-        { href: "/wav-premium", label: "Wav Premium — 1 990 € TTC pour trente jours" },
+        { href: "/wavacademy", label: "Wav Academy : 749 € TTC pour six mois" },
+        { href: "/analyse-express", label: "Analyse Express : 11,90 €" },
+        { href: "/wav-premium", label: "Wav Premium : 1 990 € TTC pour trente jours" },
         { href: "/preuves", label: "Témoignages et résultats" },
         { href: "/a-propos", label: "À propos de Fred Wav" },
         { href: "/newsletter", label: "Guide gratuit des hooks" },
@@ -196,7 +196,7 @@ const ROUTES: RouteSeo[] = [
   },
   {
     path: "/wavacademy",
-    title: "Wav Academy — progresser sans sacrifier son expertise | Fred Wav",
+    title: "Wav Academy : progresser sans sacrifier son expertise | Fred Wav",
     description: `Six mois pour sortir de l’essai-erreur sans devenir influenceur à plein temps : deux lives, retours collectifs, WavStats, ${ACADEMY_MODULES_COUNT} modules et ${ACADEMY_GUIDES_COUNT} guides.`,
 
     noscript: {
@@ -213,7 +213,7 @@ const ROUTES: RouteSeo[] = [
         url: `${BASE_URL}/wavacademy`,
         inLanguage: "fr-FR",
         offers: ACADEMY_PLANS.map((p) => ({
-          name: `${p.label} — ${p.duration}`,
+          name: `${p.label} : ${p.duration}`,
           price: String(p.total),
           priceCurrency: "EUR",
           availability: "https://schema.org/InStock",
@@ -227,7 +227,7 @@ const ROUTES: RouteSeo[] = [
   },
   {
     path: "/analyse-express",
-    title: "Analyse Express — quoi tester après tes statistiques TikTok ? | Fred Wav",
+    title: "Analyse Express : quoi tester après tes statistiques TikTok ? | Fred Wav",
     description: `Jusqu’à 120 vidéos publiques comparées pour distinguer observations, hypothèses et tests. Rapport TikTok automatisé à ${EXPRESS_PRICE.toFixed(2).replace(".", ",")} €, sans promesse de viralité.`,
 
     noscript: {
@@ -254,7 +254,7 @@ const ROUTES: RouteSeo[] = [
   },
   {
     path: "/wav-premium",
-    title: "Wav Premium — rendre ton expertise visible en 30 jours | Fred Wav",
+    title: "Wav Premium : rendre ton expertise visible en 30 jours | Fred Wav",
     description: "Analyse, quatre rendez-vous et suivi direct avec Fred pour rendre une expertise visible sans l’appauvrir et relier les contenus à ton activité. 1 990 € TTC.",
     noscript: { h1: "Ton expertise est solide : tes contenus doivent enfin la rendre visible", body: "Un accompagnement individuel pour protéger la nuance de ton expertise ou accélérer ton activité sans tester au hasard. Cadrage de 1 h 30, trois rendez-vous hebdomadaires d’une heure maximum, analyse complète et suivi WhatsApp du lundi au vendredi, 10 h–18 h (Paris). Trente jours à partir du premier rendez-vous, 1 990 € TTC, sans garantie de vues ou de résultat commercial. Paiement intégral avant démarrage. Candidature étudiée par Fred sous deux jours ouvrés.", links: [{ href: "/reserverunappel", label: "Candidater au Wav Premium" }] },
     sitemap: 0.9,
@@ -292,7 +292,7 @@ const ROUTES: RouteSeo[] = [
       ],
       links: [
         { href: "/newsletter", label: "Recevoir le guide complet des hooks en PDF" },
-        { href: "/wavacademy", label: "Wav Academy — ne poste plus seul" },
+        { href: "/wavacademy", label: "Wav Academy : ne poste plus seul" },
       ],
     },
     schema: {
@@ -428,7 +428,7 @@ const ROUTES: RouteSeo[] = [
   },
   {
     path: "/a-propos",
-    title: "Fred Wav — consultant en stratégie réseaux sociaux",
+    title: "Fred Wav : consultant en stratégie réseaux sociaux",
     description:
       "Découvre le parcours et la méthode de Fred Wav, créateur, formateur et consultant en stratégie sur TikTok, Instagram et YouTube.",
     noscript: {
@@ -465,7 +465,7 @@ const ROUTES: RouteSeo[] = [
   },
   {
     path: "/newsletter",
-    title: "La newsletter de Fred Wav — un mail, du concret",
+    title: "La newsletter de Fred Wav : un mail, du concret",
     description:
       "Reçois mes conseils formats courts par email, et le guide complet des hooks TikTok en cadeau de bienvenue. Sans spam, désinscription en un clic.",
     noscript: {
@@ -473,7 +473,7 @@ const ROUTES: RouteSeo[] = [
       body: "Mes conseils formats courts par email, et le guide complet des hooks TikTok pour commencer. La page /hooks-tiktok te donne déjà les familles d'accroches en clair.",
       links: [
         { href: "/hooks-tiktok", label: "Voir les hooks classés par famille" },
-        { href: "/wavacademy", label: "Wav Academy — ne poste plus seul" },
+        { href: "/wavacademy", label: "Wav Academy : ne poste plus seul" },
       ],
     },
     sitemap: 0.4,
@@ -482,7 +482,7 @@ const ROUTES: RouteSeo[] = [
   },
   {
     path: "/contact",
-    title: "Contact — Fred Wav | Expert Formats Courts",
+    title: "Contact : Fred Wav | Expert Formats Courts",
     description:
       "Contacte Fred Wav par email ou via les réseaux sociaux. Réponse sous 24-48h en semaine.",
     noscript: {
@@ -510,7 +510,7 @@ const ROUTES: RouteSeo[] = [
     path: "/mentions-legales",
     title: "Mentions légales | Fred Wav",
     description:
-      "Mentions légales du site fredwav.com — éditeur, hébergeur, propriété intellectuelle et données personnelles.",
+      "Mentions légales du site fredwav.com : éditeur, hébergeur, propriété intellectuelle et données personnelles.",
     noscript: {
       h1: "Mentions légales",
       body: "Éditeur, hébergeur, propriété intellectuelle et traitement des données personnelles du site fredwav.com.",
@@ -523,7 +523,7 @@ const ROUTES: RouteSeo[] = [
     path: "/politique-de-confidentialite",
     title: "Politique de confidentialité | Fred Wav",
     description:
-      "Politique de confidentialité du site fredwav.com — collecte, utilisation et protection de tes données personnelles conformément au RGPD.",
+      "Politique de confidentialité du site fredwav.com : collecte, utilisation et protection de tes données personnelles conformément au RGPD.",
     noscript: {
       h1: "Politique de confidentialité",
       body: "Comment les données personnelles sont collectées, utilisées et protégées, conformément au RGPD.",
@@ -548,7 +548,7 @@ function buildRouteSchema(route: RouteSeo, indexable: boolean): Record<string, u
 
   const nodes = route.schema ? (Array.isArray(route.schema) ? [...route.schema] : [route.schema]) : [];
   if (route.path.startsWith("/ressources/")) {
-    const name = route.title.split(/[—|]/)[0].trim();
+    const name = route.title.split(/[:|]/)[0].trim();
     nodes.push(breadcrumbSchema(route.path, name));
   }
 

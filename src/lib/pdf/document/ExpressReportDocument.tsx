@@ -37,7 +37,7 @@ export function ExpressReportDocument({ model }: { model: ReportModel }) {
 
   return (
     <Document
-      title={`Analyse Express — @${model.meta.username}`}
+      title={`Analyse Express : @${model.meta.username}`}
       author="Fred Wav"
       subject="Audit TikTok"
       creator="fredwav.com"

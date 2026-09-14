@@ -139,7 +139,7 @@ try {
   await page.goto("http://127.0.0.1:8080/start?utm_source=test#offre");
   await page.waitForURL("**/analyse-express?utm_source=test#offre");
   await page.locator('h1').waitFor();
-  await page.getByRole('link', {name:'FredWav — Accueil'}).focus();
+  await page.getByRole('link', {name:'FredWav : Accueil'}).focus();
   await page.keyboard.press("Tab");
   assert.notEqual(
     await page.evaluate(() => document.activeElement.tagName),

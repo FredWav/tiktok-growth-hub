@@ -286,7 +286,7 @@ function generateLlmsTxt() {
     .map(([key, title]) => {
       const rows = SSG_ROUTES.filter((route) => route.llmsSection === key && typeof route.llms === "string")
         .map((route) => {
-          const name = route.title.split(/[—|]/)[0].trim();
+          const name = route.title.split(/[:|]/)[0].trim();
           return `- [${name}](${route.path}): ${route.llms}`;
         })
         .join("\n");

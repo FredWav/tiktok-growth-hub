@@ -91,7 +91,7 @@ export function cleanText(text: string): string {
       .replace(/(^|[\s(])\*(\S[^*]*?)\*(?=[\s.,;:)!?]|$)/g, "$1$2")
       .replace(/`([^`]+)`/g, "$1")
       .replace(/^#{1,6}\s+/gm, "")
-      .replace(/^\s*[-–—]\s+/gm, "• ")
+      .replace(/^\s*[-–\u2014]\s+/gm, "• ")
       .replace(/[ \t]{2,}/g, " ")
       .trim(),
   );

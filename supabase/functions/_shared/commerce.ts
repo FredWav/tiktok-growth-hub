@@ -97,7 +97,12 @@ export async function enqueue(
     subject,
     body,
   }, { onConflict: "dedupe_key", ignoreDuplicates: true });
-  if (error) throw error;
+  // Le socle commerce v3 n'est pas encore en base : ne jamais faire échouer
+  // l'appelant (webhook Stripe) parce que la file d'emails est absente.
+  if (error && !missingCommerceTable(error)) throw error;
+  if (error) {
+    console.error("commerce_mail absente, email non mis en file:", key, subject);
+  }
 }
 export async function deliverMail(client: Database) {
   const deadline = Date.now() + 30000;

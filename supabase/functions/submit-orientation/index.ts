@@ -52,7 +52,7 @@ const labels: Record<string, string> = {
   under_399: "0 - 398 €",
   "399_748": "399 - 998 €",
   "749_1989": "998 - 1 499 €",
-  "1990_plus": "+ de 1 499 €",
+  "1990_plus": "Plus de 1 499 €",
 };
 
 Deno.serve(async (req) => {

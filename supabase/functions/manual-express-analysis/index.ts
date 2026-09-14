@@ -1,13 +1,15 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import { normalizeTikTokUsername } from "../_shared/tiktok-username.ts";
+import { launchExpressJob } from "../_shared/express-launch.ts";
+import type { ExpressRow } from "../_shared/express-finalize.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const API_BASE = "https://wavstats.com/api/v1";
+
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -77,53 +79,21 @@ serve(async (req) => {
     const apiKey = Deno.env.get("WAVSTATS_API_KEY") ?? Deno.env.get("WAV_SOCIAL_SCAN_API_KEY");
     if (!apiKey) throw new Error("Clé API WavStats non configurée");
 
-    const analyzeRes = await fetch(
-      `${API_BASE}/accounts/${encodeURIComponent(cleanUsername)}/analyze`,
-      {
-        method: "POST",
-        headers: {
-          "X-API-Key": apiKey,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!analyzeRes.ok) {
-      const errText = await analyzeRes.text();
-      console.error("Analyze error:", errText);
-      throw new Error(`Erreur lors du lancement de l'analyse: ${analyzeRes.status}`);
-    }
-
-    const analyzeData = await analyzeRes.json();
-    const jobId = analyzeData.jobId ?? analyzeData.job_id;
-    if (!jobId) throw new Error("job_id non retourné par l'API");
-
-    // Create express_analyses record
-    const { data: insertData, error: insertError } = await supabaseAdmin
-      .from("express_analyses")
-      .insert({
-        tiktok_username: cleanUsername,
-        stripe_session_id: `manual-${Date.now()}`,
-        status: "processing",
-        job_id: jobId,
-      })
-      .select("id")
-      .single();
-
-    if (insertError) {
-      console.error("DB insert error:", insertError);
-      throw new Error("Erreur lors de la création en base");
-    }
-
-    return new Response(
-      JSON.stringify({ job_id: jobId, analysis_id: insertData.id, status: "processing" }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      }
-    );
+    // Persist the intent before the partner call so interrupted launches remain visible.
+    const launchAt = new Date().toISOString();
+    const { data: row, error: insertError } = await supabaseAdmin.from("express_analyses").insert({
+      tiktok_username: cleanUsername, stripe_session_id: `manual-${crypto.randomUUID()}`,
+      status: "starting", launch_started_at: launchAt, processing_started_at: launchAt,
+      // Manual diagnostics have no paid sample contract when that integration is unverified.
+      report_version: Deno.env.get("EXPRESS_SAMPLE_CONTRACT_VERIFIED") === "true" ? "sample-v3" : "legacy",
+    }).select("*").single();
+    if (insertError || !row) throw new Error("Erreur lors de la création en base");
+    const saved = await launchExpressJob(supabaseAdmin, row as ExpressRow, apiKey);
+    return new Response(JSON.stringify({ job_id: saved.job_id, analysis_id: saved.id, status: saved.status }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : String(error) }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

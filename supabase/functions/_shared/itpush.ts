@@ -19,6 +19,7 @@ async function send(title: string, message: string) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ title, message, projectId: ITPUSH_PROJECT_ID }),
+      signal: AbortSignal.timeout(5_000),
     });
   } catch (err) {
     console.warn("itpush notification failed:", err);

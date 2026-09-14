@@ -69,6 +69,7 @@ export default function AnalyseExpressResult() {
   const startTimeRef = useRef<number>(0);
   const launchedRef = useRef(false);
   const jobIdRef = useRef<string | null>(null);
+  const statusInFlightRef = useRef(false);
 
   const stopPolling = useCallback(() => {
     if (pollingRef.current) {
@@ -85,11 +86,17 @@ export default function AnalyseExpressResult() {
       setLoading(false);
       return;
     }
+    if (statusInFlightRef.current) return;
+    statusInFlightRef.current = true;
     try {
       const { data: result, error: fnError } = await supabase.functions.invoke("express-analysis-status", {
         body: { session_id: sessionId },
+        signal: AbortSignal.timeout(20_000),
       });
-      if (fnError || !result) return;
+      if (fnError || !result) {
+        setCurrentStep("Consultation temporairement indisponible. Nouvelle vérification en cours, sans nouveau paiement.");
+        return;
+      }
       if (result.username) setUsername(result.username);
       if (result.progress !== undefined) setProgress(result.progress);
       if (result.current_step) setCurrentStep(result.current_step);
@@ -105,6 +112,9 @@ export default function AnalyseExpressResult() {
       }
     } catch (err) {
       console.warn("Status check exception:", err);
+      setCurrentStep("Connexion interrompue. Nouvelle vérification en cours, sans nouveau paiement.");
+    } finally {
+      statusInFlightRef.current = false;
     }
   }, [sessionId, stopPolling]);
 
@@ -123,6 +133,7 @@ export default function AnalyseExpressResult() {
       // Read archived reports before attempting a launch with today's Stripe price.
       const { data: saved, error: readError } = await supabase.functions.invoke("express-analysis-status", {
         body: { session_id: sessionId },
+        signal: AbortSignal.timeout(20_000),
       });
       if (!readError && saved?.status === "complete" && saved.data) {
         setData(saved.data as ExpressAnalysisData);
@@ -133,6 +144,7 @@ export default function AnalyseExpressResult() {
       if (!readError && saved?.status === "failed") throw new Error(saved.error || "Fred intervient sous deux jours ouvrés.");
       const { data: result, error: fnError } = await supabase.functions.invoke("express-analysis", {
         body: { session_id: sessionId },
+        signal: AbortSignal.timeout(60_000),
       });
       if (fnError || result?.error) {
         throw new Error(result?.error || fnError?.message || "Erreur lors du lancement de l'analyse");
@@ -193,6 +205,11 @@ export default function AnalyseExpressResult() {
     } finally {
       setPdfLoading(false);
     }
+  };
+
+  const handleWavStatsClick = (position: string) => {
+    trackEvent("wavstats_cta_click", { source_page: "express_result", position });
+    trackPostHogEvent("click_wavstats_link", { location: `express_result_${position}` });
   };
 
   const account = data?.account;
@@ -286,7 +303,7 @@ export default function AnalyseExpressResult() {
               {/* Shadowban */}
               {shadowban && <ShadowbanSection sb={shadowban} />}
 
-              {/* Regularity alert — Academy first, Premium for high-touch needs */}
+              {/* Regularity alert — WavStats is the next step after Express */}
               {pubPattern?.consistency_score != null && pubPattern.consistency_score < 60 && (
                 <div className="bg-amber-50 border border-amber-300 rounded-xl p-6 flex flex-col sm:flex-row items-center gap-4">
                   <div className="flex-1">
@@ -294,17 +311,19 @@ export default function AnalyseExpressResult() {
                       La régularité est une piste à tester. Ton rapport te montre le signal ; il te faut maintenant un cadre pour le corriger.
                     </p>
                     <p className="text-sm text-amber-800 mt-1">
-                      Dans la Wav Academy, tu testes, compares tes résultats et obtiens du feedback sans rester seul face à tes statistiques.
+                      Avec WavStats, analyse toutes tes vidéos, compare tes essais et transforme tes statistiques en prochaines actions.
                     </p>
                   </div>
                   <Button asChild variant="hero" size="lg" className="shrink-0">
-                    <Link
-                      to="/wavacademy"
-                      onClick={() => trackEvent("academy_cta_click", { source_page: "express_result", position: "regularity_alert" })}
+                    <a
+                      href="https://wavstats.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => handleWavStatsClick("regularity_alert")}
                     >
-                      Découvrir la Wav Academy
+                      Continuer avec WavStats
                       <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
+                    </a>
                   </Button>
                 </div>
               )}
@@ -330,34 +349,25 @@ export default function AnalyseExpressResult() {
               {/* Default continuation after the report */}
               <div className="rounded-2xl bg-foreground text-cream border border-gold/30 p-6 md:p-8 space-y-5">
                 <div className="space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold">Trois suites, à ton choix</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold">Passe à l’étape suivante</p>
                   <h2 className="font-display text-2xl md:text-3xl font-semibold">
-                    Un rapport éclaire le problème. Un cadre t'aide à le corriger.
+                    Satisfait de ton analyse express&nbsp;?
                   </h2>
                   <p className="text-cream/75 leading-relaxed max-w-2xl">
-                    Rejoins la Wav Academy pour appliquer ton plan, faire relire tes contenus et suivre l'évolution de tes statistiques avec Fred et d'autres créateurs.
+                    Obtiens des retours sur toutes tes vidéos avec la méthode de Fred Wav grâce à WavStats — l’outil qui propulse tes analyses, pensé pour les créateurs de contenu et les solopreneurs.
                   </p>
                 </div>
-                <div className="flex flex-col gap-3">
-                  <Button asChild variant="outline" size="lg" className="border-cream/30 bg-transparent text-cream hover:bg-cream/10 hover:text-cream"><a href="https://wavstats.com">WavStats — travailler en autonomie</a></Button>
-                  <Button asChild variant="hero" size="lg">
-                    <Link
-                      to="/wavacademy"
-                      onClick={() => trackEvent("academy_cta_click", { source_page: "express_result", position: "continuation" })}
-                    >
-                      Rejoindre la Wav Academy
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                  </Button>
-                  <Button asChild variant="outline" size="lg" className="border-cream/30 bg-transparent text-cream hover:bg-cream/10 hover:text-cream">
-                    <Link
-                      to="/wav-premium"
-                      onClick={() => trackEvent("premium_application_start", { source_page: "express_result", position: "continuation" })}
-                    >
-                      Besoin d'un suivi individuel ?
-                    </Link>
-                  </Button>
-                </div>
+                <Button asChild variant="hero" size="lg" className="w-full sm:w-auto">
+                  <a
+                    href="https://wavstats.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => handleWavStatsClick("continuation")}
+                  >
+                    Propulser mes analyses avec WavStats
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </a>
+                </Button>
               </div>
 
               {/* Download */}

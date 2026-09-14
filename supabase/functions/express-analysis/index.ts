@@ -1,20 +1,22 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
-import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2.57.2";
 import { getStripeSecretKey } from "../_shared/stripe-config.ts";
 import { notifySuccess, notifyError } from "../_shared/itpush.ts";
 import { normalizeTikTokUsername } from "../_shared/tiktok-username.ts";
 import { checkoutMismatch } from "../_shared/checkout-validation.ts";
+import { launchExpressJob } from "../_shared/express-launch.ts";
+import { pollExpress, type ExpressRow } from "../_shared/express-finalize.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const API_BASE = "https://wavstats.com/api/v1";
+
 
 /**
- * Fire-and-forget call to mailerlite-subscribe.
+ * Bounded newsletter call after the analysis job has been saved.
  * Updates express_analyses.newsletter_subscribed on success.
  */
 async function subscribeToNewsletter(
@@ -32,6 +34,7 @@ async function subscribeToNewsletter(
         Authorization: `Bearer ${serviceKey}`,
       },
       body: JSON.stringify({ email, source: "analyse_express" }),
+      signal: AbortSignal.timeout(10_000),
     });
     const result = await resp.json();
     if (!resp.ok) {
@@ -65,7 +68,6 @@ serve(async (req) => {
   let wantsNewsletter = false;
   let analysisId: string | null = null;
   let session_id: string | undefined;
-  let ownsLaunch = false;
 
   try {
     const body = await req.json();
@@ -89,18 +91,12 @@ serve(async (req) => {
     // ── 1. Résoudre la ligne express_analyses ──
     // Soit déjà liée à cette session Stripe (retry), soit via client_reference_id
     // posé par create-express-checkout sur le Payment Link.
-    type ExpressAnalysisRow = {
-      id: string;
-      tiktok_username: string;
-      email: string | null;
-      newsletter_requested: boolean | null;
-      job_id: string | null;
-    };
+    type ExpressAnalysisRow = ExpressRow & { newsletter_requested: boolean | null };
     let row: ExpressAnalysisRow | null = null;
     {
       const { data: bySession } = await supabase
         .from("express_analyses")
-        .select("id, tiktok_username, email, newsletter_requested, job_id")
+        .select("*")
         .eq("stripe_session_id", session_id)
         .maybeSingle();
       row = (bySession as ExpressAnalysisRow | null) ?? null;
@@ -108,7 +104,7 @@ serve(async (req) => {
     if (!row && session.client_reference_id) {
       const { data: byRef } = await supabase
         .from("express_analyses")
-        .select("id, tiktok_username, email, newsletter_requested, job_id")
+        .select("*")
         .eq("id", session.client_reference_id)
         .maybeSingle();
       row = (byRef as ExpressAnalysisRow | null) ?? null;
@@ -117,7 +113,7 @@ serve(async (req) => {
         const { data: linked, error: linkError } = await supabase
           .from("express_analyses")
           .update({ stripe_session_id: session_id })
-          .eq("id", row.id).is("stripe_session_id", null).select("id").maybeSingle();
+          .eq("id", row.id).or(`stripe_session_id.is.null,stripe_session_id.eq.${session_id}`).select("id").maybeSingle();
         if (linkError || !linked) throw new Error("Cette intention est déjà rattachée à un autre paiement");
       }
     }
@@ -132,9 +128,9 @@ serve(async (req) => {
     wantsNewsletter = row.newsletter_requested === true;
 
     // Idempotence: si on a déjà lancé l'analyse, on retourne le job_id existant.
-    if (row.job_id) {
+    if (row.job_id || ["failed", "refunded", "complete", "completed"].includes(row.status)) {
       console.log(`Returning existing job_id ${row.job_id} for session ${session_id}`);
-      return new Response(JSON.stringify({ username, job_id: row.job_id, status: "processing" }), {
+      return new Response(JSON.stringify({ ...await pollExpress(row, supabase), job_id: row.job_id }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
       });
@@ -152,88 +148,31 @@ serve(async (req) => {
 
     // One launch only: an interrupted remote call has an unknown outcome.
     // Do not create a second paid job automatically; the support outbox handles recovery.
+    const apiKey = Deno.env.get("WAVSTATS_API_KEY") || Deno.env.get("WAV_SOCIAL_SCAN_API_KEY");
+    if (!apiKey) throw new Error("Clé API WavStats non configurée");
     const launchAt = new Date().toISOString();
     const { data: launchLock, error: launchLockError } = await supabase
       .from("express_analyses")
-      .update({ status: "starting", launch_started_at: launchAt, processing_started_at: launchAt, error_message: null })
+      .update({ status: "starting", launch_started_at: launchAt, processing_started_at: launchAt, updated_at: launchAt, email: customerEmail, error_message: null })
       .eq("id", analysisId)
       .is("job_id", null)
       .in("status", ["pending", "awaiting_payment"])
-      .select("id")
+      .select("*")
       .maybeSingle();
 
     if (launchLockError) throw new Error(`Verrou de lancement impossible : ${launchLockError.message}`);
     if (!launchLock) {
-      return new Response(JSON.stringify({ username, status: "starting" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 202,
+      const { data: current, error: readError } = await supabase.from("express_analyses")
+        .select("*").eq("id", analysisId).single();
+      if (readError || !current) throw new Error("Lecture du traitement impossible");
+      return new Response(JSON.stringify(await pollExpress(current as ExpressRow, supabase)), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200,
       });
     }
-    ownsLaunch = true;
-
-    // ── 2. Inscription volontaire à la séquence Express ──
-    if (wantsNewsletter && customerEmail) {
-      // Une Edge Function peut être interrompue dès sa réponse : on attend
-      // donc cet appel afin que le groupe Express ne dépende pas du retour navigateur.
-      await subscribeToNewsletter(supabase, analysisId, customerEmail);
-    }
-
-    // ── 3. Call WavStats API ──
-    // Repli sur l'ancien nom de secret tant que WAVSTATS_API_KEY n'existe pas côté dashboard.
-    const apiKey = Deno.env.get("WAVSTATS_API_KEY") ?? Deno.env.get("WAV_SOCIAL_SCAN_API_KEY");
-    if (!apiKey) throw new Error("Clé API WavStats non configurée");
-
-    const analyzeRes = await fetch(`${API_BASE}/accounts/${encodeURIComponent(username)}/analyze`, {
-      method: "POST",
-      headers: { "X-API-Key": apiKey, "Content-Type": "application/json" },
-    });
-
-    if (!analyzeRes.ok) {
-      const errText = await analyzeRes.text();
-      console.error("Analyze error:", errText);
-      // Mark analysis as failed in DB but don't lose the row
-      if (analysisId) {
-        await supabase
-          .from("express_analyses")
-          .update({
-            status: "failed",
-            launch_started_at: null,
-            error_message: `API erreur ${analyzeRes.status}: ${errText.slice(0, 500)}`,
-          })
-          .eq("id", analysisId);
-      }
-      await notifyError("Analyse Express", `API erreur ${analyzeRes.status} • @${username} • ${customerEmail || "email manquant"}`);
-      throw new Error(`Erreur lors du lancement de l'analyse: ${analyzeRes.status}`);
-    }
-
-    const analyzeData = await analyzeRes.json();
-    const jobId = analyzeData.jobId ?? analyzeData.job_id;
-
-    if (!jobId) {
-      console.error("No job_id in response:", analyzeData);
-      if (analysisId) {
-        await supabase
-          .from("express_analyses")
-          .update({ status: "failed", launch_started_at: null, error_message: "job_id non retourné par l'API" })
-          .eq("id", analysisId);
-      }
-      throw new Error("job_id non retourné par l'API");
-    }
-
-    // ── 4. Update DB row with job_id + status=processing ──
-    if (analysisId) {
-      const { error: jobSaveError } = await supabase
-        .from("express_analyses")
-        .update({
-          tiktok_username: username,
-          job_id: jobId,
-          status: "processing",
-          launch_started_at: null,
-          processing_started_at: launchAt,
-        })
-        .eq("id", analysisId);
-      if (jobSaveError) throw new Error("Enregistrement du traitement impossible : intervention nécessaire");
-    }
+    const saved = await launchExpressJob(supabase, launchLock as ExpressRow, apiKey);
+    const jobId = saved.job_id;
+    // Newsletter latency can no longer strand an analysis before its partner launch.
+    if (wantsNewsletter && customerEmail) await subscribeToNewsletter(supabase, analysisId, customerEmail);
 
     await notifySuccess("Analyse Express", `Lancée • @${username} • job ${jobId}${customerEmail ? " • " + customerEmail : ""}`);
 
@@ -242,18 +181,6 @@ serve(async (req) => {
       status: 200,
     });
   } catch (error) {
-    if (ownsLaunch && analysisId) {
-      await supabase
-        .from("express_analyses")
-        .update({
-          status: "failed",
-          launch_started_at: null,
-          support_requested_at: new Date().toISOString(),
-          error_message: error instanceof Error ? error.message.slice(0, 1_000) : String(error).slice(0, 1_000),
-        })
-        .eq("id", analysisId)
-        .is("job_id", null);
-    }
     const message = error instanceof Error ? error.message : String(error);
     await notifyError("Analyse Express", `${message}${customerEmail ? " • " + customerEmail : ""}${username ? " • @" + username : ""}`);
     return new Response(JSON.stringify({ error: message }), {

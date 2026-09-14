@@ -239,16 +239,30 @@ test("demande et e-mails atomiques : retry sans double candidature ni notificati
     await db.close();
   }
 });
-test("finalisation répétée : un résultat et une seule notification en attente", async () => {
+test("finalisation validée : un seul email de résultat complet est mis en attente", async () => {
   const db = await database();
   try {
     const { rows: [o] } = await db.query(
       `INSERT INTO express_analyses(status,email,tiktok_username,stripe_session_id) VALUES('processing','test@example.invalid','test','cs_test_fake') RETURNING id`,
     );
+    assert.equal(
+      (await db.query("SELECT count(*)::int AS n FROM commerce_mail")).rows[0].n,
+      0,
+    );
     await db.query(
       `UPDATE express_analyses SET status='complete' WHERE id=$1`,
       [o.id],
     );
+    const { rows: [mail] } = await db.query(
+      `SELECT dedupe_key,recipient,subject,body,state,attempts FROM commerce_mail`,
+    );
+    assert.equal(mail.dedupe_key, `express-result:${o.id}`);
+    assert.equal(mail.recipient, "test@example.invalid");
+    assert.equal(mail.subject, "Ton Analyse Express est prête");
+    assert.match(mail.body, /Analyse automatisée de @test/);
+    assert.match(mail.body, /analyse-express\/result\?session_id=cs_test_fake/);
+    assert.equal(mail.state, "pending");
+    assert.equal(mail.attempts, 0);
     await db.query(
       `UPDATE express_analyses SET status='complete' WHERE id=$1`,
       [o.id],
@@ -256,6 +270,14 @@ test("finalisation répétée : un résultat et une seule notification en attent
     assert.equal(
       (await db.query("SELECT count(*)::int AS n FROM commerce_mail")).rows[0]
         .n,
+      1,
+    );
+    const { rows: [withoutEmail] } = await db.query(
+      `INSERT INTO express_analyses(status,email,tiktok_username,stripe_session_id) VALUES('processing',NULL,'manual','manual-test') RETURNING id`,
+    );
+    await db.query(`UPDATE express_analyses SET status='complete' WHERE id=$1`, [withoutEmail.id]);
+    assert.equal(
+      (await db.query("SELECT count(*)::int AS n FROM commerce_mail")).rows[0].n,
       1,
     );
   } finally {

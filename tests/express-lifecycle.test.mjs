@@ -204,3 +204,31 @@ test("le checkout reste ouvert en legacy tant que sample-v3 n'est pas validé", 
   assert.match(source, /EXPRESS_SAMPLE_CONTRACT_VERIFIED[\s\S]*\?[\s\S]*"sample-v3"[\s\S]*:[\s\S]*"legacy"/);
   assert.match(source, /report_version:\s*reportVersion/);
 });
+
+test("le webhook exige un événement Stripe signé et un paiement confirmé avant les emails Express", () => {
+  const source = readFileSync(new URL("../supabase/functions/stripe-webhook/index.ts", import.meta.url), "utf8");
+  const signatureCheck = source.indexOf("constructEventAsync");
+  const paymentCheck = source.indexOf('if (session.payment_status === "paid")');
+  const confirmation = source.lastIndexOf("await sendExpressOrderConfirmation");
+  const analysisLaunch = source.lastIndexOf("await triggerExpressAnalysis");
+  assert.ok(signatureCheck >= 0);
+  assert.ok(paymentCheck > signatureCheck);
+  assert.ok(confirmation > paymentCheck);
+  assert.ok(analysisLaunch > confirmation);
+  assert.match(source, /checkout\.session\.async_payment_succeeded/);
+  assert.match(source, /express-contract:\$\{session\.id\}/);
+});
+
+test("les emails Express utilisent une file durable avec déduplication et cinq tentatives", () => {
+  const commerce = readFileSync(new URL("../supabase/functions/_shared/commerce.ts", import.meta.url), "utf8");
+  const reconciliation = readFileSync(new URL("../supabase/functions/reconcile-express-analyses/index.ts", import.meta.url), "utf8");
+  const migration = readFileSync(new URL("../supabase/migrations/20260908120000_commerce_v3.sql", import.meta.url), "utf8");
+  const scheduler = readFileSync(new URL("../supabase/migrations/20260908121000_commerce_scheduler.sql", import.meta.url), "utf8");
+  assert.match(commerce, /state\.in\.\(pending,failed\)/);
+  assert.match(commerce, /\.lt\("attempts", 5\)/);
+  assert.match(commerce, /SMTP_PASSWORD/);
+  assert.match(reconciliation, /await deliverMail\(client\)/);
+  assert.match(migration, /dedupe_key text NOT NULL UNIQUE/);
+  assert.match(migration, /express-result:'\|\|NEW\.id/);
+  assert.match(scheduler, /cron\.schedule\('express-v3-minute','\* \* \* \* \*'/);
+});

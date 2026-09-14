@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { normalizeExpressSample } from "../supabase/functions/_shared/express-sample.ts";
 import { checkoutMismatch } from "../supabase/functions/_shared/checkout-validation.ts";
 
@@ -85,4 +86,23 @@ test("données absentes, dates invalides et doublons non présentés comme compl
   const h = fixture(3);
   h.videos[0].date = "invalid";
   assert.throws(() => normalizeExpressSample(h), /Dates/);
+});
+
+test("le formulaire de contact transmet les réponses à Fred sans recommandation automatique", () => {
+  const page = readFileSync(new URL("../src/pages/ReserverUnAppel.tsx", import.meta.url), "utf8");
+  const handler = readFileSync(new URL("../supabase/functions/submit-orientation/index.ts", import.meta.url), "utf8");
+
+  assert.match(page, /Ton compte principal/);
+  assert.match(page, /Envoyer ma demande/);
+  assert.doesNotMatch(page, /Compte, site ou projet principal|Recevoir ma recommandation|Ton budget est inférieur|Moins de 399 € :|À partir de 399 € :/);
+
+  const offers = readFileSync(new URL("../src/config/offers.ts", import.meta.url), "utf8");
+  for (const tier of ["0 - 398 €", "399 - 998 €", "998 - 1 499 €", "Plus de 1 499 €"]) {
+    assert.match(offers, new RegExp(tier.replace(/[+]/g, "\\+")));
+    assert.match(handler, new RegExp(tier.replace(/[+]/g, "\\+")));
+  }
+
+  assert.match(handler, /Nouvelle demande de contact/);
+  assert.match(handler, /Compte principal :/);
+  assert.doesNotMatch(handler, /orientation:\$\{saved\.id\}:client|clientBody|qualifyOrientation/);
 });

@@ -243,7 +243,7 @@ test("finalisation validée : un seul email de résultat complet est mis en atte
   const db = await database();
   try {
     const { rows: [o] } = await db.query(
-      `INSERT INTO express_analyses(status,email,tiktok_username,stripe_session_id) VALUES('processing','test@example.invalid','test','cs_test_fake') RETURNING id`,
+      `INSERT INTO express_analyses(status,email,tiktok_username,stripe_session_id) VALUES('processing','fredwavcm@gmail.com','fredwav','cs_test_fake') RETURNING id`,
     );
     assert.equal(
       (await db.query("SELECT count(*)::int AS n FROM commerce_mail")).rows[0].n,
@@ -257,9 +257,9 @@ test("finalisation validée : un seul email de résultat complet est mis en atte
       `SELECT dedupe_key,recipient,subject,body,state,attempts FROM commerce_mail`,
     );
     assert.equal(mail.dedupe_key, `express-result:${o.id}`);
-    assert.equal(mail.recipient, "test@example.invalid");
+    assert.equal(mail.recipient, "fredwavcm@gmail.com");
     assert.equal(mail.subject, "Ton Analyse Express est prête");
-    assert.match(mail.body, /Analyse automatisée de @test/);
+    assert.match(mail.body, /Analyse automatisée de @fredwav/);
     assert.match(mail.body, /analyse-express\/result\?session_id=cs_test_fake/);
     assert.equal(mail.state, "pending");
     assert.equal(mail.attempts, 0);

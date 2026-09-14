@@ -113,10 +113,10 @@ export const PREMIUM_BUDGET_LABELS: Record<string, string> = Object.fromEntries(
 
 /** Tranches du formulaire d'orientation commercial. */
 export const ORIENTATION_BUDGET_TIERS = [
-  { value: "under_399", label: "Moins de 399 €", short: "Moins de 399 €" },
-  { value: "399_748", label: "De 399 € à 748 €", short: "399 € à 748 €" },
-  { value: "749_1989", label: "De 749 € à 1 989 €", short: "749 € à 1 989 €" },
-  { value: "1990_plus", label: "1 990 € et plus", short: "1 990 € et plus" },
+  { value: "under_399", label: "0 - 398 €", short: "0 - 398 €" },
+  { value: "399_748", label: "399 - 998 €", short: "399 - 998 €" },
+  { value: "749_1989", label: "998 - 1 499 €", short: "998 - 1 499 €" },
+  { value: "1990_plus", label: "+ de 1 499 €", short: "+ de 1 499 €" },
 ] as const;
 
 export const ORIENTATION_BUDGET_LABELS: Record<string, string> = Object.fromEntries(

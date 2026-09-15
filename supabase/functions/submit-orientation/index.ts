@@ -9,7 +9,7 @@ import {
   text,
   uuid,
 } from "../_shared/commerce.ts";
-import { notifyDiscord } from "../_shared/discord.ts";
+import { notifyDiscordEmbed } from "../_shared/discord.ts";
 const FORM_VERSION = "orientation_v3";
 const BUDGETS = new Set(["under_399", "399_748", "749_1989", "1990_plus"]);
 const STAGES = new Set([
@@ -77,6 +77,12 @@ Deno.serve(async (req) => {
     const budget = text(body.budget, 1, 100);
     const originSource = typeof body.origin_source === "string"
       ? text(body.origin_source, 0, 500)
+      : "";
+    const followerSince = typeof body.follower_since === "string"
+      ? text(body.follower_since, 0, 100)
+      : "";
+    const conversionTrigger = typeof body.conversion_trigger === "string"
+      ? text(body.conversion_trigger, 0, 500)
       : "";
     const posthogId = typeof body.posthog_id === "string"
       ? text(body.posthog_id, 0, 200)

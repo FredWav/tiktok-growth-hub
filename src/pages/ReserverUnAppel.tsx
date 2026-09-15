@@ -44,6 +44,14 @@ const workModes = [
   ["a_definir", "Je veux que Fred m’aide à choisir"],
 ] as const;
 
+const followerSinceOptions = [
+  "Moins d’1 mois",
+  "1-3 mois",
+  "3-6 mois",
+  "6+ mois",
+  "Je ne te suivais pas",
+] as const;
+
 const allowed = (options: readonly (readonly [string, string])[], message: string) =>
   z.string().refine((value) => options.some(([key]) => key === value), message);
 
@@ -57,7 +65,9 @@ const schema = z.object({
   main_blocker: z.string().trim().min(20, "Donne un peu plus de contexte (20 caractères minimum)").max(2000),
   work_mode: allowed(workModes, "Sélectionne le type d’aide recherché"),
   budget: allowed(ORIENTATION_BUDGET_TIERS.map(({ value, label }) => [value, label] as const), "Sélectionne ton budget"),
-  origin_source: z.string().max(500).optional(),
+  origin_source: z.string().trim().max(500).optional(),
+  follower_since: z.string().trim().max(100).optional(),
+  conversion_trigger: z.string().trim().max(500).optional(),
   website: z.string().max(0).optional(),
 });
 

@@ -190,6 +190,14 @@ export default function ReserverUnAppel() {
                   <FormField control={form.control} name="budget" render={({ field }) => <FormItem><FormLabel>Quel budget total peux-tu investir maintenant ? *</FormLabel><Select value={field.value} onValueChange={field.onChange}><FormControl><SelectTrigger><SelectValue placeholder="Sélectionne ton budget" /></SelectTrigger></FormControl><SelectContent>{ORIENTATION_BUDGET_TIERS.map((tier) => <SelectItem key={tier.value} value={tier.value}>{tier.label}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>} />
                 </fieldset>
 
+                <fieldset className="space-y-5 border-t border-border pt-8">
+                  <legend className="mb-5 font-display text-2xl font-semibold"><span className="mr-3 text-primary">04</span>Pour mieux te connaître</legend>
+                  <FormField control={form.control} name="origin_source" render={({ field }) => <FormItem><FormLabel>Comment m’as-tu découvert ?</FormLabel><FormControl><Input placeholder="TikTok, Instagram, YouTube, recommandation, Google…" {...field} /></FormControl><FormMessage /></FormItem>} />
+                  <FormField control={form.control} name="follower_since" render={({ field }) => <FormItem><FormLabel>Depuis combien de temps me suis-tu ?</FormLabel><Select value={field.value} onValueChange={field.onChange}><FormControl><SelectTrigger><SelectValue placeholder="Sélectionne une durée" /></SelectTrigger></FormControl><SelectContent>{followerSinceOptions.map((option) => <SelectItem key={option} value={option}>{option}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>} />
+                  <FormField control={form.control} name="conversion_trigger" render={({ field }) => <FormItem><FormLabel>Qu’est-ce qui t’a poussé à me contacter aujourd’hui ?</FormLabel><FormControl><Input placeholder="Une vidéo, un témoignage, l’Analyse Express…" {...field} /></FormControl><FormMessage /></FormItem>} />
+                </fieldset>
+
+
                 <div className="hidden" aria-hidden="true"><Input tabIndex={-1} autoComplete="off" {...form.register("website")} /></div>
                 {error && <p role="alert" className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">{error}</p>}
                 <p className="text-sm text-muted-foreground">Tes réponses servent uniquement à traiter ta demande. <Link to="/politique-de-confidentialite" className="underline">Confidentialité</Link></p>

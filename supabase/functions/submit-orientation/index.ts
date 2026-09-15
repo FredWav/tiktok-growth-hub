@@ -142,6 +142,8 @@ Deno.serve(async (req) => {
       profil: labels[businessStage],
       budget,
       origin_source: originSource || null,
+      follower_since: followerSince || null,
+      conversion_trigger: conversionTrigger || null,
       posthog_id: posthogId || null,
       form_version: FORM_VERSION,
       account_url: accountUrl,

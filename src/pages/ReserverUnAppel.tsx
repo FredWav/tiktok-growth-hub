@@ -94,7 +94,10 @@ export default function ReserverUnAppel() {
 
   useEffect(() => {
     trackEvent("orientation_form_open", { form_version: FORM_VERSION });
-    const sync = () => form.setValue("origin_source", getStoredUtmSource(), { shouldDirty: false });
+    const sync = () => {
+      if (form.getValues("origin_source")) return;
+      form.setValue("origin_source", getStoredUtmSource(), { shouldDirty: false });
+    };
     sync();
     window.addEventListener(ATTRIBUTION_UPDATED_EVENT, sync);
     return () => window.removeEventListener(ATTRIBUTION_UPDATED_EVENT, sync);

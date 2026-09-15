@@ -87,7 +87,8 @@ export default function ReserverUnAppel() {
     defaultValues: {
       first_name: "", last_name: "", email: "", account_url: "",
       business_stage: "", primary_goal: "", main_blocker: "", work_mode: "",
-      budget: "", origin_source: "", website: "",
+      budget: "", origin_source: "", follower_since: "", conversion_trigger: "",
+      website: "",
     },
   });
 

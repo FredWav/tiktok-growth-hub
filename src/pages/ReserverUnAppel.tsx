@@ -44,6 +44,14 @@ const workModes = [
   ["a_definir", "Je veux que Fred m’aide à choisir"],
 ] as const;
 
+const followerSinceOptions = [
+  "Moins d’1 mois",
+  "1-3 mois",
+  "3-6 mois",
+  "6+ mois",
+  "Je ne te suivais pas",
+] as const;
+
 const allowed = (options: readonly (readonly [string, string])[], message: string) =>
   z.string().refine((value) => options.some(([key]) => key === value), message);
 
@@ -57,7 +65,9 @@ const schema = z.object({
   main_blocker: z.string().trim().min(20, "Donne un peu plus de contexte (20 caractères minimum)").max(2000),
   work_mode: allowed(workModes, "Sélectionne le type d’aide recherché"),
   budget: allowed(ORIENTATION_BUDGET_TIERS.map(({ value, label }) => [value, label] as const), "Sélectionne ton budget"),
-  origin_source: z.string().max(500).optional(),
+  origin_source: z.string().trim().max(500).optional(),
+  follower_since: z.string().trim().max(100).optional(),
+  conversion_trigger: z.string().trim().max(500).optional(),
   website: z.string().max(0).optional(),
 });
 
@@ -77,13 +87,17 @@ export default function ReserverUnAppel() {
     defaultValues: {
       first_name: "", last_name: "", email: "", account_url: "",
       business_stage: "", primary_goal: "", main_blocker: "", work_mode: "",
-      budget: "", origin_source: "", website: "",
+      budget: "", origin_source: "", follower_since: "", conversion_trigger: "",
+      website: "",
     },
   });
 
   useEffect(() => {
     trackEvent("orientation_form_open", { form_version: FORM_VERSION });
-    const sync = () => form.setValue("origin_source", getStoredUtmSource(), { shouldDirty: false });
+    const sync = () => {
+      if (form.getValues("origin_source")) return;
+      form.setValue("origin_source", getStoredUtmSource(), { shouldDirty: false });
+    };
     sync();
     window.addEventListener(ATTRIBUTION_UPDATED_EVENT, sync);
     return () => window.removeEventListener(ATTRIBUTION_UPDATED_EVENT, sync);
@@ -178,6 +192,14 @@ export default function ReserverUnAppel() {
                   <legend className="mb-5 font-display text-2xl font-semibold"><span className="mr-3 text-primary">03</span>Un budget réaliste</legend>
                   <FormField control={form.control} name="budget" render={({ field }) => <FormItem><FormLabel>Quel budget total peux-tu investir maintenant ? *</FormLabel><Select value={field.value} onValueChange={field.onChange}><FormControl><SelectTrigger><SelectValue placeholder="Sélectionne ton budget" /></SelectTrigger></FormControl><SelectContent>{ORIENTATION_BUDGET_TIERS.map((tier) => <SelectItem key={tier.value} value={tier.value}>{tier.label}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>} />
                 </fieldset>
+
+                <fieldset className="space-y-5 border-t border-border pt-8">
+                  <legend className="mb-5 font-display text-2xl font-semibold"><span className="mr-3 text-primary">04</span>Pour mieux te connaître</legend>
+                  <FormField control={form.control} name="origin_source" render={({ field }) => <FormItem><FormLabel>Comment m’as-tu découvert ?</FormLabel><FormControl><Input placeholder="TikTok, Instagram, YouTube, recommandation, Google…" {...field} /></FormControl><FormMessage /></FormItem>} />
+                  <FormField control={form.control} name="follower_since" render={({ field }) => <FormItem><FormLabel>Depuis combien de temps me suis-tu ?</FormLabel><Select value={field.value} onValueChange={field.onChange}><FormControl><SelectTrigger><SelectValue placeholder="Sélectionne une durée" /></SelectTrigger></FormControl><SelectContent>{followerSinceOptions.map((option) => <SelectItem key={option} value={option}>{option}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>} />
+                  <FormField control={form.control} name="conversion_trigger" render={({ field }) => <FormItem><FormLabel>Qu’est-ce qui t’a poussé à me contacter aujourd’hui ?</FormLabel><FormControl><Input placeholder="Une vidéo, un témoignage, l’Analyse Express…" {...field} /></FormControl><FormMessage /></FormItem>} />
+                </fieldset>
+
 
                 <div className="hidden" aria-hidden="true"><Input tabIndex={-1} autoComplete="off" {...form.register("website")} /></div>
                 {error && <p role="alert" className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">{error}</p>}

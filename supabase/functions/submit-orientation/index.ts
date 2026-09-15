@@ -9,7 +9,7 @@ import {
   text,
   uuid,
 } from "../_shared/commerce.ts";
-import { notifyDiscord } from "../_shared/discord.ts";
+import { notifyDiscordEmbed } from "../_shared/discord.ts";
 const FORM_VERSION = "orientation_v3";
 const BUDGETS = new Set(["under_399", "399_748", "749_1989", "1990_plus"]);
 const STAGES = new Set([
@@ -78,6 +78,12 @@ Deno.serve(async (req) => {
     const originSource = typeof body.origin_source === "string"
       ? text(body.origin_source, 0, 500)
       : "";
+    const followerSince = typeof body.follower_since === "string"
+      ? text(body.follower_since, 0, 100)
+      : "";
+    const conversionTrigger = typeof body.conversion_trigger === "string"
+      ? text(body.conversion_trigger, 0, 500)
+      : "";
     const posthogId = typeof body.posthog_id === "string"
       ? text(body.posthog_id, 0, 200)
       : "";
@@ -136,6 +142,8 @@ Deno.serve(async (req) => {
       profil: labels[businessStage],
       budget,
       origin_source: originSource || null,
+      follower_since: followerSince || null,
+      conversion_trigger: conversionTrigger || null,
       posthog_id: posthogId || null,
       form_version: FORM_VERSION,
       account_url: accountUrl,
@@ -160,17 +168,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    const details = [
-      `${firstName} ${lastName} · ${cleanEmail}`,
-      `Compte principal : ${accountUrl}`,
-      `Situation : ${labels[businessStage]}`,
-      `Objectif : ${labels[primaryGoal]}`,
-      `Besoin : ${labels[workMode]}`,
-      `Budget : ${labels[budget]}`,
-      `Blocage : ${mainBlocker}`,
-      originSource ? `Source : ${originSource}` : "",
-    ].filter(Boolean);
-
     const esc = (value: string) =>
       value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;");
@@ -180,6 +177,9 @@ Deno.serve(async (req) => {
       /^https?:\/\//i.test(url)
         ? `<a href="${esc(url)}" style="color:#b0273a">${esc(url)}</a>`
         : esc(url);
+    const posthogUrl = posthogId
+      ? `https://us.posthog.com/person/${encodeURIComponent(posthogId)}`
+      : "";
     const adminHtml =
       `<div style="font-family:Arial,sans-serif;max-width:680px;margin:0 auto;padding:20px">
         <h1 style="color:#333;border-bottom:2px solid #c8a97e;padding-bottom:10px">Nouvelle demande de contact</h1>
@@ -193,6 +193,9 @@ Deno.serve(async (req) => {
           ${row("Budget", esc(labels[budget]))}
           ${row("Blocage", esc(mainBlocker))}
           ${originSource ? row("Source", esc(originSource)) : ""}
+          ${followerSince ? row("Suit Fred depuis", esc(followerSince)) : ""}
+          ${conversionTrigger ? row("Déclencheur", esc(conversionTrigger)) : ""}
+          ${posthogUrl ? row("PostHog", link(posthogUrl)) : ""}
         </table>
       </div>`;
 
@@ -203,9 +206,22 @@ Deno.serve(async (req) => {
       `Nouvelle demande de contact · ${firstName} ${lastName}`,
       adminHtml,
     );
-    await notifyDiscord(
-      `Nouvelle demande de contact · ${firstName} ${lastName}`,
-      details,
+    await notifyDiscordEmbed(
+      "📋 **Nouvelle demande de contact !**",
+      `${firstName} ${lastName}`,
+      [
+        { name: "📧 Email", value: cleanEmail, inline: true },
+        { name: "💰 Budget total", value: labels[budget], inline: true },
+        { name: "🌐 Compte principal", value: accountUrl },
+        { name: "👤 Situation", value: labels[businessStage] },
+        { name: "🎯 Objectif", value: labels[primaryGoal] },
+        { name: "🤝 Besoin", value: labels[workMode] },
+        { name: "🧱 Blocage principal", value: mainBlocker },
+        { name: "📍 Source", value: originSource, inline: true },
+        { name: "⌛ Suit Fred depuis", value: followerSince, inline: true },
+        { name: "🔥 Déclencheur", value: conversionTrigger },
+        { name: "📊 PostHog", value: posthogUrl ? `[Voir](${posthogUrl})` : "" },
+      ],
     );
     await deliverMail(client);
 

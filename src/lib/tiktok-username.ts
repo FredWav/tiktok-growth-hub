@@ -11,3 +11,10 @@ export function normalizeTikTokUsername(value: unknown): string {
   if (typeof value !== "string") return "";
   return value.trim().replace(/^@+/, "").trim().toLowerCase();
 }
+
+export function isValidTikTokUsername(value: unknown): boolean {
+  const username = normalizeTikTokUsername(value);
+  return username.length >= 2 &&
+    username.length <= 24 &&
+    /^[a-z0-9_][a-z0-9_.]*[a-z0-9_]$/.test(username);
+}

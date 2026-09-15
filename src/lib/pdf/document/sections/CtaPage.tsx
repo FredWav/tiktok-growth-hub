@@ -3,6 +3,7 @@ import { Link, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { PageFooter, PageHeader } from "../chrome";
 import { color, font, page, size } from "../theme";
 import type { ReportModel } from "../../report-model";
+import { EXPRESS_CONTINUATION } from "../../../../config/express-continuation";
 
 const s = StyleSheet.create({
   page: {
@@ -47,15 +48,14 @@ export function CtaPage({ model }: { model: ReportModel }) {
       <PageHeader username={model.meta.username} dateLabel={model.meta.generatedAtLabel} />
 
       <View style={s.box}>
-        <Text style={s.title}>Satisfait de ton analyse ?</Text>
+        <Text style={s.title}>{EXPRESS_CONTINUATION.title}</Text>
         <Text style={s.intro}>
-          Obtiens des retours sur toutes tes vidéos avec la méthode de Fred Wav grâce à WavStats,
-          l'outil qui propulse ton analyse, pensé pour les créateurs de contenu et les solopreneurs.
+          {EXPRESS_CONTINUATION.description}
         </Text>
 
-        <Link src="https://wavstats.com" style={{ textDecoration: "none" }}>
+        <Link src={EXPRESS_CONTINUATION.url} style={{ textDecoration: "none" }}>
           <View style={s.button}>
-            <Text style={s.buttonText}>Propulser mon analyse avec WavStats</Text>
+            <Text style={s.buttonText}>{EXPRESS_CONTINUATION.button}</Text>
           </View>
         </Link>
       </View>

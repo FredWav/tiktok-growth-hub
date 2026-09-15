@@ -172,9 +172,13 @@ Deno.serve(async (req) => {
     await enqueue(
       client,
       `orientation:${saved.id}:owner`,
-      "contact@fredwav.com",
+      "fredwavcm@gmail.com",
       `Nouvelle demande de contact · ${firstName} ${lastName}`,
       details,
+    );
+    await notifyDiscord(
+      `Nouvelle demande de contact · ${firstName} ${lastName}`,
+      details.split("\n"),
     );
     await deliverMail(client);
 

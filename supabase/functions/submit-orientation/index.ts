@@ -9,6 +9,7 @@ import {
   text,
   uuid,
 } from "../_shared/commerce.ts";
+import { notifyDiscord } from "../_shared/discord.ts";
 const FORM_VERSION = "orientation_v3";
 const BUDGETS = new Set(["under_399", "399_748", "749_1989", "1990_plus"]);
 const STAGES = new Set([
@@ -172,9 +173,13 @@ Deno.serve(async (req) => {
     await enqueue(
       client,
       `orientation:${saved.id}:owner`,
-      "contact@fredwav.com",
+      "fredwavcm@gmail.com",
       `Nouvelle demande de contact · ${firstName} ${lastName}`,
       details,
+    );
+    await notifyDiscord(
+      `Nouvelle demande de contact · ${firstName} ${lastName}`,
+      details.split("\n"),
     );
     await deliverMail(client);
 

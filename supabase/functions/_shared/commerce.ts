@@ -138,12 +138,19 @@ export async function deliverMail(client: Database) {
           pass: Deno.env.get("SMTP_PASSWORD"),
         },
       });
+      const isHtml = /<\w+[^>]*>/.test(item.body);
+      const textFallback = item.body
+        .replace(/<br\s*\/?>/gi, "\n")
+        .replace(/<\/(tr|p|div|h1|h2)>/gi, "\n")
+        .replace(/<[^>]+>/g, "")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
       await mail.sendMail({
         from: "Fred Wav <noreply@fredwav.com>",
         replyTo: "contact@fredwav.com",
         to: item.recipient,
         subject: item.subject,
-        text: item.body,
+        ...(isHtml ? { html: item.body, text: textFallback } : { text: item.body }),
         messageId: `<${item.id}@fredwav.com>`,
       });
       const { error: sentError } = await client.from("commerce_mail").update({

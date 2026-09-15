@@ -21,6 +21,7 @@ import { AIAnalysisSection } from "@/components/express-result/AIAnalysisSection
 import { TopVideosSection } from "@/components/express-result/TopVideosSection";
 import { ShadowbanSection } from "@/components/express-result/ShadowbanSection";
 import { downloadExpressReport } from "@/lib/pdf";
+import { EXPRESS_CONTINUATION } from "@/config/express-continuation";
 
 const POLL_INTERVAL = 5000;
 const MAX_POLL_DURATION = 600_000;
@@ -351,10 +352,10 @@ export default function AnalyseExpressResult() {
                 <div className="space-y-2">
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold">Passe à l’étape suivante</p>
                   <h2 className="font-display text-2xl md:text-3xl font-semibold">
-                    Satisfait de ton analyse express&nbsp;?
+                    {EXPRESS_CONTINUATION.title}
                   </h2>
                   <p className="text-cream/75 leading-relaxed max-w-2xl">
-                    Obtiens des retours sur toutes tes vidéos avec la méthode de Fred Wav grâce à WavStats, l’outil qui propulse tes analyses, pensé pour les créateurs de contenu et les solopreneurs.
+                    {EXPRESS_CONTINUATION.description}
                   </p>
                 </div>
                 <Button asChild variant="hero" size="lg" className="w-full sm:w-auto">
@@ -364,7 +365,7 @@ export default function AnalyseExpressResult() {
                     rel="noopener noreferrer"
                     onClick={() => handleWavStatsClick("continuation")}
                   >
-                    Propulser mes analyses avec WavStats
+                    {EXPRESS_CONTINUATION.button}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </a>
                 </Button>

@@ -1,6 +1,6 @@
 import type { Database } from "./commerce.ts";
 import { flagExpressSupport, updateExpressAttempt, type ExpressRow } from "./express-finalize.ts";
-import { normalizeTikTokUsername } from "./tiktok-username.ts";
+import { isValidTikTokUsername, normalizeTikTokUsername } from "./tiktok-username.ts";
 
 // Caller must first acquire a starting row. Never retry a POST automatically:
 // after a timeout the partner may already have accepted it.
@@ -9,7 +9,9 @@ export async function launchExpressJob(client: Database, row: ExpressRow, apiKey
   try {
     if (!apiKey) throw new Error("Clé API WavStats non configurée");
     const username = normalizeTikTokUsername(row.tiktok_username);
-    if (username.length < 2) throw new Error("Nom d’utilisateur TikTok invalide");
+    if (!isValidTikTokUsername(username)) {
+      throw new Error("Identifiant TikTok invalide : utiliser le @ du profil, sans espace ni accent");
+    }
     const response = await fetch(`https://wavstats.com/api/v1/accounts/${encodeURIComponent(username)}/analyze`, {
       method: "POST",
       headers: { "X-API-Key": apiKey, "Content-Type": "application/json" },

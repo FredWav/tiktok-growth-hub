@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
-import { normalizeTikTokUsername } from "../_shared/tiktok-username.ts";
+import { isValidTikTokUsername, normalizeTikTokUsername } from "../_shared/tiktok-username.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -91,8 +91,11 @@ serve(async (req) => {
     // Le pseudo est ramené à sa forme canonique TikTok (minuscules) avant toute
     // validation, tout stockage et tout appel WavStats.
     const cleanUsername = normalizeTikTokUsername(username);
-    if (cleanUsername.length < 2) {
-      return jsonResponse({ error: "Nom d'utilisateur TikTok invalide" }, 400);
+    if (!isValidTikTokUsername(cleanUsername)) {
+      return jsonResponse({
+        error: "Entre ton identifiant TikTok, pas ton nom d'affichage (lettres, chiffres, _ ou ., sans espace).",
+        code: "invalid_tiktok_username",
+      }, 400);
     }
 
     const cleanEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
@@ -123,6 +126,32 @@ serve(async (req) => {
       serviceRoleKey,
       { auth: { persistSession: false } },
     );
+
+    // Un achat payé protège le même compte et la même adresse pendant 24 h.
+    // Le contrôle est fait côté serveur, sur la preuve Stripe liée par webhook :
+    // il ne peut donc pas être contourné en vidant le stockage du navigateur.
+    const paidSince = new Date(Date.now() - 24 * 60 * 60 * 1_000).toISOString();
+    const { data: recentPaidConsent, error: recentPaidError } = await supabase
+      .from("express_purchase_consents")
+      .select("id")
+      .eq("email", cleanEmail)
+      .eq("tiktok_username", cleanUsername)
+      .eq("checkout_mode", checkoutMode)
+      .eq("stripe_payment_status", "paid")
+      .gte("stripe_linked_at", paidSince)
+      .order("stripe_linked_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (recentPaidError) {
+      throw new Error(`Vérification du paiement précédent impossible : ${recentPaidError.message}`);
+    }
+    if (recentPaidConsent) {
+      return jsonResponse({
+        error: "Une Analyse Express a déjà été payée pour ce compte et cette adresse email au cours des dernières 24 heures. Consulte le rapport existant ou réessaie plus tard, sans repayer.",
+        code: "duplicate_paid_analysis",
+      }, 409);
+    }
 
     const reusableSince = new Date(Date.now() - 15 * 60 * 1_000).toISOString();
     const { data: reusableConsent } = await supabase

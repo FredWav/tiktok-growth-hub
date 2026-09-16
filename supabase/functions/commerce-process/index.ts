@@ -4,6 +4,7 @@ import {
   enqueue,
   headers,
   json,
+  OWNER_EMAIL,
   service,
   site,
 } from "../_shared/commerce.ts";
@@ -46,7 +47,7 @@ Deno.serve(async (req) => {
             await enqueue(
               client,
               `revoke:${o.id}`,
-              "contact@fredwav.com",
+              OWNER_EMAIL,
               "Révocation WavStats à effectuer",
               `Commande ${o.id} remboursée. Révoquer l'avantage partenaire dans WavStats, en conservant les autres droits du client.`,
             );
@@ -67,7 +68,7 @@ Deno.serve(async (req) => {
           await enqueue(
             client,
             `start:${o.id}`,
-            "contact@fredwav.com",
+            OWNER_EMAIL,
             "Wav Premium : démarrage",
             `Commande ${o.id} · ${o.email}\nDate ${o.start_date}. Rendez-vous et suivi à assurer selon les modalités convenues.`,
           );
@@ -179,7 +180,7 @@ Deno.serve(async (req) => {
         await enqueue(
           client,
           `activation-error:${o.id}`,
-          "contact@fredwav.com",
+          OWNER_EMAIL,
           "Activation à vérifier",
           `Commande ${o.id}\n${String(error)}`,
         );

@@ -140,6 +140,17 @@ function absoluteUrl(routePath) {
   return routePath === "/" ? `${BASE_URL}/` : `${BASE_URL}${routePath}`;
 }
 
+/**
+ * L'hébergeur sert dist/index.html (l'accueil) pour toute URL inconnue, avec un
+ * statut 200. Ce garde-fou passe la page en noindex dès le head quand l'URL
+ * demandée ne correspond pas au document servi ; React affiche ensuite la 404.
+ */
+function appendUnknownPathGuard(html, routePath) {
+  const expected = JSON.stringify(routePath === "/" ? "" : routePath.replace(/\/+$/, ""));
+  const guard = `    <script>(function(){var p=location.pathname.replace(/\\/index\\.html$/,"").replace(/\\/+$/,"");if(p!==${expected}){var m=document.querySelector('meta[name="robots"]');if(m)m.setAttribute("content","noindex, nofollow");var c=document.querySelector('link[rel="canonical"]');if(c)c.remove();}})();</script>\n`;
+  return html.replace(/<\/head>/i, `${guard}  </head>`);
+}
+
 function renderMarketingDocument(template, route, body) {
   const canonical = route.canonical || absoluteUrl(route.path);
   let html = removeRouteSchemas(template);
@@ -158,6 +169,7 @@ function renderMarketingDocument(template, route, body) {
     ? setLink(html, "alternate", canonical, ' hreflang="fr-FR"')
     : removeLink(html, "alternate");
   html = appendRouteSchemas(html, route.indexable ? route.schema : undefined);
+  html = appendUnknownPathGuard(html, route.path);
   html = replaceRoot(html, body, route.path);
   return replaceBodyNoscript(html);
 }

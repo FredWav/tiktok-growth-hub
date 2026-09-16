@@ -17,6 +17,7 @@ export const db = () =>
   );
 export type Database = ReturnType<typeof db>;
 export const VERSION = "2026-09-08";
+export const OWNER_EMAIL = "fredwavcm@gmail.com";
 export const CALENDAR = "https://calendar.app.google/UZC5UY38shFuSqmy6";
 export const site = () => Deno.env.get("SITE_URL") || "https://fredwav.com";
 export const CGV_TEXT =

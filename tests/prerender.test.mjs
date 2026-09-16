@@ -54,3 +54,17 @@ test("redirection HTML start conserve la campagne et le fragment", async () => {
   assert.match(start, /location.hash/);
   assert.match(start, /analyse-express/);
 });
+
+test("une URL inconnue servie avec l'accueil passe en noindex", async () => {
+  const home = await readFile(new URL("../dist/index.html", import.meta.url), "utf8");
+  const guard = home.match(/<script>\(function\(\)\{var p=location\.pathname[\s\S]*?<\/script>/)?.[0];
+  assert.ok(guard, "garde-fou absent de l'accueil");
+  const run = (pathname) => {
+    const meta = { content: "index, follow", setAttribute(_, value) { this.content = value; } };
+    const document = { querySelector: (selector) => selector.includes("robots") ? meta : null };
+    new Function("location", "document", guard.replace(/^<script>|<\/script>$/g, ""))({ pathname }, document);
+    return meta.content;
+  };
+  assert.equal(run("/"), "index, follow");
+  assert.equal(run("/page-inexistante"), "noindex, nofollow");
+});

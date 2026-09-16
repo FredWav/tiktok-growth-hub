@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
-import { normalizeTikTokUsername } from "@/lib/tiktok-username";
+import { isValidTikTokUsername, normalizeTikTokUsername } from "@/lib/tiktok-username";
 import { toast } from "sonner";
 import tiktokExample from "@/assets/tiktok-username-example.png";
 import { ObjectionCards } from "@/components/ObjectionCards";
@@ -107,8 +107,8 @@ export default function AnalyseExpress() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (cleanUsername.length < 2) {
-      toast.error("Entre un nom d'utilisateur valide");
+    if (!isValidTikTokUsername(cleanUsername)) {
+      toast.error("Entre ton identifiant TikTok (lettres, chiffres, _ ou ., sans espace), pas ton nom d'affichage");
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -142,7 +142,13 @@ export default function AnalyseExpress() {
       });
 
       if (error || !data?.url) {
-        throw new Error(error?.message || "Erreur lors de la création du paiement");
+        let message = typeof data?.error === "string" ? data.error : "";
+        const errorContext = (error as { context?: unknown } | null)?.context;
+        if (!message && errorContext instanceof Response) {
+          const payload = await errorContext.clone().json().catch(() => null) as { error?: unknown } | null;
+          if (typeof payload?.error === "string") message = payload.error;
+        }
+        throw new Error(message || error?.message || "Erreur lors de la création du paiement");
       }
 
       window.location.href = data.url;

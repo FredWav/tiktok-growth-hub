@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { pollExpress, updateExpressAttempt } from "../supabase/functions/_shared/express-finalize.ts";
 import { launchExpressJob } from "../supabase/functions/_shared/express-launch.ts";
 import { canRetryExpress, isExpressActive, isExpressComplete } from "../supabase/functions/_shared/express-state.ts";
+import { isValidTikTokUsername } from "../supabase/functions/_shared/tiktok-username.ts";
 import { readFileSync } from "node:fs";
 
 const originalFetch = globalThis.fetch;
@@ -203,6 +204,19 @@ test("le checkout reste ouvert en legacy tant que sample-v3 n'est pas validé", 
   assert.doesNotMatch(source, /nouvelles analyses sont temporairement suspendues/);
   assert.match(source, /EXPRESS_SAMPLE_CONTRACT_VERIFIED[\s\S]*\?[\s\S]*"sample-v3"[\s\S]*:[\s\S]*"legacy"/);
   assert.match(source, /report_version:\s*reportVersion/);
+  assert.match(source, /stripe_payment_status", "paid"/);
+  assert.match(source, /24 \* 60 \* 60 \* 1_000/);
+  assert.match(source, /duplicate_paid_analysis/);
+});
+
+test("les noms d'affichage TikTok sont refusés avant le paiement", () => {
+  assert.equal(isValidTikTokUsername("@Evangymfact"), true);
+  assert.equal(isValidTikTokUsername("fred.wav_01"), true);
+  assert.equal(isValidTikTokUsername("éole s."), false);
+  assert.equal(isValidTikTokUsername("nom avec espace"), false);
+  assert.equal(isValidTikTokUsername("pseudo."), false);
+  assert.equal(isValidTikTokUsername("a"), false);
+  assert.equal(isValidTikTokUsername("a".repeat(25)), false);
 });
 
 test("le webhook exige un événement Stripe signé et un paiement confirmé avant les emails Express", () => {

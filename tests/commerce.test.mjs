@@ -103,6 +103,29 @@ test("le formulaire de contact transmet les réponses à Fred sans recommandatio
   }
 
   assert.match(handler, /Nouvelle demande de contact/);
-  assert.match(handler, /Compte principal :/);
+  assert.match(handler, /row\("Compte principal"/);
+  assert.match(handler, /OWNER_EMAIL,/);
   assert.doesNotMatch(handler, /orientation:\$\{saved\.id\}:client|clientBody|qualifyOrientation/);
+});
+
+test("toutes les notifications internes partent vers la boîte de Fred", () => {
+  const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+  assert.match(read("supabase/functions/_shared/commerce.ts"), /OWNER_EMAIL = "fredwavcm@gmail.com"/);
+  for (const path of [
+    "supabase/functions/commerce-process/index.ts",
+    "supabase/functions/_shared/commerce-stripe.ts",
+    "supabase/functions/submit-orientation/index.ts",
+  ]) {
+    assert.doesNotMatch(read(path), /"contact@fredwav\.com",/, path);
+  }
+  const migration = read("supabase/migrations/20260916120000_notifications_fred_et_mail_inscription.sql");
+  assert.doesNotMatch(migration, /'contact@fredwav\.com'/);
+  assert.match(migration, /commerce_format_euros\(o\.amount_cents\)/);
+  assert.doesNotMatch(migration, /amount_cents\/100\.0/);
+});
+
+test("un lien d'inscription invalide affiche un message compréhensible", () => {
+  const handler = readFileSync(new URL("../supabase/functions/enrollment/index.ts", import.meta.url), "utf8");
+  assert.match(handler, /code: "invalid_link"/);
+  assert.match(handler, /n’est pas valide ou n’est plus actif/);
 });

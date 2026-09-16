@@ -59,7 +59,16 @@ export default function Enrollment() {
         <div className="max-w-2xl mx-auto space-y-6">
           <h1 className="font-display text-3xl">Ton inscription personnelle</h1>
           {busy && <p role="status">Vérification en cours…</p>}
-          {error && <p role="alert" className="text-destructive">{error}</p>}
+          {error && (
+            <div role="alert" className="space-y-4 rounded-xl border border-destructive/30 bg-destructive/5 p-5">
+              <p className="text-destructive">{error}</p>
+              {!data && (
+                <Button asChild variant="outline">
+                  <Link to="/contact">Contacter Fred</Link>
+                </Button>
+              )}
+            </div>
+          )}
           {data && (
             <>
               <p>

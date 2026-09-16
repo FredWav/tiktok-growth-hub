@@ -1,5 +1,5 @@
 import type Stripe from "https://esm.sh/stripe@18.5.0?target=deno";
-import { db, enqueue, logUnmatchedPayment } from "./commerce.ts";
+import { db, enqueue, logUnmatchedPayment, OWNER_EMAIL } from "./commerce.ts";
 
 export async function commerceCheckout(
   stripe: Stripe,
@@ -70,7 +70,7 @@ export async function commerceCheckout(
     await enqueue(
       client,
       `unmatched:${session.id}`,
-      "contact@fredwav.com",
+      OWNER_EMAIL,
       "Paiement à rapprocher",
       `${session.id}\n${reason}\nAucun nouvel accès ouvert.`,
     );
@@ -98,10 +98,23 @@ export async function commerceCheckout(
     client,
     `paid:${session.id}`,
     o.email,
-    "Paiement reçu",
-    `Commande ${o.id}\n${
-      o.amount_cents / 100
-    } € TTC reçus.\nDate convenue : ${o.start_date}.\nLes accès seront ouverts à cette date. Si le règlement est arrivé après celle-ci, Fred conviendra avec toi d'une nouvelle date.`,
+    `Paiement reçu · ${o.offer === "academy" ? "Wav Academy" : "Wav Premium"}`,
+    `Bonjour ${o.first_name},\n\nTon paiement de ${
+      new Intl.NumberFormat("fr-FR", {
+        style: "currency",
+        currency: "EUR",
+        maximumFractionDigits: o.amount_cents % 100 === 0 ? 0 : 2,
+      }).format(o.amount_cents / 100)
+    } TTC pour ${
+      o.offer === "academy" ? "la Wav Academy" : "le Wav Premium"
+    } est bien reçu.\nDate convenue : ${
+      new Date(`${o.start_date}T12:00:00Z`).toLocaleDateString("fr-FR", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+        timeZone: "Europe/Paris",
+      })
+    }.\nTes accès seront ouverts à cette date. Si le règlement est arrivé après celle-ci, Fred conviendra avec toi d'une nouvelle date.\n\nRéférence de commande : ${o.id}`,
   );
   return true;
 }

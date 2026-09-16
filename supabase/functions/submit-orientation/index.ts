@@ -6,6 +6,7 @@ import {
   fingerprint,
   headers,
   json,
+  OWNER_EMAIL,
   text,
   uuid,
 } from "../_shared/commerce.ts";
@@ -202,7 +203,7 @@ Deno.serve(async (req) => {
     await enqueue(
       client,
       `orientation:${saved.id}:owner`,
-      "fredwavcm@gmail.com",
+      OWNER_EMAIL,
       `Nouvelle demande de contact · ${firstName} ${lastName}`,
       adminHtml,
     );
@@ -223,7 +224,12 @@ Deno.serve(async (req) => {
         { name: "📊 PostHog", value: posthogUrl ? `[Voir](${posthogUrl})` : "" },
       ],
     );
-    await deliverMail(client);
+    try {
+      await deliverMail(client);
+    } catch (mailError) {
+      // La demande est enregistrée et le mail reste en file : le cron le renverra.
+      console.error("Envoi immédiat du mail de contact impossible:", mailError);
+    }
 
     return json({
       id: saved.id,

@@ -12,10 +12,19 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers });
   try {
     const b = await req.json(), client = db();
+    const unavailable =
+      "Ce lien d’inscription n’est pas valide ou n’est plus actif. Vérifie que tu as copié le lien complet reçu par email, ou contacte Fred pour en recevoir un nouveau.";
+    let token: string;
+    try {
+      token = uuid(b?.token);
+    } catch {
+      return json({ error: unavailable, code: "invalid_link" }, 404);
+    }
     const { data: o, error } = await client.from("commerce_orders").select("*")
-      .eq("token", uuid(b.token)).maybeSingle();
-    if (error || !o || ["cancelled", "expired"].includes(o.status)) {
-      return json({ error: "Inscription indisponible. Contacte Fred." }, 404);
+      .eq("token", token).maybeSingle();
+    if (error) throw error;
+    if (!o || ["cancelled", "expired"].includes(o.status)) {
+      return json({ error: unavailable, code: "invalid_link" }, 404);
     }
     if (b.action === "accept") {
       if (b.expected_starts_at !== o.starts_at) throw new Error("La date ou l’heure a changé. Actualise la page avant d’accepter.");

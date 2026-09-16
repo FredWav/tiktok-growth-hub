@@ -210,7 +210,7 @@ async function deliverPendingEmails(
   const attemptAt = new Date().toISOString();
   const attempts = row.email_delivery_attempts + 1;
   const smtpPassword = Deno.env.get("SMTP_PASSWORD") ?? "";
-  const notificationEmail = Deno.env.get("WITHDRAWAL_NOTIFICATION_EMAIL") || "contact@fredwav.com";
+  const notificationEmail = Deno.env.get("WITHDRAWAL_NOTIFICATION_EMAIL") || "fredwavcm@gmail.com";
 
   if (!smtpPassword) {
     const deliveryError = "SMTP_PASSWORD non configuré";

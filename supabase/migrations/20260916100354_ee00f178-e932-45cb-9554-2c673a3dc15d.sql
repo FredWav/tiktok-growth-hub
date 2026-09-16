@@ -1,0 +1,3 @@
+REVOKE INSERT, UPDATE, DELETE, TRUNCATE ON public.commerce_orders, public.commerce_receipts, public.commerce_unmatched_payments, public.commerce_mail, public.commerce_audit, public.commerce_applications FROM anon, authenticated;
+
+GRANT ALL ON public.commerce_orders, public.commerce_receipts, public.commerce_unmatched_payments, public.commerce_mail, public.commerce_audit, public.commerce_applications TO service_role;

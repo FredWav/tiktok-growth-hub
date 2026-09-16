@@ -33,10 +33,12 @@ const CGV_ACCEPTED_TEXT = "J'accepte les Conditions Générales de Vente.";
 const IMMEDIATE_DELIVERY_ACCEPTED_TEXT = "Je demande l'exécution immédiate du service et l'accès immédiat au contenu numérique avant l'expiration du délai de rétractation de 14 jours. Je reconnais que pour le contenu numérique, je perds mon droit de rétractation dès l'accès ; pour la partie service, en cas de rétractation, je reste redevable du prix au prorata du service déjà fourni.";
 
 async function getTechnicalFingerprint(req: Request, secret: string): Promise<string | null> {
+  // L'IP de confiance vient de l'infrastructure (Cloudflare), jamais d'un en-tête
+  // que l'appelant peut forger : x-forwarded-for n'est qu'un dernier recours.
   const ipAddress =
-    req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
     req.headers.get("cf-connecting-ip") ||
     req.headers.get("x-real-ip") ||
+    req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
     "";
   const userAgent = req.headers.get("user-agent") || "";
   if (!ipAddress && !userAgent) return null;

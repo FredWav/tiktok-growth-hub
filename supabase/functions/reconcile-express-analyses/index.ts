@@ -1,9 +1,9 @@
-import { db, headers, json, service, deliverMail } from "../_shared/commerce.ts";
+import { db, headers, json, cronCaller, deliverMail } from "../_shared/commerce.ts";
 import { pollExpress, flagExpressSupport, type ExpressRow } from "../_shared/express-finalize.ts";
 
 Deno.serve(async req => {
   if (req.method === "OPTIONS") return new Response(null,{headers});
-  if (!service(req)) return json({ error: "Accès refusé" },403);
+  if (!cronCaller(req)) return json({ error: "Accès refusé" },403);
   const client = db(), summary = { checked: 0, errors: 0 };
   const deadline=Date.now()+25000;
   try {

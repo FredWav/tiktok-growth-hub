@@ -50,6 +50,13 @@ export function service(req: Request) {
     req.headers.get("Authorization") ===
       `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`;
 }
+// Le cron pg_cron s'authentifie par en-tête dédié : sans cela la file d'emails
+// n'était jamais vidée (403 à chaque exécution planifiée).
+export function cronCaller(req: Request) {
+  const secret = Deno.env.get("RECONCILE_CRON_SECRET");
+  return service(req) ||
+    (!!secret && req.headers.get("x-cron-secret") === secret);
+}
 export async function admin(req: Request, client: Database) {
   const token = req.headers.get("Authorization")?.replace(/^Bearer /, "");
   if (!token) throw new Error("Accès refusé");

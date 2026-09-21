@@ -61,7 +61,7 @@ export default function CGV() {
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">5.2 Analyse Express</h3>
           <p className="text-muted-foreground mb-4">
-            Analyse automatisée à 11,90 € TTC pour un compte TikTok public, sur les vidéos disponibles, jusqu’à 120. Toutes les sections portent sur le même échantillon, dont le nombre et la période sont indiqués ; les compteurs globaux du profil en sont distingués. Un historique limité est signalé. Un compte privé ou sans vidéo exploitable ne produit pas un rapport présenté comme complet. Traitement normal en cinq minutes maximum après confirmation du paiement. En cas de dépassement ou d’échec, Fred intervient sous deux jours ouvrés. Si la résolution échoue, il valide le remboursement intégral.
+            Analyse automatisée à 19,90 € TTC pour un compte TikTok public, sur les vidéos disponibles, jusqu’à 120. Toutes les sections portent sur le même échantillon, dont le nombre et la période sont indiqués ; les compteurs globaux du profil en sont distingués. Un historique limité est signalé. Un compte privé ou sans vidéo exploitable ne produit pas un rapport présenté comme complet. Traitement normal en cinq minutes maximum après confirmation du paiement. En cas de dépassement ou d’échec, Fred intervient sous deux jours ouvrés. Si la résolution échoue, il valide le remboursement intégral.
           </p>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">5.3 Wav Academy</h3>

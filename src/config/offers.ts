@@ -48,8 +48,8 @@ export const ACADEMY_FROM = ACADEMY_ENTRY.total;
 export const CREATORS_COUNT = "350+";
 
 /** Analyse Express — seul autre prix affiché publiquement. */
-export const EXPRESS_PRICE = 11.9;
-export const EXPRESS_PRICE_LABEL = "11,90 €";
+export const EXPRESS_PRICE = 19.9;
+export const EXPRESS_PRICE_LABEL = "19,90 €";
 
 /**
  * Wav Premium — prix public, candidature étudiée personnellement.

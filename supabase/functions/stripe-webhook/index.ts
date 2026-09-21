@@ -249,7 +249,7 @@ serve(async (req) => {
         if (expressConsent) {
           const items = await stripe.checkout.sessions.listLineItems(session.id, { limit: 2 });
           const expectedPrice = getExpectedExpressPriceId(session.livemode);
-          const mismatch = checkoutMismatch(session, items.data, expectedPrice, 1190);
+          const mismatch = checkoutMismatch(session, items.data, expectedPrice, 1990);
           if (mismatch) {
             if (session.payment_status === "paid") {
               await logUnmatchedPayment(supabase, { session_id: session.id, reason: `Express : ${mismatch}`, amount_cents: session.amount_total, currency: session.currency, email: session.customer_details?.email, received_at: new Date(event.created * 1000).toISOString() });

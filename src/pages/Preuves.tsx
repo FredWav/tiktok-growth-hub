@@ -53,7 +53,7 @@ const chooseOffers = [
     icon: Zap,
     title: "Analyse Express",
     description: "Diagnostic automatisé de ton compte TikTok uniquement",
-    price: "11,90 €",
+    price: "19,90 €",
     cta: "Analyser mon compte",
     href: "/analyse-express",
     trackEvent: "cta_express_click",

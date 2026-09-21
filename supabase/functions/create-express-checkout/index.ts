@@ -10,7 +10,7 @@ const corsHeaders = {
 
 // Liens Stripe séparés : la preview doit fournir le lien sandbox par secret.
 const LIVE_PAYMENT_LINK = Deno.env.get("STRIPE_EXPRESS_PAYMENT_LINK_LIVE") ||
-  "https://buy.stripe.com/bJe3cu4WU4uZ8z81DacMM0y";
+  "https://buy.stripe.com/cNi5kCfBy7Hb3eO0z6cMM0J";
 // Versions conservées avec la preuve d'acceptation. À modifier à chaque changement matériel.
 const CGV_VERSION = "2026-09-08";
 const IMMEDIATE_DELIVERY_NOTICE_VERSION = "2026-08-11";

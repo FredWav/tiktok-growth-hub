@@ -91,7 +91,7 @@ serve(async (req) => {
     }
     const items = await stripe.checkout.sessions.listLineItems(session.id, { limit: 2 });
     const expectedPrice = getExpectedExpressPriceId(session.livemode);
-    const mismatch = checkoutMismatch(session, items.data, expectedPrice, 1190);
+    const mismatch = checkoutMismatch(session, items.data, expectedPrice, 1990);
     if (mismatch) throw new Error(mismatch);
 
     // ── 1. Résoudre la ligne express_analyses ──

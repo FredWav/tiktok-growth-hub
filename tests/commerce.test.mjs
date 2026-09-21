@@ -5,14 +5,14 @@ import { normalizeExpressSample } from "../supabase/functions/_shared/express-sa
 import { checkoutMismatch } from "../supabase/functions/_shared/checkout-validation.ts";
 
 test("Stripe : produit, montant, devise, quantité et configuration contrôlés", () => {
-  const session = { mode: "payment", currency: "eur", amount_total: 1190 };
+  const session = { mode: "payment", currency: "eur", amount_total: 1990 };
   const items = [{ quantity: 1, price: { id: "price_express" } }];
-  assert.equal(checkoutMismatch(session, items, "price_express", 1190), null);
-  for (const patch of [{currency:"usd"}, {amount_total:100}, {mode:"subscription"}]) assert.ok(checkoutMismatch({...session,...patch},items,"price_express",1190));
-  assert.ok(checkoutMismatch(session, items, undefined, 1190));
-  assert.ok(checkoutMismatch(session, items, "price_other", 1190));
-  assert.ok(checkoutMismatch(session, [...items,...items], "price_express", 1190));
-  assert.ok(checkoutMismatch(session, [{...items[0],quantity:2}], "price_express", 1190));
+  assert.equal(checkoutMismatch(session, items, "price_express", 1990), null);
+  for (const patch of [{currency:"usd"}, {amount_total:100}, {mode:"subscription"}]) assert.ok(checkoutMismatch({...session,...patch},items,"price_express",1990));
+  assert.ok(checkoutMismatch(session, items, undefined, 1990));
+  assert.ok(checkoutMismatch(session, items, "price_other", 1990));
+  assert.ok(checkoutMismatch(session, [...items,...items], "price_express", 1990));
+  assert.ok(checkoutMismatch(session, [{...items[0],quantity:2}], "price_express", 1990));
 });
 
 function fixture(count) {

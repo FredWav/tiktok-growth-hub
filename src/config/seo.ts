@@ -164,7 +164,7 @@ const ROUTES: RouteSeo[] = [
       body: "Pas de hack ni de promesse de viralité. Fred Wav part de tes contenus, de tes statistiques, de ton positionnement et de tes objectifs pour travailler ta stratégie sur TikTok, Instagram et YouTube. Trois besoins : l'Analyse Express TikTok, la Wav Academy et le Wav Premium multiréseaux.",
       links: [
         { href: "/wavacademy", label: "Wav Academy : 749 € TTC pour six mois" },
-        { href: "/analyse-express", label: "Analyse Express : 11,90 €" },
+        { href: "/analyse-express", label: "Analyse Express : 19,90 €" },
         { href: "/wav-premium", label: "Wav Premium : 1 990 € TTC pour trente jours" },
         { href: "/preuves", label: "Témoignages et résultats" },
         { href: "/a-propos", label: "À propos de Fred Wav" },
@@ -232,7 +232,7 @@ const ROUTES: RouteSeo[] = [
 
     noscript: {
       h1: "Tes statistiques TikTok sont visibles : que dois-tu tester ensuite ?",
-      body: "Analyse automatisée des données publiques de ton profil et de tes vidéos disponibles, jusqu’à 120, sur un même échantillon documenté. Le rapport distingue les observations des hypothèses, ne remplace ni les statistiques privées de TikTok ni une analyse humaine et ne garantit aucune vue ou vente. Cinq minutes en fonctionnement normal après paiement, rapport PDF pour 11,90 € TTC.",
+      body: "Analyse automatisée des données publiques de ton profil et de tes vidéos disponibles, jusqu’à 120, sur un même échantillon documenté. Le rapport distingue les observations des hypothèses, ne remplace ni les statistiques privées de TikTok ni une analyse humaine et ne garantit aucune vue ou vente. Cinq minutes en fonctionnement normal après paiement, rapport PDF pour 19,90 € TTC.",
       links: [{ href: "/analyse-express", label: "Lancer mon Analyse Express" }],
     },
     schema: {
@@ -249,7 +249,7 @@ const ROUTES: RouteSeo[] = [
       },
     },
     sitemap: 0.8,
-    llms: "Rapport TikTok automatisé à 11,90 € : jusqu’à 120 vidéos publiques sur un échantillon documenté, observations distinctes des hypothèses et pistes de test. Ne remplace ni les statistiques privées de TikTok ni un audit humain ; aucune garantie de résultat.",
+    llms: "Rapport TikTok automatisé à 19,90 € : jusqu’à 120 vidéos publiques sur un échantillon documenté, observations distinctes des hypothèses et pistes de test. Ne remplace ni les statistiques privées de TikTok ni un audit humain ; aucune garantie de résultat.",
     llmsSection: "offres",
   },
   {

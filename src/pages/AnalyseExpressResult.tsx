@@ -21,7 +21,7 @@ import { AIAnalysisSection } from "@/components/express-result/AIAnalysisSection
 import { TopVideosSection } from "@/components/express-result/TopVideosSection";
 import { ShadowbanSection } from "@/components/express-result/ShadowbanSection";
 import { downloadExpressReport } from "@/lib/pdf";
-import { EXPRESS_CONTINUATION } from "@/config/express-continuation";
+import { EXPRESS_CONTINUATIONS } from "@/config/express-continuation";
 
 const POLL_INTERVAL = 5000;
 const MAX_POLL_DURATION = 600_000;
@@ -208,9 +208,9 @@ export default function AnalyseExpressResult() {
     }
   };
 
-  const handleWavStatsClick = (position: string) => {
-    trackEvent("wavstats_cta_click", { source_page: "express_result", position });
-    trackPostHogEvent("click_wavstats_link", { location: `express_result_${position}` });
+  const handleContinuationClick = (key: "wavstats" | "fred", position: string) => {
+    trackEvent("express_continuation_click", { source_page: "express_result", destination: key, position });
+    trackPostHogEvent("click_express_continuation", { destination: key, location: `express_result_${position}` });
   };
 
   const account = data?.account;
@@ -320,7 +320,7 @@ export default function AnalyseExpressResult() {
                       href="https://wavstats.com"
                       target="_blank"
                       rel="noopener noreferrer"
-                      onClick={() => handleWavStatsClick("regularity_alert")}
+                      onClick={() => handleContinuationClick("wavstats", "regularity_alert")}
                     >
                       Continuer avec WavStats
                       <ArrowRight className="ml-2 h-4 w-4" />
@@ -347,28 +347,44 @@ export default function AnalyseExpressResult() {
                 </div>
               ) : null}
 
-              {/* Default continuation after the report */}
-              <div className="rounded-2xl bg-foreground text-cream border border-gold/30 p-6 md:p-8 space-y-5">
-                <div className="space-y-2">
+              {/* Two clear continuations after the report */}
+              <div className="space-y-4">
+                <div className="text-center space-y-1">
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold">Passe à l’étape suivante</p>
-                  <h2 className="font-display text-2xl md:text-3xl font-semibold">
-                    {EXPRESS_CONTINUATION.title}
-                  </h2>
-                  <p className="text-cream/75 leading-relaxed max-w-2xl">
-                    {EXPRESS_CONTINUATION.description}
-                  </p>
+                  <h2 className="font-display text-2xl md:text-3xl font-semibold">À toi de choisir la suite</h2>
                 </div>
-                <Button asChild variant="hero" size="lg" className="w-full sm:w-auto">
-                  <a
-                    href="https://wavstats.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => handleWavStatsClick("continuation")}
-                  >
-                    {EXPRESS_CONTINUATION.button}
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </a>
-                </Button>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {EXPRESS_CONTINUATIONS.map((continuation) => (
+                    <div key={continuation.key} className="rounded-xl bg-foreground text-cream border border-gold/30 p-6 flex flex-col gap-4">
+                      <div className="space-y-2 flex-1">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold">{continuation.eyebrow}</p>
+                        <h3 className="font-display text-2xl font-semibold">{continuation.title}</h3>
+                        <p className="text-cream/75 leading-relaxed">{continuation.description}</p>
+                      </div>
+                      <Button asChild variant="hero" size="lg" className="w-full">
+                        {continuation.external ? (
+                          <a
+                            href={continuation.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => handleContinuationClick(continuation.key, "continuation")}
+                          >
+                            {continuation.button}
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                          </a>
+                        ) : (
+                          <Link
+                            to={continuation.url}
+                            onClick={() => handleContinuationClick(continuation.key, "continuation")}
+                          >
+                            {continuation.button}
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                          </Link>
+                        )}
+                      </Button>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* Download */}

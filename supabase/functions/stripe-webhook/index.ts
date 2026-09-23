@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { db, enqueue, logUnmatchedPayment } from "../_shared/commerce.ts";
+import { db, deliverMail, enqueue, logUnmatchedPayment } from "../_shared/commerce.ts";
 import { getStripePricesForMode, getStripeSecretKey } from "../_shared/stripe-config.ts";
 import { notifySuccess, notifyError } from "../_shared/itpush.ts";
 import { commerceCheckout } from "../_shared/commerce-stripe.ts";
@@ -201,6 +201,12 @@ async function deliverHooksPack(
         await safeNotifyError("Livraison hooks", `Renonciation absente • session=${session.id} • vérifier le Payment Link`);
       }
       await safeNotifySuccess("Vente hooks", `${pack.name} • ${email} • session=${session.id}`);
+    }
+    // Envoi immédiat (sinon le mail attend le passage automatique de 5 min).
+    try {
+      await deliverMail(supabase as never);
+    } catch (sendErr) {
+      console.error(`Immediate hooks mail send failed: session=${session.id}`, getErrorMessage(sendErr));
     }
     return jsonResponse({ received: true, product: pack.code, fulfilment: "queued" });
   } catch (err) {

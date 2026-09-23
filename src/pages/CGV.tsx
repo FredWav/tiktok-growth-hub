@@ -12,7 +12,7 @@ export default function CGV() {
       <Section variant="default" size="lg">
         <div className="max-w-3xl mx-auto prose prose-neutral">
           <h1 className="font-display text-3xl md:text-4xl font-semibold mb-2">Conditions Générales de Vente (CGV) : Fred Wav</h1>
-          <p className="text-sm text-muted-foreground mb-10">Dernière mise à jour : 8 septembre 2026, version 2026-09-08</p>
+          <p className="text-sm text-muted-foreground mb-10">Dernière mise à jour : 23 septembre 2026, version 2026-09-23</p>
 
           {/* ARTICLE 1 */}
           <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 1 : Identification du vendeur</h2>
@@ -27,7 +27,7 @@ export default function CGV() {
           {/* ARTICLE 2 */}
           <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 2 : Objet</h2>
           <p className="text-muted-foreground mb-4">
-            Les présentes CGV encadrent la vente à distance des prestations de conseil et d'accompagnement stratégique en formats courts, ainsi que la vente d'analyses automatisées de comptes TikTok (Analyse Express).
+            Les présentes CGV encadrent la vente à distance des prestations de conseil et d'accompagnement stratégique en formats courts, la vente d'analyses automatisées de comptes TikTok (Analyse Express) et la vente de produits numériques téléchargeables (Packs de hooks).
           </p>
 
           {/* ARTICLE 3 */}
@@ -47,6 +47,7 @@ export default function CGV() {
           <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 4 : Définitions</h2>
           <ul className="text-muted-foreground mb-4 space-y-1">
             <li><strong>Prestations :</strong> Wav Premium (accompagnement 30 jours), Wav Academy (accès communauté Discord + contenus numériques) et Analyse Express (rapport d'analyse automatisé).</li>
+            <li><strong>Produits numériques :</strong> Packs de hooks (fichiers PDF et tableur téléchargeables) vendus séparément, livrés par email automatique après paiement.</li>
             <li><strong>Contenus numériques :</strong> rapports PDF, ressources, checklists et templates éventuellement remis dans le cadre de la prestation.</li>
             <li><strong>Plateformes tierces :</strong> TikTok, Instagram, YouTube, Discord, WhatsApp, Stripe, PayPal, Klarna. Fred Wav n'est pas responsable de leurs pannes, interruptions, changements de conditions d'utilisation, ni des conséquences pouvant en découler.</li>
           </ul>
@@ -75,7 +76,12 @@ export default function CGV() {
             Les lives sont maintenus ou délégués pendant les congés. Un résumé est fourni, sans replay. La Wav Academy est une prestation sans garantie de résultat, notamment en matière d’audience, de visibilité ou de revenus.
           </p>
 
-          <h3 className="font-display text-lg font-medium mt-4 mb-2">5.4 Évolution du contenu</h3>
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">5.4 Packs de hooks (fichiers à télécharger)</h3>
+          <p className="text-muted-foreground mb-4">
+            Contenus numériques vendus à l'unité : Pack 100 hooks (29 € TTC), Pack 250 hooks (49 € TTC), Pack 500 hooks (99 € TTC) et Bibliothèque complète de 850 hooks (149 € TTC). Chaque pack est fourni en deux fichiers, un PDF et un tableur, livrés par email automatique dès la confirmation du paiement, via des liens de téléchargement personnels valables un an. Le Client est invité à télécharger et conserver ses fichiers. Les hooks sont des structures de formulation à adapter : aucune garantie de résultat, de vues, de visibilité ou de revenus n'est donnée. L'achat confère un droit d'usage personnel et non transférable ; la revente, le partage et la rediffusion des fichiers sont interdits.
+          </p>
+
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">5.5 Évolution du contenu</h3>
           <p className="text-muted-foreground mb-4">
             Le contenu exact des offres (ressources, formats, modalités) est celui présenté au moment de l'achat. Le contenu de la Wav Academy peut évoluer pour s'adapter et s'améliorer (formats, ressources, organisation), sans diminution substantielle de la valeur globale. Les prix peuvent être modifiés pour l'avenir ; le tarif applicable est celui affiché au moment de la commande et reste acquis pour toute la durée de la formule prépayée souscrite.
           </p>
@@ -143,6 +149,9 @@ export default function CGV() {
             <strong>Prestations à livraison numérique immédiate (Analyse Express) :</strong> le rapport et les contenus délivrés sont définitivement dus dès leur mise à disposition lorsque le Client a expressément demandé l'exécution immédiate et préalablement reconnu la perte de son droit de rétractation dans les conditions de l'article 9.2.
           </p>
           <p className="text-muted-foreground mb-4">
+            <strong>Packs de hooks :</strong> les fichiers sont définitivement dus dès l'envoi de l'email automatique de livraison, dans les conditions de l'article 9.4. Aucun remboursement, total ou partiel, n'est accordé après cet envoi, sauf manquement du Vendeur ou fichiers non conformes.
+          </p>
+          <p className="text-muted-foreground mb-4">
             La présente clause ne s'applique pas lorsque l'interruption résulte d'un manquement du Vendeur à ses obligations. Dans ce cas, les dispositions de l'Article 10 s'appliquent.
           </p>
 
@@ -204,12 +213,25 @@ export default function CGV() {
             La formule Wav Academy est un paiement unique prépayé, sans reconduction. Les services d’accompagnement cessent au terme des six mois ; l’accès aux contenus numériques achetés se poursuit selon l’article 12.3. Cette règle reste sans préjudice du droit de rétractation et du prorata légal décrits ci-dessus.
           </p>
 
-          <h3 className="font-display text-lg font-medium mt-4 mb-2">9.4 Confirmation sur support durable</h3>
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">9.4 Contenu numérique livré immédiatement (Packs de hooks)</h3>
+          <p className="text-muted-foreground mb-2">
+            Les Packs de hooks sont des contenus numériques non fournis sur support matériel, livrés automatiquement par email dès la confirmation du paiement. Avant le paiement, le Client coche une case distincte, non précochée, par laquelle il :
+          </p>
+          <ul className="text-muted-foreground mb-4 space-y-1">
+            <li>accepte les présentes CGV ;</li>
+            <li>demande expressément l'envoi immédiat des fichiers avant la fin du délai de 14 jours ;</li>
+            <li>renonce expressément à son droit de rétractation dès cet envoi.</li>
+          </ul>
+          <p className="text-muted-foreground mb-4">
+            Conformément à l'article L221-28, 13° du Code de la consommation, <strong>aucune rétractation n'est possible dès l'envoi de l'email automatique de livraison</strong> contenant les liens de téléchargement : la commande est alors définitivement due, qu'elle soit ou non téléchargée. Le texte exact accepté, sa version, l'horodatage et la référence de paiement sont récapitulés dans cet email, qui vaut support durable. Si, pour une raison technique, aucun email de livraison n'a été envoyé, le droit de rétractation reste entier et le Client est remboursé ou livré à son choix.
+          </p>
+
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">9.5 Confirmation sur support durable</h3>
           <p className="text-muted-foreground mb-4">
             Après la commande, le vendeur adresse au Client une confirmation par email (support durable) récapitulant la commande, la version des CGV acceptées et le texte exact des consentements donnés au démarrage ou à la livraison immédiate.
           </p>
 
-          <h3 className="font-display text-lg font-medium mt-4 mb-2">9.5 Modalités d'exercice</h3>
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">9.6 Modalités d'exercice</h3>
           <p className="text-muted-foreground mb-4">
             Le Client peut notifier sa décision sans justification au moyen de la{" "}
             <Link to="/retractation" className="text-primary underline">fonctionnalité de rétractation en ligne</Link>,
@@ -321,6 +343,7 @@ export default function CGV() {
             <p>☐ (Wav Premium) Je demande expressément l'exécution de la prestation avant la fin du délai légal de rétractation de 14 jours. En cas de rétractation après le début de l'exécution, je resterai redevable du montant proportionné au service effectivement fourni ; si la prestation est pleinement exécutée, je reconnais perdre mon droit de rétractation.</p>
             <p>☐ (Analyse Express) Je demande expressément l'exécution immédiate de l'Analyse Express avant la fin du délai de 14 jours et je reconnais perdre mon droit de rétractation lorsque la prestation est pleinement exécutée et le rapport mis à disposition.</p>
             <p>☐ (Wav Academy) Je demande l’exécution du service et l’accès au contenu numérique à la date convenue avant l'expiration du délai de rétractation de 14 jours. Je reconnais que pour le contenu numérique, je perds mon droit de rétractation dès l'accès ; pour la partie service, en cas de rétractation, je reste redevable du prix au prorata du service déjà fourni.</p>
+            <p>☐ (Packs de hooks) J'accepte les CGV. Je demande l'envoi immédiat des fichiers par email, avant la fin du délai de rétractation de 14 jours, et je renonce expressément à mon droit de rétractation dès cet envoi.</p>
           </div>
         </div>
       </Section>

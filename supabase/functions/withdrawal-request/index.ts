@@ -17,6 +17,7 @@ const OFFER_LABELS: Record<string, string> = {
   analyse_express: "Analyse Express",
   wav_academy: "Wav Academy",
   wav_premium: "Wav Premium",
+  hooks_packs: "Packs de hooks",
   other: "Autre prestation",
 };
 

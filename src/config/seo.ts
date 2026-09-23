@@ -23,7 +23,7 @@ import {
   PREMIUM_DURATION_DAYS,
 } from "./offers";
 import { HOOKS_FAQ } from "./hooks-faq";
-import { HOOK_CATEGORIES, HOOKS_PUBLISHED_COUNT, HOOKS_TOTAL_COUNT } from "../data/hooks";
+import { HOOKS_BUNDLE, HOOKS_LIBRARY, HOOKS_PACKS_OFFER } from "./hooks-offer";
 
 
 export const BASE_URL = "https://fredwav.com";
@@ -277,40 +277,41 @@ const ROUTES: RouteSeo[] = [
   },
   {
     path: "/hooks-tiktok",
-    title: `Hooks TikTok : ${HOOKS_TOTAL_COUNT} accroches classées | Fred Wav`,
-    description: `Les hooks TikTok (ou accroches) rangés par famille : curiosité, suspense, urgence, émotion. ${HOOKS_PUBLISHED_COUNT} exemples en clair, ce que chaque famille coûte quand on en abuse, et le guide complet en PDF.`,
-    ogType: "article",
+    title: `Hooks TikTok : ${HOOKS_LIBRARY.total} hooks qui ont vraiment performé | Fred Wav`,
+    description: `${HOOKS_LIBRARY.total} hooks tirés de vraies vidéos TikTok : au moins 100 000 vues et au moins 5 fois les vues habituelles du compte. Chaque hook avec sa structure réutilisable. Packs dès ${HOOKS_PACKS_OFFER[0].price} €.`,
     noscript: {
-      h1: `Hooks TikTok : ${HOOKS_TOTAL_COUNT} accroches classées par famille`,
-      body: `Un hook, c'est la première seconde qui décide si ton spectateur reste ou scrolle. Voici ${HOOKS_PUBLISHED_COUNT} accroches classées en ${HOOK_CATEGORIES.length} familles, avec pour chacune ce qu'elle coûte quand on en abuse. Le guide complet (${HOOKS_TOTAL_COUNT} accroches, modèles à compléter et grille de notation) est disponible par email.`,
+      h1: "Des hooks TikTok qui ont vraiment performé. Pas des hooks inventés.",
+      body: `Des accroches réelles, tirées de vidéos TikTok qui ont explosé les vues habituelles de leur compte, avec leur structure réutilisable. ${HOOKS_LIBRARY.total} hooks sélectionnés parmi ${HOOKS_LIBRARY.analyzedVideos} de vidéos analysées : au moins 100 000 vues et au moins 5 fois les vues habituelles du compte, relus un par un. 0 hook inventé.`,
       sections: [
-        { h2: "Un hook TikTok, c'est quoi exactement ?", body: "Les deux premières secondes de ta vidéo, celles qui décident si le spectateur reste ou passe à la suivante. Le hook, c'est la raison qu'il a de ne pas scroller." },
-        { h2: `Les ${HOOK_CATEGORIES.length} familles de hooks TikTok, avec des exemples`, body: HOOK_CATEGORIES.map((c) => c.label).join(", ") + ". Chaque famille avec des exemples concrets et ce qu'elle coûte quand on la surexploite." },
-        { h2: "Pourquoi je ne te promets pas de vues avec ces hooks", body: "Un hook gagne l'attention des deux premières secondes, pas la diffusion. Personne ne contrôle l'algorithme. Ce que tu contrôles, c'est ta rétention sur les trois premières secondes, et ça se travaille." },
-        { h2: "Le guide complet des hooks TikTok en PDF", body: `Toutes les accroches classées, les modèles à compléter avec ton sujet et une grille pour noter un hook avant de tourner. Par email, gratuitement.` },
-        { h2: "Questions fréquentes sur les hooks TikTok", body: HOOKS_FAQ.slice(0, 4).map((f) => f.question).join(" ") },
+        { h2: "Ce que tu reçois, pour chaque hook", body: "Le hook, sa structure à trous, les vues, la performance par rapport au compte, le taux d'engagement et le lien vers la vidéo d'origine." },
+        { h2: "3 packs. 0 hook en commun.", body: HOOKS_PACKS_OFFER.map((p) => `${p.name} : ${p.price} €, ${p.medianViews} vues médianes, ${p.medianMultiple} les vues habituelles du compte en médiane.`).join(" ") + ` La bibliothèque complète, ${HOOKS_BUNDLE.hooks} hooks : ${HOOKS_BUNDLE.price} €.` },
+        { h2: "Questions fréquentes", body: HOOKS_FAQ.map((f) => f.question).join(" ") },
       ],
       links: [
-        { href: "/newsletter", label: "Recevoir le guide complet des hooks en PDF" },
-        { href: "/wavacademy", label: "Wav Academy : ne poste plus seul" },
+        { href: "/hooks-tiktok#packs", label: "Voir les packs de hooks" },
+        { href: "/newsletter", label: "Recevoir le guide gratuit des hooks" },
       ],
     },
     schema: {
-        "@context": "https://schema.org",
-        "@type": "Article",
-        headline: `Hooks TikTok : ${HOOKS_TOTAL_COUNT} accroches classées par famille`,
-        description: `Les hooks TikTok rangés par famille, avec ${HOOKS_PUBLISHED_COUNT} exemples en clair et ce que chaque famille coûte quand on en abuse.`,
-        image: OG_IMAGE,
-        inLanguage: "fr-FR",
-        author: { "@type": "Person", name: "Fred Wav", url: `${BASE_URL}/a-propos` },
-        publisher: { "@type": "Person", name: "Fred Wav", url: BASE_URL },
-        datePublished: "2026-08-05",
-        dateModified: "2026-08-05",
-        mainEntityOfPage: `${BASE_URL}/hooks-tiktok`,
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: "Bibliothèque de hooks TikTok",
+      description: `${HOOKS_LIBRARY.total} hooks tirés de vraies vidéos TikTok, avec leur structure réutilisable, les vues et le lien vers la vidéo d'origine. PDF et fichier tableur.`,
+      image: OG_IMAGE,
+      brand: { "@type": "Person", name: "Fred Wav", url: BASE_URL },
+      offers: [...HOOKS_PACKS_OFFER.map((p) => ({ name: p.name, price: p.price })), { name: "Bibliothèque complète", price: HOOKS_BUNDLE.price }]
+        .map((o) => ({
+          "@type": "Offer",
+          name: o.name,
+          price: o.price.toFixed(2),
+          priceCurrency: "EUR",
+          availability: "https://schema.org/InStock",
+          url: `${BASE_URL}/hooks-tiktok`,
+        })),
     },
-    sitemap: 0.7,
-    llms: `Les hooks TikTok (accroches) classés en ${HOOK_CATEGORIES.length} familles, avec ${HOOKS_PUBLISHED_COUNT} exemples en clair et ce que chaque famille coûte. Guide complet (${HOOKS_TOTAL_COUNT} accroches, modèles à compléter, grille de notation) par email.`,
-    llmsSection: "ressources",
+    sitemap: 0.8,
+    llms: `Bibliothèque de ${HOOKS_LIBRARY.total} hooks TikTok réels, tirés de vidéos d'au moins 100 000 vues et au moins 5 fois les vues habituelles du compte, avec structure réutilisable et lien vers chaque vidéo. Packs de 100, 250 et 500 hooks sans doublon (${HOOKS_PACKS_OFFER.map((p) => `${p.price} €`).join(", ")}) ou bibliothèque complète à ${HOOKS_BUNDLE.price} €. PDF et tableur envoyés par email. Aucune garantie de vues.`,
+    llmsSection: "offres",
   },
   {
     path: "/ressources",
@@ -470,9 +471,9 @@ const ROUTES: RouteSeo[] = [
       "Reçois mes conseils formats courts par email, et le guide complet des hooks TikTok en cadeau de bienvenue. Sans spam, désinscription en un clic.",
     noscript: {
       h1: "La newsletter de Fred Wav",
-      body: "Mes conseils formats courts par email, et le guide complet des hooks TikTok pour commencer. La page /hooks-tiktok te donne déjà les familles d'accroches en clair.",
+      body: "Mes conseils formats courts par email, et le guide complet des hooks TikTok pour commencer. La bibliothèque de hooks TikTok est sur /hooks-tiktok.",
       links: [
-        { href: "/hooks-tiktok", label: "Voir les hooks classés par famille" },
+        { href: "/hooks-tiktok", label: "Voir la bibliothèque de hooks TikTok" },
         { href: "/wavacademy", label: "Wav Academy : ne poste plus seul" },
       ],
     },

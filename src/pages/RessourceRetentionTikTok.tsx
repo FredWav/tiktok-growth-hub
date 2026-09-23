@@ -53,7 +53,7 @@ const related: RelatedResource[] = [
   {
     href: "/hooks-tiktok",
     title: "Travailler ses premières secondes",
-    description: "Choisis une famille de hooks cohérente avec le sujet et la promesse de ta vidéo.",
+    description: "Pars de hooks qui ont déjà performé, avec une structure à adapter à ton sujet.",
     label: "Bibliothèque de hooks",
   },
   {
@@ -212,7 +212,7 @@ export default function RessourceRetentionTikTok() {
           </div>
         </div>
         <p>
-          Une formule ne garantit rien. Elle rend simplement l’hypothèse testable. Pour varier les ouvertures sans trahir le sujet, explore les <Link className="text-primary underline underline-offset-4 hover:no-underline" to="/hooks-tiktok">familles de hooks TikTok</Link> et compare leur effet sur tes propres premières secondes.
+          Une formule ne garantit rien. Elle rend simplement l’hypothèse testable. Pour varier les ouvertures sans trahir le sujet, pars des <Link className="text-primary underline underline-offset-4 hover:no-underline" to="/hooks-tiktok">hooks TikTok qui ont déjà performé</Link> et compare leur effet sur tes propres premières secondes.
         </p>
       </ArticleSection>
 

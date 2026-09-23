@@ -53,7 +53,7 @@ const related: RelatedResource[] = [
   {
     href: "/hooks-tiktok",
     title: "Trouver un hook adapté au sujet",
-    description: "Explore les familles d’accroches sans confondre formule efficace et garantie de vues.",
+    description: "Des hooks tirés de vraies vidéos, sans confondre formule efficace et garantie de vues.",
     label: "Bibliothèque de hooks",
   },
   {

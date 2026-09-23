@@ -1,4 +1,4 @@
-import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import * as nodemailer from "https://esm.sh/nodemailer@6.9.16";
 
 export const headers = {

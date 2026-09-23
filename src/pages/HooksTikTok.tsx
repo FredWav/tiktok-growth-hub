@@ -17,6 +17,7 @@ import {
   type HooksPackOffer,
 } from "@/config/hooks-offer";
 import { trackEvent } from "@/lib/tracking";
+import { Link } from "react-router-dom";
 import {
   Accordion,
   AccordionItem,
@@ -288,6 +289,12 @@ export default function HooksTikTok() {
             </Button>
           </div>
         </div>
+
+        <p className="max-w-3xl mx-auto mt-8 text-center text-sm text-muted-foreground">
+          Paiement sécurisé par Stripe. Fichiers envoyés par email dès le paiement validé, liens valables 1 an.
+          Produit numérique à livraison immédiate : en validant la case au paiement, tu demandes l'envoi immédiat et tu renonces à ton droit de rétractation dès l'envoi de l'email de livraison
+          (<Link to="/cgv" className="underline">article 9.4 des CGV</Link>).
+        </p>
       </Section>
 
       {/* ── SUR MESURE ───────────────────────────────────────────────────── */}

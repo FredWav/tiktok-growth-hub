@@ -17,6 +17,7 @@ import {
   type HooksPackOffer,
 } from "@/config/hooks-offer";
 import { trackEvent } from "@/lib/tracking";
+import { Link } from "react-router-dom";
 import {
   Accordion,
   AccordionItem,

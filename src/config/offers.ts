@@ -113,8 +113,8 @@ export const PREMIUM_BUDGET_LABELS: Record<string, string> = Object.fromEntries(
 
 /** Tranches du formulaire d'orientation commercial. */
 export const ORIENTATION_BUDGET_TIERS = [
-  { value: "under_100", label: "0 - 100 €", short: "0 - 100 €" },
-  { value: "under_399", label: "100 - 398 €", short: "100 - 398 €" },
+  { value: "no_budget", label: "Je n'ai pas de budget pour me faire accompagner", short: "Pas de budget" },
+  { value: "under_399", label: "1 - 398 €", short: "1 - 398 €" },
   { value: "399_748", label: "399 - 998 €", short: "399 - 998 €" },
   { value: "749_1989", label: "998 - 1 499 €", short: "998 - 1 499 €" },
   { value: "1990_plus", label: "Plus de 1 499 €", short: "Plus de 1 499 €" },
@@ -123,6 +123,8 @@ export const ORIENTATION_BUDGET_TIERS = [
 export const ORIENTATION_BUDGET_LABELS: Record<string, string> = Object.fromEntries(
   ORIENTATION_BUDGET_TIERS.map((tier) => [tier.value, tier.short]),
 );
+// Tranche disparue, encore présente sur des candidatures historiques.
+ORIENTATION_BUDGET_LABELS["under_100"] = "0 - 100 €";
 
 export type RecommendedOffer = "express" | "academy" | "premium";
 

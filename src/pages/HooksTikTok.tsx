@@ -309,11 +309,12 @@ export default function HooksTikTok() {
               <p className="text-muted-foreground mt-1">Pack niche sur demande, livré en 72 h.</p>
             </div>
           </div>
-          <Button variant="outline" size="lg" asChild>
-            <a href="/contact" onClick={() => trackEvent("hooks_niche_click", { position: "custom" })}>
-              Demander un pack niche
-            </a>
-          </Button>
+          <span
+            aria-disabled="true"
+            className="inline-flex items-center justify-center gap-2 rounded-md border border-border bg-secondary/50 px-6 py-2.5 text-sm font-semibold uppercase tracking-wide text-muted-foreground cursor-not-allowed select-none"
+          >
+            Coming soon
+          </span>
         </div>
       </Section>
 

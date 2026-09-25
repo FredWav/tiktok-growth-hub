@@ -12,7 +12,7 @@ import {
 } from "../_shared/commerce.ts";
 import { notifyDiscordEmbed } from "../_shared/discord.ts";
 const FORM_VERSION = "orientation_v3";
-const BUDGETS = new Set(["under_100", "under_399", "399_748", "749_1989", "1990_plus"]);
+const BUDGETS = new Set(["no_budget", "under_399", "399_748", "749_1989", "1990_plus"]);
 const STAGES = new Set([
   "debut",
   "irregulier",
@@ -51,8 +51,8 @@ const labels: Record<string, string> = {
   suivi_collectif: "Avancer dans un cadre collectif",
   suivi_individuel: "Être accompagné individuellement",
   a_definir: "Définir le bon format avec Fred",
-  under_100: "0 - 100 €",
-  under_399: "100 - 398 €",
+  no_budget: "Pas de budget",
+  under_399: "1 - 398 €",
   "399_748": "399 - 998 €",
   "749_1989": "998 - 1 499 €",
   "1990_plus": "Plus de 1 499 €",

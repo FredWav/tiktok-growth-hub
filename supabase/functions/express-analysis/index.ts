@@ -189,7 +189,8 @@ serve(async (req) => {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     await notifyError("Analyse Express", `${message}${customerEmail ? " • " + customerEmail : ""}${username ? " • @" + username : ""}`);
-    return new Response(JSON.stringify({ error: message }), {
+    console.error("express-analysis error:", message);
+    return new Response(JSON.stringify({ error: "Analyse momentanément indisponible. Réessaie dans quelques instants." }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

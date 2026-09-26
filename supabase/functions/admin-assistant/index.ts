@@ -450,7 +450,19 @@ serve(async (req) => {
       throw new Error('OPENAI_API_KEY non configurée');
     }
 
-    let processedMessages = [...messages];
+    if (!Array.isArray(messages) || messages.length === 0 || messages.length > 100) {
+      return new Response(JSON.stringify({ error: 'Messages invalides' }), {
+        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    let processedMessages = messages
+      .filter((m: any) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
+      .map((m: any) => ({ role: m.role, content: m.content.slice(0, 20000) }));
+    if (processedMessages.length === 0) {
+      return new Response(JSON.stringify({ error: 'Messages invalides' }), {
+        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
     if (image_url && processedMessages.length > 0) {
       const lastMessage = processedMessages[processedMessages.length - 1];
       processedMessages[processedMessages.length - 1] = {

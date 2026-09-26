@@ -552,7 +552,7 @@ serve(async (req) => {
         accessExpiresAt = exp.toISOString();
       }
 
-      console.log(`WavAcademy payment confirmed: plan=${plan}, months=${accessMonths ?? "n/a"}, recurring=${!!stripeSubscriptionId}, email=${email}, consent=${consentId ?? "n/a"}`);
+      console.log(`WavAcademy payment confirmed: plan=${plan}, months=${accessMonths ?? "n/a"}, recurring=${!!stripeSubscriptionId}, consent=${consentId ?? "n/a"}`);
 
       const subscriptionSelect = "id, access_months, access_expires_at, wavstats_provisioned_at, wavstats_activation_url, wavstats_error, activation_email_status, activation_email_attempted_at, activation_email_sent_at";
       let { data: subRow, error: subscriptionLookupError } = await supabase
@@ -744,7 +744,7 @@ serve(async (req) => {
               activationUrl = (parsed?.activationUrl as string) ?? null;
               wavstatsError = null;
               console.log(
-                `WavStats provisioning OK (essai ${attempt}) • ref=${session.id} • ${email} • HTTP ${res.status} • ${
+                `WavStats provisioning OK (essai ${attempt}) • ref=${session.id} • HTTP ${res.status} • ${
                   activationUrl ? "lien d'activation émis" : "compte existant"
                 }`,
               );
@@ -772,13 +772,13 @@ serve(async (req) => {
             }
 
             console.error(
-              `WavStats provisioning échec (essai ${attempt}) • ref=${session.id} • ${email} • ${wavstatsError}`,
+              `WavStats provisioning échec (essai ${attempt}) • ref=${session.id} • ${wavstatsError}`,
             );
             if (!retryable || attempt === 3) break;
           } catch (err) {
             wavstatsError = err instanceof Error ? err.message : String(err);
             console.error(
-              `WavStats provisioning erreur réseau (essai ${attempt}) • ref=${session.id} • ${email} • ${wavstatsError}`,
+              `WavStats provisioning erreur réseau (essai ${attempt}) • ref=${session.id} • ${wavstatsError}`,
             );
             if (attempt === 3) break;
           }

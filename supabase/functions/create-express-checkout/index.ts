@@ -167,12 +167,6 @@ serve(async (req) => {
       .maybeSingle();
 
     if (reusableConsent) {
-      if (wantsNewsletter) {
-        await supabase
-          .from("express_analyses")
-          .update({ newsletter_requested: true })
-          .eq("id", reusableConsent.express_analysis_id);
-      }
       const params = new URLSearchParams({
         client_reference_id: reusableConsent.express_analysis_id,
         prefilled_email: cleanEmail,

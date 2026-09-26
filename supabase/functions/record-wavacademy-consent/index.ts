@@ -228,7 +228,7 @@ serve(async (req) => {
     console.error("record-wavacademy-consent error:", error);
     await notifyError("Record Consent", error.message);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: "Enregistrement impossible. Réessaie dans quelques instants." }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

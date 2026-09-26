@@ -162,7 +162,7 @@ serve(async (req) => {
       html: htmlBody,
     });
 
-    console.log(`Claim email sent to ${email} (token=${token})`);
+    console.log("Claim email sent");
 
     return new Response(
       JSON.stringify({ success: true }),

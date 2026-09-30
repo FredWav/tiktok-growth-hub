@@ -8,7 +8,7 @@ declare global {
 }
 
 export function trackEvent(event: string, data?: Record<string, string>) {
-  if (typeof window !== "undefined" && /^\/(inscription|claim|admin)(\/|$)|^\/analyse-express\/result/.test(window.location.pathname)) return;
+  if (typeof window !== "undefined" && /^\/(inscription|claim|admin)(\/|$)|^\/analyse-express\/result|^\/analyse-video\/rapport/.test(window.location.pathname)) return;
   // Google Analytics
   if (typeof window !== "undefined" && window.gtag) {
     window.gtag("event", event, data);

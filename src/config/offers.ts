@@ -52,6 +52,14 @@ export const EXPRESS_PRICE = 11.9;
 export const EXPRESS_PRICE_LABEL = "11,90 €";
 
 /**
+ * Analyse Vidéo TikTok — prix de lancement (test commercial 2026-10).
+ * Affichage uniquement : le montant encaissé est celui du Price Stripe
+ * (STRIPE_VIDEO_PRICE_ID_*), vérifié par le webhook. Changer les deux ensemble.
+ */
+export const VIDEO_ANALYSIS_PRICE = 2.9;
+export const VIDEO_ANALYSIS_PRICE_LABEL = "2,90 €";
+
+/**
  * Wav Premium — prix public, candidature étudiée personnellement.
  * L'accès passe par une candidature qualifiée sur /reserverunappel.
  */

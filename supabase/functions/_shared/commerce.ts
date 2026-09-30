@@ -1,4 +1,4 @@
-import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import * as nodemailer from "https://esm.sh/nodemailer@6.9.16";
 
 export const headers = {
@@ -49,6 +49,13 @@ export function service(req: Request) {
   return !!Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") &&
     req.headers.get("Authorization") ===
       `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`;
+}
+// Le cron pg_cron s'authentifie par en-tête dédié : sans cela la file d'emails
+// n'était jamais vidée (403 à chaque exécution planifiée).
+export function cronCaller(req: Request) {
+  const secret = Deno.env.get("RECONCILE_CRON_SECRET");
+  return service(req) ||
+    (!!secret && req.headers.get("x-cron-secret") === secret);
 }
 export async function admin(req: Request, client: Database) {
   const token = req.headers.get("Authorization")?.replace(/^Bearer /, "");

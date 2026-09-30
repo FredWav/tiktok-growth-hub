@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { normalizeTikTokUsername } from "../_shared/tiktok-username.ts";
 import { launchExpressJob } from "../_shared/express-launch.ts";
 import type { ExpressRow } from "../_shared/express-finalize.ts";

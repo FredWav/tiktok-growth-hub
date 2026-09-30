@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { db, enqueue, logUnmatchedPayment } from "../_shared/commerce.ts";
+import { db, deliverMail, enqueue, logUnmatchedPayment } from "../_shared/commerce.ts";
 import { getStripePricesForMode, getStripeSecretKey } from "../_shared/stripe-config.ts";
 import { notifySuccess, notifyError } from "../_shared/itpush.ts";
 import { commerceCheckout } from "../_shared/commerce-stripe.ts";
@@ -202,6 +202,12 @@ async function deliverHooksPack(
         await safeNotifyError("Livraison hooks", `Renonciation absente • session=${session.id} • vérifier le Payment Link`);
       }
       await safeNotifySuccess("Vente hooks", `${pack.name} • ${email} • session=${session.id}`);
+    }
+    // Envoi immédiat (sinon le mail attend le passage automatique de 5 min).
+    try {
+      await deliverMail(supabase as never);
+    } catch (sendErr) {
+      console.error(`Immediate hooks mail send failed: session=${session.id}`, getErrorMessage(sendErr));
     }
     return jsonResponse({ received: true, product: pack.code, fulfilment: "queued" });
   } catch (err) {
@@ -451,7 +457,7 @@ serve(async (req) => {
         if (expressConsent) {
           const items = await stripe.checkout.sessions.listLineItems(session.id, { limit: 2 });
           const expectedPrice = getExpectedExpressPriceId(session.livemode);
-          const mismatch = checkoutMismatch(session, items.data, expectedPrice, 1190);
+          const mismatch = checkoutMismatch(session, items.data, expectedPrice, 1990);
           if (mismatch) {
             if (session.payment_status === "paid") {
               await logUnmatchedPayment(supabase, { session_id: session.id, reason: `Express : ${mismatch}`, amount_cents: session.amount_total, currency: session.currency, email: session.customer_details?.email, received_at: new Date(event.created * 1000).toISOString() });
@@ -651,7 +657,7 @@ serve(async (req) => {
         accessExpiresAt = exp.toISOString();
       }
 
-      console.log(`WavAcademy payment confirmed: plan=${plan}, months=${accessMonths ?? "n/a"}, recurring=${!!stripeSubscriptionId}, email=${email}, consent=${consentId ?? "n/a"}`);
+      console.log(`WavAcademy payment confirmed: plan=${plan}, months=${accessMonths ?? "n/a"}, recurring=${!!stripeSubscriptionId}, consent=${consentId ?? "n/a"}`);
 
       const subscriptionSelect = "id, access_months, access_expires_at, wavstats_provisioned_at, wavstats_activation_url, wavstats_error, activation_email_status, activation_email_attempted_at, activation_email_sent_at";
       let { data: subRow, error: subscriptionLookupError } = await supabase
@@ -843,7 +849,7 @@ serve(async (req) => {
               activationUrl = (parsed?.activationUrl as string) ?? null;
               wavstatsError = null;
               console.log(
-                `WavStats provisioning OK (essai ${attempt}) • ref=${session.id} • ${email} • HTTP ${res.status} • ${
+                `WavStats provisioning OK (essai ${attempt}) • ref=${session.id} • HTTP ${res.status} • ${
                   activationUrl ? "lien d'activation émis" : "compte existant"
                 }`,
               );
@@ -871,13 +877,13 @@ serve(async (req) => {
             }
 
             console.error(
-              `WavStats provisioning échec (essai ${attempt}) • ref=${session.id} • ${email} • ${wavstatsError}`,
+              `WavStats provisioning échec (essai ${attempt}) • ref=${session.id} • ${wavstatsError}`,
             );
             if (!retryable || attempt === 3) break;
           } catch (err) {
             wavstatsError = err instanceof Error ? err.message : String(err);
             console.error(
-              `WavStats provisioning erreur réseau (essai ${attempt}) • ref=${session.id} • ${email} • ${wavstatsError}`,
+              `WavStats provisioning erreur réseau (essai ${attempt}) • ref=${session.id} • ${wavstatsError}`,
             );
             if (attempt === 3) break;
           }

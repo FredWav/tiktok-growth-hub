@@ -180,12 +180,12 @@ export default function Ressources() {
           >
             <Lightbulb className="h-6 w-6 text-primary mb-5" />
             <span className="text-xs font-semibold uppercase tracking-wider text-primary">Bibliothèque pratique</span>
-            <h2 className="font-display text-2xl font-semibold mt-3 mb-3">Hooks TikTok classés par famille</h2>
+            <h2 className="font-display text-2xl font-semibold mt-3 mb-3">Hooks TikTok qui ont vraiment performé</h2>
             <p className="text-sm text-cream/70 leading-relaxed mb-6">
-              Des accroches prêtes à adapter, mais aussi ce que chaque famille coûte quand tu en abuses.
+              850 hooks tirés de vraies vidéos, avec leur structure à adapter à ton sujet.
             </p>
             <span className="inline-flex items-center text-sm font-semibold">
-              Explorer les hooks <ArrowRight className="ml-2 h-4 w-4" />
+              Voir la bibliothèque <ArrowRight className="ml-2 h-4 w-4" />
             </span>
           </Link>
 

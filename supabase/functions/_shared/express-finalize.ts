@@ -2,6 +2,7 @@ import type { Database } from "./commerce.ts";
 import { extractHealthScoreNumber, hasAiInsights, normalizeWavStatsResult } from "./wavstats-normalizer.ts";
 import { normalizeExpressSample } from "./express-sample.ts";
 import { EXPRESS_LAUNCH_TIMEOUT_MS, isExpressComplete } from "./express-state.ts";
+import { sendExpressResultMail } from "./express-result-mail.ts";
 
 export type ExpressRow = {
   id: string;
@@ -15,6 +16,7 @@ export type ExpressRow = {
   processing_started_at: string | null;
   created_at: string;
   support_requested_at: string | null;
+  result_email_sent_at?: string | null;
   error_message?: string | null;
   health_score?: number | null;
 };
@@ -121,7 +123,15 @@ export async function pollExpress(row: ExpressRow, client: Database) {
       health_score: extractHealthScoreNumber(normalized),
       completed_at: new Date().toISOString(), error_message: null, launch_started_at: null,
     });
-    return storedResult(saved || await currentRow(client, row.id));
+    const final = saved || await currentRow(client, row.id);
+    // La livraison du rapport ne doit jamais faire échouer la finalisation :
+    // le cron de rattrapage repassera si la mise en file échoue.
+    try {
+      await sendExpressResultMail(client, final);
+    } catch (error) {
+      console.error("Mail de rapport non mis en file", row.id, error);
+    }
+    return storedResult(final);
   }
   if (["failed", "cancelled"].includes(job.status)) return await fail(`Échec du prestataire d’analyse : ${job.status}`);
   if (delayed) return await warn(row.error_message || "Traitement supérieur à cinq minutes après paiement",

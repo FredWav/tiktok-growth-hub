@@ -435,7 +435,7 @@ export default function Commerce() {
               const f = new FormData(e.currentTarget);
               if (
                 window.confirm(
-                  "Le remboursement intégral de 11,90 € a-t-il été effectué ?",
+                  "Le remboursement intégral de 19,90 € a-t-il été effectué ?",
                 )
               ) {
                 void act({

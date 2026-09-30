@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
-import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2.57.2";
+import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { getStripePricesForMode, getStripeSecretKey } from "../_shared/stripe-config.ts";
 import { notifySuccess, notifyError } from "../_shared/itpush.ts";
 import { normalizeTikTokUsername } from "../_shared/tiktok-username.ts";
@@ -91,7 +91,7 @@ serve(async (req) => {
     }
     const items = await stripe.checkout.sessions.listLineItems(session.id, { limit: 2 });
     const expectedPrice = getExpectedExpressPriceId(session.livemode);
-    const mismatch = checkoutMismatch(session, items.data, expectedPrice, 1190);
+    const mismatch = checkoutMismatch(session, items.data, expectedPrice, 1990);
     if (mismatch) throw new Error(mismatch);
 
     // ── 1. Résoudre la ligne express_analyses ──
@@ -189,7 +189,8 @@ serve(async (req) => {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     await notifyError("Analyse Express", `${message}${customerEmail ? " • " + customerEmail : ""}${username ? " • @" + username : ""}`);
-    return new Response(JSON.stringify({ error: message }), {
+    console.error("express-analysis error:", message);
+    return new Response(JSON.stringify({ error: "Analyse momentanément indisponible. Réessaie dans quelques instants." }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

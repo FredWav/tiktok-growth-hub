@@ -189,7 +189,7 @@ export default function AnalyseExpress() {
             <span className="font-semibold text-foreground">Analyse Express</span>{" "}
             rassemble les données publiques de ton profil et de jusqu’à 120 vidéos
             disponibles pour produire un diagnostic automatisé,
-            des hypothèses et un plan d’action. Rapport PDF à 11,90 €.
+            des hypothèses et un plan d’action. Rapport PDF à 19,90 €.
           </p>
           <p className="text-sm text-muted-foreground/70 mb-10">
             Disponible uniquement pour TikTok pour le moment, d'autres plateformes arrivent bientôt.
@@ -233,7 +233,7 @@ export default function AnalyseExpress() {
               </label>
             </div>
             <Button type="submit" variant="hero" size="lg" className="w-full" disabled={loading}>
-              {loading ? "Redirection..." : "Lancer l'analyse (11,90€)"}
+              {loading ? "Redirection..." : "Lancer l'analyse (19,90€)"}
             </Button>
           </form>
 

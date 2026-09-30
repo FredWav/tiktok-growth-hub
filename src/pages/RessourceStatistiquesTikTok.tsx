@@ -52,7 +52,7 @@ const related: RelatedResource[] = [
   },
   {
     href: "/hooks-tiktok",
-    title: "Hooks TikTok classés par famille",
+    title: "Hooks TikTok qui ont vraiment performé",
     description: "Travaille les premières secondes avec des structures à adapter à ton sujet.",
     label: "Bibliothèque de hooks",
   },

@@ -16,7 +16,7 @@ const PRICE_IDS = {
     vip_12_months: "price_1T4jklPXtjut80rmykmo5hbD",
   },
   live: {
-    analyse_express: "price_1T4pbIBfuzQl0PTiYbMnz92u",
+    analyse_express: "price_1UI2AuBfuzQl0PTixTSsMijh",
     one_shot: "price_1T4pbcBfuzQl0PTity4YOdMv",
     vip_3_months: "price_1T4pbqBfuzQl0PTipRtbfEoW",
     vip_6_months: "price_1T4pc8BfuzQl0PTihU7VtQvo",

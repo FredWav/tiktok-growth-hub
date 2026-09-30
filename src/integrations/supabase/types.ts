@@ -1304,6 +1304,12 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_deep_link_click: {
+        Args: { p_slug: string }
+        Returns: {
+          youtube_id: string
+        }[]
+      }
       increment_deep_link_clicks: {
         Args: { p_slug: string }
         Returns: undefined

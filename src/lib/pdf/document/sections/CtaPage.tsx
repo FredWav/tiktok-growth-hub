@@ -3,7 +3,7 @@ import { Link, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { PageFooter, PageHeader } from "../chrome";
 import { color, font, page, size } from "../theme";
 import type { ReportModel } from "../../report-model";
-import { EXPRESS_CONTINUATION } from "../../../../config/express-continuation";
+import { EXPRESS_CONTINUATIONS } from "../../../../config/express-continuation";
 
 const s = StyleSheet.create({
   page: {
@@ -13,7 +13,22 @@ const s = StyleSheet.create({
     paddingHorizontal: page.paddingHorizontal,
     justifyContent: "center",
   },
-  box: { backgroundColor: color.noir, borderRadius: 12, padding: 30 },
+  heading: {
+    fontFamily: font.display,
+    fontSize: 24,
+    color: color.noir,
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  box: { backgroundColor: color.noir, borderRadius: 12, padding: 24, marginBottom: 14 },
+  eyebrow: {
+    fontFamily: font.sans,
+    fontSize: 8,
+    fontWeight: 700,
+    color: color.goldBright,
+    textTransform: "uppercase",
+    marginBottom: 8,
+  },
   title: { fontFamily: font.display, fontSize: 21, color: color.cream, lineHeight: 1.3 },
   intro: {
     fontFamily: font.sans,
@@ -47,18 +62,23 @@ export function CtaPage({ model }: { model: ReportModel }) {
     <Page size="A4" style={s.page}>
       <PageHeader username={model.meta.username} dateLabel={model.meta.generatedAtLabel} />
 
-      <View style={s.box}>
-        <Text style={s.title}>{EXPRESS_CONTINUATION.title}</Text>
-        <Text style={s.intro}>
-          {EXPRESS_CONTINUATION.description}
-        </Text>
+      <Text style={s.heading}>À toi de choisir la suite</Text>
+      {EXPRESS_CONTINUATIONS.map((continuation) => (
+        <View key={continuation.key} style={s.box} wrap={false}>
+          <Text style={s.eyebrow}>{continuation.eyebrow}</Text>
+          <Text style={s.title}>{continuation.title}</Text>
+          <Text style={s.intro}>{continuation.description}</Text>
 
-        <Link src={EXPRESS_CONTINUATION.url} style={{ textDecoration: "none" }}>
-          <View style={s.button}>
-            <Text style={s.buttonText}>{EXPRESS_CONTINUATION.button}</Text>
-          </View>
-        </Link>
-      </View>
+          <Link
+            src={continuation.external ? continuation.url : `https://fredwav.com${continuation.url}`}
+            style={{ textDecoration: "none" }}
+          >
+            <View style={s.button}>
+              <Text style={s.buttonText}>{continuation.button}</Text>
+            </View>
+          </Link>
+        </View>
+      ))}
 
       <Text style={s.outro}>
         Analyse automatisée, sans relecture individuelle ·{" "}

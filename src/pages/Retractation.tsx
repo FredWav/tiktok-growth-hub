@@ -167,6 +167,7 @@ export default function Retractation() {
                     <option value="analyse_express">Analyse Express</option>
                     <option value="wav_academy">Wav Academy</option>
                     <option value="wav_premium">Wav Premium</option>
+                    <option value="hooks_packs">Packs de hooks</option>
                     <option value="other">Autre prestation</option>
                   </select>
                 </div>

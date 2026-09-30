@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "test:commerce": "node --test tests/commerce.test.mjs tests/express-lifecycle.test.mjs",
+    "test:commerce": "node --test tests/commerce.test.mjs tests/express-lifecycle.test.mjs tests/hooks-delivery.test.mjs",
     "test:commerce:database": "node --test tests/commerce-database.test.mjs",
     "test:prerender": "node --test tests/prerender.test.mjs",
     "dev": "vite",

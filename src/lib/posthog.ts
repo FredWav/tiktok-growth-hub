@@ -36,7 +36,7 @@ export function initPostHog(): Promise<void> {
           autocapture: true,
           persistence: "localStorage+cookie",
           before_send: (event) => {
-            if (typeof window !== "undefined" && /^\/(inscription|claim|admin)(\/|$)|^\/analyse-express\/result/.test(window.location.pathname)) return null;
+            if (typeof window !== "undefined" && /^\/(inscription|claim|admin)(\/|$)|^\/analyse-express\/result|^\/analyse-video\/rapport/.test(window.location.pathname)) return null;
             return event;
           },
         });

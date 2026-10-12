@@ -13,7 +13,7 @@ import {
   hooksPackFor,
   type HooksPack,
 } from "../_shared/hooks-delivery.ts";
-import { advanceVideo, type VideoRow } from "../_shared/video-analysis.ts";
+import { advanceVideo, watchVideo, type VideoRow } from "../_shared/video-analysis.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -323,7 +323,16 @@ async function handleVideoCheckout(
     const { data: fresh, error: readError } = await client.from("video_analyses").select("*").eq("id", row.id).single();
     if (readError) throw readError;
     const apiKey = Deno.env.get("WAVSTATS_API_KEY") || Deno.env.get("WAV_SOCIAL_SCAN_API_KEY") || "";
-    await advanceVideo(client, fresh as VideoRow, apiKey);
+    const launched = await advanceVideo(client, fresh as VideoRow, apiKey);
+    if (launched?.status === "processing") {
+      // Suivi rapproché en arrière-plan : le rapport part dès la fin de l'analyse,
+      // sans attendre le cron. La réponse à Stripe n'attend pas ce suivi.
+      const watch = watchVideo(client, launched.id, apiKey, { onDelivered: () => deliverMail(client) })
+        .catch((e) => console.error(`${tag} watch failed`, getErrorMessage(e)));
+      // deno-lint-ignore no-explicit-any
+      const rt = (globalThis as any).EdgeRuntime;
+      if (rt?.waitUntil) rt.waitUntil(watch);
+    }
   } catch (err) {
     // Paiement déjà enregistré : le cron reprendra, inutile de faire rejouer Stripe.
     console.error(`${tag} launch deferred`, getErrorMessage(err));

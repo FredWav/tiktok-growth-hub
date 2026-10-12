@@ -81,7 +81,7 @@ ${p("Nous avons analysé ta vidéo pour identifier ce qui fonctionne, les princi
 ${p("Depuis cette page, tu peux aussi télécharger ton rapport complet en PDF. Garde cet e-mail : le lien reste valable.")}
 ${p(`<span style="font-size:13px;color:#6B6B6B">Vidéo analysée : ${esc(row.tiktok_url)}</span>`)}
 ${p("À bientôt,<br>Fred<br>FredWav")}`);
-  return { subject: "Ton analyse vidéo TikTok est prête 🚀", html };
+  return { subject: "Ton analyse vidéo TikTok est prête", html };
 }
 
 export function buildVideoFailureEmail(row: Pick<VideoRow, "tiktok_url" | "id">) {
@@ -273,4 +273,32 @@ export async function advanceVideo(client: Database, row: VideoRow, apiKey: stri
   if (current?.status === "processing") current = await pollVideo(client, current, apiKey);
   if (current?.status === "completed") current = await deliverVideoReport(client, current);
   return current;
+}
+
+/**
+ * Suivi rapproché juste après le lancement : interroge WavStats toutes les `intervalMs`
+ * pendant `budgetMs`, puis rend la main au cron (5 min). Au plus budget/interval appels.
+ * `onDelivered` permet d'envoyer le mail aussitôt (sinon il part au prochain passage).
+ */
+export async function watchVideo(
+  client: Database, id: string, apiKey: string,
+  opts: { budgetMs?: number; intervalMs?: number; onDelivered?: () => Promise<unknown>; sleep?: (ms: number) => Promise<void> } = {},
+) {
+  const { budgetMs = 120_000, intervalMs = 15_000, onDelivered } = opts;
+  const sleep = opts.sleep ?? ((ms: number) => new Promise<void>((r) => setTimeout(r, ms)));
+  const deadline = Date.now() + budgetMs;
+  while (Date.now() + intervalMs <= deadline) {
+    await sleep(intervalMs);
+    const { data, error } = await client.from("video_analyses").select("*").eq("id", id).maybeSingle();
+    if (error || !data) return null;
+    const row = data as VideoRow;
+    if (row.status !== "processing" && row.status !== "completed") return row;
+    const next = await advanceVideo(client, row, apiKey);
+    if (next?.status === "delivered") {
+      if (onDelivered) await safe(onDelivered);
+      return next;
+    }
+    if (next && next.status !== "processing") return next;
+  }
+  return null;
 }

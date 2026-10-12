@@ -179,7 +179,7 @@ test("livraison : un seul e-mail même si elle est rejouée", async () => {
   assert.equal(db.row.status, "delivered");
   assert.equal(db.mails.size, 1);
   const mail = db.mails.get("video-report:order-1");
-  assert.equal(mail.subject, "Ton analyse vidéo TikTok est prête 🚀");
+  assert.equal(mail.subject, "Ton analyse vidéo TikTok est prête");
   assert.match(mail.body, /analyse-video\/rapport\?t=11111111-1111-4111-8111-111111111111/);
 });
 

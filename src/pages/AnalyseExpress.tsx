@@ -16,7 +16,7 @@ import { isValidTikTokUsername, normalizeTikTokUsername } from "@/lib/tiktok-use
 import { toast } from "sonner";
 import tiktokExample from "@/assets/tiktok-username-example.png";
 import { ObjectionCards } from "@/components/ObjectionCards";
-import { EXPRESS_USERS_COUNT } from "@/config/offers";
+import { EXPRESS_USERS_BASE_COUNT } from "@/config/offers";
 
 const features = [
   { icon: BarChart3, title: "Audit profil complet", description: "Photo, bio, positionnement : analyse technique et recommandations concrètes de réécriture" },
@@ -95,6 +95,8 @@ export default function AnalyseExpress() {
   const [consentCgv, setConsentCgv] = useState(false);
   const [consentImmediateDelivery, setConsentImmediateDelivery] = useState(false);
   const [existingSessionId, setExistingSessionId] = useState<string | null>(null);
+  // Paiements Analyse Express valides depuis la base verifiee (rpc express_paid_since).
+  const [paidSince, setPaidSince] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -102,6 +104,18 @@ export default function AnalyseExpress() {
 
   useEffect(() => {
     setExistingSessionId(window.localStorage.getItem("express_session_id"));
+  }, []);
+
+  // Le compteur de preuve sociale monte tout seul : la base verifiee est augmentee
+  // du nombre de paiements valides. Si la lecture echoue, on reste sur la base.
+  useEffect(() => {
+    let alive = true;
+    supabase.rpc("express_paid_since").then(({ data, error }) => {
+      if (alive && !error && typeof data === "number") setPaidSince(data);
+    });
+    return () => {
+      alive = false;
+    };
   }, []);
 
   // Forme canonique TikTok (minuscules) : c'est celle qui part au checkout puis
@@ -241,7 +255,7 @@ export default function AnalyseExpress() {
             <p className="flex items-center justify-center gap-2 pt-1 text-sm text-muted-foreground">
               <Users className="h-4 w-4 shrink-0 text-primary" aria-hidden />
               <span>
-                <span className="font-semibold text-foreground">{EXPRESS_USERS_COUNT}</span>{" "}
+                <span className="font-semibold text-foreground">{EXPRESS_USERS_BASE_COUNT + paidSince}</span>{" "}
                 créateurs de contenu ont déjà adoré l'analyse express. Analyse ton compte TikTok dès maintenant.
               </span>
             </p>

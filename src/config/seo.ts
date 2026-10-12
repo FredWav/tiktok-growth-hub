@@ -246,12 +246,12 @@ const ROUTES: RouteSeo[] = [
     description: `Audit automatisé de ton compte TikTok : jusqu’à 120 vidéos publiques comparées, points faibles, hypothèses et tests à lancer. Rapport PDF à ${EXPRESS_PRICE.toFixed(2).replace(".", ",")} €.`,
     noscript: {
       h1: "Tes statistiques TikTok sont visibles : que dois-tu tester ensuite ?",
-      body: "Analyse automatisée des données publiques de ton profil et de tes vidéos disponibles, jusqu’à 120, sur un même échantillon documenté. Le rapport distingue les observations des hypothèses, ne remplace ni les statistiques privées de TikTok ni une analyse humaine et ne garantit aucune vue ou vente. Cinq minutes en fonctionnement normal après paiement, rapport PDF pour 19,90 € TTC.",
+      body: "Analyse automatisée des données publiques de ton profil et de tes vidéos disponibles, jusqu’à 120, sur un même échantillon documenté. Le rapport distingue les observations des hypothèses, ne remplace ni les statistiques privées de TikTok ni une analyse humaine et ne garantit aucune vue ou vente. En moins de 3 minutes dans ta boîte mail en fonctionnement normal après paiement, rapport PDF pour 19,90 € TTC.",
       sections: [
         { h2: "Qu’est-ce que l’Analyse Express ?", body: "Un audit de compte TikTok automatisé : tu indiques ton @, l’outil compare tes vidéos publiques (vues, engagement, régularité, formats) et identifie ce qui performe, ce qui décroche et quoi tester ensuite." },
         { h2: "Ce que contient le rapport", body: "Score de santé du compte, comparaison des vidéos, observations chiffrées, hypothèses et pistes de test prioritaires, au format PDF téléchargeable et envoyé par e-mail." },
         { h2: "Pour qui ?", body: "Créateurs, entrepreneurs et indépendants qui publient sur TikTok et veulent un diagnostic rapide et objectif de leur compte, sans abonnement ni rendez-vous." },
-        { h2: "Prix et délai", body: "19,90 € TTC, paiement unique. Rapport disponible en environ cinq minutes après paiement. Pour une seule vidéo, voir l’Analyse Vidéo TikTok." },
+        { h2: "Prix et délai", body: "19,90 € TTC, paiement unique. Rapport reçu dans ta boîte mail en moins de 3 minutes après paiement. Pour une seule vidéo, voir l’Analyse Vidéo TikTok." },
       ],
       links: [
         { href: "/analyse-express", label: "Lancer mon Analyse Express" },
@@ -281,7 +281,7 @@ const ROUTES: RouteSeo[] = [
       offerBreadcrumb("/analyse-express", "Analyse Express"),
     ],
     sitemap: 0.9,
-    llms: "Audit automatisé de compte TikTok à 19,90 € (Analyse Express) : jusqu’à 120 vidéos publiques comparées, score de santé, observations distinctes des hypothèses et pistes de test, rapport PDF en environ 5 minutes. Ne remplace ni les statistiques privées de TikTok ni un audit humain ; aucune garantie de résultat.",
+    llms: "Audit automatisé de compte TikTok à 19,90 € (Analyse Express) : jusqu’à 120 vidéos publiques comparées, score de santé, observations distinctes des hypothèses et pistes de test, rapport PDF reçu dans ta boîte mail en moins de 3 minutes. Ne remplace ni les statistiques privées de TikTok ni un audit humain ; aucune garantie de résultat.",
     llmsSection: "offres",
   },
   {

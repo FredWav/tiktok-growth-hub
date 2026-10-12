@@ -267,9 +267,15 @@ async function handleVideoCheckout(
     return await reconcile("commande déjà rattachée à un autre paiement");
   }
   const items = await stripe.checkout.sessions.listLineItems(session.id, { limit: 2 });
-  const expectedPrice = Deno.env.get(session.livemode ? "STRIPE_VIDEO_PRICE_ID_LIVE" : "STRIPE_VIDEO_PRICE_ID_TEST");
-  const unitAmount = items.data[0]?.price?.unit_amount ?? -1;
-  const mismatch = checkoutMismatch(session, items.data, expectedPrice, unitAmount);
+  // Le produit Stripe fait foi (STRIPE_VIDEO_PRODUCT_ID_*) : le prix peut changer dans
+  // Stripe sans toucher aux secrets. Un ID de tarif précis reste accepté s'il est configuré.
+  const suffix = session.livemode ? "LIVE" : "TEST";
+  const price = items.data[0]?.price;
+  const productId = typeof price?.product === "string" ? price.product : price?.product?.id;
+  const expectedProduct = Deno.env.get(`STRIPE_VIDEO_PRODUCT_ID_${suffix}`);
+  const expectedPrice = Deno.env.get(`STRIPE_VIDEO_PRICE_ID_${suffix}`);
+  const recognized = (!!expectedProduct && productId === expectedProduct) || (!!expectedPrice && price?.id === expectedPrice);
+  const mismatch = checkoutMismatch(session, items.data, recognized ? price?.id : undefined, price?.unit_amount ?? -1);
   if (mismatch) return await reconcile(mismatch);
 
   const fulfil = session.livemode || Deno.env.get("ALLOW_TEST_FULFILLMENT") === "true";

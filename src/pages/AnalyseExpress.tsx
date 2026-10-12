@@ -51,7 +51,7 @@ const faqs = [
   },
   {
     question: "En combien de temps le rapport est-il disponible ?",
-    answer: "Cinq minutes maximum en fonctionnement normal après confirmation du paiement. En cas de dépassement, Fred est prévenu et intervient sous deux jours ouvrés.",
+    answer: "En moins de 3 minutes dans ta boîte mail en fonctionnement normal après confirmation du paiement. En cas de dépassement, Fred est prévenu et intervient sous deux jours ouvrés.",
   },
   {
     question: "L'analyse est-elle réalisée par Fred ?",
@@ -181,7 +181,7 @@ export default function AnalyseExpress() {
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
             <Zap className="h-4 w-4" />
-            Cinq minutes en fonctionnement normal après paiement
+            En moins de 3 minutes dans ta boîte mail
           </div>
 
           <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">

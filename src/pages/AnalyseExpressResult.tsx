@@ -238,7 +238,7 @@ export default function AnalyseExpressResult() {
               </div>
               <h2 className="font-display text-2xl font-semibold">Analyse en cours...</h2>
               <p className="text-muted-foreground">
-                Nous analysons le compte @{username || "..."} – jusqu’à cinq minutes en fonctionnement normal après confirmation du paiement.
+                Nous analysons le compte @{username || "..."} - en moins de 3 minutes dans ta boîte mail après confirmation du paiement.
               </p>
               <div className="bg-card border border-border rounded-xl p-5 max-w-sm mx-auto space-y-3">
                 <Progress value={progress} className="h-3" />

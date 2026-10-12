@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { Zap, BarChart3, FileText, TrendingUp, Search } from "lucide-react";
+import { Zap, BarChart3, FileText, TrendingUp, Search, Users } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
 import { trackPostHogEvent } from "@/lib/posthog";
 import { SEOHead } from "@/components/SEOHead";
@@ -16,6 +16,7 @@ import { isValidTikTokUsername, normalizeTikTokUsername } from "@/lib/tiktok-use
 import { toast } from "sonner";
 import tiktokExample from "@/assets/tiktok-username-example.png";
 import { ObjectionCards } from "@/components/ObjectionCards";
+import { EXPRESS_USERS_COUNT } from "@/config/offers";
 
 const features = [
   { icon: BarChart3, title: "Audit profil complet", description: "Photo, bio, positionnement : analyse technique et recommandations concrètes de réécriture" },
@@ -237,6 +238,13 @@ export default function AnalyseExpress() {
             <Button type="submit" variant="hero" size="lg" className="w-full" disabled={loading}>
               {loading ? "Redirection..." : "Lancer l'analyse (19,90€)"}
             </Button>
+            <p className="flex items-center justify-center gap-2 pt-1 text-sm text-muted-foreground">
+              <Users className="h-4 w-4 shrink-0 text-primary" aria-hidden />
+              <span>
+                <span className="font-semibold text-foreground">{EXPRESS_USERS_COUNT}</span>{" "}
+                créateurs de contenu ont déjà adoré l'analyse express. Analyse ton compte TikTok dès maintenant.
+              </span>
+            </p>
           </form>
 
           {existingSessionId && (

@@ -8,8 +8,9 @@ const corsHeaders = {
 
 const PUBLIC_CONSENT_VERSION = "newsletter-2026-08-11";
 const PUBLIC_CONSENT_TEXT = "J'accepte de recevoir le guide et les conseils de Fred Wav par email. Je peux me désinscrire à tout moment.";
-const EXPRESS_CONSENT_VERSION = "analyse-express-newsletter-2026-08-11";
-const EXPRESS_CONSENT_TEXT = "Je veux aussi recevoir le guide ULTIME des hooks et tous les conseils de Fred.";
+// Texte affiché sous le formulaire Analyse Express : changer l'un impose de changer l'autre et la version.
+const EXPRESS_CONSENT_VERSION = "analyse-express-contact-2026-10-12";
+const EXPRESS_CONSENT_TEXT = "J'accepte de recevoir les e-mails de Fred (conseils et offres, 2 fois par mois maximum). Je peux me désinscrire à tout moment.";
 
 function jsonResponse(body: Record<string, unknown>, status = 200): Response {
   return new Response(JSON.stringify(body), {

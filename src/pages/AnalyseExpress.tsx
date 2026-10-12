@@ -78,6 +78,8 @@ const faqs = [
   },
 ];
 
+// Doit rester identique à EXPRESS_CONSENT_TEXT dans mailerlite-subscribe (preuve du consentement).
+const MARKETING_CONSENT_TEXT = "J'accepte de recevoir les e-mails de Fred (conseils et offres, 2 fois par mois maximum). Je peux me désinscrire à tout moment.";
 const CGV_ACCEPTED_TEXT = "J'ai lu et j'accepte les Conditions Générales de Vente.";
 const IMMEDIATE_DELIVERY_ACCEPTED_TEXT = "Je demande expressément l'exécution immédiate de l'Analyse Express avant la fin du délai de 14 jours et je reconnais perdre mon droit de rétractation lorsque la prestation est pleinement exécutée et le rapport mis à disposition.";
 
@@ -229,7 +231,7 @@ export default function AnalyseExpress() {
                 htmlFor="subscribe"
                 className="text-xs text-muted-foreground leading-relaxed cursor-pointer"
               >
-                Je veux aussi recevoir le guide <span className="font-semibold text-foreground">ULTIME des hooks</span> et tous les conseils de Fred
+                {MARKETING_CONSENT_TEXT}
               </label>
             </div>
             <Button type="submit" variant="hero" size="lg" className="w-full" disabled={loading}>

@@ -5,6 +5,7 @@ import {
   useExpressAnalyses,
   type ExpressAnalysis,
 } from "@/hooks/useExpressAnalyses";
+import { isVideoActive, isVideoComplete, useVideoAnalyses, type VideoAnalysis } from "@/hooks/useVideoAnalyses";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,7 +18,7 @@ import {
 } from "@/components/ui/table";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Download, Loader2, RefreshCw, Search, Mail, Copy, Check } from "lucide-react";
+import { Download, ExternalLink, Loader2, RefreshCw, Search, Mail, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import { downloadExpressReport } from "@/lib/pdf";
 import { supabase } from "@/integrations/supabase/client";
@@ -36,6 +37,28 @@ const statusConfig: Record<string, { label: string; variant: "default" | "second
   complete: { label: "Terminée", variant: "default" },
   failed: { label: "Échouée", variant: "destructive" },
 };
+
+const videoStatusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
+  awaiting_payment: { label: "Paiement attendu", variant: "outline" },
+  paid: { label: "Payée, lancement", variant: "secondary" },
+  starting: { label: "Démarrage", variant: "secondary" },
+  processing: { label: "En cours", variant: "secondary" },
+  completed: { label: "Terminée, envoi du mail", variant: "secondary" },
+  delivered: { label: "Rapport envoyé", variant: "default" },
+  failed: { label: "Échouée", variant: "destructive" },
+  refunded: { label: "Remboursée", variant: "outline" },
+};
+
+type TypeFilter = "all" | "account" | "video";
+type Row =
+  | { kind: "account"; date: string; analysis: ExpressAnalysis }
+  | { kind: "video"; date: string; video: VideoAnalysis };
+
+/** « @compte » quand le lien est complet, sinon le lien court tel quel. */
+function videoLabel(url: string): string {
+  const match = url.match(/tiktok\.com\/@([^/]+)\/video\//);
+  return match ? `@${match[1]}` : url.replace(/^https?:\/\//, "");
+}
 
 async function downloadPDF(analysis: ExpressAnalysis) {
   try {
@@ -71,6 +94,8 @@ async function checkAnalysisStatus(analysisId: string, signal: AbortSignal) {
 
 const ExpressAnalyses = () => {
   const { data: analyses, isLoading, error: listError } = useExpressAnalyses();
+  const { data: videoData, error: videoError } = useVideoAnalyses();
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
   const queryClient = useQueryClient();
   const [retryingIds, setRetryingIds] = useState<Set<string>>(new Set());
   const analysesRef = useRef(analyses);
@@ -238,21 +263,32 @@ const ExpressAnalyses = () => {
 
   // Mémoïsé : sans ça, ces quatre parcours du tableau étaient refaits à chaque
   // frappe dans le champ « @username » du lancement manuel.
+  // Comptes et vidéos dans une seule liste, du plus récent au plus ancien.
+  const rows = useMemo<Row[]>(() => {
+    const merged: Row[] = [
+      ...(typeFilter === "video" ? [] : (analyses ?? []).map((analysis): Row => ({ kind: "account", date: analysis.created_at, analysis }))),
+      ...(typeFilter === "account" ? [] : (videoData?.rows ?? []).map((video): Row => ({ kind: "video", date: video.created_at, video }))),
+    ];
+    return merged.sort((a, b) => b.date.localeCompare(a.date));
+  }, [analyses, videoData, typeFilter]);
+
   const stats = useMemo(() => {
     if (!analyses) return null;
+    const count = (account: (a: ExpressAnalysis) => boolean, video: (v: VideoAnalysis) => boolean) =>
+      rows.filter((row) => (row.kind === "account" ? account(row.analysis) : video(row.video))).length;
     return {
-      total: analyses.length,
-      complete: analyses.filter(isExpressComplete).length,
-      failed: analyses.filter((a) => a.status === "failed").length,
-      processing: analyses.filter(isExpressActive).length,
+      total: rows.length,
+      complete: count(isExpressComplete, isVideoComplete),
+      failed: count((a) => a.status === "failed", (v) => v.status === "failed"),
+      processing: count(isExpressActive, isVideoActive),
     };
-  }, [analyses]);
+  }, [analyses, rows]);
 
   return (
     <AdminLayout>
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <h1 className="font-display text-3xl text-primary">Analyses Express</h1>
+          <h1 className="font-display text-3xl text-primary">Analyses</h1>
           <div className="flex items-center gap-2">
             <Input
               placeholder="@username"
@@ -280,6 +316,21 @@ const ExpressAnalyses = () => {
           <p role="alert" className="text-amber-300 text-sm">{listError ? "Impossible de charger les analyses. Actualise la page ou reconnecte-toi." : pollingError}</p>
         )}
 
+        {videoData?.tableMissing && (
+          <p role="alert" className="text-amber-300 text-sm">Analyses vidéo indisponibles : la table video_analyses n'existe pas encore en base.</p>
+        )}
+        {videoError && (
+          <p role="alert" className="text-amber-300 text-sm">Impossible de charger les analyses vidéo. Les analyses de compte restent affichées.</p>
+        )}
+
+        <div className="flex gap-2">
+          {([["all", "Tout"], ["account", "Comptes"], ["video", "Vidéos"]] as const).map(([value, label]) => (
+            <Button key={value} size="sm" variant={typeFilter === value ? "default" : "outline"} onClick={() => setTypeFilter(value)}>
+              {label}
+            </Button>
+          ))}
+        </div>
+
         {stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-noir-light border border-primary/20 rounded-lg p-4">
@@ -305,25 +356,30 @@ const ExpressAnalyses = () => {
           <div className="flex justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
-        ) : !analyses?.length ? (
-          <p className="text-cream/60 text-center py-12">Aucune analyse express pour le moment.</p>
+        ) : !rows.length ? (
+          <p className="text-cream/60 text-center py-12">Aucune analyse pour le moment.</p>
         ) : (
           <div className="bg-noir-light border border-primary/20 rounded-lg overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow className="border-primary/20">
                   <TableHead className="text-cream/70">Date</TableHead>
-                  <TableHead className="text-cream/70">Username</TableHead>
+                  <TableHead className="text-cream/70">Type</TableHead>
+                  <TableHead className="text-cream/70">Compte / vidéo</TableHead>
                   <TableHead className="text-cream/70">Email</TableHead>
-                  <TableHead className="text-cream/70">Newsletter</TableHead>
+                  <TableHead className="text-cream/70">Contact e-mail</TableHead>
                   <TableHead className="text-cream/70">Statut</TableHead>
-                  <TableHead className="text-cream/70">Health Score</TableHead>
+                  <TableHead className="text-cream/70">Score</TableHead>
                   <TableHead className="text-cream/70">Erreur</TableHead>
                   <TableHead className="text-cream/70">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {analyses.map((analysis) => {
+                {rows.map((row) => {
+                  if (row.kind === "video") {
+                    return <VideoRowView key={`video-${row.video.id}`} video={row.video} copiedEmail={copiedEmail} onCopyEmail={handleCopyEmail} />;
+                  }
+                  const analysis = row.analysis;
                   const config = statusConfig[analysis.status] || { label: "Statut inconnu", variant: "outline" as const };
                   // `result_data` n'est plus dans la liste : le statut suffit à
                   // savoir s'il y a quelque chose à exporter, et le clic vérifie.
@@ -337,6 +393,7 @@ const ExpressAnalyses = () => {
                       <TableCell className="text-cream/80">
                         {format(new Date(analysis.created_at), "dd MMM yyyy HH:mm", { locale: fr })}
                       </TableCell>
+                      <TableCell><Badge variant="outline">Compte</Badge></TableCell>
                       <TableCell className="text-cream font-medium">
                         @{analysis.tiktok_username}
                       </TableCell>
@@ -377,11 +434,11 @@ const ExpressAnalyses = () => {
                           ) : (
                             <Badge variant="outline" className="gap-1 text-yellow-400 border-yellow-500/40">
                               <Mail className="h-3 w-3" />
-                              En attente
+                              Accord donné
                             </Badge>
                           )
                         ) : (
-                          <span className="text-cream/30 text-xs">Non demandé</span>
+                          <span className="text-cream/30 text-xs">Pas d'accord</span>
                         )}
                       </TableCell>
                       <TableCell>
@@ -443,5 +500,66 @@ const ExpressAnalyses = () => {
     </AdminLayout>
   );
 };
+
+function VideoRowView({ video, copiedEmail, onCopyEmail }: {
+  video: VideoAnalysis;
+  copiedEmail: string | null;
+  onCopyEmail: (email: string) => void;
+}) {
+  const config = videoStatusConfig[video.status] || { label: "Statut inconnu", variant: "outline" as const };
+  return (
+    <TableRow className="border-primary/10">
+      <TableCell className="text-cream/80">
+        {format(new Date(video.created_at), "dd MMM yyyy HH:mm", { locale: fr })}
+      </TableCell>
+      <TableCell>
+        <Badge variant="secondary">Vidéo</Badge>
+        {video.checkout_mode === "test" && <span className="ml-1 text-xs text-amber-300">test</span>}
+      </TableCell>
+      <TableCell className="text-cream font-medium max-w-[220px]">
+        <a href={video.tiktok_url} target="_blank" rel="noopener noreferrer" title={video.tiktok_url} className="hover:text-primary truncate block">
+          {videoLabel(video.tiktok_url)}
+        </a>
+      </TableCell>
+      <TableCell className="text-cream/80 max-w-[220px]">
+        <div className="flex items-center gap-1.5 group">
+          <a href={`mailto:${video.email}`} className="text-cream/80 hover:text-primary truncate" title={video.email}>{video.email}</a>
+          <button
+            type="button"
+            onClick={() => onCopyEmail(video.email)}
+            className="opacity-0 group-hover:opacity-100 transition-opacity text-cream/40 hover:text-primary"
+            title="Copier l'email"
+          >
+            {copiedEmail === video.email ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+          </button>
+        </div>
+      </TableCell>
+      <TableCell><span className="text-cream/30 text-xs">Non proposé</span></TableCell>
+      <TableCell>
+        <Badge variant={config.variant}>{config.label}</Badge>
+        {(video.report_viewed_at || video.pdf_downloaded_at) && (
+          <p className="mt-1 text-xs text-cream/50">
+            {[video.report_viewed_at && "Rapport ouvert", video.pdf_downloaded_at && "PDF téléchargé"].filter(Boolean).join(" · ")}
+          </p>
+        )}
+      </TableCell>
+      <TableCell className="text-cream/30">-</TableCell>
+      <TableCell className="text-red-400 text-sm max-w-[320px] whitespace-normal break-words">
+        {video.error_message || "-"}
+      </TableCell>
+      <TableCell>
+        {isVideoComplete(video) ? (
+          <Button variant="ghost" size="sm" asChild title="Voir le rapport (sans compter comme une ouverture client)">
+            <a href={`/analyse-video/rapport?t=${video.report_token}&apercu=1`} target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="h-4 w-4" />
+            </a>
+          </Button>
+        ) : (
+          <span className="text-cream/30">-</span>
+        )}
+      </TableCell>
+    </TableRow>
+  );
+}
 
 export default ExpressAnalyses;

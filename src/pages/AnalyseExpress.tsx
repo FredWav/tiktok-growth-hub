@@ -238,6 +238,13 @@ export default function AnalyseExpress() {
             <Button type="submit" variant="hero" size="lg" className="w-full" disabled={loading}>
               {loading ? "Redirection..." : "Lancer l'analyse (19,90€)"}
             </Button>
+            <p className="flex items-center justify-center gap-2 pt-1 text-sm text-muted-foreground">
+              <Users className="h-4 w-4 shrink-0 text-primary" aria-hidden />
+              <span>
+                <span className="font-semibold text-foreground">{EXPRESS_USERS_COUNT}</span>{" "}
+                créateurs de contenu ont déjà adoré l'analyse express. Analyse ton compte TikTok dès maintenant.
+              </span>
+            </p>
           </form>
 
           {existingSessionId && (

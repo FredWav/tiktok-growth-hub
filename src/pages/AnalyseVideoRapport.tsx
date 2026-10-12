@@ -21,6 +21,8 @@ type State =
 export default function AnalyseVideoRapport() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("t") || "";
+  // Ouverture depuis l'admin : le rapport s'affiche sans compter comme une lecture client.
+  const preview = searchParams.get("apercu") === "1";
   const [state, setState] = useState<State>({ kind: "loading" });
   const [pdfLoading, setPdfLoading] = useState(false);
 
@@ -38,7 +40,7 @@ export default function AnalyseVideoRapport() {
       setState({ kind: "error", message: "Lien incomplet. Ouvre le bouton « Voir mon analyse » depuis ton e-mail." });
       return;
     }
-    const { data, error } = await supabase.functions.invoke("video-analysis-report", { body: { token } });
+    const { data, error } = await supabase.functions.invoke("video-analysis-report", { body: { token, ...(preview ? { action: "preview" } : {}) } });
     if (error || !data) {
       setState({ kind: "error", message: "Ce rapport est introuvable ou momentanément indisponible. Réessaie dans un instant." });
       return;
@@ -46,7 +48,7 @@ export default function AnalyseVideoRapport() {
     if (data.status === "ready") setState({ kind: "ready", report: data.report as VideoReport, tiktokUrl: data.tiktok_url, completedAt: data.completed_at ?? undefined });
     else if (data.status === "failed") setState({ kind: "failed" });
     else setState({ kind: "processing" });
-  }, [token]);
+  }, [token, preview]);
 
   useEffect(() => { void load(); }, [load]);
 
@@ -64,7 +66,7 @@ export default function AnalyseVideoRapport() {
       // Le moteur PDF n'est téléchargé qu'au clic.
       const { downloadVideoReport } = await import("@/lib/pdf/video");
       await downloadVideoReport(state.report, state.completedAt);
-      if (token) void supabase.functions.invoke("video-analysis-report", { body: { token, action: "pdf" } });
+      if (token && !preview) void supabase.functions.invoke("video-analysis-report", { body: { token, action: "pdf" } });
       toast.success("Rapport PDF téléchargé !");
     } catch (err) {
       console.error("PDF generation error:", err);

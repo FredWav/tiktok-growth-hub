@@ -239,8 +239,12 @@ async function handleVideoCheckout(
   if (error) {
     const code = (error as { code?: string }).code;
     if (code === "42P01" || code === "PGRST205") return null; // Migration pas encore appliquée.
+    // Une panne propre à la table vidéo ne doit jamais bloquer les autres produits
+    // (Express, Academy) : on alerte et on laisse les branches suivantes traiter la session.
+    // Si c'était une commande vidéo, elle finit dans les paiements à rapprocher.
     console.error(`[video-analysis] lookup failed: session=${session.id}`, getErrorMessage(error));
-    return jsonResponse({ error: "Video order lookup failed" }, 500);
+    await safeNotifyError("Analyse Vidéo Webhook", `Lecture video_analyses impossible • session=${session.id} • vérifier si ce paiement est une Analyse Vidéo`);
+    return null;
   }
   if (!data) return null;
   const row = data as VideoRow;

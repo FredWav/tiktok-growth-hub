@@ -1,5 +1,5 @@
 -- Analyse Vidéo TikTok : commande à l'unité, séparée de express_analyses.
--- Le rattrapage Express ne voit jamais ces lignes (normaliseur « compte » différent).
+-- Table distincte : le suivi Express applique un normaliseur « compte » qui ne convient pas.
 CREATE TABLE IF NOT EXISTS public.video_analyses (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   email text NOT NULL,
@@ -53,24 +53,5 @@ REVOKE INSERT, UPDATE, DELETE ON public.video_analyses FROM authenticated;
 GRANT SELECT ON public.video_analyses TO authenticated;
 GRANT ALL ON public.video_analyses TO service_role;
 
--- Tick dédié : mêmes secrets Vault que le commerce, sans modifier private.commerce_tick.
-CREATE SCHEMA IF NOT EXISTS private;
-CREATE OR REPLACE FUNCTION private.video_analysis_tick() RETURNS void
-LANGUAGE plpgsql SECURITY DEFINER SET search_path=public,private AS $$
-DECLARE project_url text; service_key text;
-BEGIN
-  SELECT decrypted_secret INTO project_url FROM vault.decrypted_secrets WHERE name='commerce_project_url';
-  SELECT decrypted_secret INTO service_key FROM vault.decrypted_secrets WHERE name='commerce_service_role';
-  IF project_url IS NULL OR service_key IS NULL THEN RAISE WARNING 'Analyse vidéo : configurer Vault avant activation'; RETURN; END IF;
-  PERFORM net.http_post(url:=project_url||'/functions/v1/reconcile-video-analyses',
-    headers:=jsonb_build_object('Content-Type','application/json','Authorization','Bearer '||service_key),
-    body:='{}'::jsonb,timeout_milliseconds:=60000);
-END $$;
-REVOKE ALL ON FUNCTION private.video_analysis_tick() FROM PUBLIC, anon, authenticated;
-
-DO $$ DECLARE j record; BEGIN
-  FOR j IN SELECT jobid FROM cron.job WHERE jobname = 'video-analysis-minute' LOOP
-    PERFORM cron.unschedule(j.jobid);
-  END LOOP;
-END $$;
-SELECT cron.schedule('video-analysis-minute', '* * * * *', $$SELECT private.video_analysis_tick()$$);
+-- Pas de cron dédié : les analyses vidéo sont traitées par le passage du rattrapage
+-- Express (reconcile-express-analyses), seul cron authentifié sur l'hébergement.

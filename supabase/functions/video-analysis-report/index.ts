@@ -25,8 +25,11 @@ Deno.serve(async (req) => {
     }
 
     // Premier affichage et premier PDF : repères du funnel, sans donnée personnelle.
+    // « preview » : consultation depuis l'admin, sans effet sur les repères.
     const now = new Date().toISOString();
-    if (action === "pdf" && !data.pdf_downloaded_at) {
+    if (action === "preview") {
+      // Rien à enregistrer.
+    } else if (action === "pdf" && !data.pdf_downloaded_at) {
       await client.from("video_analyses").update({ pdf_downloaded_at: now }).eq("id", data.id).is("pdf_downloaded_at", null);
       console.log(`[video-analysis] order=${data.id} pdf downloaded`);
     } else if (action !== "pdf" && !data.report_viewed_at) {

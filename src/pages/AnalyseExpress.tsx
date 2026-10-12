@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { Zap, BarChart3, FileText, TrendingUp, Search } from "lucide-react";
+import { Zap, BarChart3, FileText, TrendingUp, Search, Users } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
 import { trackPostHogEvent } from "@/lib/posthog";
 import { SEOHead } from "@/components/SEOHead";
@@ -16,6 +16,7 @@ import { isValidTikTokUsername, normalizeTikTokUsername } from "@/lib/tiktok-use
 import { toast } from "sonner";
 import tiktokExample from "@/assets/tiktok-username-example.png";
 import { ObjectionCards } from "@/components/ObjectionCards";
+import { EXPRESS_USERS_COUNT } from "@/config/offers";
 
 const features = [
   { icon: BarChart3, title: "Audit profil complet", description: "Photo, bio, positionnement : analyse technique et recommandations concrètes de réécriture" },

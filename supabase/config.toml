@@ -100,3 +100,12 @@ verify_jwt = false
 # Validation, limitation de débit et écriture service-role sont gérées dans la fonction.
 [functions.withdrawal-request]
 verify_jwt = false
+
+[functions.create-video-checkout]
+verify_jwt = false
+
+[functions.reconcile-video-analyses]
+verify_jwt = false
+
+[functions.video-analysis-report]
+verify_jwt = false

@@ -27,7 +27,7 @@ function PostHogPageTracker() {
   }, []);
 
   useEffect(() => {
-    if (location.pathname.startsWith("/inscription/") || location.pathname.startsWith("/claim/") || location.pathname === "/analyse-express/result" || location.pathname.startsWith("/admin")) return;
+    if (location.pathname.startsWith("/inscription/") || location.pathname.startsWith("/claim/") || location.pathname === "/analyse-express/result" || location.pathname === "/analyse-video/rapport" || location.pathname.startsWith("/admin")) return;
     capturePageview();
 
     if (localStorage.getItem("cookie_consent") === "accepted") {
@@ -52,6 +52,9 @@ const CGV = lazy(() => import("./pages/CGV"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const AnalyseExpress = lazy(() => import("./pages/AnalyseExpress"));
 const AnalyseExpressResult = lazy(() => import("./pages/AnalyseExpressResult"));
+const AnalyseVideo = lazy(() => import("./pages/AnalyseVideo"));
+const AnalyseVideoMerci = lazy(() => import("./pages/AnalyseVideoMerci"));
+const AnalyseVideoRapport = lazy(() => import("./pages/AnalyseVideoRapport"));
 const ReserverUnAppel = lazy(() => import("./pages/ReserverUnAppel"));
 const WavPremium = lazy(() => import("./pages/WavPremium"));
 const AcademyAppel = lazy(() => import("./pages/AcademyAppel"));
@@ -90,6 +93,7 @@ const SSG_ROUTE_ELEMENTS: Record<string, ReactNode> = {
   "/": <Home />,
   "/wavacademy": <WavAcademy />,
   "/analyse-express": <AnalyseExpress />,
+  "/analyse-video": <AnalyseVideo />,
   "/wav-premium": <WavPremium />,
   "/preuves": <Preuves />,
   "/hooks-tiktok": <HooksTikTok />,
@@ -122,6 +126,8 @@ const CSR_ROUTE_ELEMENTS: Record<string, ReactNode> = {
   "/admin/testimonials": <AdminTestimonials />,
   "/admin/wavacademy-consents": <AdminWavAcademyConsents />,
   "/analyse-express/result": <AnalyseExpressResult />,
+  "/analyse-video/merci": <AnalyseVideoMerci />,
+  "/analyse-video/rapport": <AnalyseVideoRapport />,
   "/processing": <DiagnosticProcessing />,
   "/result": <DiagnosticResult />,
   "/claim/error": <Claim />,

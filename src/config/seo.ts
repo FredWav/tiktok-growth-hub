@@ -20,6 +20,8 @@ import {
   ACADEMY_MODULES_COUNT,
   ACADEMY_SUPPORT_DAYS,
   EXPRESS_PRICE,
+  VIDEO_ANALYSIS_PRICE,
+  VIDEO_ANALYSIS_PRICE_LABEL,
   PREMIUM_DURATION_DAYS,
 } from "./offers";
 import { HOOKS_FAQ } from "./hooks-faq";
@@ -250,6 +252,31 @@ const ROUTES: RouteSeo[] = [
     },
     sitemap: 0.8,
     llms: "Rapport TikTok automatisé à 19,90 € : jusqu’à 120 vidéos publiques sur un échantillon documenté, observations distinctes des hypothèses et pistes de test. Ne remplace ni les statistiques privées de TikTok ni un audit humain ; aucune garantie de résultat.",
+    llmsSection: "offres",
+  },
+  {
+    path: "/analyse-video",
+    title: "Analyse Vidéo TikTok : ce qui fonctionne et ce qui bloque | Fred Wav",
+    description: `Envoie le lien d’une vidéo TikTok : accroche, structure, message et plan d’action concret, livrés par e-mail avec un rapport PDF. ${VIDEO_ANALYSIS_PRICE_LABEL}, sans compte ni abonnement.`,
+    noscript: {
+      h1: "Envoie ta vidéo TikTok. On te dit ce qui fonctionne, ce qui bloque et quoi changer.",
+      body: `Analyse automatisée d’une vidéo TikTok publique : accroche, structure, message et recommandations prioritaires. Rapport livré par e-mail avec un PDF téléchargeable, ${VIDEO_ANALYSIS_PRICE_LABEL} TTC, sans compte ni abonnement. Aucune garantie de vues.`,
+      links: [{ href: "/analyse-video", label: "Analyser ma vidéo" }],
+    },
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: "Analyse Vidéo TikTok",
+      description: "Analyse automatisée d’une vidéo TikTok publique : accroche, structure, message et plan d’action, rapport PDF envoyé par e-mail.",
+      offers: {
+        price: VIDEO_ANALYSIS_PRICE.toFixed(2),
+        priceCurrency: "EUR",
+        availability: "https://schema.org/InStock",
+        url: `${BASE_URL}/analyse-video`,
+      },
+    },
+    sitemap: 0.7,
+    llms: `Analyse automatisée d’une seule vidéo TikTok publique à ${VIDEO_ANALYSIS_PRICE_LABEL} : accroche, structure, message et plan d’action, rapport PDF envoyé par e-mail. Aucune garantie de résultat.`,
     llmsSection: "offres",
   },
   {
@@ -538,7 +565,7 @@ const ROUTES: RouteSeo[] = [
 const ALLOWED_SCHEMA_TYPES = new Set(["Product", "Course", "Person", "Article", "BreadcrumbList"]);
 
 function routeKind(path: string): Exclude<RouteKind, "redirect"> {
-  if (["/wavacademy", "/analyse-express", "/wav-premium"].includes(path)) return "commercial";
+  if (["/wavacademy", "/analyse-express", "/analyse-video", "/wav-premium"].includes(path)) return "commercial";
   if (["/cgv", "/mentions-legales", "/politique-de-confidentialite"].includes(path)) return "legal";
   return "content";
 }
@@ -610,6 +637,8 @@ const csrManifest: CsrRouteManifestEntry[] = ([
   { path: "/admin/testimonials", title: "Témoignages | Fred Wav", private: true, clientBoundary: "admin" },
   { path: "/admin/wavacademy-consents", title: "Consentements Wav Academy | Fred Wav", private: true, clientBoundary: "admin" },
   { path: "/analyse-express/result", title: "Résultat de l'Analyse Express | Fred Wav" },
+  { path: "/analyse-video/merci", title: "Commande confirmée | Fred Wav" },
+  { path: "/analyse-video/rapport", title: "Ton analyse vidéo | Fred Wav", private: true },
   { path: "/processing", title: "Diagnostic en cours | Fred Wav" },
   { path: "/result", title: "Résultat du diagnostic | Fred Wav" },
   { path: "/claim/error", title: "Accès personnel | Fred Wav" },

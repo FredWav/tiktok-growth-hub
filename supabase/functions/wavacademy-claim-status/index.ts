@@ -68,7 +68,7 @@ serve(async (req) => {
   } catch (error) {
     console.error("claim-status error:", error);
     return new Response(
-      JSON.stringify({ status: "error", error: error.message }),
+      JSON.stringify({ status: "error", error: (error as Error).message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

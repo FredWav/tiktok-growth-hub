@@ -151,7 +151,7 @@ async function resolveHooksPack(stripe: Stripe, session: Stripe.Checkout.Session
  * l'événement, et la dedupe_key évite tout doublon d'email.
  */
 async function deliverHooksPack(
-  supabase: ReturnType<typeof createClient>,
+  supabase: any,
   session: Stripe.Checkout.Session,
   pack: HooksPack,
   eventCreated: number,

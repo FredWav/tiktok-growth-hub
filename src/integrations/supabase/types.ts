@@ -880,6 +880,102 @@ export type Database = {
         }
         Relationships: []
       }
+      video_analyses: {
+        Row: {
+          accepted_at: string
+          cgv_accepted_text: string
+          cgv_version: string
+          checkout_mode: string
+          completed_at: string | null
+          created_at: string
+          email: string
+          error_message: string | null
+          id: string
+          immediate_delivery_accepted_text: string
+          immediate_delivery_notice_version: string
+          job_id: string | null
+          launch_attempts: number
+          paid_at: string | null
+          pdf_downloaded_at: string | null
+          processing_started_at: string | null
+          report_data: Json | null
+          report_token: string
+          report_version: string
+          report_viewed_at: string | null
+          result_email_queued_at: string | null
+          result_raw: Json | null
+          status: string
+          stripe_session_id: string | null
+          support_requested_at: string | null
+          technical_fingerprint_hash: string | null
+          tiktok_url: string
+          updated_at: string
+          video_id: string
+        }
+        Insert: {
+          accepted_at: string
+          cgv_accepted_text: string
+          cgv_version: string
+          checkout_mode: string
+          completed_at?: string | null
+          created_at?: string
+          email: string
+          error_message?: string | null
+          id?: string
+          immediate_delivery_accepted_text: string
+          immediate_delivery_notice_version: string
+          job_id?: string | null
+          launch_attempts?: number
+          paid_at?: string | null
+          pdf_downloaded_at?: string | null
+          processing_started_at?: string | null
+          report_data?: Json | null
+          report_token?: string
+          report_version?: string
+          report_viewed_at?: string | null
+          result_email_queued_at?: string | null
+          result_raw?: Json | null
+          status?: string
+          stripe_session_id?: string | null
+          support_requested_at?: string | null
+          technical_fingerprint_hash?: string | null
+          tiktok_url: string
+          updated_at?: string
+          video_id: string
+        }
+        Update: {
+          accepted_at?: string
+          cgv_accepted_text?: string
+          cgv_version?: string
+          checkout_mode?: string
+          completed_at?: string | null
+          created_at?: string
+          email?: string
+          error_message?: string | null
+          id?: string
+          immediate_delivery_accepted_text?: string
+          immediate_delivery_notice_version?: string
+          job_id?: string | null
+          launch_attempts?: number
+          paid_at?: string | null
+          pdf_downloaded_at?: string | null
+          processing_started_at?: string | null
+          report_data?: Json | null
+          report_token?: string
+          report_version?: string
+          report_viewed_at?: string | null
+          result_email_queued_at?: string | null
+          result_raw?: Json | null
+          status?: string
+          stripe_session_id?: string | null
+          support_requested_at?: string | null
+          technical_fingerprint_hash?: string | null
+          tiktok_url?: string
+          updated_at?: string
+          video_id?: string
+        }
+        Relationships: []
+      }
       wav_premium_applications: {
         Row: {
           accompagnement_critere: string | null

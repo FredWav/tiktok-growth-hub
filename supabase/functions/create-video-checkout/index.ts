@@ -73,23 +73,26 @@ serve(async (req) => {
       return jsonResponse({ error: "L'acceptation des CGV et la demande d'exécution immédiate sont obligatoires" }, 400);
     }
 
-    let video = parseTikTokVideoUrl(tiktokUrl);
-    if (video.kind === "short") {
+    const parsed = parseTikTokVideoUrl(tiktokUrl);
+    if (parsed.kind === "invalid") {
+      return jsonResponse({ error: parsed.reason || INVALID_VIDEO_URL_MESSAGE, code: "invalid_tiktok_video_url" }, 400);
+    }
+    // Lien court : on tente d'obtenir le lien complet (anti-doublon plus fiable).
+    // Si TikTok ne répond pas, WavStats accepte aussi le lien court tel quel.
+    let video: { url: string; videoId: string };
+    if (parsed.kind === "video") {
+      video = parsed;
+    } else {
+      let resolved = parsed as ReturnType<typeof parseTikTokVideoUrl>;
       try {
-        video = await resolveShortLink(video.url);
+        resolved = await resolveShortLink(parsed.url);
       } catch (err) {
         console.warn("[video-analysis] short link resolution failed", err instanceof Error ? err.message : err);
-        video = { kind: "invalid", reason: "" };
       }
-      if (video.kind !== "video") {
-        return jsonResponse({
-          error: "Ce lien court n'a pas pu être vérifié. Ouvre la vidéo dans ton navigateur et colle le lien complet (…tiktok.com/@compte/video/…).",
-          code: "short_link_unresolved",
-        }, 400);
+      if (resolved.kind === "invalid") {
+        return jsonResponse({ error: resolved.reason || INVALID_VIDEO_URL_MESSAGE, code: "invalid_tiktok_video_url" }, 400);
       }
-    }
-    if (video.kind !== "video") {
-      return jsonResponse({ error: video.reason || INVALID_VIDEO_URL_MESSAGE, code: "invalid_tiktok_video_url" }, 400);
+      video = resolved.kind === "video" ? resolved : { url: parsed.url, videoId: `short:${new URL(parsed.url).pathname.replace(/\//g, "")}` };
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";

@@ -1,0 +1,203 @@
+{
+  "id": "c3e7f6a4-5d4d-4e44-a1ca-9d0e18c8f842",
+  "type": "video_analysis",
+  "status": "completed",
+  "progress": 100,
+  "progressMessage": "Sauvegarde des résultats...",
+  "input": {
+    "tiktokUrl": "https://www.tiktok.com/@creator_example/video/7412345678901234567"
+  },
+  "result": {
+    "schemaVersion": 1,
+    "overallScore": 72,
+    "niche": "business",
+    "maturity": {
+      "ageHours": 168,
+      "stage": "mature",
+      "readyAt": null,
+      "includeInStrongConclusions": true,
+      "notice": null
+    },
+    "speech": {
+      "hasSpeech": true,
+      "wordCount": 86,
+      "durationSeconds": 31.2,
+      "wordsPerMinute": 165,
+      "speechStartMs": 0,
+      "speechStartBand": "immediat",
+      "hooks": {
+        "s3": "Tu perds du temps chaque matin sans t'en rendre compte",
+        "s5": "Tu perds du temps chaque matin sans t'en rendre compte. Voici le réglage à changer",
+        "s10": "Tu perds du temps chaque matin sans t'en rendre compte. Voici le réglage à changer sur ton téléphone"
+      }
+    },
+    "perMille": {
+      "likes": 74.04,
+      "comments": 3.21,
+      "shares": 4.52,
+      "saves": 6.79,
+      "views": 42000,
+      "counts": {
+        "likes": 3110,
+        "comments": 135,
+        "shares": 190,
+        "saves": 285
+      },
+      "reliable": {
+        "likes": true,
+        "comments": true,
+        "shares": true,
+        "saves": true
+      },
+      "stepPerMille": 0.02
+    },
+    "scores": {
+      "viral": 70,
+      "hook": 76,
+      "engagement": 79,
+      "saves": 74,
+      "share": 70
+    },
+    "scoreReliability": {
+      "engagement": true,
+      "saves": true,
+      "share": true
+    },
+    "scoreSources": {
+      "hook": "spoken",
+      "retention": "unavailable"
+    },
+    "hookScore": {
+      "score": 76,
+      "breakdown": {
+        "curiosity": 20,
+        "length": 18,
+        "power": 16,
+        "address": 12,
+        "specificity": 10
+      },
+      "dataCategory": "problem",
+      "dataLift": null,
+      "dataNiche": null,
+      "hookText": "Tu perds du temps chaque matin sans t'en rendre compte",
+      "gradedOn": "spoken"
+    },
+    "scriptBreakdown": {
+      "hasTranscript": true,
+      "segments": [
+        {
+          "label": "Hook (0-3s)",
+          "quote": "Tu perds du temps chaque matin sans t'en rendre compte",
+          "analysis": "Le problème est immédiatement identifiable.",
+          "rewrite": "Tu perds 20 minutes chaque matin à cause de ce réglage."
+        },
+        {
+          "label": "Corps",
+          "quote": "Voici le réglage à changer sur ton téléphone.",
+          "analysis": "La démonstration arrive vite et reste concrète.",
+          "rewrite": "Ouvre ce menu et désactive exactement cette option."
+        },
+        {
+          "label": "CTA",
+          "quote": "Enregistre la vidéo pour le refaire plus tard.",
+          "analysis": "Le CTA correspond à une action utile après visionnage.",
+          "rewrite": "Enregistre-la maintenant, tu le referas demain matin."
+        }
+      ]
+    },
+    "catalog": {
+      "medianViews": 18000,
+      "viewsRatio": 233,
+      "engagementRate": 8.07,
+      "accountEngagement": 5.3,
+      "rank": 4,
+      "rankTotal": 87,
+      "topPercent": 5,
+      "baselineWindow": 120,
+      "baselineSize": 86
+    },
+    "verdict": "La vidéo surperforme le niveau habituel du compte. Le problème est clair et la démonstration arrive assez tôt.",
+    "videoData": {
+      "author": "creator_example",
+      "description": "Le réglage qui me fait gagner du temps chaque matin #productivite #telephone #astuce",
+      "views": 42000,
+      "likes": 3110,
+      "comments": 135,
+      "shares": 190,
+      "saves": 285,
+      "duration": 31,
+      "engagementRate": 8.86,
+      "hashtags": ["#productivite", "#telephone", "#astuce"],
+      "coverUrl": "https://cdn.example.test/covers/7412345678901234567.jpg"
+    },
+    "strengths": [
+      {
+        "title": "Problème compréhensible dès l'ouverture",
+        "description": "La première phrase désigne une friction quotidienne identifiable.",
+        "impact": "high"
+      }
+    ],
+    "improvements": [
+      {
+        "title": "Preuve visuelle à avancer",
+        "description": "Le réglage apparaît après la promesse.",
+        "action": "Afficher le menu dès la deuxième seconde."
+      }
+    ],
+    "hookAnalysis": {
+      "text": "Tu perds du temps chaque matin sans t'en rendre compte",
+      "type": "problem",
+      "score": 76,
+      "effectiveness": "Le problème est précis et concerne directement le spectateur.",
+      "improvement": "Ajouter un bénéfice concret dans la seconde phrase."
+    },
+    "ctaAnalysis": {
+      "hasCta": true,
+      "type": "save",
+      "verdict": "Le CTA est cohérent avec un tutoriel à refaire.",
+      "improvement": "Rappeler l'action avec un texte à l'écran dans les dernières secondes."
+    },
+    "descriptionSeo": {
+      "currentLength": 87,
+      "score": 64,
+      "analysis": "La description contient le bénéfice principal mais peut préciser le réglage concerné.",
+      "suggestions": [
+        "Nommer le réglage dans la première phrase."
+      ],
+      "hashtagSuggestions": [
+        "#productivite",
+        "#astucetelephone",
+        "#organisation",
+        "#routinematin",
+        "#conseil"
+      ]
+    },
+    "thumbnailAnalysis": {
+      "verdict": "Le texte de couverture est lisible mais le bénéfice pourrait être plus visible.",
+      "score": 7,
+      "suggestions": [
+        "Réduire le texte de couverture à quatre mots."
+      ]
+    },
+    "recommendations": [
+      {
+        "title": "Tester une promesse chiffrée",
+        "description": "Comparer une ouverture qui annonce le temps gagné.",
+        "priority": "high",
+        "metric": "taux de rétention à 3 secondes"
+      }
+    ],
+    "transcript": "Tu perds du temps chaque matin sans t'en rendre compte. Voici le réglage à changer sur ton téléphone. Enregistre la vidéo pour le refaire plus tard.",
+    "retention": null,
+    "retentionError": null,
+    "retentionErrorCode": null
+  },
+  "errorMessage": null,
+  "errorCode": null,
+  "creditsSpent": 50,
+  "creditRefunded": 0,
+  "createdAt": "2026-10-05T09:58:00.000Z",
+  "startedAt": "2026-10-05T09:58:02.000Z",
+  "completedAt": "2026-10-05T09:58:31.000Z",
+  "durationMs": 29000
+}

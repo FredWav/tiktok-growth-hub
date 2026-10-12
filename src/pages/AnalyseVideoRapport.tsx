@@ -16,7 +16,7 @@ type State =
   | { kind: "processing" }
   | { kind: "failed" }
   | { kind: "error"; message: string }
-  | { kind: "ready"; report: VideoReport; tiktokUrl: string };
+  | { kind: "ready"; report: VideoReport; tiktokUrl: string; completedAt?: string };
 
 export default function AnalyseVideoRapport() {
   const [searchParams] = useSearchParams();
@@ -25,6 +25,15 @@ export default function AnalyseVideoRapport() {
   const [pdfLoading, setPdfLoading] = useState(false);
 
   const load = useCallback(async () => {
+    // Aperçu local du rapport avec l'exemple du contrat WavStats (jamais en production).
+    if (import.meta.env.DEV && new URLSearchParams(window.location.search).get("demo") === "1") {
+      const [{ default: job }, { normalizeVideoResult }] = await Promise.all([
+        import("../../tests/fixtures/wavstats-video-job.json"),
+        import("../../supabase/functions/_shared/video-report"),
+      ]);
+      setState({ kind: "ready", report: normalizeVideoResult(job.result), tiktokUrl: job.input.tiktokUrl, completedAt: job.completedAt });
+      return;
+    }
     if (!token) {
       setState({ kind: "error", message: "Lien incomplet. Ouvre le bouton « Voir mon analyse » depuis ton e-mail." });
       return;
@@ -34,7 +43,7 @@ export default function AnalyseVideoRapport() {
       setState({ kind: "error", message: "Ce rapport est introuvable ou momentanément indisponible. Réessaie dans un instant." });
       return;
     }
-    if (data.status === "ready") setState({ kind: "ready", report: data.report as VideoReport, tiktokUrl: data.tiktok_url });
+    if (data.status === "ready") setState({ kind: "ready", report: data.report as VideoReport, tiktokUrl: data.tiktok_url, completedAt: data.completed_at ?? undefined });
     else if (data.status === "failed") setState({ kind: "failed" });
     else setState({ kind: "processing" });
   }, [token]);
@@ -54,8 +63,8 @@ export default function AnalyseVideoRapport() {
     try {
       // Le moteur PDF n'est téléchargé qu'au clic.
       const { downloadVideoReport } = await import("@/lib/pdf/video");
-      await downloadVideoReport(state.report);
-      void supabase.functions.invoke("video-analysis-report", { body: { token, action: "pdf" } });
+      await downloadVideoReport(state.report, state.completedAt);
+      if (token) void supabase.functions.invoke("video-analysis-report", { body: { token, action: "pdf" } });
       toast.success("Rapport PDF téléchargé !");
     } catch (err) {
       console.error("PDF generation error:", err);

@@ -1,5 +1,7 @@
 import test, { beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { normalizeVideoResult } from "../supabase/functions/_shared/video-report.ts";
 import { parseTikTokVideoUrl } from "../supabase/functions/_shared/tiktok-video-url.ts";
 import {
   advanceVideo,
@@ -179,4 +181,51 @@ test("livraison : un seul e-mail même si elle est rejouée", async () => {
   const mail = db.mails.get("video-report:order-1");
   assert.equal(mail.subject, "Ton analyse vidéo TikTok est prête 🚀");
   assert.match(mail.body, /analyse-video\/rapport\?t=11111111-1111-4111-8111-111111111111/);
+});
+
+const fixture = JSON.parse(readFileSync(new URL("./fixtures/wavstats-video-job.json", import.meta.url), "utf8"));
+
+test("contrat WavStats : le job terminé produit un rapport complet puis un seul e-mail", async () => {
+  const db = database(row({ status: "processing", job_id: "job-1", processing_started_at: new Date().toISOString() }));
+  wavstats(async () => Response.json(fixture));
+  await advanceVideo(db.client, db.row, "k");
+  assert.equal(db.row.status, "delivered");
+  assert.deepEqual(db.row.result_raw, fixture.result);
+  const report = db.row.report_data;
+  assert.equal(report.version, "video-v1");
+  assert.equal(report.summary.overallScore, 72);
+  assert.equal(report.metrics.views, 42000);
+  assert.equal(report.hook.text, "Tu perds du temps chaque matin sans t'en rendre compte");
+  assert.equal(report.script.length, 3);
+  assert.equal(report.actionPlan[0].title, "Afficher le menu dès la deuxième seconde.");
+  assert.ok(report.actionPlan.length <= 5);
+  assert.ok(db.mails.has("video-report:order-1"));
+});
+
+test("contrat WavStats : blocs null, clés inconnues et ratios non fiables sont tolérés sans rien inventer", () => {
+  const sparse = {
+    ...fixture.result,
+    speech: null, perMille: null, catalog: null, hookScore: null, scriptBreakdown: null, hookAnalysis: null,
+    ctaAnalysis: null, descriptionSeo: null, thumbnailAnalysis: null, transcript: null, strengths: [],
+    recommendations: [], scoreReliability: { engagement: false, saves: false, share: false },
+    videoData: { ...fixture.result.videoData, author: null, duration: null, coverUrl: null },
+    futureKey: { anything: true },
+  };
+  const report = normalizeVideoResult(sparse);
+  assert.equal(report.video.author, null);
+  assert.equal(report.metrics.perMille, null);
+  assert.equal(report.metrics.account, null);
+  assert.equal(report.scores.engagement, null);
+  assert.equal(report.hook, null);
+  assert.deepEqual(report.script, []);
+  assert.equal(report.actionPlan.length, 1);
+  assert.throws(() => normalizeVideoResult({ ...sparse, verdict: null }), /verdict/);
+  assert.throws(() => normalizeVideoResult({ ...sparse, improvements: [] }), /aucune analyse/);
+});
+
+test("job échoué : le message vient de errorMessage", async () => {
+  const db = database(row({ status: "processing", job_id: "job-1", processing_started_at: new Date().toISOString() }));
+  wavstats(async () => Response.json({ status: "failed", result: null, errorMessage: "Impossible d'analyser cette vidéo pour le moment." }));
+  await pollVideo(db.client, db.row, "k");
+  assert.match(db.row.error_message, /Impossible d'analyser cette vidéo/);
 });

@@ -213,7 +213,7 @@ export async function pollVideo(client: Database, row: VideoRow, apiKey: string)
     return await later(reason);
   }
 
-  let job: { status?: unknown; result?: unknown; error?: unknown; progressMessage?: unknown };
+  let job: { status?: unknown; result?: unknown; errorMessage?: unknown };
   try {
     job = await response.json();
   } catch {
@@ -243,8 +243,8 @@ export async function pollVideo(client: Database, row: VideoRow, apiKey: string)
     return saved;
   }
   if (job?.status === "failed" || job?.status === "cancelled") {
-    const detail = typeof job.error === "string" ? job.error
-      : (job.error as { message?: string } | undefined)?.message ?? "";
+    // Contrat WavStats : l'erreur est dans errorMessage, jamais dans result.
+    const detail = typeof job.errorMessage === "string" ? job.errorMessage.slice(0, 300) : "";
     return await failVideo(client, row, `Job WavStats ${job.status}${detail ? ` : ${detail}` : ""}`);
   }
   return await later("Analyse vidéo supérieure à 15 minutes");

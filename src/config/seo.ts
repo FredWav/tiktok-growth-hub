@@ -155,6 +155,18 @@ function breadcrumbSchema(path: string, name: string) {
   };
 }
 
+/** Fil des pages d'offre : Accueil › offre. */
+function offerBreadcrumb(path: string, name: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Accueil", item: `${BASE_URL}/` },
+      { "@type": "ListItem", position: 2, name, item: `${BASE_URL}${path}` },
+    ],
+  };
+}
+
 const ROUTES: RouteSeo[] = [
   {
     path: "/",
@@ -166,7 +178,8 @@ const ROUTES: RouteSeo[] = [
       body: "Pas de hack ni de promesse de viralité. Fred Wav part de tes contenus, de tes statistiques, de ton positionnement et de tes objectifs pour travailler ta stratégie sur TikTok, Instagram et YouTube. Trois besoins : l'Analyse Express TikTok, la Wav Academy et le Wav Premium multiréseaux.",
       links: [
         { href: "/wavacademy", label: "Wav Academy : 749 € TTC pour six mois" },
-        { href: "/analyse-express", label: "Analyse Express : 19,90 €" },
+        { href: "/analyse-express", label: "Analyse Express : audit de compte TikTok à 19,90 €" },
+        { href: "/analyse-video", label: "Analyse Vidéo TikTok : une vidéo décortiquée" },
         { href: "/wav-premium", label: "Wav Premium : 1 990 € TTC pour trente jours" },
         { href: "/preuves", label: "Témoignages et résultats" },
         { href: "/a-propos", label: "À propos de Fred Wav" },
@@ -229,54 +242,89 @@ const ROUTES: RouteSeo[] = [
   },
   {
     path: "/analyse-express",
-    title: "Analyse Express : quoi tester après tes statistiques TikTok ? | Fred Wav",
-    description: `Jusqu’à 120 vidéos publiques comparées pour distinguer observations, hypothèses et tests. Rapport TikTok automatisé à ${EXPRESS_PRICE.toFixed(2).replace(".", ",")} €, sans promesse de viralité.`,
-
+    title: "Analyse Express : audit de compte TikTok en 5 min | Fred Wav",
+    description: `Audit automatisé de ton compte TikTok : jusqu’à 120 vidéos publiques comparées, points faibles, hypothèses et tests à lancer. Rapport PDF à ${EXPRESS_PRICE.toFixed(2).replace(".", ",")} €.`,
     noscript: {
       h1: "Tes statistiques TikTok sont visibles : que dois-tu tester ensuite ?",
       body: "Analyse automatisée des données publiques de ton profil et de tes vidéos disponibles, jusqu’à 120, sur un même échantillon documenté. Le rapport distingue les observations des hypothèses, ne remplace ni les statistiques privées de TikTok ni une analyse humaine et ne garantit aucune vue ou vente. Cinq minutes en fonctionnement normal après paiement, rapport PDF pour 19,90 € TTC.",
-      links: [{ href: "/analyse-express", label: "Lancer mon Analyse Express" }],
+      sections: [
+        { h2: "Qu’est-ce que l’Analyse Express ?", body: "Un audit de compte TikTok automatisé : tu indiques ton @, l’outil compare tes vidéos publiques (vues, engagement, régularité, formats) et identifie ce qui performe, ce qui décroche et quoi tester ensuite." },
+        { h2: "Ce que contient le rapport", body: "Score de santé du compte, comparaison des vidéos, observations chiffrées, hypothèses et pistes de test prioritaires, au format PDF téléchargeable et envoyé par e-mail." },
+        { h2: "Pour qui ?", body: "Créateurs, entrepreneurs et indépendants qui publient sur TikTok et veulent un diagnostic rapide et objectif de leur compte, sans abonnement ni rendez-vous." },
+        { h2: "Prix et délai", body: "19,90 € TTC, paiement unique. Rapport disponible en environ cinq minutes après paiement. Pour une seule vidéo, voir l’Analyse Vidéo TikTok." },
+      ],
+      links: [
+        { href: "/analyse-express", label: "Lancer mon Analyse Express" },
+        { href: "/analyse-video", label: "Analyser une seule vidéo TikTok" },
+      ],
     },
-    schema: {
-      "@context": "https://schema.org",
-      "@type": "Product",
-      name: "Analyse Express",
-      description:
-        "Diagnostic automatisé des données TikTok publiques disponibles : métriques, comparaison de vidéos, observations, hypothèses et rapport PDF téléchargeable.",
-      offers: {
-        price: EXPRESS_PRICE.toFixed(2),
-        priceCurrency: "EUR",
-        availability: "https://schema.org/InStock",
+    schema: [
+      {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: "Analyse Express - audit de compte TikTok",
+        description:
+          "Audit automatisé d’un compte TikTok à partir des données publiques : jusqu’à 120 vidéos comparées, score, observations, hypothèses, pistes de test et rapport PDF.",
+        image: OG_IMAGE,
+        category: "Audit de compte TikTok",
+        brand: { "@type": "Brand", name: "Fred Wav" },
         url: `${BASE_URL}/analyse-express`,
+        offers: {
+          "@type": "Offer",
+          price: EXPRESS_PRICE.toFixed(2),
+          priceCurrency: "EUR",
+          availability: "https://schema.org/InStock",
+          url: `${BASE_URL}/analyse-express`,
+          seller: { "@type": "Person", name: "Fred Wav", url: BASE_URL },
+        },
       },
-    },
-    sitemap: 0.8,
-    llms: "Rapport TikTok automatisé à 19,90 € : jusqu’à 120 vidéos publiques sur un échantillon documenté, observations distinctes des hypothèses et pistes de test. Ne remplace ni les statistiques privées de TikTok ni un audit humain ; aucune garantie de résultat.",
+      offerBreadcrumb("/analyse-express", "Analyse Express"),
+    ],
+    sitemap: 0.9,
+    llms: "Audit automatisé de compte TikTok à 19,90 € (Analyse Express) : jusqu’à 120 vidéos publiques comparées, score de santé, observations distinctes des hypothèses et pistes de test, rapport PDF en environ 5 minutes. Ne remplace ni les statistiques privées de TikTok ni un audit humain ; aucune garantie de résultat.",
     llmsSection: "offres",
   },
   {
     path: "/analyse-video",
-    title: "Analyse Vidéo TikTok : ce qui fonctionne et ce qui bloque | Fred Wav",
-    description: `Envoie le lien d’une vidéo TikTok : accroche, structure, message et plan d’action concret, livrés par e-mail avec un rapport PDF. ${VIDEO_ANALYSIS_PRICE_LABEL}, sans compte ni abonnement.`,
+    title: "Analyse vidéo TikTok : hook, structure, CTA | Fred Wav",
+    description: `Envoie le lien d’une vidéo TikTok : analyse de l’accroche, de la structure, du message et du CTA, plan d’action et rapport PDF par e-mail. ${VIDEO_ANALYSIS_PRICE_LABEL}, sans abonnement.`,
     noscript: {
       h1: "Envoie ta vidéo TikTok. On te dit ce qui fonctionne, ce qui bloque et quoi changer.",
       body: `Analyse automatisée d’une vidéo TikTok publique : accroche, structure, message et recommandations prioritaires. Rapport livré par e-mail avec un PDF téléchargeable, ${VIDEO_ANALYSIS_PRICE_LABEL} TTC, sans compte ni abonnement. Aucune garantie de vues.`,
-      links: [{ href: "/analyse-video", label: "Analyser ma vidéo" }],
+      sections: [
+        { h2: "Comment analyser une vidéo TikTok ?", body: "Colle le lien public de ta vidéo, paie, et l’analyse démarre automatiquement. Le rapport arrive par e-mail en quelques minutes." },
+        { h2: "Ce qui est analysé", body: "Le hook des premières secondes, la structure du script, la clarté du message, le rythme, l’appel à l’action et les performances publiques de la vidéo, avec un score global." },
+        { h2: "Ce que tu reçois", body: "Ce qui fonctionne, ce qui bloque et un plan d’action priorisé pour ta prochaine vidéo, en ligne et en PDF." },
+        { h2: "Vidéo ou compte complet ?", body: "L’Analyse Vidéo porte sur une seule vidéo. Pour auditer tout ton compte TikTok, choisis l’Analyse Express." },
+      ],
+      links: [
+        { href: "/analyse-video", label: "Analyser ma vidéo TikTok" },
+        { href: "/analyse-express", label: "Auditer tout mon compte TikTok" },
+      ],
     },
-    schema: {
-      "@context": "https://schema.org",
-      "@type": "Product",
-      name: "Analyse Vidéo TikTok",
-      description: "Analyse automatisée d’une vidéo TikTok publique : accroche, structure, message et plan d’action, rapport PDF envoyé par e-mail.",
-      offers: {
-        price: VIDEO_ANALYSIS_PRICE.toFixed(2),
-        priceCurrency: "EUR",
-        availability: "https://schema.org/InStock",
+    schema: [
+      {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: "Analyse Vidéo TikTok",
+        description: "Analyse automatisée d’une vidéo TikTok publique : hook, structure, message, CTA, score et plan d’action, rapport PDF envoyé par e-mail.",
+        image: OG_IMAGE,
+        category: "Analyse de vidéo TikTok",
+        brand: { "@type": "Brand", name: "Fred Wav" },
         url: `${BASE_URL}/analyse-video`,
+        offers: {
+          "@type": "Offer",
+          price: VIDEO_ANALYSIS_PRICE.toFixed(2),
+          priceCurrency: "EUR",
+          availability: "https://schema.org/InStock",
+          url: `${BASE_URL}/analyse-video`,
+          seller: { "@type": "Person", name: "Fred Wav", url: BASE_URL },
+        },
       },
-    },
-    sitemap: 0.7,
-    llms: `Analyse automatisée d’une seule vidéo TikTok publique à ${VIDEO_ANALYSIS_PRICE_LABEL} : accroche, structure, message et plan d’action, rapport PDF envoyé par e-mail. Aucune garantie de résultat.`,
+      offerBreadcrumb("/analyse-video", "Analyse Vidéo TikTok"),
+    ],
+    sitemap: 0.9,
+    llms: `Analyse automatisée d’une seule vidéo TikTok publique à ${VIDEO_ANALYSIS_PRICE_LABEL} : hook, structure, message, CTA, score et plan d’action, rapport PDF envoyé par e-mail en quelques minutes. Aucune garantie de résultat.`,
     llmsSection: "offres",
   },
   {

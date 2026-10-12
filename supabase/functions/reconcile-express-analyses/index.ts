@@ -1,6 +1,7 @@
 import { db, headers, json, cronCaller, deliverMail } from "../_shared/commerce.ts";
 import { pollExpress, flagExpressSupport, type ExpressRow } from "../_shared/express-finalize.ts";
 import { sendExpressResultMail } from "../_shared/express-result-mail.ts";
+import { reconcileVideoAnalyses } from "../_shared/video-reconcile.ts";
 
 Deno.serve(async req => {
   if (req.method === "OPTIONS") return new Response(null,{headers});
@@ -41,6 +42,12 @@ Deno.serve(async req => {
         summary.errors++;
         console.error("Rattrapage mail rapport échoué", item.id, e);
       }
+    }
+    // Analyses Vidéo : même passage, isolé pour ne jamais perturber l'Express.
+    try {
+      await reconcileVideoAnalyses(client, 15000);
+    } catch (e) {
+      console.error("[video-analysis] reconcile failed", e);
     }
     await deliverMail(client);
     return json(summary);

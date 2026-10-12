@@ -560,7 +560,7 @@ serve(async (req) => {
 
                   openaiMessages = [
                     ...openaiMessages,
-                    { role: 'assistant', tool_calls: currentToolCalls },
+                    { role: "assistant", tool_calls: currentToolCalls } as any,
                     ...toolResults
                   ];
 

@@ -54,11 +54,14 @@ export const EXPRESS_PRICE = 19.9;
 export const EXPRESS_PRICE_LABEL = "19,90 €";
 
 /**
- * Preuve sociale Analyse Express : nombre de personnes ayant déjà utilisé
- * l'analyse. Mis à jour manuellement (Fred vérifie le total) ; affiché sur
- * /analyse-express. centralisé ici pour ne pas diverger d'une page à l'autre.
+ * Preuve sociale Analyse Express : base verifiee a la main par Fred au
+ * 12/10/2026 (213 personnes). Le total affiche sur /analyse-express = cette
+ * base + le nombre de paiements valides depuis cette date, renvoye par la
+ * fonction de base express_paid_since. Le compteur monte donc tout seul a
+ * chaque paiement Stripe confirme. On ne touche cette base que pour corriger
+ * le total de depart.
  */
-export const EXPRESS_USERS_COUNT = 213;
+export const EXPRESS_USERS_BASE_COUNT = 213;
 
 /**
  * Analyse Vidéo TikTok — prix de lancement (test commercial 2026-10).

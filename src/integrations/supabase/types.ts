@@ -1361,6 +1361,7 @@ export type Database = {
       }
       commerce_revenue: { Args: never; Returns: Json }
       commerce_submit_application: { Args: { v: Json }; Returns: string }
+      express_paid_since: { Args: never; Returns: number }
       get_express_analysis_by_session: {
         Args: { p_session_id: string }
         Returns: {

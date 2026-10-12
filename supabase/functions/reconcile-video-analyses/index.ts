@@ -1,4 +1,4 @@
-import { db, deliverMail, json, headers, service } from "../_shared/commerce.ts";
+import { cronCaller, db, deliverMail, json, headers } from "../_shared/commerce.ts";
 import { advanceVideo, failVideo, log, type VideoRow } from "../_shared/video-analysis.ts";
 
 // Quota WavStats : 30 req/min par clé, partagé avec l'Analyse Express.
@@ -7,7 +7,8 @@ const STALE_START_MS = 5 * 60_000;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers });
-  if (!service(req)) return json({ error: "Accès refusé" }, 403);
+  // pg_cron s'authentifie par x-cron-secret (RECONCILE_CRON_SECRET) ; la clé serveur reste acceptée.
+  if (!cronCaller(req)) return json({ error: "Accès refusé" }, 403);
   const client = db();
   const apiKey = Deno.env.get("WAVSTATS_API_KEY") || Deno.env.get("WAV_SOCIAL_SCAN_API_KEY") || "";
   const allowTest = Deno.env.get("ALLOW_TEST_FULFILLMENT") === "true";

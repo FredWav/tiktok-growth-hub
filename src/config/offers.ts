@@ -47,9 +47,18 @@ export const ACADEMY_FROM = ACADEMY_ENTRY.total;
  */
 export const CREATORS_COUNT = "350+";
 
-/** Analyse Express — seul autre prix affiché publiquement. */
+/**
+ * Analyse Express — seul autre prix affiché publiquement.
+ */
 export const EXPRESS_PRICE = 19.9;
 export const EXPRESS_PRICE_LABEL = "19,90 €";
+
+/**
+ * Preuve sociale Analyse Express : nombre de personnes ayant déjà utilisé
+ * l'analyse. Mis à jour manuellement (Fred vérifie le total) ; affiché sur
+ * /analyse-express. centralisé ici pour ne pas diverger d'une page à l'autre.
+ */
+export const EXPRESS_USERS_COUNT = 213;
 
 /**
  * Analyse Vidéo TikTok — prix de lancement (test commercial 2026-10).

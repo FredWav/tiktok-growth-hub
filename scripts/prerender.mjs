@@ -276,10 +276,11 @@ function assertRenderedPage(route, body, document) {
 }
 
 function generateSitemap() {
+  const lastmod = new Date().toISOString().slice(0, 10);
   const urls = SSG_ROUTES.filter((route) => route.indexable && route.sitemap !== false)
     .map((route) => {
       const priority = typeof route.sitemap === "number" ? route.sitemap.toFixed(1) : "0.5";
-      return `  <url><loc>${absoluteUrl(route.path)}</loc><priority>${priority}</priority></url>`;
+      return `  <url><loc>${absoluteUrl(route.path)}</loc><lastmod>${lastmod}</lastmod><priority>${priority}</priority></url>`;
     })
     .join("\n");
 
@@ -307,7 +308,7 @@ function generateLlmsTxt() {
     .filter(Boolean)
     .join("\n\n");
 
-  return `# Fred Wav\n\n> Consultant en stratégie de contenus et réseaux sociaux. Ressources TikTok, Wav Academy, Analyse Express et accompagnement individuel Wav Premium.\n\n${content}\n`;
+  return `# Fred Wav\n\n> Consultant en stratégie de contenus et réseaux sociaux. Ressources TikTok, Wav Academy, Analyse Express (audit de compte TikTok), Analyse Vidéo TikTok et accompagnement individuel Wav Premium.\n\n${content}\n`;
 }
 
 const duplicatePaths = SSG_ROUTES.filter(

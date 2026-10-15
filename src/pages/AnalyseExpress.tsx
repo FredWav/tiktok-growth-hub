@@ -191,24 +191,24 @@ export default function AnalyseExpress() {
       )}
 
       {/* Hero */}
-      <Section className="pt-32 pb-16 md:pt-40 md:pb-20">
+      <Section className="pt-24 pb-16 md:pt-40 md:pb-20">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4 md:mb-6">
             <Zap className="h-4 w-4" />
             En moins de 3 minutes dans ta boîte mail
           </div>
 
-          <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">
+          <h1 className="font-display text-3xl md:text-5xl font-semibold tracking-tight mb-4 md:mb-6">
             Tes chiffres sont visibles. Mais que dois-tu tester ensuite ?
           </h1>
 
-          <p className="text-lg text-muted-foreground max-w-xl mx-auto mb-4">
+          <p className="text-base md:text-lg text-muted-foreground max-w-xl mx-auto mb-3 md:mb-4">
             <span className="font-semibold text-foreground">Analyse Express</span>{" "}
             rassemble les données publiques de ton profil et de jusqu’à 120 vidéos
             disponibles pour produire un diagnostic automatisé,
             des hypothèses et un plan d’action.
           </p>
-          <p className="text-sm text-muted-foreground/70 mb-10">
+          <p className="text-sm text-muted-foreground/70 mb-6 md:mb-10">
             Disponible uniquement pour TikTok pour le moment, d'autres plateformes arrivent bientôt.
           </p>
 

@@ -89,9 +89,9 @@ export function CookieConsent() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 inset-x-0 z-50 p-3 md:p-6">
-      <div className="max-w-3xl mx-auto bg-card border border-border rounded-xl shadow-lg p-3.5 md:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-        <p className="text-xs sm:text-sm text-muted-foreground flex-1 leading-relaxed">
+    <div className="fixed bottom-0 inset-x-0 z-50 p-2 md:p-6">
+      <div className="max-w-3xl mx-auto bg-card border border-border rounded-xl shadow-lg p-2.5 md:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+        <p className="text-[11px] sm:text-sm text-muted-foreground flex-1 leading-snug sm:leading-relaxed line-clamp-2 sm:line-clamp-none">
           Ce site utilise des cookies de mesure d'audience (Google Analytics et PostHog) pour améliorer votre expérience.
           Le refus est aussi simple que l'acceptation, et vous pouvez modifier votre choix à tout moment.{" "}
           <Link to="/politique-de-confidentialite" className="text-primary hover:underline">
@@ -99,10 +99,10 @@ export function CookieConsent() {
           </Link>
         </p>
         <div className="grid grid-cols-2 sm:flex gap-2 sm:gap-3 shrink-0 w-full sm:w-auto">
-          <Button variant="outline" size="sm" className="min-h-11" onClick={refuse}>
+          <Button variant="outline" size="sm" className="min-h-10" onClick={refuse}>
             Refuser
           </Button>
-          <Button size="sm" className="min-h-11" onClick={accept}>
+          <Button size="sm" className="min-h-10" onClick={accept}>
             Accepter
           </Button>
         </div>

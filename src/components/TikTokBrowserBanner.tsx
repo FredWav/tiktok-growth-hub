@@ -1,132 +1,40 @@
 import { useState, useEffect } from "react";
-import { Copy, Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 
 function isTikTokBrowser(userAgent: string) {
   return /TikTok|BytedanceWebview|ByteLocale/i.test(userAgent);
 }
 
+/**
+ * Bande discrète et fermable pour les visiteurs du navigateur TikTok.
+ * Ne bloque jamais la page et ne redirige jamais : un écran plein + redirection
+ * forcée faisait partir 95 % des visiteurs venus des pubs TikTok en 6 secondes.
+ */
 export function TikTokBrowserBanner() {
   const [visible, setVisible] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [url, setUrl] = useState("");
-  const [isAndroid, setIsAndroid] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined" || typeof navigator === "undefined") return;
-
-    const currentUrl = window.location.href;
-    const userAgent = navigator.userAgent || "";
-    const android = /android/i.test(userAgent);
-    if (!isTikTokBrowser(userAgent)) return;
-
-    setUrl(currentUrl);
-    setIsAndroid(android);
-
-    if (android) {
-      // Auto-redirect Android to Chrome via intent
-      window.location.href = `intent://${currentUrl.replace(/^https?:\/\//, "")}#Intent;scheme=https;package=com.android.chrome;end`;
-      // Show overlay as fallback if intent doesn't work after 1s
-      const timer = setTimeout(() => setVisible(true), 1000);
-      return () => clearTimeout(timer);
-    }
-
-    // iOS: try googlechrome:// scheme, then show blocking overlay
-    try {
-      const chromeUrl = currentUrl.replace(/^https/, "googlechrome");
-      window.location.href = chromeUrl;
-    } catch {
-      // ignore
-    }
-
-    // Always show overlay on iOS as fallback
+    if (!isTikTokBrowser(navigator.userAgent || "")) return;
+    if (sessionStorage.getItem("tt_banner_closed") === "1") return;
     setVisible(true);
   }, []);
 
   if (!visible) return null;
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 3000);
-    } catch {
-      // fallback: select input
-    }
+  const close = () => {
+    sessionStorage.setItem("tt_banner_closed", "1");
+    setVisible(false);
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-background flex flex-col items-center justify-center px-6 text-center">
-      <div className="max-w-sm w-full flex flex-col items-center gap-6">
-        {/* Icon */}
-        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-          <svg viewBox="0 0 24 24" className="w-8 h-8 text-primary" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-            <polyline points="15 3 21 3 21 9" />
-            <line x1="10" y1="14" x2="21" y2="3" />
-          </svg>
-        </div>
-
-        <div className="space-y-2">
-          <h2 className="text-xl font-bold text-foreground">
-            Ouvre dans {isAndroid ? "Chrome" : "Safari"}
-          </h2>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            {isAndroid
-              ? "Le navigateur TikTok ne supporte pas toutes les fonctionnalités. Appuie sur le bouton ci-dessous pour ouvrir dans Chrome."
-              : "Le navigateur TikTok bloque certaines fonctionnalités. Suis les étapes ci-dessous pour continuer."}
-          </p>
-        </div>
-
-        {isAndroid ? (
-          <Button
-            size="lg"
-            className="w-full"
-            onClick={() => {
-              window.location.href = `intent://${url.replace(/^https?:\/\//, "")}#Intent;scheme=https;package=com.android.chrome;end`;
-            }}
-          >
-            Ouvrir dans Chrome
-          </Button>
-        ) : (
-          <>
-            {/* Step-by-step iOS instructions */}
-            <div className="w-full space-y-3 text-left">
-              <div className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">1</span>
-                <p className="text-sm text-foreground pt-1">
-                  Appuie sur les <span className="font-bold text-lg leading-none">⋯</span> en bas à droite de l'écran
-                </p>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">2</span>
-                <p className="text-sm text-foreground pt-1">
-                  Appuie sur <span className="font-semibold">« Ouvrir dans le navigateur »</span>
-                </p>
-              </div>
-            </div>
-
-            <div className="w-full border-t border-border pt-4 space-y-3">
-              <p className="text-xs text-muted-foreground">
-                Ou copie le lien et colle-le dans Safari :
-              </p>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  readOnly
-                  value={url}
-                  className="flex-1 text-xs px-3 py-2.5 rounded-md bg-muted text-foreground border border-border select-all truncate"
-                  onFocus={(e) => e.target.select()}
-                />
-                <Button size="sm" variant="outline" onClick={handleCopy} className="shrink-0 gap-1.5">
-                  {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                  {copied ? "Copié" : "Copier"}
-                </Button>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
+    <div className="fixed bottom-0 inset-x-0 z-50 bg-muted text-muted-foreground border-t border-border px-4 py-2 flex items-center gap-3 text-xs">
+      <p className="flex-1">
+        Un souci de paiement ? Appuie sur ... puis « Ouvrir dans le navigateur ».
+      </p>
+      <button onClick={close} aria-label="Fermer" className="shrink-0 p-1">
+        <X className="h-4 w-4" />
+      </button>
     </div>
   );
 }

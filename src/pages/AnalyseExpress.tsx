@@ -213,7 +213,7 @@ export default function AnalyseExpress() {
           </p>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-4">
+          <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-3 md:space-y-4">
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">@</span>
               <Input
@@ -222,7 +222,7 @@ export default function AnalyseExpress() {
                 placeholder="ton_username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="pl-8 h-12 text-base"
+                className="pl-8 h-11 md:h-12 text-base"
                 disabled={loading}
               />
             </div>
@@ -231,7 +231,7 @@ export default function AnalyseExpress() {
               placeholder="ton@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="h-12 text-base"
+              className="h-11 md:h-12 text-base"
               disabled={loading}
               required
             />

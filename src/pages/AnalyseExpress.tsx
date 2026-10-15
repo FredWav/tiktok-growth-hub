@@ -191,29 +191,29 @@ export default function AnalyseExpress() {
       )}
 
       {/* Hero */}
-      <Section className="pt-32 pb-16 md:pt-40 md:pb-20">
+      <Section className="pt-16 pb-16 md:pt-40 md:pb-20">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-xs md:text-sm font-medium mb-3 md:mb-6">
             <Zap className="h-4 w-4" />
             En moins de 3 minutes dans ta boîte mail
           </div>
 
-          <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">
+          <h1 className="font-display text-2xl md:text-5xl font-semibold tracking-tight mb-3 md:mb-6">
             Tes chiffres sont visibles. Mais que dois-tu tester ensuite ?
           </h1>
 
-          <p className="text-lg text-muted-foreground max-w-xl mx-auto mb-4">
+          <p className="text-sm md:text-lg text-muted-foreground max-w-xl mx-auto mb-4 md:mb-4">
             <span className="font-semibold text-foreground">Analyse Express</span>{" "}
             rassemble les données publiques de ton profil et de jusqu’à 120 vidéos
             disponibles pour produire un diagnostic automatisé,
             des hypothèses et un plan d’action.
           </p>
-          <p className="text-sm text-muted-foreground/70 mb-10">
+          <p className="hidden md:block text-sm text-muted-foreground/70 mb-10">
             Disponible uniquement pour TikTok pour le moment, d'autres plateformes arrivent bientôt.
           </p>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-4">
+          <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-3 md:space-y-4">
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">@</span>
               <Input
@@ -222,7 +222,7 @@ export default function AnalyseExpress() {
                 placeholder="ton_username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="pl-8 h-12 text-base"
+                className="pl-8 h-11 md:h-12 text-base"
                 disabled={loading}
               />
             </div>
@@ -231,7 +231,7 @@ export default function AnalyseExpress() {
               placeholder="ton@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="h-12 text-base"
+              className="h-11 md:h-12 text-base"
               disabled={loading}
               required
             />

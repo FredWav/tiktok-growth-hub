@@ -4,7 +4,7 @@ import { Section, SectionHeader } from "@/components/ui/section";
 import { ObjectionCards } from "@/components/ObjectionCards";
 import { OfferPage } from "@/components/offers/OfferPage";
 import { seoFor } from "@/config/seo";
-import { OFFERS } from "@/config/offers";
+import { INSTALLMENTS_LABEL, INSTALLMENTS_NOTE, OFFERS } from "@/config/offers";
 
 const premiumFaq = [
   {
@@ -97,8 +97,8 @@ export default function WavPremium() {
           <>
             <p>
               Aucun paiement lors de la demande. Après la réponse de Fred et la proposition acceptée, tu règles
-              l'intégralité avant le démarrage : en ligne par carte, en 3 fois avec Klarna (sous réserve d'acceptation
-              par Klarna) ou par virement.
+              l'intégralité avant le démarrage : en ligne par carte, {INSTALLMENTS_LABEL} ({INSTALLMENTS_NOTE}), ou par
+              virement.
             </p>
             <p>
               Deux nouveaux accompagnements par mois au maximum. La Wav Academy et WavStats ne sont pas inclus.

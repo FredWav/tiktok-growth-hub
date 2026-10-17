@@ -75,7 +75,6 @@ serve(async (req) => {
     const {
       username,
       email,
-      subscribeToNewsletter,
       consent_cgv,
       consent_immediate_delivery,
       mode,
@@ -110,7 +109,6 @@ serve(async (req) => {
       );
     }
 
-    const wantsNewsletter = subscribeToNewsletter === true || subscribeToNewsletter === "true";
     const acceptedAt = new Date().toISOString();
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
@@ -205,7 +203,6 @@ serve(async (req) => {
       .insert({
         tiktok_username: cleanUsername,
         email: cleanEmail,
-        newsletter_requested: wantsNewsletter,
         status: "awaiting_payment",
         report_version: reportVersion,
       })

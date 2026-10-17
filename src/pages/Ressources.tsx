@@ -7,7 +7,7 @@ import {
   Eye,
   Gauge,
   Lightbulb,
-  Mail,
+  LineChart,
   Search,
 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
@@ -189,20 +189,22 @@ export default function Ressources() {
             </span>
           </Link>
 
-          <Link
-            to="/newsletter"
+          <a
+            href="https://wavstats.com"
+            target="_blank"
+            rel="noopener noreferrer"
             className="group rounded-2xl border border-border bg-cream p-7 transition-transform hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
-            <Mail className="h-6 w-6 text-primary mb-5" />
-            <span className="text-xs font-semibold uppercase tracking-wider text-primary">Guide gratuit</span>
-            <h2 className="font-display text-2xl font-semibold mt-3 mb-3">Reçois le guide complet des hooks</h2>
+            <LineChart className="h-6 w-6 text-primary mb-5" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-primary">Outil</span>
+            <h2 className="font-display text-2xl font-semibold mt-3 mb-3">WavStats, pour suivre tes contenus seul</h2>
             <p className="text-sm text-muted-foreground leading-relaxed mb-6">
-              Les structures d’accroches, les modèles à compléter et mes prochains décryptages directement par email.
+              L'outil d'analyse pour observer tes contenus et comparer tes essais en autonomie. Service distinct, tarifs sur WavStats.
             </p>
             <span className="inline-flex items-center text-sm font-semibold">
-              Recevoir le guide <ArrowRight className="ml-2 h-4 w-4" />
+              Découvrir WavStats <ArrowRight className="ml-2 h-4 w-4" />
             </span>
-          </Link>
+          </a>
         </div>
       </Section>
 

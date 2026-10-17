@@ -64,7 +64,6 @@ const Enrollment = lazy(() => import("./pages/Enrollment"));
 const AdminCommerce = lazy(() => import("./pages/admin/Commerce"));
 const DiagnosticProcessing = lazy(() => import("./pages/DiagnosticProcessing"));
 const DiagnosticResult = lazy(() => import("./pages/DiagnosticResult"));
-const Mail = lazy(() => import("./pages/Mail"));
 const HooksTikTok = lazy(() => import("./pages/HooksTikTok"));
 const WavAcademy = lazy(() => import("./pages/WavAcademy"));
 const Claim = lazy(() => import("./pages/Claim"));
@@ -107,7 +106,6 @@ const SSG_ROUTE_ELEMENTS: Record<string, ReactNode> = {
   "/ressources/vues-tiktok": <RessourceVuesTikTok />,
   "/ressources/retention-tiktok": <RessourceRetentionTikTok />,
   "/a-propos": <APropos />,
-  "/newsletter": <Mail />,
   "/contact": <Contact />,
   "/cgv": <CGV />,
   "/mentions-legales": <MentionsLegales />,

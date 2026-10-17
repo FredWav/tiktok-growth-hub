@@ -35,7 +35,6 @@ const footerGroups = [
     links: [
       { label: "Guides TikTok", href: "/ressources" },
       { label: "Hooks TikTok", href: "/hooks-tiktok" },
-      { label: "Newsletter", href: "/newsletter" },
       { label: "Témoignages", href: "/temoignages" },
       { label: "À propos", href: "/a-propos" },
       { label: "Contact", href: "/contact" },

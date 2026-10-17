@@ -79,8 +79,6 @@ const faqs = [
   },
 ];
 
-// Doit rester identique à EXPRESS_CONSENT_TEXT dans mailerlite-subscribe (preuve du consentement).
-const MARKETING_CONSENT_TEXT = "J'accepte de recevoir les e-mails de Fred (conseils et offres, 2 fois par mois maximum). Je peux me désinscrire à tout moment.";
 const CGV_ACCEPTED_TEXT = "J'ai lu et j'accepte les Conditions Générales de Vente.";
 const IMMEDIATE_DELIVERY_ACCEPTED_TEXT = "Je demande expressément l'exécution immédiate de l'Analyse Express avant la fin du délai de 14 jours et je reconnais perdre mon droit de rétractation lorsque la prestation est pleinement exécutée et le rapport mis à disposition.";
 
@@ -89,8 +87,6 @@ export default function AnalyseExpress() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  // Consentement marketing = acte positif (RGPD/CNIL) : décoché par défaut.
-  const [subscribeToNewsletter, setSubscribeToNewsletter] = useState(false);
   // Consentements contractuels distincts, explicites et décochés par défaut.
   const [consentCgv, setConsentCgv] = useState(false);
   const [consentImmediateDelivery, setConsentImmediateDelivery] = useState(false);
@@ -151,7 +147,6 @@ export default function AnalyseExpress() {
         body: {
           username: cleanUsername,
           email: email.trim(),
-          subscribeToNewsletter,
           consent_cgv: consentCgv,
           consent_immediate_delivery: consentImmediateDelivery,
           ...(testMode ? { mode: "test" } : {}),
@@ -235,20 +230,6 @@ export default function AnalyseExpress() {
               disabled={loading}
               required
             />
-            <div className="flex items-start gap-3">
-              <Checkbox
-                id="subscribe"
-                checked={subscribeToNewsletter}
-                onCheckedChange={(v) => setSubscribeToNewsletter(v === true)}
-                disabled={loading}
-              />
-              <label
-                htmlFor="subscribe"
-                className="text-xs text-muted-foreground leading-relaxed cursor-pointer"
-              >
-                {MARKETING_CONSENT_TEXT}
-              </label>
-            </div>
             <Button type="submit" variant="hero" size="lg" className="w-full" disabled={loading}>
               {loading ? "Redirection..." : "Lancer l'analyse (19,90€)"}
             </Button>

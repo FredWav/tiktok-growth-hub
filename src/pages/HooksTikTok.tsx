@@ -4,7 +4,6 @@ import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { SEOHead } from "@/components/SEOHead";
 import { seoFor } from "@/config/seo";
-import { NewsletterForm } from "@/components/NewsletterForm";
 import { HOOKS_FAQ } from "@/config/hooks-faq";
 import {
   HOOKS_BUNDLE,
@@ -370,19 +369,6 @@ export default function HooksTikTok() {
         </div>
       </Section>
 
-      {/* ── NEWSLETTER ───────────────────────────────────────────────────── */}
-      <Section variant="default" size="md">
-        <div className="max-w-lg mx-auto">
-          <SectionHeader
-            title="Pas encore prêt ?"
-            subtitle="Reçois mes conseils formats courts par email, avec le guide gratuit des hooks en cadeau."
-            className="mb-8 md:mb-10"
-          />
-          <div className="bg-card border border-border rounded-xl p-8 shadow-sm">
-            <NewsletterForm location="hooks_page" submitLabel="Recevoir le guide gratuit" />
-          </div>
-        </div>
-      </Section>
     </Layout>
   );
 }

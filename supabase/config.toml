@@ -34,12 +34,6 @@ verify_jwt = false
 [functions.manual-express-analysis]
 verify_jwt = false
 
-[functions.mailerlite-count]
-verify_jwt = false
-
-[functions.mailerlite-subscribe]
-verify_jwt = false
-
 [functions.express-analysis-status]
 verify_jwt = false
 

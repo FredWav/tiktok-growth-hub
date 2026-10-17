@@ -4,7 +4,7 @@ import { Section, SectionHeader } from "@/components/ui/section";
 import { ObjectionCards } from "@/components/ObjectionCards";
 import { OfferPage } from "@/components/offers/OfferPage";
 import { seoFor } from "@/config/seo";
-import { OFFERS } from "@/config/offers";
+import { INSTALLMENTS_LABEL, INSTALLMENTS_NOTE, OFFERS } from "@/config/offers";
 import { WAVACADEMY_FAQ } from "@/config/wavacademy-faq";
 
 export default function WavAcademy() {
@@ -73,8 +73,8 @@ export default function WavAcademy() {
         terms={
           <>
             <p>
-              Un seul paiement, sans abonnement ni reconduction : en ligne par carte, en 3 fois avec Klarna (sous réserve
-              d'acceptation par Klarna) ou par virement. L'accès est à vie, tant que la Wav Academy existe.
+              Un seul paiement, sans abonnement ni reconduction : en ligne par carte, {INSTALLMENTS_LABEL} ({INSTALLMENTS_NOTE}),
+              ou par virement. L'accès est à vie, tant que la Wav Academy existe.
             </p>
             <p>
               Places limitées à 5 nouveaux membres par mois pour garder des lives où chacun est écouté. Quand le mois est

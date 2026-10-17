@@ -436,7 +436,6 @@ const ROUTES: RouteSeo[] = [
       ],
       links: [
         { href: "/hooks-tiktok#packs", label: "Voir les packs de hooks" },
-        { href: "/newsletter", label: "Recevoir le guide gratuit des hooks" },
       ],
     },
     schema: {
@@ -612,23 +611,6 @@ const ROUTES: RouteSeo[] = [
     llmsSection: "principales",
   },
   {
-    path: "/newsletter",
-    title: "La newsletter de Fred Wav : un mail, du concret",
-    description:
-      "Reçois mes conseils formats courts par email, et le guide complet des hooks TikTok en cadeau de bienvenue. Sans spam, désinscription en un clic.",
-    noscript: {
-      h1: "La newsletter de Fred Wav",
-      body: "Mes conseils formats courts par email, et le guide complet des hooks TikTok pour commencer. La bibliothèque de hooks TikTok est sur /hooks-tiktok.",
-      links: [
-        { href: "/hooks-tiktok", label: "Voir la bibliothèque de hooks TikTok" },
-        { href: "/accompagnements", label: "Les accompagnements de Fred Wav" },
-      ],
-    },
-    sitemap: 0.4,
-    llms: "Inscription à la newsletter de Fred Wav ; le guide complet des hooks TikTok est offert à l'inscription.",
-    llmsSection: "ressources",
-  },
-  {
     path: "/contact",
     title: "Contact : Fred Wav | Expert Formats Courts",
     description:
@@ -795,7 +777,8 @@ const redirectDefinitions: [string, string, 307 | 308][] = [
   ["/accompagnement-reseaux-sociaux", "/accompagnements", 308],
   ["/accompagnement-tiktok", "/accompagnements", 308],
   ["/one-shot/success", "/", 307],
-  ["/mail", "/newsletter", 308],
+  ["/mail", "/ressources", 308],
+  ["/newsletter", "/ressources", 308],
 ];
 
 const redirectManifest: RedirectRouteManifestEntry[] = redirectDefinitions.map<RedirectRouteManifestEntry>(

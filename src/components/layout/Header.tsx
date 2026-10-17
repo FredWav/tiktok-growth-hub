@@ -9,7 +9,7 @@ const navItems = [
   { label: "Analyses", href: "/analyses", children: ["/analyse-express", "/analyse-video"] },
   { label: "Accompagnements", href: "/accompagnements", children: ["/one-shot", "/wavacademy", "/wav-premium"] },
   { label: "Témoignages", href: "/temoignages", children: [] },
-  { label: "Ressources", href: "/ressources", children: ["/hooks-tiktok", "/newsletter"] },
+  { label: "Ressources", href: "/ressources", children: ["/hooks-tiktok"] },
   { label: "À propos", href: "/a-propos", children: [] },
 ];
 

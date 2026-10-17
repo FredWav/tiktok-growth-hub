@@ -49,7 +49,7 @@ export default function CGV() {
             <li><strong>Prestations :</strong> One Shot (audit et rendez-vous individuel), Wav Premium (accompagnement individuel de six semaines ou plus), Wav Academy (accompagnement collectif à vie : communauté Discord, lives et contenus numériques), Analyse vidéo et Analyse Express (rapports d'analyse automatisés).</li>
             <li><strong>Produits numériques :</strong> Packs de hooks (fichiers PDF et tableur téléchargeables) vendus séparément, livrés par email automatique après paiement.</li>
             <li><strong>Contenus numériques :</strong> rapports PDF, ressources, checklists et templates éventuellement remis dans le cadre de la prestation.</li>
-            <li><strong>Plateformes tierces :</strong> TikTok, Instagram, YouTube, Discord, WhatsApp, Stripe, PayPal, Klarna. Fred Wav n'est pas responsable de leurs pannes, interruptions, changements de conditions d'utilisation, ni des conséquences pouvant en découler.</li>
+            <li><strong>Plateformes tierces :</strong> TikTok, Instagram, YouTube, Discord, WhatsApp, Stripe, PayPal, Klarna, Scalapay. Fred Wav n'est pas responsable de leurs pannes, interruptions, changements de conditions d'utilisation, ni des conséquences pouvant en découler.</li>
           </ul>
 
           {/* ARTICLE 5 */}
@@ -112,7 +112,7 @@ export default function CGV() {
             <strong>Tarifs :</strong> exprimés en euros TTC. Fred Wav se réserve le droit de modifier ses prix à tout moment pour l'avenir. Le tarif applicable est celui affiché au moment de la commande.
           </p>
           <p className="text-muted-foreground mb-4">
-            <strong>Paiement :</strong> en ligne via Stripe, selon les moyens proposés lors du paiement (dont, lorsqu'il est proposé, le paiement en plusieurs fois via Klarna, sous réserve d'acceptation par Klarna et selon ses conditions), ou par virement pour le One Shot, la Wav Academy et le Wav Premium. Le règlement intégral doit être encaissé avant le démarrage ; en cas de paiement via Klarna, le Vendeur est réglé en une fois par Klarna, et l'échéancier lie le Client à Klarna. Les références de facture et de paiement sont conservées. Une preuve d’émission de virement ne vaut pas encaissement.
+            <strong>Paiement :</strong> en ligne via Stripe, selon les moyens proposés lors du paiement (dont, lorsqu'il est proposé, le paiement en plusieurs fois sans frais via Klarna, Scalapay ou PayPal, sous réserve d'acceptation par l'organisme et selon ses conditions), ou par virement pour le One Shot, la Wav Academy et le Wav Premium. Le règlement intégral doit être encaissé avant le démarrage ; en cas de paiement en plusieurs fois, le Vendeur est réglé en une fois par l'organisme, et l'échéancier lie le Client à cet organisme. Les références de facture et de paiement sont conservées. Une preuve d’émission de virement ne vaut pas encaissement.
           </p>
           <p className="text-muted-foreground mb-4">
             <strong>Incident de paiement :</strong> tout rejet de paiement peut entraîner la suspension immédiate des accès et le report ou la suspension de l'exécution des prestations jusqu'à régularisation.

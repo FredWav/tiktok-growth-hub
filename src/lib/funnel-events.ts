@@ -25,7 +25,6 @@ export const FUNNEL_EVENTS = {
   academyPurchase: "academy_purchase",
   premiumApplicationStart: "premium_application_start",
   premiumApplicationSubmit: "premium_application_submit",
-  newsletterOptIn: "newsletter_opt_in",
 } as const;
 
 export type FunnelEventName = (typeof FUNNEL_EVENTS)[keyof typeof FUNNEL_EVENTS];

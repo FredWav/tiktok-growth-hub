@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { SEOHead } from "@/components/SEOHead";
 import { OfferPage } from "@/components/offers/OfferPage";
 import { seoFor } from "@/config/seo";
-import { OFFERS } from "@/config/offers";
+import { INSTALLMENTS_LABEL, INSTALLMENTS_NOTE, OFFERS } from "@/config/offers";
 
 const oneShotFaq = [
   {
@@ -57,8 +57,8 @@ export default function OneShot() {
         terms={
           <>
             <p>
-              Aucun paiement lors de la demande. Une fois la date convenue, tu règles 399 € TTC en ligne par carte ou par
-              virement pour confirmer le rendez-vous.
+              Aucun paiement lors de la demande. Une fois la date convenue, tu règles 399 € TTC pour confirmer le
+              rendez-vous : en ligne par carte, {INSTALLMENTS_LABEL} ({INSTALLMENTS_NOTE}), ou par virement.
             </p>
             <p>Dix One Shot par mois au maximum. Quand le mois est complet, une date le mois suivant t'est proposée.</p>
             <p>

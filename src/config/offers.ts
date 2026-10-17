@@ -45,6 +45,16 @@ export type Offer = {
   featured?: boolean;
 };
 
+/**
+ * Paiement en plusieurs fois proposé par les organismes partenaires au moment du
+ * paiement Stripe (One Shot, Wav Academy, Wav Premium). Fred est réglé en une fois ;
+ * l'échéancier lie le client à l'organisme. Ne jamais annoncer ici une offre à
+ * intérêts (6, 12 ou 24 fois) : ce serait de la publicité pour un crédit.
+ * PayPal 4 fois : à confirmer par un paiement test via Stripe avant mise en ligne.
+ */
+export const INSTALLMENTS_LABEL = "en 3 fois sans frais avec Klarna, en 3 ou 4 fois avec Scalapay, ou en 4 fois avec PayPal";
+export const INSTALLMENTS_NOTE = "sous réserve d'acceptation par l'organisme de paiement";
+
 /** Fin des prix de lancement : la hausse s'applique réellement à cette date. */
 export const LAUNCH_END_LABEL = "31/12/2026";
 

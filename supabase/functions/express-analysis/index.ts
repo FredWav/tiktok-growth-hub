@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
-import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { getStripePricesForMode, getStripeSecretKey } from "../_shared/stripe-config.ts";
 import { notifySuccess, notifyError } from "../_shared/itpush.ts";
 import { normalizeTikTokUsername } from "../_shared/tiktok-username.ts";
@@ -21,44 +21,6 @@ function getExpectedExpressPriceId(livemode: boolean): string {
     getStripePricesForMode(mode).analyse_express;
 }
 
-/**
- * Bounded newsletter call after the analysis job has been saved.
- * Updates express_analyses.newsletter_subscribed on success.
- */
-async function subscribeToNewsletter(
-  supabase: SupabaseClient,
-  analysisId: string | null,
-  email: string,
-): Promise<void> {
-  try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    const resp = await fetch(`${supabaseUrl}/functions/v1/mailerlite-subscribe`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${serviceKey}`,
-      },
-      body: JSON.stringify({ email, source: "analyse_express" }),
-      signal: AbortSignal.timeout(10_000),
-    });
-    const result = await resp.json();
-    if (!resp.ok) {
-      console.error(`Newsletter subscription failed for ${email}:`, result);
-      return;
-    }
-    console.log(`Newsletter subscription OK for ${email}`);
-    if (analysisId) {
-      await supabase
-        .from("express_analyses")
-        .update({ newsletter_subscribed: true })
-        .eq("id", analysisId);
-    }
-  } catch (err) {
-    console.error("subscribeToNewsletter error:", err);
-  }
-}
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -71,7 +33,6 @@ serve(async (req) => {
 
   let username: string | undefined;
   let customerEmail: string | null = null;
-  let wantsNewsletter = false;
   let analysisId: string | null = null;
   let session_id: string | undefined;
 
@@ -97,7 +58,7 @@ serve(async (req) => {
     // ── 1. Résoudre la ligne express_analyses ──
     // Soit déjà liée à cette session Stripe (retry), soit via client_reference_id
     // posé par create-express-checkout sur le Payment Link.
-    type ExpressAnalysisRow = ExpressRow & { newsletter_requested: boolean | null };
+    type ExpressAnalysisRow = ExpressRow;
     let row: ExpressAnalysisRow | null = null;
     {
       const { data: bySession } = await supabase
@@ -131,7 +92,6 @@ serve(async (req) => {
     username = normalizeTikTokUsername(row.tiktok_username);
     if (!username) throw new Error("Nom d'utilisateur TikTok invalide sur l'intention d'analyse");
     customerEmail = row.email || session.customer_details?.email || null;
-    wantsNewsletter = row.newsletter_requested === true;
 
     // Idempotence: si on a déjà lancé l'analyse, on retourne le job_id existant.
     if (row.job_id || ["failed", "refunded", "complete", "completed"].includes(row.status)) {
@@ -177,8 +137,6 @@ serve(async (req) => {
     }
     const saved = await launchExpressJob(supabase, launchLock as ExpressRow, apiKey);
     const jobId = saved.job_id;
-    // Newsletter latency can no longer strand an analysis before its partner launch.
-    if (wantsNewsletter && customerEmail) await subscribeToNewsletter(supabase, analysisId, customerEmail);
 
     await notifySuccess("Analyse Express", `Lancée • @${username} • job ${jobId}${customerEmail ? " • " + customerEmail : ""}`);
 

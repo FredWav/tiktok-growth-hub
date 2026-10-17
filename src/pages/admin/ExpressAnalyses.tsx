@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/table";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Download, ExternalLink, Loader2, RefreshCw, Search, Mail, Copy, Check } from "lucide-react";
+import { Download, ExternalLink, Loader2, RefreshCw, Search, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import { downloadExpressReport } from "@/lib/pdf";
 import { supabase } from "@/integrations/supabase/client";
@@ -367,7 +367,6 @@ const ExpressAnalyses = () => {
                   <TableHead className="text-cream/70">Type</TableHead>
                   <TableHead className="text-cream/70">Compte / vidéo</TableHead>
                   <TableHead className="text-cream/70">Email</TableHead>
-                  <TableHead className="text-cream/70">Contact e-mail</TableHead>
                   <TableHead className="text-cream/70">Statut</TableHead>
                   <TableHead className="text-cream/70">Score</TableHead>
                   <TableHead className="text-cream/70">Erreur</TableHead>
@@ -422,23 +421,6 @@ const ExpressAnalyses = () => {
                           </div>
                         ) : (
                           <span className="text-cream/30">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {analysis.newsletter_requested ? (
-                          analysis.newsletter_subscribed ? (
-                            <Badge variant="default" className="gap-1">
-                              <Mail className="h-3 w-3" />
-                              Inscrit
-                            </Badge>
-                          ) : (
-                            <Badge variant="outline" className="gap-1 text-yellow-400 border-yellow-500/40">
-                              <Mail className="h-3 w-3" />
-                              Accord donné
-                            </Badge>
-                          )
-                        ) : (
-                          <span className="text-cream/30 text-xs">Pas d'accord</span>
                         )}
                       </TableCell>
                       <TableCell>
@@ -534,7 +516,6 @@ function VideoRowView({ video, copiedEmail, onCopyEmail }: {
           </button>
         </div>
       </TableCell>
-      <TableCell><span className="text-cream/30 text-xs">Non proposé</span></TableCell>
       <TableCell>
         <Badge variant={config.variant}>{config.label}</Badge>
         {(video.report_viewed_at || video.pdf_downloaded_at) && (

@@ -14,8 +14,6 @@ export interface ExpressAnalysis {
   stripe_session_id: string | null;
   tiktok_username: string;
   email: string | null;
-  newsletter_requested: boolean;
-  newsletter_subscribed: boolean;
   job_id: string | null;
   status: string;
   error_message: string | null;
@@ -29,8 +27,6 @@ const LIST_COLUMNS = [
   "stripe_session_id",
   "tiktok_username",
   "email",
-  "newsletter_requested",
-  "newsletter_subscribed",
   "job_id",
   "status",
   "error_message",

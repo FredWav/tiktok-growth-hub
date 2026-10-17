@@ -15,7 +15,6 @@ Ce ne sont pas des secrets, juste des identifiants à recopier.
 | `STRIPE_VIDEO_PAYMENT_LINK_TEST` / `_LIVE` | Stripe → Liens de paiement | oui | oui |
 | `STRIPE_VIDEO_PRODUCT_ID_TEST` / `_LIVE` | Stripe → Catalogue → Analyse vidéo | oui | oui |
 | `STRIPE_WEBHOOK_SECRET_TEST` / `STRIPE_WEBHOOK_SECRET` | Créé avec le nouveau webhook (voir B) ; ensuite toujours visible via « Révéler » | oui | oui |
-| `MAILERLITE_GROUP_ID`, `MAILERLITE_DEFAULT_GROUP_ID`, `MAILERLITE_EXPRESS_GROUP_ID` | MailerLite → Abonnés → Groupes (l'identifiant est dans l'adresse de la page) | non | oui |
 | `DISCORD_GUILD_ID` | Discord → clic droit sur le serveur → « Copier l'identifiant » (mode développeur activé) | non | oui |
 | `DISCORD_VIP1_ROLE_ID`, `DISCORD_VIP2_ROLE_ID`, `DISCORD_VIP_ROLE_ID` | Discord → Paramètres du serveur → Rôles → clic droit → « Copier l'identifiant ». Les 5 abonnés Academy historiques utilisent VIP1 (3) et VIP2 (2) | non | oui |
 | `DISCORD_CLIENT_ID` | Discord Developer Portal → ton application → OAuth2 | non | oui |
@@ -31,7 +30,6 @@ Ce ne sont pas des secrets, juste des identifiants à recopier.
 | `STRIPE_WEBHOOK_SECRET_TEST` | Nouvelle destination webhook en mode test vers `https://ykcjzdqpvffdzlxxtjqc.supabase.co/functions/v1/stripe-webhook` (événements : `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `customer.subscription.deleted`) | oui | — |
 | `STRIPE_WEBHOOK_SECRET` (live) | Nouvelle destination webhook live vers le projet de production, créée le jour de la bascule | — | oui |
 | `WAVSTATS_API_KEY` | Nouvelle clé API dans WavStats | oui | oui |
-| `MAILERLITE_API_KEY` | MailerLite → Intégrations → API → « Générer un nouveau jeton » | non (éviter de polluer tes listes) | oui |
 | `OPENAI_API_KEY` | platform.openai.com → API keys → « Create new secret key » (assistant de l'admin) | optionnel | optionnel |
 | `ITPUSH_API_KEY` | itpush.dev → nouvelle clé (notifications push sur ton téléphone) | optionnel | optionnel |
 | `DISCORD_WEBHOOK_URL` | Discord → salon → Intégrations → Webhooks → « Nouveau webhook » | optionnel | optionnel |
@@ -60,6 +58,7 @@ Les régénérer maintenant couperait immédiatement le site actuel.
 | Nom | Pourquoi |
 |---|---|
 | `WAVSTATS_PARTNER_KEY`, `WAVSTATS_PARTNER_PLAN_ID`, `WAVSTATS_PROVISION_ENABLED` | La nouvelle Academy n'inclut plus de crédits WavStats |
+| `MAILERLITE_API_KEY`, `MAILERLITE_*_GROUP_ID` | Newsletter et guide gratuit des hooks retirés du site (en suspens) |
 | `WAV_SOCIAL_SCAN_API_KEY` | Ancien nom de `WAVSTATS_API_KEY` |
 | `EXPRESS_SAMPLE_CONTRACT_VERIFIED` | Jamais activé en production (toutes les analyses depuis mars 2026 sont au format « legacy ») : on le laisse absent |
 | `COMMERCE_ACADEMY_PAYMENT_URL`, `COMMERCE_PREMIUM_PAYMENT_URL`, `COMMERCE_*_PAYMENT_LINK_ID`, `COMMERCE_*_PRICE_ID`, `COMMERCE_SALES_ENABLED`, `COMMERCE_WAVSTATS_VERIFIED`, `COMMERCE_TRANSFER_INSTRUCTIONS` | Recréés au lot 1 avec la nouvelle gamme (One Shot, Academy à vie, Premium) |

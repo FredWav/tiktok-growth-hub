@@ -45,7 +45,6 @@ Dans chaque lien de paiement test, l'URL de redirection après paiement doit poi
 |---|---|---|
 | `ADMIN_SETUP_CODE` | Code pour créer ton compte admin sur le site de test | Au premier test de l'admin |
 | `DISCORD_*` (bot, serveur, OAuth, rôle) | Accès Academy | Avec un serveur Discord de test, au lot 1 |
-| `MAILERLITE_*` | Newsletter | À éviter sur le test (polluerait tes listes) |
 | `ITPUSH_*`, `DISCORD_WEBHOOK_URL`, `DISCORD_PING_USER_ID` | Notifications push | Optionnel |
 | `OPENAI_API_KEY` | Assistant de l'admin | Optionnel |
 | `COMMERCE_*` | Ventes d'accompagnements | Réécrits au lot 1 (nouvelle gamme) |

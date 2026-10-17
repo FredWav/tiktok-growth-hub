@@ -573,7 +573,6 @@ export default function AdminMarketing() {
                   <option value="https://fredwav.com/temoignages">Témoignages</option>
                   <option value="https://fredwav.com/a-propos">À Propos</option>
                   <option value="https://fredwav.com/contact">Contact</option>
-                  <option value="https://fredwav.com/newsletter">Newsletter</option>
                 </select>
               </div>
               <div className="grid grid-cols-3 gap-3">

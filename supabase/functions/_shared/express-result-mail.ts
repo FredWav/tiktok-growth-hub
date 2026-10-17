@@ -1,4 +1,5 @@
-import { enqueue, site, type Database } from "./commerce.ts";
+import type { Database } from "./commerce.ts";
+import { enqueue, site } from "./mail-queue.ts";
 
 /**
  * Mail de livraison de l'Analyse Express. Le PDF est produit dans le navigateur

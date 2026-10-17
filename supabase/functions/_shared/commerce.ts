@@ -1,5 +1,8 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import * as nodemailer from "https://esm.sh/nodemailer@6.9.16";
+// File d'e-mails et utilitaires sans dépendance réseau : importables par les tests Node.
+export { enqueue, missingCommerceTable, site } from "./mail-queue.ts";
+import { missingCommerceTable } from "./mail-queue.ts";
 
 export const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -19,7 +22,6 @@ export type Database = ReturnType<typeof db>;
 export const VERSION = "2026-09-08";
 export const OWNER_EMAIL = "fredwavcm@gmail.com";
 export const CALENDAR = "https://calendar.app.google/UZC5UY38shFuSqmy6";
-export const site = () => Deno.env.get("SITE_URL") || "https://fredwav.com";
 export const CGV_TEXT =
   "J'ai lu et j'accepte les CGV et le récapitulatif de ma commande, avec sa date de démarrage.";
 export const EARLY_TEXT =
@@ -92,26 +94,6 @@ export async function fingerprint(req: Request) {
     (b) => b.toString(16).padStart(2, "0"),
   ).join("");
 }
-export async function enqueue(
-  client: Database,
-  key: string,
-  recipient: string,
-  subject: string,
-  body: string,
-) {
-  const { error } = await client.from("commerce_mail").upsert({
-    dedupe_key: key,
-    recipient,
-    subject,
-    body,
-  }, { onConflict: "dedupe_key", ignoreDuplicates: true });
-  // Le socle commerce v3 n'est pas encore en base : ne jamais faire échouer
-  // l'appelant (webhook Stripe) parce que la file d'emails est absente.
-  if (error && !missingCommerceTable(error)) throw error;
-  if (error) {
-    console.error("commerce_mail absente, email non mis en file:", key, subject);
-  }
-}
 export async function deliverMail(client: Database) {
   const deadline = Date.now() + 30000;
   const { data, error } = await client.from("commerce_mail").select("*")
@@ -178,10 +160,6 @@ export async function deliverMail(client: Database) {
 
 // Le socle commerce v3 n'est pas encore en base : consigner un paiement à rapprocher
 // ne doit jamais faire échouer le webhook (Stripe retenterait en boucle).
-export function missingCommerceTable(error: unknown) {
-  const code = (error as { code?: string } | null)?.code;
-  return code === "42P01" || code === "PGRST205";
-}
 export async function logUnmatchedPayment(client: Database, payload: {
   session_id: string;
   reason: string;

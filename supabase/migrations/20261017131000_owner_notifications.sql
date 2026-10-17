@@ -1,24 +1,19 @@
--- Toutes les notifications internes partent vers la boîte de Fred, et le mail
--- de confirmation d'inscription affiche un montant, une offre et des dates lisibles.
+-- Notifications internes vers la boîte de Fred.
+--
+-- La migration du 16/09/2026 (notifications_fred_et_mail_inscription) n'a jamais
+-- été appliquée en production : les nouvelles demandes et les alertes Express
+-- partaient encore vers contact@fredwav.com. On reprend les définitions réelles
+-- de la production en ne changeant que le destinataire interne (OWNER_EMAIL de
+-- supabase/functions/_shared/commerce.ts) et le libellé de l'offre.
+-- Les textes client (anciens prix) seront réécrits avec le catalogue v2.
 
--- 74900 -> « 749 € », 119050 -> « 1 190,50 € ».
-CREATE OR REPLACE FUNCTION public.commerce_format_euros(p_cents integer) RETURNS text
-LANGUAGE sql IMMUTABLE SET search_path=public AS $$
-  SELECT replace(to_char(p_cents / 100, 'FM999G999G990'), ',', ' ')
-    || CASE WHEN p_cents % 100 = 0 THEN '' ELSE ',' || lpad((p_cents % 100)::text, 2, '0') END
-    || ' €';
-$$;
-REVOKE ALL ON FUNCTION public.commerce_format_euros(integer) FROM PUBLIC,anon,authenticated;
-GRANT EXECUTE ON FUNCTION public.commerce_format_euros(integer) TO service_role;
-
-CREATE OR REPLACE FUNCTION public.express_notification_outbox() RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path=public AS $$
+CREATE OR REPLACE FUNCTION public.express_notification_outbox() RETURNS trigger
+    LANGUAGE plpgsql SECURITY DEFINER
+    SET search_path TO 'public'
+    AS $$
 BEGIN
-  IF NEW.status='complete' AND OLD.status IS DISTINCT FROM 'complete' AND NEW.email IS NOT NULL THEN
-    INSERT INTO commerce_mail(dedupe_key,recipient,subject,body) VALUES
-      ('express-result:'||NEW.id,NEW.email,'Ton Analyse Express est prête',
-       'Analyse automatisée de @'||NEW.tiktok_username||E'\nConsulte ton rapport : https://fredwav.com/analyse-express/result?session_id='||NEW.stripe_session_id)
-    ON CONFLICT(dedupe_key) DO NOTHING;
-  END IF;
+  -- Le mail client de livraison est mis en file par sendExpressResultMail (version HTML).
+  -- Ce trigger ne doit plus insérer la variante texte brut : elle gagnait le dedupe_key.
   IF NEW.support_requested_at IS NOT NULL AND OLD.support_requested_at IS NULL THEN
     INSERT INTO commerce_mail(dedupe_key,recipient,subject,body) VALUES
       ('express-support:'||NEW.id,'fredwavcm@gmail.com','Analyse Express : intervention requise',
@@ -30,7 +25,9 @@ END $$;
 REVOKE ALL ON FUNCTION public.express_notification_outbox() FROM PUBLIC, anon, authenticated;
 
 CREATE OR REPLACE FUNCTION public.commerce_submit_application(v jsonb) RETURNS uuid
-LANGUAGE plpgsql SECURITY DEFINER SET search_path=public AS $$
+    LANGUAGE plpgsql SECURITY DEFINER
+    SET search_path TO 'public'
+    AS $$
 DECLARE existing commerce_applications; result_id uuid;
 BEGIN
   -- Serialize duplicate/rate-limit checks, including simultaneous tabs and retries.
@@ -56,6 +53,20 @@ BEGIN
      ELSE 'Wav Premium : 1 990 € TTC pour trente jours. Fred étudie personnellement ta candidature et répond sous deux jours ouvrés. Aucun paiement à cette étape.' END);
   RETURN result_id;
 END $$;
+
+-- Mail de confirmation d'inscription lisible (montant, offre, dates) : repris de la
+-- migration du 16/09/2026 jamais appliquée en production.
+
+-- 74900 -> « 749 € », 119050 -> « 1 190,50 € ».
+CREATE OR REPLACE FUNCTION public.commerce_format_euros(p_cents integer) RETURNS text
+LANGUAGE sql IMMUTABLE SET search_path=public AS $$
+  SELECT replace(to_char(p_cents / 100, 'FM999G999G990'), ',', ' ')
+    || CASE WHEN p_cents % 100 = 0 THEN '' ELSE ',' || lpad((p_cents % 100)::text, 2, '0') END
+    || ' €';
+$$;
+REVOKE ALL ON FUNCTION public.commerce_format_euros(integer) FROM PUBLIC,anon,authenticated;
+GRANT EXECUTE ON FUNCTION public.commerce_format_euros(integer) TO service_role;
+
 REVOKE ALL ON FUNCTION public.commerce_submit_application(jsonb) FROM PUBLIC,anon,authenticated;
 GRANT EXECUTE ON FUNCTION public.commerce_submit_application(jsonb) TO service_role;
 

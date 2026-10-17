@@ -236,15 +236,17 @@ test("le webhook exige un événement Stripe signé et un paiement confirmé ava
 test("les emails Express utilisent une file durable avec déduplication et cinq tentatives", () => {
   const commerce = readFileSync(new URL("../supabase/functions/_shared/commerce.ts", import.meta.url), "utf8");
   const reconciliation = readFileSync(new URL("../supabase/functions/reconcile-express-analyses/index.ts", import.meta.url), "utf8");
-  const migration = readFileSync(new URL("../supabase/migrations/20260908120000_commerce_v3.sql", import.meta.url), "utf8");
-  const scheduler = readFileSync(new URL("../supabase/migrations/20260908121000_commerce_scheduler.sql", import.meta.url), "utf8");
+  const migration = readFileSync(new URL("../supabase/migrations/20261017120000_reference_prod.sql", import.meta.url), "utf8");
+  const scheduler = readFileSync(new URL("../supabase/migrations/20261017130000_cron_v2.sql", import.meta.url), "utf8");
   assert.match(commerce, /state\.in\.\(pending,failed\)/);
   assert.match(commerce, /\.lt\("attempts", 5\)/);
   assert.match(commerce, /SMTP_PASSWORD/);
   assert.match(reconciliation, /await deliverMail\(client\)/);
-  assert.match(migration, /dedupe_key text NOT NULL UNIQUE/);
-  assert.match(migration, /express-result:'\|\|NEW\.id/);
-  assert.match(scheduler, /cron\.schedule\('express-v3-minute','\* \* \* \* \*'/);
+  assert.match(migration, /dedupe_key text NOT NULL,/);
+  assert.match(migration, /UNIQUE \(dedupe_key\)/);
+  const resultMail = readFileSync(new URL("../supabase/functions/_shared/express-result-mail.ts", import.meta.url), "utf8");
+  assert.match(resultMail, /express-result:\$\{row\.id\}/);
+  assert.match(scheduler, /cron\.schedule\('reconcile-analyses', '\* \* \* \* \*'/);
 });
 
 test("la page Express annonce jusqu’à 120 vidéos sans tiret cadratin", () => {

@@ -1,4 +1,4 @@
-project_id = "rdpykyvqcckxpygwblxf"
+project_id = "fredwav"
 
 [functions.submit-academy-application]
 verify_jwt = false
@@ -19,37 +19,16 @@ verify_jwt = false
 [functions.setup-admin]
 verify_jwt = false
 
-[functions.create-vip-checkout]
-verify_jwt = false
-
 [functions.stripe-webhook]
 verify_jwt = false
 
 [functions.discord-role]
 verify_jwt = false
 
-[functions.check-vip-expiry]
-verify_jwt = false
-
-[functions.create-oneshot-checkout]
-verify_jwt = false
-
-[functions.send-oneshot-form]
-verify_jwt = false
-
-[functions.verify-oneshot-payment]
-verify_jwt = false
-
 [functions.create-express-checkout]
 verify_jwt = false
 
 [functions.express-analysis]
-verify_jwt = false
-
-[functions.express-pdf]
-verify_jwt = false
-
-[functions.notify-application]
 verify_jwt = false
 
 [functions.retry-express-analysis]
@@ -59,9 +38,6 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.manual-express-analysis]
-verify_jwt = false
-
-[functions.create-wavacademy-checkout]
 verify_jwt = false
 
 [functions.mailerlite-count]
@@ -102,9 +78,6 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.create-video-checkout]
-verify_jwt = false
-
-[functions.reconcile-video-analyses]
 verify_jwt = false
 
 [functions.video-analysis-report]

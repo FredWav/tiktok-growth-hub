@@ -3,7 +3,7 @@
  * jobs WavStats, livraison des rapports terminés.
  *
  * Appelé chaque minute par le cron du rattrapage Express (reconcile-express-analyses),
- * seul cron authentifié sur l'hébergement, et par reconcile-video-analyses à la demande.
+ * seul cron authentifié sur l'hébergement.
  */
 import type { Database } from "./commerce.ts";
 import { advanceVideo, failVideo, log, type VideoRow } from "./video-analysis.ts";

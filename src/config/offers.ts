@@ -9,7 +9,7 @@
  */
 
 export type AcademyPlan = {
-  /** Identifiant de formule envoyé à record-wavacademy-consent */
+  /** Identifiant de formule (historique) */
   term: "3m" | "6m" | "12m";
   months: number;
   /** Prix total en euros, payé en une seule fois */

@@ -5,13 +5,13 @@ import {
   headers,
   json,
   OWNER_EMAIL,
-  service,
+  cronCaller,
   site,
 } from "../_shared/commerce.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers });
-  if (!service(req)) return json({ error: "Accès refusé" }, 403);
+  if (!cronCaller(req)) return json({ error: "Accès refusé" }, 403);
   const client = db(), now = new Date().toISOString();
   const summary = { activated: 0, errors: 0 };
   const deadline = Date.now() + 25000;

@@ -1,1 +1,0 @@
-ALTER TABLE public.diagnostic_leads ADD COLUMN temps text;

@@ -225,7 +225,7 @@ async function deliverHooksPack(
  * Analyse Vidéo : le client_reference_id pointe vers video_analyses.
  * Renvoie null si la session ne concerne pas ce produit (les autres branches la traitent).
  * Une fois le paiement enregistré, on répond 200 même si le lancement échoue :
- * la commande porte son état, et le cron reconcile-video-analyses reprend la suite.
+ * la commande porte son état, et le cron reconcile-express-analyses reprend la suite.
  */
 async function handleVideoCheckout(
   stripe: Stripe,

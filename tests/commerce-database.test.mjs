@@ -1,7 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
-import { PGlite } from "@electric-sql/pglite";
+import { referenceDatabase } from "./reference-db.mjs";
 
 test("Premium : horaire Paris conservé, changement d'heure et consentement périmé", async () => {
   const db = await database();
@@ -44,25 +43,7 @@ test("échec d'enregistrement de la notification : aucune fausse candidature ré
 });
 
 async function database() {
-  const db = new PGlite();
-  await db.exec(
-    `CREATE ROLE anon; CREATE ROLE authenticated; CREATE ROLE service_role;
-    CREATE SCHEMA auth; CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql AS 'SELECT null::uuid';
-    CREATE TABLE user_roles(user_id uuid,role text);
-    CREATE TABLE wavacademy_subscriptions(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),email text,status text,access_expires_at timestamptz);
-    CREATE TABLE express_analyses(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),status text,email text,tiktok_username text,stripe_session_id text);
-  `,
-  );
-  await db.exec(
-    await readFile(
-      new URL(
-        "../supabase/migrations/20260908120000_commerce_v3.sql",
-        import.meta.url,
-      ),
-      "utf8",
-    ),
-  );
-  return db;
+  return referenceDatabase();
 }
 async function order(db, start = "2027-08-31") {
   return (await db.query(
@@ -239,47 +220,24 @@ test("demande et e-mails atomiques : retry sans double candidature ni notificati
     await db.close();
   }
 });
-test("finalisation validée : un seul email de résultat complet est mis en attente", async () => {
+test("Express : le trigger ne met en file que l'alerte d'intervention, adressée à Fred", async () => {
   const db = await database();
   try {
     const { rows: [o] } = await db.query(
-      `INSERT INTO express_analyses(status,email,tiktok_username,stripe_session_id) VALUES('processing','fredwavcm@gmail.com','fredwav','cs_test_fake') RETURNING id`,
+      `INSERT INTO express_analyses(status,email,tiktok_username,stripe_session_id) VALUES('processing','client@example.invalid','fredwav','cs_test_fake') RETURNING id`,
     );
-    assert.equal(
-      (await db.query("SELECT count(*)::int AS n FROM commerce_mail")).rows[0].n,
-      0,
-    );
-    await db.query(
-      `UPDATE express_analyses SET status='complete' WHERE id=$1`,
-      [o.id],
-    );
-    const { rows: [mail] } = await db.query(
-      `SELECT dedupe_key,recipient,subject,body,state,attempts FROM commerce_mail`,
-    );
-    assert.equal(mail.dedupe_key, `express-result:${o.id}`);
-    assert.equal(mail.recipient, "fredwavcm@gmail.com");
-    assert.equal(mail.subject, "Ton Analyse Express est prête");
-    assert.match(mail.body, /Analyse automatisée de @fredwav/);
-    assert.match(mail.body, /analyse-express\/result\?session_id=cs_test_fake/);
-    assert.equal(mail.state, "pending");
-    assert.equal(mail.attempts, 0);
-    await db.query(
-      `UPDATE express_analyses SET status='complete' WHERE id=$1`,
-      [o.id],
-    );
-    assert.equal(
-      (await db.query("SELECT count(*)::int AS n FROM commerce_mail")).rows[0]
-        .n,
-      1,
-    );
-    const { rows: [withoutEmail] } = await db.query(
-      `INSERT INTO express_analyses(status,email,tiktok_username,stripe_session_id) VALUES('processing',NULL,'manual','manual-test') RETURNING id`,
-    );
-    await db.query(`UPDATE express_analyses SET status='complete' WHERE id=$1`, [withoutEmail.id]);
-    assert.equal(
-      (await db.query("SELECT count(*)::int AS n FROM commerce_mail")).rows[0].n,
-      1,
-    );
+    // Le mail de résultat (HTML) est mis en file par sendExpressResultMail, pas par le trigger.
+    await db.query(`UPDATE express_analyses SET status='complete' WHERE id=$1`, [o.id]);
+    assert.equal((await db.query("SELECT count(*)::int AS n FROM commerce_mail")).rows[0].n, 0);
+    await db.query(`UPDATE express_analyses SET support_requested_at=now() WHERE id=$1`, [o.id]);
+    await db.query(`UPDATE express_analyses SET support_requested_at=now() WHERE id=$1`, [o.id]);
+    const { rows } = await db.query(`SELECT dedupe_key,recipient,subject,state,attempts FROM commerce_mail`);
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].dedupe_key, `express-support:${o.id}`);
+    assert.equal(rows[0].recipient, "fredwavcm@gmail.com");
+    assert.equal(rows[0].subject, "Analyse Express : intervention requise");
+    assert.equal(rows[0].state, "pending");
+    assert.equal(rows[0].attempts, 0);
   } finally {
     await db.close();
   }

@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.1"
+    PostgrestVersion: "14.18"
   }
   public: {
     Tables: {
@@ -1339,6 +1339,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      call_cron_function: { Args: { p_function: string }; Returns: number }
       commerce_accept: {
         Args: {
           p_consent: Json
@@ -1348,6 +1349,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      commerce_format_euros: { Args: { p_cents: number }; Returns: string }
       commerce_record_payment: {
         Args: {
           p_actor?: string

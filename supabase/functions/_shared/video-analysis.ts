@@ -11,11 +11,11 @@
 import type { Database } from "./commerce.ts";
 import { notifyError, notifySuccess } from "./itpush.ts";
 import { normalizeVideoResult } from "./video-report.ts";
+import { OWNER_EMAIL } from "./owner.ts";
 
 export const WAVSTATS_API = "https://wavstats.com/api/v1";
 export const VIDEO_MAX_LAUNCH_ATTEMPTS = 3;
 export const VIDEO_DELAY_ALERT_MS = 15 * 60_000;
-const OWNER_EMAIL = "fredwavcm@gmail.com";
 
 export type VideoRow = {
   id: string;

@@ -220,16 +220,18 @@ test("les noms d'affichage TikTok sont refusés avant le paiement", () => {
 });
 
 test("le webhook exige un événement Stripe signé et un paiement confirmé avant les emails Express", () => {
-  const source = readFileSync(new URL("../supabase/functions/stripe-webhook/index.ts", import.meta.url), "utf8");
-  const signatureCheck = source.indexOf("constructEventAsync");
+  const router = readFileSync(new URL("../supabase/functions/stripe-webhook/index.ts", import.meta.url), "utf8");
+  const source = readFileSync(new URL("../supabase/functions/stripe-webhook/express.ts", import.meta.url), "utf8");
+  // La signature est vérifiée avant tout aiguillage vers les modules produits.
+  assert.ok(router.indexOf("constructEventAsync") >= 0);
+  assert.ok(router.indexOf("routeCheckout(") > router.indexOf("constructEventAsync"));
+  assert.match(router, /checkout\.session\.async_payment_succeeded/);
   const paymentCheck = source.indexOf('if (session.payment_status === "paid")');
   const confirmation = source.lastIndexOf("await sendExpressOrderConfirmation");
   const analysisLaunch = source.lastIndexOf("await triggerExpressAnalysis");
-  assert.ok(signatureCheck >= 0);
-  assert.ok(paymentCheck > signatureCheck);
+  assert.ok(paymentCheck >= 0);
   assert.ok(confirmation > paymentCheck);
   assert.ok(analysisLaunch > confirmation);
-  assert.match(source, /checkout\.session\.async_payment_succeeded/);
   assert.match(source, /express-contract:\$\{session\.id\}/);
 });
 

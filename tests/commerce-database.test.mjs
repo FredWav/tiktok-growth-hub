@@ -220,7 +220,7 @@ test("demande et e-mails atomiques : retry sans double candidature ni notificati
     await db.close();
   }
 });
-test("Express : le trigger ne met en file que l'alerte d'intervention, adressée à Fred", async () => {
+test("Express : le trigger ne met en file que l'alerte d'intervention, adressée à contact@", async () => {
   const db = await database();
   try {
     const { rows: [o] } = await db.query(
@@ -234,7 +234,7 @@ test("Express : le trigger ne met en file que l'alerte d'intervention, adressée
     const { rows } = await db.query(`SELECT dedupe_key,recipient,subject,state,attempts FROM commerce_mail`);
     assert.equal(rows.length, 1);
     assert.equal(rows[0].dedupe_key, `express-support:${o.id}`);
-    assert.equal(rows[0].recipient, "fredwavcm@gmail.com");
+    assert.equal(rows[0].recipient, "contact@fredwav.com");
     assert.equal(rows[0].subject, "Analyse Express : intervention requise");
     assert.equal(rows[0].state, "pending");
     assert.equal(rows[0].attempts, 0);

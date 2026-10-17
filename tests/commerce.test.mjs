@@ -110,18 +110,20 @@ test("le formulaire de contact transmet les réponses à Fred sans recommandatio
   assert.doesNotMatch(handler, /orientation:\$\{saved\.id\}:client|clientBody|qualifyOrientation/);
 });
 
-test("toutes les notifications internes partent vers la boîte de Fred", () => {
+test("toutes les notifications internes partent vers contact@fredwav.com", () => {
   const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
-  assert.match(read("supabase/functions/_shared/commerce.ts"), /OWNER_EMAIL = "fredwavcm@gmail.com"/);
+  assert.match(read("supabase/functions/_shared/owner.ts"), /OWNER_EMAIL = "contact@fredwav\.com"/);
+  assert.match(read("supabase/functions/_shared/commerce.ts"), /export \{ OWNER_EMAIL \} from "\.\/owner\.ts"/);
   for (const path of [
     "supabase/functions/commerce-process/index.ts",
     "supabase/functions/_shared/commerce-stripe.ts",
     "supabase/functions/submit-orientation/index.ts",
   ]) {
-    assert.doesNotMatch(read(path), /"contact@fredwav\.com",/, path);
+    assert.doesNotMatch(read(path), /fredwavcm@gmail\.com/, path);
   }
   const migration = read("supabase/migrations/20261017131000_owner_notifications.sql");
-  assert.doesNotMatch(migration, /'contact@fredwav\.com'/);
+  assert.doesNotMatch(migration, /fredwavcm@gmail\.com/);
+  assert.match(migration, /'contact@fredwav\.com'/);
   assert.match(migration, /commerce_format_euros\(o\.amount_cents\)/);
   assert.doesNotMatch(migration, /amount_cents\/100\.0/);
 });

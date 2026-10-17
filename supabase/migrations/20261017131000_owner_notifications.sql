@@ -1,10 +1,9 @@
--- Notifications internes vers la boîte de Fred.
+-- Notifications internes et mail d'inscription.
 --
--- La migration du 16/09/2026 (notifications_fred_et_mail_inscription) n'a jamais
--- été appliquée en production : les nouvelles demandes et les alertes Express
--- partaient encore vers contact@fredwav.com. On reprend les définitions réelles
--- de la production en ne changeant que le destinataire interne (OWNER_EMAIL de
--- supabase/functions/_shared/commerce.ts) et le libellé de l'offre.
+-- Toutes les notifications internes partent vers contact@fredwav.com (OWNER_EMAIL
+-- de supabase/functions/_shared/owner.ts). On reprend les définitions réelles de la
+-- production en améliorant le libellé de l'offre, et on récupère le mail
+-- d'inscription lisible de la migration du 16/09/2026, jamais appliquée en prod.
 -- Les textes client (anciens prix) seront réécrits avec le catalogue v2.
 
 CREATE OR REPLACE FUNCTION public.express_notification_outbox() RETURNS trigger
@@ -16,7 +15,7 @@ BEGIN
   -- Ce trigger ne doit plus insérer la variante texte brut : elle gagnait le dedupe_key.
   IF NEW.support_requested_at IS NOT NULL AND OLD.support_requested_at IS NULL THEN
     INSERT INTO commerce_mail(dedupe_key,recipient,subject,body) VALUES
-      ('express-support:'||NEW.id,'fredwavcm@gmail.com','Analyse Express : intervention requise',
+      ('express-support:'||NEW.id,'contact@fredwav.com','Analyse Express : intervention requise',
        'Dossier '||NEW.id||' · @'||NEW.tiktok_username||E'\nIntervention sous deux jours ouvrés. Si résolution impossible, effectuer le remboursement intégral puis en enregistrer la référence.')
     ON CONFLICT(dedupe_key) DO NOTHING;
   END IF;
@@ -45,7 +44,7 @@ BEGIN
   INSERT INTO commerce_applications(request_id,offer,first_name,email,account_or_project,objective,timing,commitments,fingerprint)
     VALUES((v->>'request_id')::uuid,v->>'offer',v->>'first_name',v->>'email',v->>'account_or_project',v->>'objective',v->>'timing',v->'commitments',v->>'fingerprint') RETURNING id INTO result_id;
   INSERT INTO commerce_mail(dedupe_key,recipient,subject,body) VALUES
-    ('application:'||result_id||':owner','fredwavcm@gmail.com',
+    ('application:'||result_id||':owner','contact@fredwav.com',
      'Nouvelle demande '||CASE WHEN v->>'offer'='academy' THEN 'Wav Academy' ELSE 'Wav Premium' END||' · '||(v->>'first_name'),
      (v->>'first_name')||' · '||(v->>'email')||E'\n'||(v->>'account_or_project')||E'\n'||(v->>'objective')||E'\nDémarrage souhaité : '||coalesce(nullif(v->>'timing',''),'non précisé')),
     ('application:'||result_id||':client',v->>'email','Ta demande est enregistrée',

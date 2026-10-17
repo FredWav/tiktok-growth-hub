@@ -222,12 +222,19 @@ export function capacityLabel(offer: Offer): string | null {
 export const CREATORS_COUNT = "350+";
 
 /**
- * Preuve sociale Analyse Express : base vérifiée à la main par Fred au
- * 12/10/2026 (213 personnes). Le total affiché sur /analyse-express = cette
- * base + le nombre de paiements valides depuis cette date (fonction
- * express_paid_since). On ne touche cette base que pour corriger le départ.
+ * Preuve sociale Analyse Express : 224 personnes au 17/10/2026, 21 h (UTC),
+ * chiffre donné par Fred. Le total affiché sur /analyse-express = cette base +
+ * les paiements valides après cette date (fonction express_paid_since, même
+ * date de départ). Changer la base et la date ensemble.
  */
-export const EXPRESS_USERS_BASE_COUNT = 213;
+export const EXPRESS_USERS_BASE_COUNT = 224;
+
+/**
+ * Preuve sociale Analyse vidéo : 47 au 17/10/2026, 21 h (UTC), chiffre donné par
+ * Fred. Total affiché = cette base + les paiements réels après cette date
+ * (fonction video_paid_since). Changer la base et la date ensemble.
+ */
+export const VIDEO_USERS_BASE_COUNT = 47;
 
 // ── Raccourcis historiques, calculés depuis le catalogue ────────────────────
 export const EXPRESS_PRICE = OFFERS.analyse_express.price;

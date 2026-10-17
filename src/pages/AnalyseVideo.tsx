@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { Clapperboard, Gauge, Lightbulb, ListChecks, Mail } from "lucide-react";
+import { Clapperboard, Gauge, Lightbulb, ListChecks, Mail, Users } from "lucide-react";
 import { toast } from "sonner";
 import { SEOHead } from "@/components/SEOHead";
 import { seoFor } from "@/config/seo";
@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { FUNNEL_EVENTS, trackFunnelEvent } from "@/lib/funnel-events";
-import { OFFERS, VIDEO_ANALYSIS_PRICE_LABEL, launchLabel } from "@/config/offers";
+import { OFFERS, VIDEO_ANALYSIS_PRICE_LABEL, VIDEO_USERS_BASE_COUNT, launchLabel } from "@/config/offers";
 import { parseTikTokVideoUrl } from "../../supabase/functions/_shared/tiktok-video-url";
 
 // Doivent rester identiques aux textes enregistrés par create-video-checkout.
@@ -55,6 +55,18 @@ export default function AnalyseVideo() {
   const [consentImmediateDelivery, setConsentImmediateDelivery] = useState(false);
   const [loading, setLoading] = useState(false);
   const [urlError, setUrlError] = useState<string | null>(null);
+  // Paiements Analyse vidéo réels depuis la base de 47 (rpc video_paid_since).
+  const [paidSince, setPaidSince] = useState(0);
+
+  useEffect(() => {
+    let alive = true;
+    supabase.rpc("video_paid_since").then(({ data, error }) => {
+      if (alive && !error && typeof data === "number") setPaidSince(data);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
   const formStartedRef = useRef(false);
   const [searchParams] = useSearchParams();
   const testMode = import.meta.env.VITE_STRIPE_TEST_MODE === "true" || searchParams.get("test") === "1";
@@ -209,6 +221,12 @@ export default function AnalyseVideo() {
               {loading ? "Redirection vers le paiement…" : `Analyser ma vidéo (${VIDEO_ANALYSIS_PRICE_LABEL})`}
             </Button>
             <p className="text-center text-xs text-muted-foreground">Paiement sécurisé par Stripe · Rapport par e-mail en quelques minutes</p>
+            <p className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+              <Users className="h-4 w-4 shrink-0 text-primary" aria-hidden />
+              <span>
+                <span className="font-semibold text-foreground">{VIDEO_USERS_BASE_COUNT + paidSince}</span> vidéos déjà analysées.
+              </span>
+            </p>
           </form>
         </div>
       </Section>

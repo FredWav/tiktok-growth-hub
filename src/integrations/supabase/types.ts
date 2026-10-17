@@ -826,6 +826,39 @@ export type Database = {
         }
         Relationships: []
       }
+      stripe_events: {
+        Row: {
+          attempts: number
+          id: string
+          last_error: string | null
+          livemode: boolean
+          outcome: Json | null
+          processed_at: string | null
+          received_at: string
+          type: string
+        }
+        Insert: {
+          attempts?: number
+          id: string
+          last_error?: string | null
+          livemode: boolean
+          outcome?: Json | null
+          processed_at?: string | null
+          received_at?: string
+          type: string
+        }
+        Update: {
+          attempts?: number
+          id?: string
+          last_error?: string | null
+          livemode?: boolean
+          outcome?: Json | null
+          processed_at?: string | null
+          received_at?: string
+          type?: string
+        }
+        Relationships: []
+      }
       trusted_clients: {
         Row: {
           avatar_url: string | null
@@ -1426,6 +1459,7 @@ export type Database = {
         }
         Returns: string
       }
+      video_paid_since: { Args: never; Returns: number }
     }
     Enums: {
       app_role: "admin" | "client"

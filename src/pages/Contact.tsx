@@ -123,7 +123,7 @@ export default function Contact() {
               Pas besoin d'attendre. Envoie-moi un message via les réseaux ci-dessus ou par email et on en parle directement.
             </p>
             <p className="text-muted-foreground text-xs mt-4">
-              Envie de mieux me connaître ? <Link to="/a-propos" className="text-primary underline hover:no-underline">Découvre mon parcours</Link> ou consulte les <Link to="/preuves" className="text-primary underline hover:no-underline">témoignages clients</Link>.
+              Envie de mieux me connaître ? <Link to="/a-propos" className="text-primary underline hover:no-underline">Découvre mon parcours</Link> ou consulte les <Link to="/temoignages" className="text-primary underline hover:no-underline">témoignages clients</Link>.
             </p>
           </div>
         </div>

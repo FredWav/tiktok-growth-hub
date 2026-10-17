@@ -182,7 +182,7 @@ export function ResourceArticle({
             ))}
           </div>
           <p className="text-center text-sm text-muted-foreground mt-7">
-            Tu peux aussi consulter les <Link to="/preuves" className="text-primary underline underline-offset-4 hover:no-underline">résultats documentés</Link> avant de choisir une offre.
+            Tu peux aussi consulter les <Link to="/temoignages" className="text-primary underline underline-offset-4 hover:no-underline">résultats documentés</Link> avant de choisir une offre.
           </p>
         </Section>
 

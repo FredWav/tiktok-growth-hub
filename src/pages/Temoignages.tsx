@@ -1,0 +1,118 @@
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
+import { Layout } from "@/components/layout/Layout";
+import { Section, SectionHeader } from "@/components/ui/section";
+import { Button } from "@/components/ui/button";
+import { trackEvent } from "@/lib/tracking";
+import { SEOHead } from "@/components/SEOHead";
+import { seoFor } from "@/config/seo";
+import { ScreenshotWall } from "@/components/ScreenshotWall";
+import { ClientResults } from "@/components/ClientResults";
+import { VideoCard } from "@/components/VideoCard";
+
+// Les légendes (nom + niche + résultat) viennent de src/data/videoTestimonials.ts,
+// indexées par ID YouTube. Une vidéo sans fiche reste affichée sans légende.
+const videoTestimonials = [
+  { id: "LOi7RTx12nE", alt: "Témoignage client - Retour d'expérience récent" },
+  { id: "Hgkn3ifjSS0", alt: "Témoignage client - Retour d'expérience récent" },
+  { id: "Bzw7nwqB2rQ", alt: "Témoignage client - Nouveau retour d'expérience" },
+  { id: "XMMmmLLKue4", alt: "Témoignage client - Nouveau retour d'expérience" },
+  { id: "Jh5yrsotoHM", alt: "Témoignage client - Retour d'expérience récent" },
+  { id: "p3nCwuBZRGI", alt: "Témoignage client - Nouveau retour d'expérience" },
+  { id: "g9QYqO-xiqw", alt: "Témoignage client - Retour d'expérience Wav Premium" },
+  { id: "cc1cRfCEJGE", alt: "Témoignage client - Résultats après coaching stratégie de contenu" },
+  { id: "hwTyjA6BORY", alt: "Témoignage client - Transformation de présence en ligne" },
+  { id: "FrMFqiAqAkU", alt: "Témoignage client - impact sur la stratégie de contenu" },
+  { id: "s-VaJvfFqbM", alt: "Témoignage client - Croissance après accompagnement" },
+  { id: "wu2CPcqp-yU", alt: "Témoignage client - Avis sur le Wav Premium de Fred Wav" },
+];
+
+export default function Temoignages() {
+  return (
+    <Layout>
+      <SEOHead {...seoFor("/temoignages")} />
+      <Section variant="cream" size="lg">
+        <div className="max-w-3xl mx-auto text-center">
+          <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">
+            Témoignages : <span className="text-gold-gradient">des résultats, pas des promesses</span>
+          </h1>
+          <p className="text-lg text-muted-foreground">
+            Ce que des créateurs, entrepreneurs et experts accompagnés par Fred ont obtenu, avec leur contexte.
+            Pas de chiffres gonflés, et aucun résultat présenté comme une garantie.
+          </p>
+        </div>
+      </Section>
+
+      {/* Résultats clients documentés */}
+      <Section variant="cream" size="md" className="pt-0">
+        <SectionHeader
+          title="Des résultats documentés."
+          subtitle="Des créateurs réels, des chiffres réels."
+        />
+        <ClientResults />
+      </Section>
+
+      {/* Video Testimonials */}
+      <Section variant="cream" size="lg">
+        <SectionHeader
+          title="Ils témoignent en vidéo"
+          subtitle="Des retours authentiques, face caméra."
+        />
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          {videoTestimonials.map((video) => (
+            <VideoCard key={video.id} id={video.id} alt={video.alt} location="temoignages" />
+          ))}
+        </div>
+      </Section>
+
+      {/* Screenshot Wall */}
+      <Section variant="cream" size="lg">
+        <ScreenshotWall location="preuves" title="Ce qu'ils en disent" subtitle="Retours directs de clients après leur accompagnement." cols={2} />
+      </Section>
+
+      {/* Suite : les deux familles d'offres */}
+      <Section variant="dark" size="lg">
+        <div className="mx-auto max-w-4xl text-center">
+          <h2 className="font-display text-3xl md:text-4xl font-semibold text-cream mb-4">
+            Et toi, par où commencer ?
+          </h2>
+          <p className="text-cream/70 mb-10">
+            Un diagnostic automatisé pour comprendre ce qui bloque, ou un accompagnement avec Fred pour avancer.
+          </p>
+          <div className="grid gap-6 md:grid-cols-2 text-left">
+            {[
+              {
+                title: "Les analyses",
+                body: "Une vidéo dès 2,90 €, tout ton compte à 19,90 €. Rapport en quelques minutes, sans abonnement.",
+                href: "/analyses",
+                cta: "Voir les analyses",
+              },
+              {
+                title: "Les accompagnements",
+                body: "One Shot, Wav Academy à vie ou Wav Premium individuel : travailler directement avec Fred.",
+                href: "/accompagnements",
+                cta: "Voir les accompagnements",
+              },
+            ].map((item) => (
+              <div key={item.href} className="rounded-2xl border border-primary/30 p-6">
+                <h3 className="font-display text-2xl text-cream mb-2">{item.title}</h3>
+                <p className="text-cream/70 mb-6">{item.body}</p>
+                <Button
+                  variant="hero"
+                  asChild
+                  onClick={() => trackEvent("testimonials_cta_click", { target: item.href })}
+                >
+                  <Link to={item.href}>
+                    {item.cta}
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Section>
+    </Layout>
+  );
+}

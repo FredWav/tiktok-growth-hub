@@ -14,8 +14,8 @@ export const EXPRESS_CONTINUATIONS = [
     eyebrow: "Construis une stratégie complète",
     title: "Mets en place toute ta stratégie avec Fred",
     description: "Transforme ton diagnostic en stratégie claire avec Fred : positionnement, contenus, conversion et plan d’action adaptés à ton activité.",
-    button: "Réserve ton appel avec Fred",
-    url: "/reserverunappel",
+    button: "Découvrir les accompagnements",
+    url: "/accompagnements",
     external: false,
   },
 ] as const;

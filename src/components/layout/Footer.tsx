@@ -16,17 +16,31 @@ function CookieSettingsButton() {
   );
 }
 
-const navLinks = [
-  { label: "Accueil", href: "/", section: "navigation" },
-  { label: "Wav Academy", href: "/wavacademy", section: "navigation" },
-  { label: "Wav Premium", href: "/wav-premium", section: "navigation" },
-  { label: "Analyse Express", href: "/analyse-express", section: "navigation" },
-  { label: "Témoignages", href: "/preuves", section: "navigation" },
-  { label: "Ressources TikTok", href: "/ressources", section: "navigation" },
-  { label: "À propos", href: "/a-propos", section: "navigation" },
-  { label: "Hooks TikTok", href: "/hooks-tiktok", section: "navigation" },
-  { label: "Newsletter", href: "/newsletter", section: "navigation" },
-  { label: "Contact", href: "/contact", section: "navigation" },
+/** Pied de page : toutes les offres et ressources, regroupées comme dans le menu. */
+const footerGroups = [
+  {
+    title: "Offres",
+    links: [
+      { label: "Toutes les analyses", href: "/analyses" },
+      { label: "Analyse vidéo", href: "/analyse-video" },
+      { label: "Analyse Express", href: "/analyse-express" },
+      { label: "Tous les accompagnements", href: "/accompagnements" },
+      { label: "One Shot", href: "/one-shot" },
+      { label: "Wav Academy", href: "/wavacademy" },
+      { label: "Wav Premium", href: "/wav-premium" },
+    ],
+  },
+  {
+    title: "Ressources",
+    links: [
+      { label: "Guides TikTok", href: "/ressources" },
+      { label: "Hooks TikTok", href: "/hooks-tiktok" },
+      { label: "Newsletter", href: "/newsletter" },
+      { label: "Témoignages", href: "/temoignages" },
+      { label: "À propos", href: "/a-propos" },
+      { label: "Contact", href: "/contact" },
+    ],
+  },
 ];
 
 const socialLinks = [
@@ -105,25 +119,29 @@ export function Footer({ minimal = false }: { minimal?: boolean }) {
               Expert stratégie formats courts. 
               Des résultats, pas des promesses.
             </p>
+            <a href="mailto:contact@fredwav.com" className="mt-4 inline-flex min-h-11 items-center text-sm hover:text-gold-light transition-colors" onClick={() => trackPostHogEvent("click_email_link", { location: "footer" })}>
+              contact@fredwav.com
+            </a>
           </div>
 
-          {/* Navigation */}
-          <nav aria-label="Navigation footer - Pages principales">
-            <h2 className="font-semibold text-cream mb-4">Navigation</h2>
-            <ul className="space-y-2 text-sm">
-              {navLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    to={link.href}
-                    className="inline-flex min-h-11 items-center hover:text-gold-light transition-colors"
-                    onClick={() => trackPostHogEvent("click_footer_link", { item: link.label, section: "navigation" })}
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          {footerGroups.map((group) => (
+            <nav key={group.title} aria-label={`Pied de page - ${group.title}`}>
+              <h2 className="font-semibold text-cream mb-4">{group.title}</h2>
+              <ul className="space-y-2 text-sm">
+                {group.links.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      to={link.href}
+                      className="inline-flex min-h-11 items-center hover:text-gold-light transition-colors"
+                      onClick={() => trackPostHogEvent("click_footer_link", { item: link.label, section: group.title })}
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))}
 
           {/* Réseaux sociaux */}
           <nav aria-label="Réseaux sociaux">
@@ -145,23 +163,6 @@ export function Footer({ minimal = false }: { minimal?: boolean }) {
               ))}
             </ul>
           </nav>
-
-          {/* Contact */}
-          <div>
-            <h2 className="font-semibold text-cream mb-4">Contact</h2>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link to="/contact" className="inline-flex min-h-11 items-center hover:text-gold-light transition-colors" onClick={() => trackPostHogEvent("click_footer_link", { item: "Contact", section: "contact" })}>
-                  Nous contacter
-                </Link>
-              </li>
-              <li>
-                <a href="mailto:contact@fredwav.com" className="inline-flex min-h-11 items-center hover:text-gold-light transition-colors" onClick={() => trackPostHogEvent("click_email_link", { location: "footer" })}>
-                  contact@fredwav.com
-                </a>
-              </li>
-            </ul>
-          </div>
         </div>
 
         <div className="border-t border-border/20 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">

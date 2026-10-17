@@ -42,7 +42,11 @@ function PostHogPageTracker() {
 
 const Home = lazy(() => import("./pages/Home"));
 const APropos = lazy(() => import("./pages/APropos"));
-const Preuves = lazy(() => import("./pages/Preuves"));
+const Temoignages = lazy(() => import("./pages/Temoignages"));
+const Analyses = lazy(() => import("./pages/Analyses"));
+const Accompagnements = lazy(() => import("./pages/Accompagnements"));
+const OneShot = lazy(() => import("./pages/OneShot"));
+const Candidature = lazy(() => import("./pages/Candidature"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Auth = lazy(() => import("./pages/Auth"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
@@ -55,9 +59,7 @@ const AnalyseExpressResult = lazy(() => import("./pages/AnalyseExpressResult"));
 const AnalyseVideo = lazy(() => import("./pages/AnalyseVideo"));
 const AnalyseVideoMerci = lazy(() => import("./pages/AnalyseVideoMerci"));
 const AnalyseVideoRapport = lazy(() => import("./pages/AnalyseVideoRapport"));
-const ReserverUnAppel = lazy(() => import("./pages/ReserverUnAppel"));
 const WavPremium = lazy(() => import("./pages/WavPremium"));
-const AcademyAppel = lazy(() => import("./pages/AcademyAppel"));
 const Enrollment = lazy(() => import("./pages/Enrollment"));
 const AdminCommerce = lazy(() => import("./pages/admin/Commerce"));
 const DiagnosticProcessing = lazy(() => import("./pages/DiagnosticProcessing"));
@@ -95,7 +97,10 @@ const SSG_ROUTE_ELEMENTS: Record<string, ReactNode> = {
   "/analyse-express": <AnalyseExpress />,
   "/analyse-video": <AnalyseVideo />,
   "/wav-premium": <WavPremium />,
-  "/preuves": <Preuves />,
+  "/one-shot": <OneShot />,
+  "/analyses": <Analyses />,
+  "/accompagnements": <Accompagnements />,
+  "/temoignages": <Temoignages />,
   "/hooks-tiktok": <HooksTikTok />,
   "/ressources": <Ressources />,
   "/ressources/statistiques-tiktok": <RessourceStatistiquesTikTok />,
@@ -111,8 +116,7 @@ const SSG_ROUTE_ELEMENTS: Record<string, ReactNode> = {
 
 /** Le manifeste décide quelles routes CSR existent ; cette map ne fournit que leur vue. */
 const CSR_ROUTE_ELEMENTS: Record<string, ReactNode> = {
-  "/reserverunappel": <ReserverUnAppel />,
-  "/wavacademy/appel": <AcademyAppel />,
+  "/candidature": <Candidature />,
   "/inscription/:token": <Enrollment />,
   "/admin/commandes": <AdminCommerce />,
   "/auth": <Auth />,

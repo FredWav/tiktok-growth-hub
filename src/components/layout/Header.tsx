@@ -3,16 +3,21 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/tracking";
-import { FUNNEL_EVENTS, trackFunnelEvent } from "@/lib/funnel-events";
 
+/** Menu principal : cinq entrées, un seul niveau. Les pages d'offres sont sous leur famille. */
 const navItems = [
-  { label: "Wav Academy", href: "/wavacademy" },
-  { label: "Analyse Express", href: "/analyse-express" },
-  { label: "Wav Premium", href: "/wav-premium" },
-  { label: "Résultats", href: "/preuves" },
-  { label: "Ressources", href: "/ressources" },
-  { label: "À propos", href: "/a-propos" },
+  { label: "Analyses", href: "/analyses", children: ["/analyse-express", "/analyse-video"] },
+  { label: "Accompagnements", href: "/accompagnements", children: ["/one-shot", "/wavacademy", "/wav-premium"] },
+  { label: "Témoignages", href: "/temoignages", children: [] },
+  { label: "Ressources", href: "/ressources", children: ["/hooks-tiktok", "/newsletter"] },
+  { label: "À propos", href: "/a-propos", children: [] },
 ];
+
+const CTA = { label: "Analyser mon compte", href: "/analyse-express" };
+
+function isActive(pathname: string, item: (typeof navItems)[number]) {
+  return [item.href, ...item.children].some((href) => pathname === href || pathname.startsWith(`${href}/`));
+}
 
 export function Header({ minimal = false }: { minimal?: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -53,7 +58,7 @@ export function Header({ minimal = false }: { minimal?: boolean }) {
                 key={item.href}
                 to={item.href}
                 className={`inline-flex min-h-11 items-center text-sm font-medium transition-colors hover:text-primary ${
-                  location.pathname === item.href || location.pathname.startsWith(`${item.href}/`)
+                  isActive(location.pathname, item)
                     ? "text-primary"
                     : "text-muted-foreground"
                 }`}
@@ -70,15 +75,10 @@ export function Header({ minimal = false }: { minimal?: boolean }) {
           <div className="hidden lg:block">
             <Button asChild className="min-h-11">
               <Link
-                to="/wavacademy"
-                onClick={() =>
-                  trackFunnelEvent(FUNNEL_EVENTS.academyCtaClick, {
-                    source_page: location.pathname,
-                    position: "header_desktop",
-                  })
-                }
+                to={CTA.href}
+                onClick={() => trackEvent("header_cta_click", { source_page: location.pathname, position: "header_desktop" })}
               >
-                Rejoindre la Wav Academy
+                {CTA.label}
               </Link>
             </Button>
           </div>
@@ -109,7 +109,7 @@ export function Header({ minimal = false }: { minimal?: boolean }) {
                   key={item.href}
                   to={item.href}
                   className={`flex min-h-11 items-center rounded-md px-2 text-base font-medium transition-colors hover:bg-muted hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-                    location.pathname === item.href || location.pathname.startsWith(`${item.href}/`)
+                    isActive(location.pathname, item)
                       ? "text-primary"
                       : "text-muted-foreground"
                   }`}
@@ -123,16 +123,13 @@ export function Header({ minimal = false }: { minimal?: boolean }) {
               ))}
               <Button asChild className="mt-2 min-h-11">
                 <Link
-                  to="/wavacademy"
+                  to={CTA.href}
                   onClick={() => {
-                    trackFunnelEvent(FUNNEL_EVENTS.academyCtaClick, {
-                      source_page: location.pathname,
-                      position: "header_mobile",
-                    });
+                    trackEvent("header_cta_click", { source_page: location.pathname, position: "header_mobile" });
                     setIsOpen(false);
                   }}
                 >
-                  Rejoindre la Wav Academy
+                  {CTA.label}
                 </Link>
               </Button>
             </div>

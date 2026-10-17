@@ -74,7 +74,7 @@ export default function APropos() {
               TikTok est une grosse partie de mon parcours et de mon expertise. Mais une stratégie cohérente peut aussi faire travailler Instagram, YouTube et Facebook ensemble, selon ton activité et ton audience.
             </p>
             <p className="text-muted-foreground">
-              Mon approche : du contexte, des données, du feedback et des décisions que tu comprends. Pas de hacks miracles ni de viralité garantie. Tu peux voir les <Link to="/preuves" className="text-primary underline hover:no-underline">résultats documentés</Link> avec leur contexte.
+              Mon approche : du contexte, des données, du feedback et des décisions que tu comprends. Pas de hacks miracles ni de viralité garantie. Tu peux voir les <Link to="/temoignages" className="text-primary underline hover:no-underline">résultats documentés</Link> avec leur contexte.
             </p>
           </div>
 
@@ -213,18 +213,18 @@ export default function APropos() {
             Envie de travailler ensemble ?
           </h2>
           <p className="text-muted-foreground mb-6">
-            Tu veux progresser dans un cadre régulier ? La Wav Academy reste le point de départ. Tu veux travailler directement sur une stratégie multiréseaux pendant 30 jours ? Commence par me donner le contexte.
+            Tu veux un regard ponctuel sur ton compte, un cadre collectif dans la durée ou un suivi individuel ? Les trois façons de travailler avec moi sont présentées au même endroit, avec leurs prix.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="hero" size="lg" asChild onClick={() => trackEvent("cta_academy_click", { location: "apropos" })}>
-              <Link to="/wavacademy">
-                Rejoindre la Wav Academy
+              <Link to="/accompagnements">
+                Voir les accompagnements
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
             <Button variant="outline" size="lg" asChild onClick={() => trackEvent("cta_contact_click", { location: "apropos" })}>
-              <Link to="/wav-premium" onClick={() => trackEvent("cta_premium_click", { location: "apropos" })}>
-                Réserve ton appel
+              <Link to="/analyses" onClick={() => trackEvent("cta_analyses_click", { location: "apropos" })}>
+                Commencer par une analyse
               </Link>
             </Button>
           </div>

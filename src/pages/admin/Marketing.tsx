@@ -568,9 +568,9 @@ export default function AdminMarketing() {
                   <option value="https://fredwav.com">Accueil</option>
                   <option value="https://fredwav.com/wav-premium">Wav Premium</option>
                   <option value="https://fredwav.com/analyse-express">Analyse Express</option>
-                  <option value="https://fredwav.com/reserverunappel">Réserver un appel</option>
+                  <option value="https://fredwav.com/candidature">Demande d'accompagnement</option>
                   <option value="https://fredwav.com/wavacademy">Wav Academy</option>
-                  <option value="https://fredwav.com/preuves">Témoignages</option>
+                  <option value="https://fredwav.com/temoignages">Témoignages</option>
                   <option value="https://fredwav.com/a-propos">À Propos</option>
                   <option value="https://fredwav.com/contact">Contact</option>
                   <option value="https://fredwav.com/newsletter">Newsletter</option>

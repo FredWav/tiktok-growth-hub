@@ -21,7 +21,6 @@ export const db = () =>
 export type Database = ReturnType<typeof db>;
 export const VERSION = "2026-09-08";
 export { OWNER_EMAIL } from "./owner.ts";
-export const CALENDAR = "https://calendar.app.google/UZC5UY38shFuSqmy6";
 export const CGV_TEXT =
   "J'ai lu et j'accepte les CGV et le récapitulatif de ma commande, avec sa date de démarrage.";
 export const EARLY_TEXT =

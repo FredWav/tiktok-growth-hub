@@ -2,7 +2,7 @@ import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { SEOHead } from "@/components/SEOHead";
 import { seoFor } from "@/config/seo";
-import { ACADEMY_LIVE_SLOT, ACADEMY_SUPPORT_DAYS } from "@/config/offers";
+import { ACADEMY_LIVE_SLOT, ACADEMY_SUPPORT_DAYS, LAUNCH_END_LABEL } from "@/config/offers";
 import { Link } from "react-router-dom";
 
 export default function CGV() {
@@ -12,7 +12,7 @@ export default function CGV() {
       <Section variant="default" size="lg">
         <div className="max-w-3xl mx-auto prose prose-neutral">
           <h1 className="font-display text-3xl md:text-4xl font-semibold mb-2">Conditions Générales de Vente (CGV) : Fred Wav</h1>
-          <p className="text-sm text-muted-foreground mb-10">Dernière mise à jour : 23 septembre 2026, version 2026-09-23</p>
+          <p className="text-sm text-muted-foreground mb-10">Dernière mise à jour : 17 octobre 2026, version 2026-10-17</p>
 
           {/* ARTICLE 1 */}
           <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 1 : Identification du vendeur</h2>
@@ -27,7 +27,7 @@ export default function CGV() {
           {/* ARTICLE 2 */}
           <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 2 : Objet</h2>
           <p className="text-muted-foreground mb-4">
-            Les présentes CGV encadrent la vente à distance des prestations de conseil et d'accompagnement stratégique en formats courts, la vente d'analyses automatisées de comptes TikTok (Analyse Express) et la vente de produits numériques téléchargeables (Packs de hooks).
+            Les présentes CGV encadrent la vente à distance des prestations de conseil et d'accompagnement en stratégie de contenu (One Shot, Wav Academy, Wav Premium), la vente d'analyses automatisées de vidéos et de comptes TikTok (Analyse vidéo, Analyse Express) et la vente de produits numériques téléchargeables (Packs de hooks).
           </p>
 
           {/* ARTICLE 3 */}
@@ -46,7 +46,7 @@ export default function CGV() {
           {/* ARTICLE 4 */}
           <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 4 : Définitions</h2>
           <ul className="text-muted-foreground mb-4 space-y-1">
-            <li><strong>Prestations :</strong> Wav Premium (accompagnement 30 jours), Wav Academy (accès communauté Discord + contenus numériques) et Analyse Express (rapport d'analyse automatisé).</li>
+            <li><strong>Prestations :</strong> One Shot (audit et rendez-vous individuel), Wav Premium (accompagnement individuel de six semaines ou plus), Wav Academy (accompagnement collectif à vie : communauté Discord, lives et contenus numériques), Analyse vidéo et Analyse Express (rapports d'analyse automatisés).</li>
             <li><strong>Produits numériques :</strong> Packs de hooks (fichiers PDF et tableur téléchargeables) vendus séparément, livrés par email automatique après paiement.</li>
             <li><strong>Contenus numériques :</strong> rapports PDF, ressources, checklists et templates éventuellement remis dans le cadre de la prestation.</li>
             <li><strong>Plateformes tierces :</strong> TikTok, Instagram, YouTube, Discord, WhatsApp, Stripe, PayPal, Klarna. Fred Wav n'est pas responsable de leurs pannes, interruptions, changements de conditions d'utilisation, ni des conséquences pouvant en découler.</li>
@@ -55,42 +55,52 @@ export default function CGV() {
           {/* ARTICLE 5 */}
           <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 5 : Description des offres</h2>
 
-          <h3 className="font-display text-lg font-medium mt-4 mb-2">5.1 Wav Premium (30 jours)</h3>
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">5.1 One Shot</h3>
           <p className="text-muted-foreground mb-4">
-            Accompagnement individuel à 1 990 € TTC sur candidature validée par Fred Wav : trente jours à partir du premier rendez-vous. Un cadrage de 1 h 30 avec remise de l’analyse complète du compte, puis trois rendez-vous hebdomadaires d’une heure maximum. TikTok, Instagram et YouTube. Suivi WhatsApp du lundi au vendredi, de 10 h à 18 h (Paris), réponse dans la journée ou le jour ouvré suivant pour un message hors horaires. Week-end off. Réponse aux candidatures sous deux jours ouvrés. Prestation sans garantie de résultat.
+            Prestation individuelle à 399 € TTC, sur demande étudiée par Fred Wav : audit complet du compte du Client (TikTok, Instagram ou YouTube) préparé avant le rendez-vous, puis un rendez-vous en visio de 1 h 30 pour fixer la ligne à suivre, traiter les problèmes identifiés et répondre aux questions. Un résumé écrit de l'appel est envoyé dans l'heure qui suit. Des ressources (cours, guides) peuvent être transmises selon les besoins identifiés. Dix démarrages par mois au maximum. Prestation sans garantie de résultat.
           </p>
 
-          <h3 className="font-display text-lg font-medium mt-4 mb-2">5.2 Analyse Express</h3>
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">5.2 Wav Premium</h3>
+          <p className="text-muted-foreground mb-4">
+            Accompagnement individuel sur demande validée par Fred Wav, d'une durée de six semaines minimum à partir du premier rendez-vous, à partir de 1 499 € TTC pour six semaines. Des durées de 12 ou 18 semaines peuvent être proposées sur devis ; la durée, le prix et la date de démarrage sont fixés dans la proposition acceptée par le Client. L'accompagnement comprend au moins trois rendez-vous : un premier rendez-vous de 1 h 30, puis un rendez-vous d'une heure tous les quinze jours. Suivi WhatsApp du lundi au vendredi, réponse sous un jour ouvré, et retours sur les contenus à la demande. TikTok, Instagram et YouTube. La Wav Academy et WavStats ne sont pas inclus. Deux démarrages par mois au maximum. Prestation sans garantie de résultat.
+          </p>
+
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">5.3 Analyse Express</h3>
           <p className="text-muted-foreground mb-4">
             Analyse automatisée à 19,90 € TTC pour un compte TikTok public, sur les vidéos disponibles, jusqu’à 120. Toutes les sections portent sur le même échantillon, dont le nombre et la période sont indiqués ; les compteurs globaux du profil en sont distingués. Un historique limité est signalé. Un compte privé ou sans vidéo exploitable ne produit pas un rapport présenté comme complet. Traitement normal en cinq minutes maximum après confirmation du paiement. En cas de dépassement ou d’échec, Fred intervient sous deux jours ouvrés. Si la résolution échoue, il valide le remboursement intégral.
           </p>
 
-          <h3 className="font-display text-lg font-medium mt-4 mb-2">5.3 Wav Academy</h3>
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">5.4 Analyse vidéo</h3>
           <p className="text-muted-foreground mb-4">
-            Accompagnement collectif sur TikTok, Instagram et YouTube : communauté Discord, 6 modules, 19 guides et avantage WavStats. Offre unique de six mois à 749 € TTC. Les débutants avec un projet concret sont acceptés. Les services d’accompagnement sont limités à ces six mois ; l’accès aux contenus numériques suit les règles de l’article 12.3.
-          </p>
-          <p className="text-muted-foreground mb-4">
-            L’accompagnement comprend deux lives en accès libre, {ACADEMY_LIVE_SLOT} (heure de Paris), et des retours sur le Discord collectif {ACADEMY_SUPPORT_DAYS}. Le week-end est off. Les membres peuvent participer aux deux créneaux.
-          </p>
-          <p className="text-muted-foreground mb-4">
-            Les lives sont maintenus ou délégués pendant les congés. Un résumé est fourni, sans replay. La Wav Academy est une prestation sans garantie de résultat, notamment en matière d’audience, de visibilité ou de revenus.
+            Analyse automatisée d'une vidéo TikTok publique, à partir de son lien : accroche, structure, message, appel à l'action et recommandations, avec un rapport en ligne et au format PDF envoyé par email. Prix de lancement de 2,90 € TTC jusqu'au {LAUNCH_END_LABEL}, puis 4,90 € TTC. Traitement normal en quelques minutes après confirmation du paiement. En cas d'échec, Fred intervient sous deux jours ouvrés ; si la résolution échoue, il valide le remboursement intégral.
           </p>
 
-          <h3 className="font-display text-lg font-medium mt-4 mb-2">5.4 Packs de hooks (fichiers à télécharger)</h3>
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">5.5 Wav Academy</h3>
+          <p className="text-muted-foreground mb-4">
+            Accompagnement collectif à vie sur TikTok, Instagram et YouTube, tant que la Wav Academy existe, en un paiement unique : communauté Discord, cours, guides et ressources, mises à jour comprises, et une stratégie personnalisée travaillée avec le collectif. Prix de lancement de 749 € TTC jusqu'au {LAUNCH_END_LABEL}, puis 990 € TTC. Pas d'accompagnement individuel ; aucun crédit WavStats n'est inclus. Les débutants avec un projet concret sont acceptés. Cinq nouveaux membres par mois au maximum.
+          </p>
+          <p className="text-muted-foreground mb-4">
+            L’accompagnement comprend deux lives par semaine en accès libre, {ACADEMY_LIVE_SLOT} (heure de Paris), et des retours sur le Discord collectif {ACADEMY_SUPPORT_DAYS}. Le week-end est off.
+          </p>
+          <p className="text-muted-foreground mb-4">
+            Les lives sont maintenus ou délégués pendant les congés. Un résumé de chaque live est fourni, ainsi qu'un replay des lives de cours. La Wav Academy est une prestation sans garantie de résultat, notamment en matière d’audience, de visibilité ou de revenus.
+          </p>
+
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">5.6 Packs de hooks (fichiers à télécharger)</h3>
           <p className="text-muted-foreground mb-4">
             Contenus numériques vendus à l'unité : Pack 100 hooks (29 € TTC), Pack 250 hooks (49 € TTC), Pack 500 hooks (99 € TTC) et Bibliothèque complète de 850 hooks (149 € TTC). Chaque pack est fourni en deux fichiers, un PDF et un tableur, livrés par email automatique dès la confirmation du paiement, via des liens de téléchargement personnels valables un an. Le Client est invité à télécharger et conserver ses fichiers. Les hooks sont des structures de formulation à adapter : aucune garantie de résultat, de vues, de visibilité ou de revenus n'est donnée. L'achat confère un droit d'usage personnel et non transférable ; la revente, le partage et la rediffusion des fichiers sont interdits.
           </p>
 
-          <h3 className="font-display text-lg font-medium mt-4 mb-2">5.5 Évolution du contenu</h3>
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">5.7 Évolution du contenu, prix de lancement et capacité</h3>
           <p className="text-muted-foreground mb-4">
-            Le contenu exact des offres (ressources, formats, modalités) est celui présenté au moment de l'achat. Le contenu de la Wav Academy peut évoluer pour s'adapter et s'améliorer (formats, ressources, organisation), sans diminution substantielle de la valeur globale. Les prix peuvent être modifiés pour l'avenir ; le tarif applicable est celui affiché au moment de la commande et reste acquis pour toute la durée de la formule prépayée souscrite.
+            Le contenu exact des offres (ressources, formats, modalités) est celui présenté au moment de l'achat. Le contenu de la Wav Academy peut évoluer pour s'adapter et s'améliorer (formats, ressources, organisation), sans diminution substantielle de la valeur globale. Les prix peuvent être modifiés pour l'avenir ; le tarif applicable est celui affiché au moment de la commande et reste acquis pour la prestation souscrite. Un prix de lancement s'applique jusqu'à la date indiquée sur le site ; le prix suivant, également indiqué, s'applique ensuite. Le nombre de démarrages par mois indiqué pour chaque accompagnement correspond à une capacité réelle : lorsqu'un mois est complet, une date ultérieure est proposée.
           </p>
 
           {/* ARTICLE 6 */}
           <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 6 : Commande et candidature</h2>
           <p className="text-muted-foreground mb-4">
             Le processus de commande suit la règle du "double clic" (sélection, validation des CGV, confirmation de paiement).
-            Pour Wav Premium, la validation finale est soumise à l'acceptation de la candidature par Fred Wav. En cas de refus, aucun débit n'est effectué.
+            Pour le One Shot, le Wav Premium et, jusqu'à l'ouverture de l'inscription en ligne, la Wav Academy, le Client adresse d'abord une demande via le formulaire du site. Fred Wav y répond personnellement ; la commande n'est formée qu'après acceptation par le Client de la proposition (offre, prix, date de démarrage) et règlement. En cas de refus de la demande, aucun débit n'est effectué.
           </p>
           <p className="text-muted-foreground mb-4">
             Lorsque l'offre doit être exécutée avant la fin du délai de rétractation, l'acceptation des CGV et la demande d'exécution immédiate font l'objet de cases distinctes, non précochées. Leur texte exact, leur version et leur horodatage sont enregistrés avant la redirection vers le paiement puis rattachés à la commande et à la référence de paiement en ligne ou de virement. Une confirmation est ensuite envoyée par email sur un support durable.
@@ -102,7 +112,7 @@ export default function CGV() {
             <strong>Tarifs :</strong> exprimés en euros TTC. Fred Wav se réserve le droit de modifier ses prix à tout moment pour l'avenir. Le tarif applicable est celui affiché au moment de la commande.
           </p>
           <p className="text-muted-foreground mb-4">
-            <strong>Paiement :</strong> en ligne via Stripe, selon les moyens proposés lors du paiement, ou par virement pour Academy et Premium. Le règlement intégral doit être encaissé avant le démarrage. Les références de facture et de paiement sont conservées. Une preuve d’émission de virement ne vaut pas encaissement.
+            <strong>Paiement :</strong> en ligne via Stripe, selon les moyens proposés lors du paiement (dont, lorsqu'il est proposé, le paiement en plusieurs fois via Klarna, sous réserve d'acceptation par Klarna et selon ses conditions), ou par virement pour le One Shot, la Wav Academy et le Wav Premium. Le règlement intégral doit être encaissé avant le démarrage ; en cas de paiement via Klarna, le Vendeur est réglé en une fois par Klarna, et l'échéancier lie le Client à Klarna. Les références de facture et de paiement sont conservées. Une preuve d’émission de virement ne vaut pas encaissement.
           </p>
           <p className="text-muted-foreground mb-4">
             <strong>Incident de paiement :</strong> tout rejet de paiement peut entraîner la suspension immédiate des accès et le report ou la suspension de l'exécution des prestations jusqu'à régularisation.
@@ -123,18 +133,18 @@ export default function CGV() {
             <strong>Retards :</strong> tout retard du client est décompté du temps de session. La session se termine à l'heure prévue initialement.
           </p>
           <p className="text-muted-foreground mb-4">
-            <strong>Annulation et report (RDV Wav Premium) :</strong> possible jusqu'à 48h avant le rendez-vous. Passé ce délai, la session est considérée comme due et consommée, sauf cas de force majeure justifié.
+            <strong>Annulation et report (rendez-vous One Shot et Wav Premium) :</strong> possible jusqu'à 48h avant le rendez-vous. Passé ce délai, la session est considérée comme due et consommée, sauf cas de force majeure justifié.
           </p>
           <p className="text-muted-foreground mb-4">
             <strong>No-show (absence non justifiée) :</strong> la session est considérée comme due et consommée.
           </p>
           <p className="text-muted-foreground mb-4">
-            <strong>Wav Premium :</strong> la durée d'accompagnement est de 30 jours calendaires. Les reports ne prolongent pas automatiquement la durée, sauf accord écrit.
+            <strong>Wav Premium :</strong> la durée d'accompagnement est celle de la proposition acceptée (six semaines minimum). Les reports ne prolongent pas automatiquement la durée, sauf accord écrit.
           </p>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">8.1 Caractère forfaitaire et non-remboursement</h3>
           <p className="text-muted-foreground mb-4">
-            Toute prestation payée auprès du Vendeur, qu'il s'agisse de Wav Premium, de la Wav Academy ou de l'Analyse Express, constitue un forfait global et indivisible, correspondant à un dispositif construit, réservé et planifié dans son ensemble. Le prix n'est pas décomposable par session, par ressource, par fonctionnalité, par semaine ou par période entamée.
+            Toute prestation payée auprès du Vendeur, qu'il s'agisse du One Shot, du Wav Premium, de la Wav Academy, de l'Analyse vidéo ou de l'Analyse Express, constitue un forfait global et indivisible, correspondant à un dispositif construit, réservé et planifié dans son ensemble. Le prix n'est pas décomposable par session, par ressource, par fonctionnalité, par semaine ou par période entamée.
           </p>
           <p className="text-muted-foreground mb-4">
             Sous réserve des droits impératifs du Client, après l'expiration du délai de rétractation ou après sa perte valable dans les conditions de l'Article 9, toute interruption, suspension ou arrêt de la prestation à la seule initiative du Client, pour convenance personnelle, ne donne lieu à aucun remboursement, total ou partiel.
@@ -143,10 +153,10 @@ export default function CGV() {
             <strong>Accompagnements individuels (Wav Premium) :</strong> les sessions et ressources déjà délivrées sont définitivement dues. Les sessions non encore consommées restent acquises au Client et disponibles dans la limite de la durée de validité prévue à l'article 8.2 ci-dessous, sans pouvoir donner lieu à un remboursement en numéraire.
           </p>
           <p className="text-muted-foreground mb-4">
-            <strong>Wav Academy : six mois prépayés :</strong> le forfait est réglé intégralement avant démarrage, sans reconduction. Hors droits impératifs du client, une interruption pour convenance personnelle n’entraîne pas de remboursement au prorata du niveau d’utilisation. Cette clause ne limite ni la rétractation prévue à l’article 9.3 ni les recours en cas de manquement du vendeur.
+            <strong>Wav Academy : paiement unique, accès à vie :</strong> le prix est réglé intégralement avant démarrage, sans abonnement ni reconduction. Hors droits impératifs du client, une interruption pour convenance personnelle n’entraîne pas de remboursement au prorata du niveau d’utilisation. Cette clause ne limite ni la rétractation prévue à l’article 9.3 ni les recours en cas de manquement du vendeur.
           </p>
           <p className="text-muted-foreground mb-4">
-            <strong>Prestations à livraison numérique immédiate (Analyse Express) :</strong> le rapport et les contenus délivrés sont définitivement dus dès leur mise à disposition lorsque le Client a expressément demandé l'exécution immédiate et préalablement reconnu la perte de son droit de rétractation dans les conditions de l'article 9.2.
+            <strong>Prestations à livraison numérique immédiate (Analyse vidéo, Analyse Express) :</strong> le rapport et les contenus délivrés sont définitivement dus dès leur mise à disposition lorsque le Client a expressément demandé l'exécution immédiate et préalablement reconnu la perte de son droit de rétractation dans les conditions de l'article 9.2.
           </p>
           <p className="text-muted-foreground mb-4">
             <strong>Packs de hooks :</strong> les fichiers sont définitivement dus dès l'envoi de l'email automatique de livraison, dans les conditions de l'article 9.4. Aucun remboursement, total ou partiel, n'est accordé après cet envoi, sauf manquement du Vendeur ou fichiers non conformes.
@@ -157,7 +167,7 @@ export default function CGV() {
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">8.2 Durée de validité (accompagnements individuels à durée déterminée)</h3>
           <p className="text-muted-foreground mb-4">
-            L'accompagnement individuel à durée déterminée (notamment Wav Premium), y compris en cas de suspension prévue à l'article 8.3, doit être pleinement réalisé dans un délai maximum de 30 jours calendaires à compter de la date du premier rendez-vous. Passé ce délai, les sessions non consommées sont caduques et ne peuvent donner lieu ni à exécution ni à remboursement.
+            L'accompagnement individuel à durée déterminée (Wav Premium), hors suspension prévue à l'article 8.3, doit être pleinement réalisé dans la durée prévue par la proposition acceptée, à compter de la date du premier rendez-vous. Le rendez-vous du One Shot doit être réalisé dans les trois mois suivant le paiement. Passé ces délais, les sessions non consommées sont caduques et ne peuvent donner lieu ni à exécution ni à remboursement.
           </p>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">8.3 Suspension à la demande du Client (accompagnements individuels)</h3>
@@ -165,7 +175,7 @@ export default function CGV() {
             À titre exceptionnel, le Client peut demander la suspension temporaire de son accompagnement individuel à durée déterminée. Cette suspension est soumise à l'accord écrit préalable du Vendeur.
           </p>
           <p className="text-muted-foreground mb-4">
-            La demande s'effectue par écrit. Le Client peut bénéficier d'une seule suspension, d'une durée maximale de 30 jours. Pendant la suspension, le décompte des 30 jours calendaires prévu à l'article 8.2 est gelé et reprend à la date de reprise convenue.
+            La demande s'effectue par écrit. Le Client peut bénéficier d'une seule suspension, d'une durée maximale de 30 jours. Pendant la suspension, le décompte de la durée prévue à l'article 8.2 est gelé et reprend à la date de reprise convenue.
           </p>
           <p className="text-muted-foreground mb-4">
             La suspension est formalisée par email valant support durable, précisant la date de début de suspension et la nouvelle date de fin d'accompagnement. La suspension ne donne lieu à aucun remboursement et ne modifie pas la durée de validité maximale prévue à l'article 8.2.
@@ -180,17 +190,17 @@ export default function CGV() {
             Conformément à l'article L221-18 du Code de la consommation, le client consommateur dispose de 14 jours pour se rétracter, sauf exceptions.
           </p>
 
-          <h3 className="font-display text-lg font-medium mt-4 mb-2">9.1 Démarrage avant la fin des 14 jours (Wav Premium)</h3>
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">9.1 Démarrage avant la fin des 14 jours (One Shot, Wav Premium)</h3>
           <p className="text-muted-foreground mb-4">
-            Si le Client demande expressément le démarrage de l'accompagnement Wav Premium avant la fin du délai de 14 jours, l'exécution peut commencer sans attendre l'expiration de ce délai.
+            Si le Client demande expressément le démarrage du One Shot ou de l'accompagnement Wav Premium avant la fin du délai de 14 jours, l'exécution peut commencer sans attendre l'expiration de ce délai.
           </p>
           <p className="text-muted-foreground mb-4">
             Si le Client se rétracte alors que l'exécution a commencé à sa demande, il reste redevable uniquement d'un montant proportionné au service effectivement fourni jusqu'à la notification de sa décision, rapporté au prix total convenu, conformément à l'article L221-25 du Code de la consommation. Si la prestation est pleinement exécutée avant la fin du délai de 14 jours, le droit de rétractation n'est perdu qu'après demande expresse d'exécution et reconnaissance préalable de cette perte.
           </p>
 
-          <h3 className="font-display text-lg font-medium mt-4 mb-2">9.2 Exécution et livraison immédiates (Analyse Express)</h3>
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">9.2 Exécution et livraison immédiates (Analyse vidéo, Analyse Express)</h3>
           <p className="text-muted-foreground mb-2">
-            L'Analyse Express est une prestation automatisée aboutissant à la mise à disposition rapide d'un rapport numérique. Avant le paiement, le Client :
+            L'Analyse vidéo et l'Analyse Express sont des prestations automatisées aboutissant à la mise à disposition rapide d'un rapport numérique. Avant le paiement, le Client :
           </p>
           <ul className="text-muted-foreground mb-4 space-y-1">
             <li>accepte séparément les présentes CGV ;</li>
@@ -203,14 +213,14 @@ export default function CGV() {
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">9.3 Contenu numérique et service (Wav Academy)</h3>
           <p className="text-muted-foreground mb-2">
-            La Wav Academy combine un <strong>contenu numérique</strong> (modules, guides et ressources accessibles à la date convenue) et une <strong>prestation de service</strong> exécutée pendant la durée souscrite (lives, accompagnement, animation de la communauté Discord). Le démarrage intervient à la date convenue avec Fred, après règlement intégral et acceptation des modalités. Si cette date précède la fin du délai de 14 jours, le Client demande expressément le commencement anticipé du service et l’accès au contenu numérique à cette date. À défaut, le démarrage est fixé après le délai légal. En conséquence, conformément aux articles L221-28, 1° et 13° du Code de la consommation :
+            La Wav Academy combine un <strong>contenu numérique</strong> (cours, guides et ressources accessibles à la date convenue) et une <strong>prestation de service</strong> exécutée dans la durée (lives, accompagnement, animation de la communauté Discord). Le démarrage intervient à la date convenue avec Fred, après règlement intégral et acceptation des modalités. Si cette date précède la fin du délai de 14 jours, le Client demande expressément le commencement anticipé du service et l’accès au contenu numérique à cette date. À défaut, le démarrage est fixé après le délai légal. En conséquence, conformément aux articles L221-28, 1° et 13° du Code de la consommation :
           </p>
           <ul className="text-muted-foreground mb-4 space-y-1">
             <li>pour la part de <strong>contenu numérique</strong>, le Client perd son droit de rétractation dès le début de l'accès, après l'avoir expressément demandé et avoir expressément reconnu la perte de ce droit ;</li>
             <li>pour la part de <strong>service</strong>, en cas de rétractation dans le délai de 14 jours, le Client reste redevable du prix au prorata du service déjà fourni à la date de sa demande.</li>
           </ul>
           <p className="text-muted-foreground mb-4">
-            La formule Wav Academy est un paiement unique prépayé, sans reconduction. Les services d’accompagnement cessent au terme des six mois ; l’accès aux contenus numériques achetés se poursuit selon l’article 12.3. Cette règle reste sans préjudice du droit de rétractation et du prorata légal décrits ci-dessus.
+            La Wav Academy est un paiement unique, sans reconduction, donnant accès aux services et contenus dans les conditions de l’article 12. Cette règle reste sans préjudice du droit de rétractation et du prorata légal décrits ci-dessus.
           </p>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">9.4 Contenu numérique livré immédiatement (Packs de hooks)</h3>
@@ -259,32 +269,30 @@ export default function CGV() {
           </p>
 
           {/* ARTICLE 12 */}
-          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 12 : Wav Academy (formules, reconduction, résiliation, suspension)</h2>
+          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 12 : Wav Academy (accès à vie, inscriptions antérieures, suspension)</h2>
 
-          <h3 className="font-display text-lg font-medium mt-4 mb-2">12.1 Formules disponibles</h3>
-          <p className="text-muted-foreground mb-2">
-            La Wav Academy est proposée pour <strong>749 € TTC, six mois de date à date</strong>, en un règlement, sans reconduction. La date de début est convenue directement avec Fred pendant l’appel d’inscription, puis confirmée par le client. Aucun accès n’est ouvert avant cette date. Si le paiement arrive après, une nouvelle date est convenue, sans antidater les droits.
-          </p>
-          <p className="text-muted-foreground mb-4">Le calendrier est calculé en heure de Paris : si le jour n’existe pas dans le mois cible, le dernier jour de ce mois est retenu. Six dotations de 3 000 crédits WavStats sont prévues au démarrage et aux cinq anniversaires mensuels. Le solde Academy inutilisé est perdu à chaque renouvellement ; il ne se cumule pas. Cet avantage expire au terme des six mois.</p>
-          <p className="text-muted-foreground mb-4">Les inscriptions antérieures conservent leurs conditions, durées et échéances d’origine.</p>
-
-          <h3 className="font-display text-lg font-medium mt-4 mb-2">12.2 Absence de reconduction</h3>
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">12.1 Offre</h3>
           <p className="text-muted-foreground mb-4">
-            La Wav Academy n’est pas un abonnement : l’offre de six mois est un paiement unique prépayé, sans reconduction automatique. Les lives, la communauté, l’accompagnement, le support et l’avantage WavStats cessent de plein droit au terme des six mois, sauf nouvelle souscription volontaire. L’accès aux contenus numériques achetés est régi séparément par l’article 12.3.
+            La Wav Academy est proposée en un règlement unique, sans abonnement ni reconduction : <strong>749 € TTC jusqu'au {LAUNCH_END_LABEL}</strong> (prix de lancement), puis 990 € TTC. La date de début est convenue avec le Client. Aucun accès n’est ouvert avant la confirmation du règlement.
+          </p>
+          <p className="text-muted-foreground mb-4">
+            Les inscriptions antérieures au 17 octobre 2026 conservent leurs conditions, durées, échéances et avantages d’origine, sauf accord écrit et explicite du Client pour passer à l’offre décrite au présent article.
           </p>
 
-          <h3 className="font-display text-lg font-medium mt-4 mb-2">12.3 Durée et périmètre de l’accès</h3>
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">12.2 Accès à vie</h3>
           <p className="text-muted-foreground mb-4">
-            L’achat du programme Wav Academy confère au Client un droit d’accès personnel, nominatif et non transférable aux contenus numériques compris dans l’offre au jour de la commande.
+            « À vie » signifie que l’accès à la communauté, aux lives, aux cours, aux ressources et à leurs mises à jour n’a pas de date de fin et ne nécessite aucun paiement supplémentaire, aussi longtemps que la Wav Academy est exploitée. Le droit d’accès est personnel, nominatif et non transférable.
           </p>
           <p className="text-muted-foreground mb-4">
-            Cet accès est garanti pendant une durée de cinq ans à compter de la commande. À l’issue de cette période, il demeure accessible sans paiement supplémentaire aussi longtemps que Wav Academy poursuit l’exploitation du programme concerné.
+            L’accès aux contenus numériques compris dans l’offre au jour de la commande est en tout état de cause garanti pendant cinq ans à compter de la commande.
           </p>
           <p className="text-muted-foreground mb-4">
-            Cette offre n’inclut pas automatiquement les futurs programmes, formations ou services commercialisés séparément. Sauf indication contraire figurant dans l’offre, l’accès à la communauté, aux séances en direct, à l’accompagnement individuel ou collectif et au support renforcé est limité à douze mois. Pour l’offre Wav Academy décrite à l’article 12.1, cette durée est expressément limitée à six mois.
+            En cas d’arrêt définitif de la Wav Academy, les membres sont informés au moins trois mois à l’avance. Une copie téléchargeable des contenus concernés est proposée lorsque cela est techniquement et juridiquement possible ; à défaut, et si l’arrêt intervient pendant la période garantie de cinq ans, une solution compensatoire adaptée est proposée.
           </p>
+
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">12.3 Périmètre</h3>
           <p className="text-muted-foreground mb-4">
-            En cas d’arrêt définitif du programme pendant la période garantie, Wav Academy proposera, lorsque cela est techniquement et juridiquement possible, un accès alternatif ou une copie téléchargeable des contenus concernés. À défaut, une solution compensatoire adaptée à la période d’accès restant à courir sera proposée.
+            L’offre n’inclut ni accompagnement individuel, ni crédits WavStats, ni les futurs programmes ou services commercialisés séparément (One Shot, Wav Premium, Packs de hooks, analyses).
           </p>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">12.4 Suspension</h3>
@@ -340,8 +348,8 @@ export default function CGV() {
           <h2 className="font-display text-xl font-semibold mt-14 mb-3 border-t pt-8">Annexe 2 : Consentements express (cases à cocher au checkout)</h2>
           <div className="bg-muted/50 rounded-lg p-4 mb-4 space-y-3 text-sm text-muted-foreground">
             <p>☐ J'ai lu et j'accepte les Conditions Générales de Vente.</p>
-            <p>☐ (Wav Premium) Je demande expressément l'exécution de la prestation avant la fin du délai légal de rétractation de 14 jours. En cas de rétractation après le début de l'exécution, je resterai redevable du montant proportionné au service effectivement fourni ; si la prestation est pleinement exécutée, je reconnais perdre mon droit de rétractation.</p>
-            <p>☐ (Analyse Express) Je demande expressément l'exécution immédiate de l'Analyse Express avant la fin du délai de 14 jours et je reconnais perdre mon droit de rétractation lorsque la prestation est pleinement exécutée et le rapport mis à disposition.</p>
+            <p>☐ (One Shot, Wav Premium) Je demande expressément l'exécution de la prestation avant la fin du délai légal de rétractation de 14 jours. En cas de rétractation après le début de l'exécution, je resterai redevable du montant proportionné au service effectivement fourni ; si la prestation est pleinement exécutée, je reconnais perdre mon droit de rétractation.</p>
+            <p>☐ (Analyse vidéo, Analyse Express) Je demande expressément l'exécution immédiate de l'analyse avant la fin du délai de 14 jours et je reconnais perdre mon droit de rétractation lorsque la prestation est pleinement exécutée et le rapport mis à disposition.</p>
             <p>☐ (Wav Academy) Je demande l’exécution du service et l’accès au contenu numérique à la date convenue avant l'expiration du délai de rétractation de 14 jours. Je reconnais que pour le contenu numérique, je perds mon droit de rétractation dès l'accès ; pour la partie service, en cas de rétractation, je reste redevable du prix au prorata du service déjà fourni.</p>
             <p>☐ (Packs de hooks) J'accepte les CGV. Je demande l'envoi immédiat des fichiers par email, avant la fin du délai de rétractation de 14 jours, et je renonce expressément à mon droit de rétractation dès cet envoi.</p>
           </div>

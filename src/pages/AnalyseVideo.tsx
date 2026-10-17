@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { FUNNEL_EVENTS, trackFunnelEvent } from "@/lib/funnel-events";
-import { VIDEO_ANALYSIS_PRICE_LABEL } from "@/config/offers";
+import { OFFERS, VIDEO_ANALYSIS_PRICE_LABEL, launchLabel } from "@/config/offers";
 import { parseTikTokVideoUrl } from "../../supabase/functions/_shared/tiktok-video-url";
 
 // Doivent rester identiques aux textes enregistrés par create-video-checkout.
@@ -135,6 +135,7 @@ export default function AnalyseVideo() {
             <Lightbulb className="h-4 w-4" />
             Analyse Vidéo TikTok · {VIDEO_ANALYSIS_PRICE_LABEL}
           </div>
+          <p className="-mt-3 mb-6 text-sm text-muted-foreground">{launchLabel(OFFERS.analyse_video)}</p>
 
           <h1 className="mb-5 font-display text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">
             Envoie ta vidéo. On te dit ce qui fonctionne, ce qui bloque et quoi changer.

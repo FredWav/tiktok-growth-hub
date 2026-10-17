@@ -14,15 +14,17 @@
  */
 
 import {
-  ACADEMY_PLANS,
   ACADEMY_GUIDES_COUNT,
   ACADEMY_LIVE_SLOT,
   ACADEMY_MODULES_COUNT,
   ACADEMY_SUPPORT_DAYS,
   EXPRESS_PRICE,
+  OFFERS,
   VIDEO_ANALYSIS_PRICE,
   VIDEO_ANALYSIS_PRICE_LABEL,
-  PREMIUM_DURATION_DAYS,
+  launchLabel,
+  priceLabel,
+  type Offer,
 } from "./offers";
 import { HOOKS_FAQ } from "./hooks-faq";
 import { HOOKS_BUNDLE, HOOKS_LIBRARY, HOOKS_PACKS_OFFER } from "./hooks-offer";
@@ -114,7 +116,31 @@ export type RouteManifestEntry =
   | CsrRouteManifestEntry
   | RedirectRouteManifestEntry;
 
-const academyPricing = ACADEMY_PLANS.map((p) => `${p.duration} (${p.total} €)`).join(", ");
+const academy = OFFERS.academy;
+const premium = OFFERS.premium;
+const oneShot = OFFERS.one_shot;
+const academyPrice = `${priceLabel(academy)} TTC, ${academy.priceNote} (${launchLabel(academy)})`;
+
+/** Données structurées d'un accompagnement : un Service et son offre. */
+function serviceSchema(offer: Offer, description: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: offer.name,
+    serviceType: "Accompagnement en stratégie de contenu et réseaux sociaux",
+    description,
+    provider: { "@type": "Person", name: "Fred Wav", url: BASE_URL },
+    areaServed: "FR",
+    url: `${BASE_URL}${offer.href}`,
+    offers: {
+      "@type": "Offer",
+      price: offer.price.toFixed(2),
+      priceCurrency: "EUR",
+      availability: "https://schema.org/InStock",
+      url: `${BASE_URL}${offer.href}`,
+    },
+  };
+}
 
 /**
  * FAQ éditoriale de la home, partagée avec l'accordéon visible.
@@ -126,11 +152,11 @@ export const HOME_FAQ = [
   },
   {
     question: "Quelle différence entre la Wav Academy et le Wav Premium ?",
-    answer: `Ce ne sont pas deux niveaux du même accompagnement. La Wav Academy est un cadre collectif avec des ressources, des outils, des lives et une communauté. Le Wav Premium est un accompagnement individuel de ${PREMIUM_DURATION_DAYS} jours où on travaille directement sur ta situation et ta stratégie.`,
+    answer: "La Wav Academy est un accompagnement collectif à vie : lives, Discord, cours et stratégie construite avec le groupe. Le Wav Premium est un suivi individuel d'au moins six semaines, avec des rendez-vous et WhatsApp. Pour un avis ponctuel, il y a le One Shot.",
   },
   {
     question: "La Wav Academy est-elle un abonnement ?",
-    answer: "Non. Six mois à 749 € TTC, à partir de la date convenue avec Fred. Il n'y a pas de reconduction automatique.",
+    answer: `Non. Un seul paiement de ${priceLabel(academy)} TTC (${launchLabel(academy)?.toLowerCase()}) donne un accès à vie, tant que la Wav Academy existe.`,
   },
   {
     question: "Je débute. Est-ce trop tôt ?",
@@ -175,15 +201,15 @@ const ROUTES: RouteSeo[] = [
       "Comprends ce que racontent tes contenus et prends de meilleures décisions sur TikTok, Instagram et YouTube avec Fred Wav.",
     noscript: {
       h1: "Arrête de poster seul. Tes stats disent déjà ce qui bloque.",
-      body: "Pas de hack ni de promesse de viralité. Fred Wav part de tes contenus, de tes statistiques, de ton positionnement et de tes objectifs pour travailler ta stratégie sur TikTok, Instagram et YouTube. Trois besoins : l'Analyse Express TikTok, la Wav Academy et le Wav Premium multiréseaux.",
+      body: "Pas de hack ni de promesse de viralité. Fred Wav part de tes contenus, de tes statistiques, de ton positionnement et de tes objectifs pour travailler ta stratégie sur TikTok, Instagram et YouTube. Deux familles d'offres : des analyses TikTok automatisées (vidéo et compte) et des accompagnements avec Fred (One Shot, Wav Academy, Wav Premium) sur TikTok, Instagram et YouTube.",
       links: [
-        { href: "/wavacademy", label: "Wav Academy : 749 € TTC pour six mois" },
-        { href: "/analyse-express", label: "Analyse Express : audit de compte TikTok à 19,90 €" },
-        { href: "/analyse-video", label: "Analyse Vidéo TikTok : une vidéo décortiquée" },
-        { href: "/wav-premium", label: "Wav Premium : 1 990 € TTC pour trente jours" },
-        { href: "/preuves", label: "Témoignages et résultats" },
+        { href: "/analyses", label: "Analyses TikTok : vidéo dès 2,90 €, compte à 19,90 €" },
+        { href: "/accompagnements", label: "Accompagnements : One Shot, Wav Academy, Wav Premium" },
+        { href: "/wavacademy", label: `Wav Academy : ${priceLabel(academy)} TTC, accès à vie` },
+        { href: "/wav-premium", label: `Wav Premium : ${priceLabel(premium)} TTC pour six semaines` },
+        { href: "/one-shot", label: `One Shot : audit et 1 h 30 avec Fred, ${priceLabel(oneShot)} TTC` },
+        { href: "/temoignages", label: "Témoignages" },
         { href: "/a-propos", label: "À propos de Fred Wav" },
-        { href: "/newsletter", label: "Guide gratuit des hooks" },
         { href: "/contact", label: "Contact" },
       ],
     },
@@ -206,38 +232,24 @@ const ROUTES: RouteSeo[] = [
       ],
     },
     sitemap: 1.0,
-    llms: "Stratégie de contenu et réseaux sociaux avec Fred Wav : Wav Academy comme offre principale, Analyse Express automatisée uniquement pour TikTok, et Wav Premium individuel sur TikTok, Instagram et YouTube.",
+    llms: "Stratégie de contenu et réseaux sociaux avec Fred Wav : analyses TikTok automatisées (vidéo, compte) et accompagnements (One Shot, Wav Academy à vie, Wav Premium individuel) sur TikTok, Instagram et YouTube.",
     llmsSection: "principales",
   },
   {
     path: "/wavacademy",
-    title: "Wav Academy : progresser sans sacrifier son expertise | Fred Wav",
-    description: `Six mois pour sortir de l’essai-erreur sans devenir influenceur à plein temps : deux lives, retours collectifs, WavStats, ${ACADEMY_MODULES_COUNT} modules et ${ACADEMY_GUIDES_COUNT} guides.`,
-
+    title: "Wav Academy : accompagnement collectif à vie | Fred Wav",
+    description: `Accompagnement collectif à vie sur TikTok, Instagram et YouTube : Discord en semaine, deux lives par semaine, tous les cours. ${priceLabel(academy)} TTC en paiement unique.`,
     noscript: {
-      h1: "Fais progresser tes contenus sans sacrifier ton expertise ni y passer ta vie",
-      body: `TikTok, Instagram et YouTube : un cadre pour transmettre une expertise sans l’appauvrir et relier le contenu à un objectif d’autorité ou d’activité. Deux lives hebdomadaires ${ACADEMY_LIVE_SLOT}, un suivi ${ACADEMY_SUPPORT_DAYS}, des retours collectifs, Discord, ${ACADEMY_MODULES_COUNT} modules et ${ACADEMY_GUIDES_COUNT} guides. Six mois : ${academyPricing}, à compter de la date convenue avec Fred. Paiement unique, sans reconduction et sans garantie de vues ou de revenus.`,
-      links: [{ href: "/wavacademy", label: "Voir le programme Wav Academy" }],
+      h1: "Progresse dans la durée, avec un cadre et un groupe, sans y passer ta vie",
+      body: `Accompagnement collectif à vie, tant que la Wav Academy existe : deux lives par semaine ${ACADEMY_LIVE_SLOT}, Discord ${ACADEMY_SUPPORT_DAYS}, ${ACADEMY_MODULES_COUNT} modules, ${ACADEMY_GUIDES_COUNT} guides et une stratégie construite avec le collectif. ${academyPrice}. ${academy.capacityPerMonth} nouveaux membres par mois. Sans garantie de vues ou de revenus.`,
+      links: [{ href: "/wavacademy", label: "Voir la Wav Academy" }, { href: "/accompagnements", label: "Comparer les accompagnements" }],
     },
-    schema: {
-        "@context": "https://schema.org",
-        "@type": "Course",
-        name: "Wav Academy",
-        description: `Accompagnement collectif TikTok, Instagram et YouTube : deux lives hebdomadaires, suivi ${ACADEMY_SUPPORT_DAYS}, retours sur les contenus, ${ACADEMY_MODULES_COUNT} modules, ${ACADEMY_GUIDES_COUNT} guides et dotations WavStats. Six mois pour tester sans recette de viralité ni garantie de résultat.`,
-        provider: { "@type": "Person", name: "Fred Wav", url: BASE_URL },
-        url: `${BASE_URL}/wavacademy`,
-        inLanguage: "fr-FR",
-        offers: ACADEMY_PLANS.map((p) => ({
-          name: `${p.label} : ${p.duration}`,
-          price: String(p.total),
-          priceCurrency: "EUR",
-          availability: "https://schema.org/InStock",
-          url: `${BASE_URL}/wavacademy`,
-        })),
-    },
-
+    schema: [
+      serviceSchema(academy, "Accompagnement collectif à vie sur TikTok, Instagram et YouTube : deux lives par semaine, Discord en semaine, cours et ressources, stratégie construite dans le temps."),
+      offerBreadcrumb("/wavacademy", "Wav Academy"),
+    ],
     sitemap: 0.9,
-    llms: `Accompagnement collectif pour rendre une expertise visible sans l’appauvrir et sortir de l’essai-erreur : deux lives hebdomadaires, suivi ${ACADEMY_SUPPORT_DAYS}, retours, Discord, ${ACADEMY_MODULES_COUNT} modules, ${ACADEMY_GUIDES_COUNT} guides et dotations WavStats. Six mois, paiement unique sans abonnement : ${academyPricing}. Pas de garantie de vues ou de revenus.`,
+    llms: `Accompagnement collectif à vie (Wav Academy) : deux lives par semaine, Discord en semaine, ${ACADEMY_MODULES_COUNT} modules, ${ACADEMY_GUIDES_COUNT} guides, stratégie construite avec le collectif. ${academyPrice}. Pas d'individuel, pas de crédits WavStats, pas de garantie de résultat.`,
     llmsSection: "offres",
   },
   {
@@ -329,22 +341,82 @@ const ROUTES: RouteSeo[] = [
   },
   {
     path: "/wav-premium",
-    title: "Wav Premium : rendre ton expertise visible en 30 jours | Fred Wav",
-    description: "Analyse, quatre rendez-vous et suivi direct avec Fred pour rendre une expertise visible sans l’appauvrir et relier les contenus à ton activité. 1 990 € TTC.",
-    noscript: { h1: "Ton expertise est solide : tes contenus doivent enfin la rendre visible", body: "Un accompagnement individuel pour protéger la nuance de ton expertise ou accélérer ton activité sans tester au hasard. Cadrage de 1 h 30, trois rendez-vous hebdomadaires d’une heure maximum, analyse complète et suivi WhatsApp du lundi au vendredi, 10 h–18 h (Paris). Trente jours à partir du premier rendez-vous, 1 990 € TTC, sans garantie de vues ou de résultat commercial. Paiement intégral avant démarrage. Candidature étudiée par Fred sous deux jours ouvrés.", links: [{ href: "/reserverunappel", label: "Candidater au Wav Premium" }] },
+    title: "Wav Premium : accompagnement individuel avec Fred | Fred Wav",
+    description: `Accompagnement individuel d'au moins six semaines : rendez-vous tous les quinze jours, suivi WhatsApp et retours sur tes contenus au jour le jour. ${priceLabel(premium)} TTC.`,
+    noscript: {
+      h1: "Ton expertise est solide : tes contenus doivent enfin la rendre visible",
+      body: `Accompagnement individuel avec Fred, six semaines minimum (12 ou 18 sur devis) : un rendez-vous de 1 h 30 puis un rendez-vous d'une heure tous les quinze jours, suivi WhatsApp du lundi au vendredi avec réponse sous un jour ouvré, analyse des contenus à la demande. ${priceLabel(premium)} TTC pour six semaines. ${premium.capacityPerMonth} démarrages par mois, sur demande étudiée par Fred.`,
+      links: [{ href: "/candidature?offre=premium", label: "Demander mon accompagnement" }, { href: "/accompagnements", label: "Comparer les accompagnements" }],
+    },
+    schema: [
+      serviceSchema(premium, "Accompagnement individuel d'au moins six semaines en stratégie de contenu sur TikTok, Instagram et YouTube : rendez-vous réguliers, suivi WhatsApp, analyse des contenus."),
+      offerBreadcrumb("/wav-premium", "Wav Premium"),
+    ],
     sitemap: 0.9,
-    llms: "Accompagnement individuel de 30 jours à 1 990 € TTC pour rendre une expertise visible sans l’appauvrir ou relier le contenu à l’activité : analyse complète, 4 rendez-vous et WhatsApp en semaine. TikTok, Instagram et YouTube, sur candidature, sans garantie de résultat.",
+    llms: `Accompagnement individuel (Wav Premium) d'au moins six semaines, dès ${priceLabel(premium)} TTC : rendez-vous tous les quinze jours, WhatsApp en semaine, retours sur les contenus. Sur demande, sans garantie de résultat.`,
     llmsSection: "offres",
   },
   {
-    path: "/preuves",
+    path: "/one-shot",
+    title: "One Shot : audit de compte et 1 h 30 avec Fred | Fred Wav",
+    description: `Fred audite ton compte TikTok, Instagram ou YouTube, puis 1 h 30 de rendez-vous pour fixer la ligne à suivre. Résumé écrit fourni. ${priceLabel(oneShot)} TTC.`,
+    noscript: {
+      h1: "Un regard expert sur ton compte, et une ligne claire à suivre",
+      body: `Audit complet du compte par Fred, puis 1 h 30 de rendez-vous pour corriger les problèmes et répondre à toutes les questions. Résumé écrit envoyé dans l'heure, ressources selon les besoins. ${priceLabel(oneShot)} TTC, ${oneShot.capacityPerMonth} places par mois, sur demande.`,
+      links: [{ href: "/candidature?offre=one_shot", label: "Demander mon One Shot" }, { href: "/accompagnements", label: "Comparer les accompagnements" }],
+    },
+    schema: [
+      serviceSchema(oneShot, "Audit de compte réseaux sociaux par Fred Wav suivi d'un rendez-vous de 1 h 30, avec résumé écrit et ressources."),
+      offerBreadcrumb("/one-shot", "One Shot"),
+    ],
+    sitemap: 0.9,
+    llms: `Audit de compte par Fred Wav et rendez-vous de 1 h 30 (One Shot), ${priceLabel(oneShot)} TTC : ligne à suivre, corrections, questions, résumé écrit. TikTok, Instagram et YouTube, sur demande.`,
+    llmsSection: "offres",
+  },
+  {
+    path: "/accompagnements",
+    title: "Accompagnements réseaux sociaux avec Fred Wav : prix et formules",
+    description: `One Shot (${priceLabel(oneShot)}), Wav Academy à vie (${priceLabel(academy)}) ou Wav Premium individuel (${priceLabel(premium)}) : compare les trois façons de travailler avec Fred.`,
+    noscript: {
+      h1: "Travailler avec Fred : trois façons, selon ton besoin",
+      body: `One Shot : audit et 1 h 30 avec Fred, ${priceLabel(oneShot)} TTC. Wav Academy : accompagnement collectif à vie, ${academyPrice}. Wav Premium : accompagnement individuel dès ${priceLabel(premium)} TTC pour six semaines. TikTok, Instagram et YouTube.`,
+      links: [
+        { href: "/one-shot", label: "One Shot" },
+        { href: "/wavacademy", label: "Wav Academy" },
+        { href: "/wav-premium", label: "Wav Premium" },
+      ],
+    },
+    schema: offerBreadcrumb("/accompagnements", "Accompagnements"),
+    sitemap: 0.9,
+    llms: "Comparatif des accompagnements de Fred Wav : One Shot (audit ponctuel), Wav Academy (collectif à vie) et Wav Premium (individuel), avec prix, format et suivi.",
+    llmsSection: "offres",
+  },
+  {
+    path: "/analyses",
+    title: "Analyses TikTok automatisées : vidéo et compte | Fred Wav",
+    description: `Analyse d'une vidéo TikTok à ${VIDEO_ANALYSIS_PRICE_LABEL} ou de tout ton compte à ${OFFERS.analyse_express.price.toFixed(2).replace(".", ",")} € : rapport en quelques minutes, sans abonnement.`,
+    noscript: {
+      h1: "Comprends ce qui bloque, vidéo par vidéo ou sur tout ton compte",
+      body: `Deux analyses TikTok automatisées, livrées en quelques minutes par e-mail avec un PDF. Analyse vidéo : ${VIDEO_ANALYSIS_PRICE_LABEL} (${launchLabel(OFFERS.analyse_video)?.toLowerCase()}). Analyse Express du compte : 19,90 €. Sans abonnement.`,
+      links: [
+        { href: "/analyse-video", label: "Analyser une vidéo TikTok" },
+        { href: "/analyse-express", label: "Analyser mon compte TikTok" },
+      ],
+    },
+    schema: offerBreadcrumb("/analyses", "Analyses"),
+    sitemap: 0.9,
+    llms: "Comparatif des deux analyses TikTok automatisées de Fred Wav : Analyse vidéo (une vidéo) et Analyse Express (le compte), prix et délais.",
+    llmsSection: "offres",
+  },
+  {
+    path: "/temoignages",
     title: "Témoignages et résultats clients | Fred Wav",
     description:
       "Découvre des résultats clients contextualisés, des témoignages vidéo et des retours directs après accompagnement avec Fred Wav.",
     noscript: {
       h1: "Des résultats, pas des promesses",
       body: "Ce qui s'est réellement passé chez des créateurs accompagnés : résultats contextualisés, témoignages vidéo et captures de retours. Aucun résultat n'est présenté comme une garantie.",
-      links: [{ href: "/preuves", label: "Voir tous les témoignages" }],
+      links: [{ href: "/temoignages", label: "Voir tous les témoignages" }],
     },
     sitemap: 0.7,
     llms: "Résultats clients contextualisés, témoignages vidéo et captures de retours, sans garantie ni cas générique inventé.",
@@ -510,7 +582,7 @@ const ROUTES: RouteSeo[] = [
     noscript: {
       h1: "Je ne t'aide pas à poster plus. Je t'aide à comprendre quoi faire ensuite.",
       body: "Fred Wav est créateur de contenu, formateur et consultant en stratégie réseaux sociaux. Son expertise historique vient de TikTok et des formats courts, mais ses accompagnements peuvent aussi intégrer Instagram, YouTube, Facebook et les stratégies multiréseaux. Son approche repose sur le contexte, les contenus, les statistiques, le positionnement et les objectifs réels.",
-      links: [{ href: "/preuves", label: "Voir les résultats" }],
+      links: [{ href: "/temoignages", label: "Voir les témoignages" }],
     },
     schema: {
       "@context": "https://schema.org",
@@ -549,7 +621,7 @@ const ROUTES: RouteSeo[] = [
       body: "Mes conseils formats courts par email, et le guide complet des hooks TikTok pour commencer. La bibliothèque de hooks TikTok est sur /hooks-tiktok.",
       links: [
         { href: "/hooks-tiktok", label: "Voir la bibliothèque de hooks TikTok" },
-        { href: "/wavacademy", label: "Wav Academy : ne poste plus seul" },
+        { href: "/accompagnements", label: "Les accompagnements de Fred Wav" },
       ],
     },
     sitemap: 0.4,
@@ -573,10 +645,10 @@ const ROUTES: RouteSeo[] = [
     path: "/cgv",
     title: "Conditions Générales de Vente | Fred Wav",
     description:
-      "CGV applicables aux prestations de conseil en stratégie de contenu et aux Pass Wav Academy proposés par Fred Wav.",
+      "CGV applicables aux analyses, au One Shot, à la Wav Academy, au Wav Premium et aux packs de hooks proposés par Fred Wav.",
     noscript: {
       h1: "Conditions Générales de Vente",
-      body: "Conditions applicables aux Pass Wav Academy, à l'Analyse Express et aux prestations d'accompagnement.",
+      body: "Conditions applicables aux analyses vidéo et Express, au One Shot, à la Wav Academy, au Wav Premium et aux packs de hooks.",
     },
     sitemap: 0.2,
     llms: "CGV du site.",
@@ -610,10 +682,10 @@ const ROUTES: RouteSeo[] = [
   },
 ];
 
-const ALLOWED_SCHEMA_TYPES = new Set(["Product", "Course", "Person", "Article", "BreadcrumbList"]);
+const ALLOWED_SCHEMA_TYPES = new Set(["Product", "Service", "Person", "Article", "BreadcrumbList"]);
 
 function routeKind(path: string): Exclude<RouteKind, "redirect"> {
-  if (["/wavacademy", "/analyse-express", "/analyse-video", "/wav-premium"].includes(path)) return "commercial";
+  if (["/analyses", "/accompagnements", "/one-shot", "/wavacademy", "/analyse-express", "/analyse-video", "/wav-premium"].includes(path)) return "commercial";
   if (["/cgv", "/mentions-legales", "/politique-de-confidentialite"].includes(path)) return "legal";
   return "content";
 }
@@ -646,7 +718,7 @@ function buildRouteSchema(route: RouteSeo, indexable: boolean): Record<string, u
 }
 
 const ssgManifest: SsgRouteManifestEntry[] = ROUTES.map((route) => {
-  const indexable = route.path !== "/start";
+  const indexable = true;
   return {
     ...route,
     kind: routeKind(route.path),
@@ -670,8 +742,7 @@ type CsrDefinition = {
 };
 
 const csrManifest: CsrRouteManifestEntry[] = ([
-  { path: "/reserverunappel", title: "Trouver l’offre adaptée | Fred Wav" },
-  { path: "/wavacademy/appel", title: "Appel Wav Academy | Fred Wav" },
+  { path: "/candidature", title: "Demande d’accompagnement | Fred Wav" },
   { path: "/inscription/:token", title: "Inscription personnelle | Fred Wav", private: true },
   { path: "/admin/commandes", title: "Commandes et demandes | Fred Wav", private: true, clientBoundary: "admin" },
   { path: "/auth", title: "Connexion | Fred Wav", clientBoundary: "auth" },
@@ -713,16 +784,18 @@ const csrManifest: CsrRouteManifestEntry[] = ([
 
 const redirectDefinitions: [string, string, 307 | 308][] = [
   ["/start", "/analyse-express", 308],
-  ["/offres", "/", 308],
-  ["/45-jours", "/reserverunappel", 308],
-  ["/offres/45-jours", "/reserverunappel", 308],
+  ["/offres", "/accompagnements", 308],
+  ["/preuves", "/temoignages", 308],
+  ["/reserverunappel", "/candidature", 308],
+  ["/wavacademy/appel", "/candidature?offre=academy", 308],
+  ["/wav-premium/candidature", "/candidature?offre=premium", 308],
+  ["/45-jours", "/accompagnements", 308],
+  ["/offres/45-jours", "/accompagnements", 308],
   ["/offres/vip", "/wavacademy", 308],
-  ["/one-shot", "/reserverunappel", 308],
-  ["/accompagnement-reseaux-sociaux", "/reserverunappel", 308],
-  ["/accompagnement-tiktok", "/wavacademy", 308],
+  ["/accompagnement-reseaux-sociaux", "/accompagnements", 308],
+  ["/accompagnement-tiktok", "/accompagnements", 308],
   ["/one-shot/success", "/", 307],
   ["/mail", "/newsletter", 308],
-  ["/wav-premium/candidature", "/reserverunappel", 308],
 ];
 
 const redirectManifest: RedirectRouteManifestEntry[] = redirectDefinitions.map<RedirectRouteManifestEntry>(

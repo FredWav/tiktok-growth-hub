@@ -29,10 +29,12 @@ import {
 } from "@/components/ui/accordion";
 import { seoFor, HOME_FAQ } from "@/config/seo";
 import {
-  ACADEMY_ENTRY,
-  ACADEMY_FROM,
+  ACCOMPAGNEMENTS,
+  ANALYSES,
   CREATORS_COUNT,
-  EXPRESS_PRICE_LABEL,
+  OFFERS,
+  launchLabel,
+  priceLabel,
 } from "@/config/offers";
 import { trackEvent } from "@/lib/tracking";
 import { FUNNEL_EVENTS, trackFunnelEvent } from "@/lib/funnel-events";
@@ -119,28 +121,23 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-br from-cream via-background to-primary/5 -z-10" />
         <div className="max-w-4xl mx-auto text-center">
           <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary mb-5">
-            <Sparkles className="h-3.5 w-3.5" /> Stratégie TikTok et formats courts
+            <Sparkles className="h-3.5 w-3.5" /> Stratégie TikTok, Instagram et YouTube
           </span>
           <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 text-balance">
-            Arrête de poster seul. <span className="text-gold-gradient">Tes statistiques TikTok disent déjà ce qui bloque.</span>
+            Arrête de poster seul. <span className="text-gold-gradient">Tes statistiques disent déjà ce qui bloque.</span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-8 leading-relaxed">
-            Pas de hack ni de promesse de viralité. Tu apprends à lire tes contenus, comprendre ce qui retient vraiment l’attention et décider quoi tester sur la vidéo suivante.
+            Pas de hack ni de promesse de viralité. Une analyse pour comprendre ce qui bloque, ou un accompagnement avec Fred pour décider quoi tester sur la vidéo suivante.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-stretch sm:items-center">
             <Button
               variant="hero"
               size="xl"
               asChild
-              onClick={() =>
-                trackFunnelEvent(FUNNEL_EVENTS.academyCtaClick, {
-                  source_page: "/",
-                  position: "hero_primary",
-                })
-              }
+              onClick={() => trackEvent("home_cta_click", { position: "hero_primary", target: "/accompagnements" })}
             >
-              <Link to="/wavacademy">
-                Rejoindre la Wav Academy
+              <Link to="/accompagnements">
+                Voir les accompagnements
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
@@ -155,11 +152,11 @@ export default function Home() {
                 })
               }
             >
-              <Link to="/analyse-express">Commencer par l’Analyse Express : {EXPRESS_PRICE_LABEL}</Link>
+              <Link to="/analyses">Analyser mon TikTok, dès {priceLabel(OFFERS.analyse_video)}</Link>
             </Button>
           </div>
           <p className="text-sm text-muted-foreground mt-4">
-            Academy {ACADEMY_FROM} € pour {ACADEMY_ENTRY.duration}, paiement unique et sans reconduction.
+            Analyses sans abonnement · accompagnements sur TikTok, Instagram et YouTube.
           </p>
         </div>
       </Section>
@@ -168,7 +165,7 @@ export default function Home() {
         <div className="grid sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {[
             [CREATORS_COUNT, "créateurs accompagnés"],
-            ["Paiement unique", "aucun abonnement ni reconduction"],
+            ["Sans abonnement", "paiement unique, analyses comme accompagnements"],
             ["Cas contextualisés", "des résultats, jamais une garantie"],
           ].map(([value, label]) => (
             <div key={value} className="text-center sm:text-left sm:border-l sm:border-cream/15 sm:pl-6 first:border-l-0 first:pl-0">
@@ -199,10 +196,23 @@ export default function Home() {
 
       <Section variant="cream" size="lg">
         <SectionHeader
-          title="Trois besoins. Trois façons d’avancer."
-          subtitle="L’Analyse Express pose le diagnostic, la Wav Academy installe un cadre régulier, le Wav Premium traite une stratégie individuelle."
+          title="Comprendre seul, ou avancer avec Fred."
+          subtitle="Deux familles d’offres, tous les prix au même endroit."
         />
-        <OfferComparison location="home" />
+        <h2 className="font-display text-2xl font-semibold text-center mb-2">Les analyses TikTok</h2>
+        <p className="text-center text-muted-foreground mb-8">Automatisées, livrées en quelques minutes.</p>
+        <OfferComparison offers={ANALYSES} location="home_analyses" />
+        <h2 className="font-display text-2xl font-semibold text-center mt-16 mb-2">Les accompagnements</h2>
+        <p className="text-center text-muted-foreground mb-10">Avec Fred, sur TikTok, Instagram et YouTube.</p>
+        <OfferComparison offers={ACCOMPAGNEMENTS} location="home_accompagnements" />
+        <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
+          <Button variant="outline" size="lg" asChild>
+            <Link to="/analyses">Comparer les analyses</Link>
+          </Button>
+          <Button variant="outline" size="lg" asChild>
+            <Link to="/accompagnements">Comparer les accompagnements</Link>
+          </Button>
+        </div>
       </Section>
 
       <Section variant="default" size="lg">
@@ -218,8 +228,8 @@ export default function Home() {
         </div>
         <div className="text-center mt-10">
           <Button variant="outline" size="lg" asChild onClick={() => trackEvent("proofs_cta_click", { source_page: "/", position: "results" })}>
-            <Link to="/preuves">
-              Voir les résultats et leur contexte
+            <Link to="/temoignages">
+              Voir tous les témoignages
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
@@ -331,13 +341,13 @@ export default function Home() {
       <Section variant="dark" size="lg">
         <div className="max-w-4xl mx-auto text-center">
           <span className="mb-5 inline-flex items-center gap-2 rounded-full bg-gold-light/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-gold-light">
-            <ShieldCheck className="h-3.5 w-3.5" /> Sans abonnement
+            <ShieldCheck className="h-3.5 w-3.5" /> Accès à vie, sans abonnement
           </span>
           <h2 className="font-display text-3xl md:text-4xl font-semibold mb-4 text-cream text-balance">
             Ne reste plus seul face à tes contenus et à tes statistiques.
           </h2>
           <p className="text-cream/70 text-lg mb-8">
-            Rejoins un cadre régulier pour analyser, décider et progresser avec du feedback.
+            La Wav Academy : deux lives par semaine, un suivi sur Discord et tous les cours, à vie, en un seul paiement.
           </p>
           <Button
             variant="hero"
@@ -351,12 +361,12 @@ export default function Home() {
             }
           >
             <Link to="/wavacademy">
-              Rejoindre la Wav Academy
+              Découvrir la Wav Academy
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
           <p className="text-xs text-cream/50 mt-4">
-            {ACADEMY_ENTRY.duration} {ACADEMY_FROM} €, paiement unique et aucune reconduction automatique.
+            {priceLabel(OFFERS.academy)} TTC, accès à vie. {launchLabel(OFFERS.academy)}.
           </p>
           <div className="mt-8 pt-8 border-t border-cream/10">
             <p className="text-sm text-cream/60 mb-3">Tu préfères commencer par un diagnostic de ton compte TikTok ?</p>
@@ -372,7 +382,7 @@ export default function Home() {
                 })
               }
             >
-              <Link to="/analyse-express">Faire mon Analyse Express : {EXPRESS_PRICE_LABEL}</Link>
+              <Link to="/analyse-express">Faire mon Analyse Express : {priceLabel(OFFERS.analyse_express)}</Link>
             </Button>
           </div>
         </div>

@@ -90,24 +90,19 @@ test("données absentes, dates invalides et doublons non présentés comme compl
   assert.throws(() => normalizeExpressSample(h), /Dates/);
 });
 
-test("le formulaire de contact transmet les réponses à Fred sans recommandation automatique", () => {
-  const page = readFileSync(new URL("../src/pages/ReserverUnAppel.tsx", import.meta.url), "utf8");
-  const handler = readFileSync(new URL("../supabase/functions/submit-orientation/index.ts", import.meta.url), "utf8");
+test("le formulaire de demande unique couvre les trois accompagnements et le conseil, sans agenda automatique", () => {
+  const page = readFileSync(new URL("../src/pages/Candidature.tsx", import.meta.url), "utf8");
+  const handler = readFileSync(new URL("../supabase/functions/_shared/submit-application.ts", import.meta.url), "utf8");
+  const migration = readFileSync(new URL("../supabase/migrations/20261018090000_applications_v2.sql", import.meta.url), "utf8");
 
-  assert.match(page, /Ton compte principal/);
-  assert.match(page, /Envoyer ma demande/);
-  assert.doesNotMatch(page, /Compte, site ou projet principal|Recevoir ma recommandation|Ton budget est inférieur|Moins de 399 € :|À partir de 399 € :/);
-
-  const offers = readFileSync(new URL("../src/config/offers.ts", import.meta.url), "utf8");
-  for (const tier of ["1 - 398 €", "399 - 998 €", "998 - 1 499 €", "Plus de 1 499 €"]) {
-    assert.match(offers, new RegExp(tier.replace(/[+]/g, "\\+")));
-    assert.match(handler, new RegExp(tier.replace(/[+]/g, "\\+")));
+  for (const offer of ["one_shot", "academy", "premium", "conseil"]) {
+    assert.match(page, new RegExp(`"${offer}"`));
+    assert.match(handler, new RegExp(`"${offer}"`));
+    assert.match(migration, new RegExp(`'${offer}'`));
   }
-
-  assert.match(handler, /Nouvelle demande de contact/);
-  assert.match(handler, /row\("Compte principal"/);
-  assert.match(handler, /OWNER_EMAIL,/);
-  assert.doesNotMatch(handler, /orientation:\$\{saved\.id\}:client|clientBody|qualifyOrientation/);
+  assert.match(page, /submit-application/);
+  assert.doesNotMatch(page + handler, /calendar/i);
+  assert.match(migration, /'contact@fredwav\.com'/);
 });
 
 test("toutes les notifications internes partent vers contact@fredwav.com", () => {
@@ -117,7 +112,7 @@ test("toutes les notifications internes partent vers contact@fredwav.com", () =>
   for (const path of [
     "supabase/functions/commerce-process/index.ts",
     "supabase/functions/_shared/commerce-stripe.ts",
-    "supabase/functions/submit-orientation/index.ts",
+    "supabase/functions/_shared/submit-application.ts",
   ]) {
     assert.doesNotMatch(read(path), /fredwavcm@gmail\.com/, path);
   }

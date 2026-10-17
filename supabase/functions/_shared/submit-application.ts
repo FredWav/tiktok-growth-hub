@@ -1,5 +1,4 @@
 import {
-  CALENDAR,
   db,
   email,
   fingerprint,
@@ -9,7 +8,23 @@ import {
   uuid,
 } from "./commerce.ts";
 
-export function applicationHandler(offer: "academy" | "premium") {
+/** Offres acceptées par le formulaire de demande unique (/candidature). */
+export const APPLICATION_OFFERS = ["one_shot", "academy", "premium", "conseil"] as const;
+export type ApplicationOffer = (typeof APPLICATION_OFFERS)[number];
+
+export function applicationOffer(value: unknown): ApplicationOffer {
+  if (typeof value === "string" && (APPLICATION_OFFERS as readonly string[]).includes(value)) {
+    return value as ApplicationOffer;
+  }
+  throw new Error("Offre invalide");
+}
+
+/**
+ * Enregistre une demande d'accompagnement. Fred répond personnellement :
+ * aucun lien d'agenda n'est renvoyé.
+ * `fixedOffer` sert aux anciens points d'entrée (submit-academy-application…).
+ */
+export function applicationHandler(fixedOffer?: ApplicationOffer) {
   return async (req: Request) => {
     if (req.method === "OPTIONS") return new Response(null, { headers });
     if (req.method !== "POST") {
@@ -20,7 +35,7 @@ export function applicationHandler(offer: "academy" | "premium") {
       if (body.website) return json({ error: "Demande non acceptée" }, 400);
       const values = {
         request_id: uuid(body.request_id),
-        offer,
+        offer: fixedOffer ?? applicationOffer(body.offer),
         first_name: text(body.first_name, 1, 100),
         email: email(body.email),
         account_or_project: text(body.account_or_project, 5, 2000),
@@ -31,13 +46,12 @@ export function applicationHandler(offer: "academy" | "premium") {
         commitments: {
           price: body.price === true,
           practice: body.practice === true,
-          commercial_call: body.commercial_call === true,
         },
         fingerprint: await fingerprint(req),
       };
       if (!Object.values(values.commitments).every(Boolean)) {
         return json({
-          error: "Lis les conditions de l'appel avant de réserver.",
+          error: "Coche les deux engagements avant d'envoyer ta demande.",
           eligible: false,
         }, 422);
       }
@@ -47,11 +61,7 @@ export function applicationHandler(offer: "academy" | "premium") {
         { v: values },
       );
       if (error || !id) throw error || new Error("Enregistrement absent");
-      return json({
-        id,
-        ...(offer === "academy" ? { calendar_url: CALENDAR } : {}),
-        notification: "queued",
-      });
+      return json({ id, notification: "queued" });
     } catch (error) {
       console.error(error);
       return json({

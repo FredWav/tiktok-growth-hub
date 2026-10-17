@@ -57,7 +57,7 @@ const related: RelatedResource[] = [
     label: "Bibliothèque de hooks",
   },
   {
-    href: "/preuves",
+    href: "/temoignages",
     title: "Voir des résultats documentés",
     description: "Découvre des cas contextualisés avant de choisir la prochaine étape de ton diagnostic.",
     label: "Résultats",

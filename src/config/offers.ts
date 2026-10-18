@@ -50,7 +50,8 @@ export type Offer = {
  * paiement Stripe (One Shot, Wav Academy, Wav Premium). Fred est réglé en une fois ;
  * l'échéancier lie le client à l'organisme. Ne jamais annoncer ici une offre à
  * intérêts (6, 12 ou 24 fois) : ce serait de la publicité pour un crédit.
- * PayPal 4 fois : à confirmer par un paiement test via Stripe avant mise en ligne.
+ * PayPal via Stripe : le client choisit sur PayPal sa source, dont le « payer plus tard » (4 fois),
+ * selon son éligibilité (docs.stripe.com/payments/paypal, vérifié le 17/10/2026).
  */
 export const INSTALLMENTS_LABEL = "en 3 fois sans frais avec Klarna, en 3 ou 4 fois avec Scalapay, ou en 4 fois avec PayPal";
 export const INSTALLMENTS_NOTE = "sous réserve d'acceptation par l'organisme de paiement";

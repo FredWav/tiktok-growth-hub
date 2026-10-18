@@ -12,6 +12,7 @@ node_modules
 tmp/
 dist
 dist-ssr
+dist-caddy
 *.local
 
 # Caches de build TypeScript et temporaires Supabase

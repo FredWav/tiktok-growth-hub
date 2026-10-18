@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/tracking";
 import { launchLabel, type Offer, priceLabel } from "@/config/offers";
 import { PlacesLeft } from "@/components/offers/PlacesLeft";
+import { AnalysisCount } from "@/components/offers/AnalysisCount";
+import { isCountedAnalysis } from "@/lib/analysis-counts";
 
 /**
  * Cartes de comparaison d'une famille d'offres (analyses ou accompagnements).
@@ -54,6 +56,9 @@ export function OfferComparison({
             <p className="text-xs text-muted-foreground mb-1">{offer.priceNote}</p>
             {launch && <p className="text-xs font-medium text-foreground/80 mb-1">{launch}</p>}
             <PlacesLeft offer={offer} className="text-xs font-medium text-foreground/80" />
+            {isCountedAnalysis(offer.id) && (
+              <AnalysisCount offer={offer.id} className="mt-2 text-sm text-muted-foreground" />
+            )}
 
             <p className="text-sm text-muted-foreground mt-4 mb-4">{offer.summary}</p>
 

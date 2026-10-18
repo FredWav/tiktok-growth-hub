@@ -81,9 +81,17 @@ export async function openCheckout(
       price_data: {
         currency: "eur",
         unit_amount: due,
+        // Prix TTC : la taxe éventuelle est comprise, jamais ajoutée au montant.
+        tax_behavior: "inclusive",
         product_data: { name, description },
       },
     }],
+    // Mêmes réglages que les liens de paiement des analyses : facture, adresse
+    // de facturation, taxe automatique (désactivable par COMMERCE_AUTOMATIC_TAX=false).
+    automatic_tax: { enabled: Deno.env.get("COMMERCE_AUTOMATIC_TAX") !== "false" },
+    billing_address_collection: "required",
+    customer_creation: "always",
+    invoice_creation: { enabled: true, invoice_data: { description: `${name} · commande ${order.id}`, metadata } },
     client_reference_id: order.id,
     customer_email: order.email,
     metadata,

@@ -4,6 +4,20 @@ import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { commerceCall, money } from "@/lib/commerce";
+import { OFFERS } from "@/config/offers";
+
+const OFFER_INFO: Record<string, { name: string; href: string }> = {
+  one_shot: { name: OFFERS.one_shot.name, href: OFFERS.one_shot.href },
+  academy: { name: OFFERS.academy.name, href: OFFERS.academy.href },
+  premium: { name: OFFERS.premium.name, href: OFFERS.premium.href },
+};
+const frDate = (iso: string) =>
+  new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "Europe/Paris" });
+function durationLabel(d: EnrollmentData) {
+  if (d.offer === "one_shot") return "Rendez-vous unique de 1 h 30, résumé envoyé dans l'heure qui suit";
+  if (d.offer === "academy") return d.ends_at ? `Jusqu'au ${frDate(d.ends_at)}` : "À vie, tant que la Wav Academy existe";
+  return `${d.duration_weeks ?? 6} semaines${d.ends_at ? `, jusqu'au ${frDate(d.ends_at)}` : ""}`;
+}
 
 type EnrollmentData = {
   offer: string;
@@ -13,12 +27,15 @@ type EnrollmentData = {
   start_date: string;
   start_time: string;
   starts_at: string;
+  ends_at: string | null;
+  duration_weeks: number | null;
+  hold_until: string | null;
   sales_enabled: boolean;
+  can_pay: boolean;
   status: string;
   accepted: boolean;
   cgv_text: string;
   early_text: string;
-  payment_url: string | null;
   transfer_instructions: string | null;
   reference: string;
 };
@@ -43,6 +60,17 @@ export default function Enrollment() {
   useEffect(() => {
     void load();
   }, [load]);
+  async function pay() {
+    setBusy(true);
+    setError("");
+    try {
+      const { url } = await commerceCall<{ url: string }>("enrollment", { token, action: "checkout" });
+      window.location.assign(url);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Paiement indisponible.");
+      setBusy(false);
+    }
+  }
   function accept(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const f = new FormData(event.currentTarget);
@@ -74,7 +102,7 @@ export default function Enrollment() {
               <p>
                 Bonjour{" "}
                 {data.first_name}. Voici les modalités convenues avec Fred pour
-                Wav {data.offer === "academy" ? "Academy" : "Premium"}.
+                ton {OFFER_INFO[data.offer]?.name ?? "accompagnement"}.
               </p>
               <dl className="rounded-xl border border-border p-6 space-y-3">
                 <div>
@@ -82,21 +110,17 @@ export default function Enrollment() {
                   <dd className="font-semibold">{money(data.amount_cents)}</dd>
                 </div>
                 <div>
-                  <dt>Début convenu (heure de Paris)</dt>
+                  <dt>{data.offer === "academy" ? "Accès à partir du" : "Rendez-vous (heure de Paris)"}</dt>
                   <dd>
                     {data.start_date.split("-").reverse().join("/")}
-                    {data.offer === "premium"
+                    {data.offer !== "academy"
                       ? ` à ${data.start_time.slice(0, 5)}`
                       : ""}
                   </dd>
                 </div>
                 <div>
                   <dt>Durée</dt>
-                  <dd>
-                    {data.offer === "academy"
-                      ? "Six mois de date à date, sans reconduction"
-                      : "Trente jours à partir du premier rendez-vous"}
-                  </dd>
+                  <dd>{durationLabel(data)}</dd>
                 </div>
                 <div>
                   <dt>Montant encaissé et confirmé</dt>
@@ -117,9 +141,7 @@ export default function Enrollment() {
                     <p>
                       Consulte le{" "}
                       <Link
-                        to={data.offer === "academy"
-                          ? "/wavacademy"
-                          : "/wav-premium"}
+                        to={OFFER_INFO[data.offer]?.href ?? "/accompagnements"}
                         className="underline"
                       >
                         programme
@@ -163,24 +185,20 @@ export default function Enrollment() {
                       intégral et n’est ouvert qu’à la date convenue.
                     </p>
                     {data.amount_received === 0 && !data.sales_enabled && <p role="status">Les nouveaux règlements sont temporairement suspendus. Contacte Fred ; ne règle pas depuis un ancien lien.</p>}
-                    {data.amount_received === 0 && data.sales_enabled && (
+                    {data.can_pay && (
                       <div className="space-y-5">
                         <h2 className="font-display text-2xl">
                           Choisis ton moyen de paiement
                         </h2>
-                        {data.payment_url
-                          ? (
-                            <Button asChild>
-                              <a href={data.payment_url} rel="noreferrer">
-                                Payer en ligne
-                              </a>
-                            </Button>
-                          )
-                          : (
-                            <p>
-                              Pour le paiement en ligne, demande le lien à Fred.
-                            </p>
-                          )}
+                        <div className="space-y-2">
+                          <Button disabled={busy} onClick={() => void pay()}>
+                            Payer {money(data.amount_cents - data.amount_received)} en ligne
+                          </Button>
+                          <p className="text-sm text-muted-foreground">
+                            Carte bancaire, Klarna, Scalapay ou PayPal (paiement en plusieurs fois sous réserve d'acceptation par l'organisme).
+                            {data.hold_until && ` Ta place est réservée jusqu'au ${frDate(data.hold_until)}.`}
+                          </p>
+                        </div>
                         <div className="border border-border rounded-xl p-5">
                           <h3 className="font-semibold mb-3">
                             Payer par virement

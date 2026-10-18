@@ -1,13 +1,22 @@
+import Stripe from "https://esm.sh/stripe@18.5.0?target=deno";
 import {
   CGV_TEXT,
   db,
-  EARLY_TEXT,
+  earlyText,
   headers,
   json,
+  site,
   uuid,
   VERSION,
 } from "../_shared/commerce.ts";
+import { openCheckout, salesEnabled } from "../_shared/commerce-checkout.ts";
+import { getStripeSecretKey } from "../_shared/stripe-config.ts";
 
+/**
+ * Lien personnel /inscription/:token, envoyé par Fred après une demande
+ * (One Shot, Wav Premium, ou Wav Academy réglée hors ligne) : récapitulatif,
+ * acceptation des modalités, puis paiement Stripe ou virement.
+ */
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers });
   try {
@@ -49,7 +58,7 @@ Deno.serve(async (req) => {
         p_consent: {
           version: VERSION,
           cgv: CGV_TEXT,
-          early: b.early_start === true ? EARLY_TEXT : null,
+          early: b.early_start === true ? earlyText(o.offer) : null,
           start_date: o.start_date,
           starts_at: o.starts_at,
         },
@@ -60,44 +69,46 @@ Deno.serve(async (req) => {
         );
       }
     }
-    const { data: current } = await client.from("commerce_orders").select(
-      "consent_at",
-    ).eq("id", o.id).single();
-    const paymentLink = o.offer === "academy"
-      ? (Deno.env.get("COMMERCE_ACADEMY_PAYMENT_URL") ||
-        "https://buy.stripe.com/6oUeVc7525z38z84PmcMM0I")
-      : Deno.env.get("COMMERCE_PREMIUM_PAYMENT_URL");
-    const configured = Deno.env.get(
-      o.offer === "academy"
-        ? "COMMERCE_ACADEMY_PAYMENT_LINK_ID"
-        : "COMMERCE_PREMIUM_PAYMENT_LINK_ID",
-    );
-    const canPay = Deno.env.get("COMMERCE_SALES_ENABLED") === "true" &&
-      !!current?.consent_at && o.amount_received === 0 &&
-      o.status !== "needs_reschedule" &&
-      (o.offer !== "academy" ||
-        Deno.env.get("COMMERCE_WAVSTATS_VERIFIED") === "true");
+    const { data: current, error: currentError } = await client.from("commerce_orders")
+      .select("*").eq("id", o.id).single();
+    if (currentError) throw currentError;
+    const canPay = salesEnabled() && !!current.consent_at &&
+      current.amount_received < current.amount_cents &&
+      current.status !== "needs_reschedule";
+    if (b.action === "checkout") {
+      if (!canPay) throw new Error("Le paiement en ligne n’est pas disponible pour cette inscription. Contacte Fred.");
+      const stripe = new Stripe(getStripeSecretKey(), {
+        apiVersion: "2025-08-27.basil",
+        httpClient: Stripe.createFetchHttpClient(),
+      });
+      const url = await openCheckout(stripe, client, current, {
+        success: `${site()}/inscription/${current.token}?paiement=ok`,
+        cancel: `${site()}/inscription/${current.token}`,
+      });
+      return json({ url });
+    }
     return json({
-      offer: o.offer,
-      first_name: o.first_name,
-      amount_cents: o.amount_cents,
-      amount_received: o.amount_received,
-      start_date: o.start_date,
-      start_time: o.start_time,
-      starts_at: o.starts_at,
-      sales_enabled: Deno.env.get("COMMERCE_SALES_ENABLED") === "true" && (o.offer !== "academy" || Deno.env.get("COMMERCE_WAVSTATS_VERIFIED") === "true"),
-      status: o.status,
-      accepted: !!current?.consent_at,
+      offer: current.offer,
+      first_name: current.first_name,
+      amount_cents: current.amount_cents,
+      amount_received: current.amount_received,
+      start_date: current.start_date,
+      start_time: current.start_time,
+      starts_at: current.starts_at,
+      ends_at: current.ends_at,
+      duration_weeks: current.duration_weeks,
+      hold_until: current.hold_until,
+      sales_enabled: salesEnabled(),
+      status: current.status,
+      accepted: !!current.consent_at,
       cgv_text: CGV_TEXT,
-      early_text: EARLY_TEXT,
-      payment_url: canPay && paymentLink && configured
-        ? `${paymentLink}?client_reference_id=${o.id}`
-        : null,
+      early_text: earlyText(current.offer),
+      can_pay: canPay,
       transfer_instructions: canPay
         ? (Deno.env.get("COMMERCE_TRANSFER_INSTRUCTIONS") ||
           "Fred te transmet le RIB et la facture directement. Indique la référence de commande avec ton virement.")
         : null,
-      reference: o.id,
+      reference: current.id,
     });
   } catch (error) {
     return json({

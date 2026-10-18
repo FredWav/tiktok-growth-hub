@@ -2,6 +2,10 @@ import { type FormEvent, useCallback, useEffect, useState } from "react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { commerceCall, commerceInput, money } from "@/lib/commerce";
+import { monthName, type Places } from "@/lib/places";
+import { OFFERS, priceLabel } from "@/config/offers";
+
+const OFFER_NAMES: Record<string, string> = { one_shot: "One Shot", academy: "Wav Academy", premium: "Wav Premium" };
 
 type Order = {
   id: string;
@@ -15,7 +19,9 @@ type Order = {
   amount_received: number;
   consent_at: string | null;
   discord_status: string;
-  wavstats_status: string;
+  source: string;
+  hold_until: string | null;
+  duration_weeks: number | null;
   last_error: string | null;
 };
 type Application = {
@@ -38,6 +44,7 @@ type Snapshot = {
     subject: string;
     error: string;
   }[];
+  places: Places | null;
 };
 const stages: Record<string, string> = {
   received: "Reçue",
@@ -52,6 +59,7 @@ export default function Commerce() {
   const [busy, setBusy] = useState(false);
   const [selected, setSelected] = useState<Order | null>(null);
   const [application, setApplication] = useState<Application | null>(null);
+  const [newOffer, setNewOffer] = useState("premium");
   const reload = useCallback(
     async () =>
       setSnapshot(
@@ -90,6 +98,9 @@ export default function Commerce() {
       email: f.get("email"),
       start_date: f.get("start_date"),
       start_time: f.get("start_time"),
+      amount_eur: f.get("amount_eur"),
+      duration_weeks: f.get("duration_weeks"),
+      hold_days: Number(f.get("hold_days")),
       invoice_reference: f.get("invoice_reference"),
       ...(application ? { application_id: application.id } : {}),
     });
@@ -140,7 +151,7 @@ export default function Commerce() {
         </Button>
         <section>
           <h2 className="text-2xl font-display mb-4">
-            Après closing : créer l’inscription
+            Proposer un accompagnement (lien personnel)
           </h2>
           {application && (
             <p className="mb-3">
@@ -158,30 +169,60 @@ export default function Commerce() {
             <label>
               Offre<select
                 name="offer"
-                defaultValue={application?.offer || "academy"}
+                value={newOffer}
+                onChange={(e) => setNewOffer(e.target.value)}
                 className={commerceInput}
               >
-                <option value="academy">Academy · 749 € TTC</option>
-                <option value="premium">Premium · 1 990 € TTC</option>
+                <option value="one_shot">One Shot · {priceLabel(OFFERS.one_shot)}</option>
+                <option value="premium">Wav Premium · {priceLabel(OFFERS.premium)}</option>
+                <option value="academy">Wav Academy (réglée hors ligne) · {priceLabel(OFFERS.academy)}</option>
               </select>
             </label>
             <label>
-              Date convenue (Paris)<input
+              Montant TTC en euros<input
+                name="amount_eur"
+                type="number"
+                min="1"
+                step="0.01"
+                placeholder={`Vide : prix du catalogue (${priceLabel(OFFERS[newOffer as "premium"])})`}
+                className={commerceInput}
+              />
+            </label>
+            {newOffer === "premium" && (
+              <label>
+                Durée<select name="duration_weeks" defaultValue="6" className={commerceInput}>
+                  <option value="6">6 semaines</option>
+                  <option value="12">12 semaines</option>
+                  <option value="18">18 semaines</option>
+                </select>
+              </label>
+            )}
+            <label>
+              {newOffer === "academy" ? "Date d'ouverture de l'accès (Paris)" : "Date du rendez-vous (Paris)"}<input
                 name="start_date"
                 type="date"
                 required
                 className={commerceInput}
               />
             </label>
+            {newOffer !== "academy" && (
+              <label>
+                Heure du rendez-vous (Paris)<input
+                  name="start_time"
+                  type="time"
+                  required
+                  className={commerceInput}
+                />
+              </label>
+            )}
             <label>
-              Heure du premier rendez-vous Premium (Paris)<input
-                name="start_time"
-                type="time"
-                className={commerceInput}
-              />
-              <span className="text-sm">
-                Obligatoire pour Premium ; ignorée pour Academy.
-              </span>
+              Place réservée pendant<select name="hold_days" defaultValue="3" className={commerceInput}>
+                <option value="1">1 jour</option>
+                <option value="3">3 jours</option>
+                <option value="7">7 jours</option>
+                <option value="14">14 jours</option>
+              </select>
+              <span className="text-sm">Sans paiement à l'échéance, la place se libère.</span>
             </label>
             <label>
               Prénom<input
@@ -213,6 +254,65 @@ export default function Commerce() {
           </form>
         </section>
         <section>
+          <h2 className="text-2xl font-display mb-4">Places par mois</h2>
+          <div className="grid sm:grid-cols-3 gap-4 mb-4">
+            {(["one_shot", "academy", "premium"] as const).map((id) => (
+              <div key={id} className="border border-primary/20 rounded-xl p-4">
+                <h3 className="font-semibold mb-2">{OFFER_NAMES[id]}</h3>
+                {snapshot?.places?.[id]?.months.map((m) => (
+                  <p key={m.month}>
+                    {monthName(m.month)} : {m.capacity - m.remaining} prise{m.capacity - m.remaining > 1 ? "s" : ""} / {m.capacity}
+                  </p>
+                )) ?? <p>Indisponible</p>}
+              </div>
+            ))}
+          </div>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const f = new FormData(e.currentTarget);
+              void act({ action: "capacity", offer: f.get("offer"), month: f.get("month"), capacity: Number(f.get("capacity")) });
+            }}
+            className="grid sm:grid-cols-4 gap-4 items-end"
+          >
+            <label>
+              Offre<select name="offer" className={commerceInput}>
+                <option value="one_shot">One Shot</option>
+                <option value="academy">Wav Academy</option>
+                <option value="premium">Wav Premium</option>
+              </select>
+            </label>
+            <label>
+              Mois<input name="month" type="month" required className={commerceInput} />
+            </label>
+            <label>
+              Places ce mois-là<input name="capacity" type="number" min="0" max="100" required className={commerceInput} />
+            </label>
+            <Button disabled={busy} type="submit">Modifier la capacité</Button>
+          </form>
+        </section>
+        <section>
+          <h2 className="text-2xl font-display mb-4">Ancien élève : Academy à vie</h2>
+          <p className="mb-3">
+            Rend à vie l'accès Wav Academy en cours de cette adresse (inscriptions de six mois). L'action est journalisée.
+          </p>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const address = new FormData(e.currentTarget).get("email");
+              if (window.confirm(`Passer à vie l'accès Wav Academy de ${address} ?`)) {
+                void act({ action: "grant_lifetime", email: address });
+              }
+            }}
+            className="flex flex-col sm:flex-row gap-4 sm:items-end"
+          >
+            <label className="flex-1">
+              E-mail de l'élève<input name="email" type="email" required className={commerceInput} />
+            </label>
+            <Button disabled={busy} type="submit">Accorder l'accès à vie</Button>
+          </form>
+        </section>
+        <section>
           <h2 className="text-2xl font-display mb-4">Demandes</h2>
           <div className="space-y-4">
             {snapshot?.applications.map((a) => (
@@ -221,7 +321,7 @@ export default function Commerce() {
                 className="p-5 border border-primary/20 rounded-xl space-y-3"
               >
                 <h3 className="font-semibold">
-                  {a.first_name} · {a.offer} · {a.email}
+                  {a.first_name} · {OFFER_NAMES[a.offer] ?? "Conseil"} · {a.email}
                 </h3>
                 <p className="break-words whitespace-pre-wrap">
                   {a.account_or_project}
@@ -250,6 +350,7 @@ export default function Commerce() {
                   disabled={busy}
                   onClick={() => {
                     setApplication(a);
+                    if (a.offer in OFFER_NAMES) setNewOffer(a.offer);
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
                 >
@@ -268,17 +369,19 @@ export default function Commerce() {
                 className="p-5 border border-primary/20 rounded-xl space-y-3"
               >
                 <h3 className="font-semibold">
-                  {o.first_name} · {o.offer} · {o.email}
+                  {o.first_name} · {OFFER_NAMES[o.offer] ?? o.offer} · {o.email}
                 </h3>
                 <p>
                   {o.start_date} · {o.status} · {money(o.amount_received)}{" "}
                   encaissés / {money(o.amount_cents)}
+                  {o.duration_weeks ? ` · ${o.duration_weeks} semaines` : ""}
+                  {o.source === "direct" ? " · achat en ligne" : ""}
                 </p>
                 <p>
                   Consentement : {o.consent_at ? "enregistré" : "à confirmer"}
-                  {" "}
-                  · Discord : {o.discord_status} · WavStats :{" "}
-                  {o.wavstats_status}
+                  {o.offer === "academy" && ` · Discord : ${o.discord_status}`}
+                  {o.amount_received === 0 && o.hold_until &&
+                    ` · place réservée jusqu'au ${new Date(o.hold_until).toLocaleString("fr-FR")}`}
                 </p>
                 {o.last_error && <p className="text-red-300">{o.last_error}</p>}
                 <p className="break-all text-sm">
@@ -354,7 +457,7 @@ export default function Commerce() {
                   className={commerceInput}
                 />
                 </label>
-                {selected.offer === "premium" && <label>Heure du premier rendez-vous (Paris)<input name="start_time" type="time" required className={commerceInput} /></label>}
+                {selected.offer !== "academy" && <label>Heure du premier rendez-vous (Paris)<input name="start_time" type="time" required className={commerceInput} /></label>}
               <p>
                 Avant démarrage uniquement. Le client devra accepter à nouveau
                 les modalités depuis son lien.

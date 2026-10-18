@@ -22,7 +22,7 @@ Dans Stripe, active le **mode test** (interrupteur « Test mode » en haut à dr
 
 | Nom | Où le trouver |
 |---|---|
-| `STRIPE_SECRET_KEY_TEST` | Développeurs → Clés API → « Clé secrète » (`sk_test_…`) |
+| `STRIPE_SECRET_KEY_TEST` | Développeurs → Clés API → clé restreinte (`rk_test_…`) avec **Checkout Sessions : écriture** et **Payment Links : lecture** |
 | `STRIPE_WEBHOOK_SECRET_TEST` | Développeurs → Webhooks → « Ajouter une destination » : URL `https://ykcjzdqpvffdzlxxtjqc.supabase.co/functions/v1/stripe-webhook`, événements `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `customer.subscription.deleted`. Puis « Secret de signature » (`whsec_…`) |
 | `STRIPE_EXPRESS_PAYMENT_LINK_TEST` | Liens de paiement → lien test de l'Analyse Express (`https://buy.stripe.com/test_…`) |
 | `STRIPE_EXPRESS_PRICE_ID_TEST` | Catalogue → Analyse Express → prix (`price_…`) |
@@ -47,7 +47,8 @@ Dans chaque lien de paiement test, l'URL de redirection après paiement doit poi
 | `DISCORD_*` (bot, serveur, OAuth, rôle) | Accès Academy | Avec un serveur Discord de test, au lot 1 |
 | `ITPUSH_*`, `DISCORD_WEBHOOK_URL`, `DISCORD_PING_USER_ID` | Notifications push | Optionnel |
 | `OPENAI_API_KEY` | Assistant de l'admin | Optionnel |
-| `COMMERCE_*` | Ventes d'accompagnements | Réécrits au lot 1 (nouvelle gamme) |
+| `COMMERCE_SALES_ENABLED` = `true` | Interrupteur des ventes d'accompagnements (déjà posé par Claude) | — |
+| `COMMERCE_TRANSFER_INSTRUCTIONS` | Texte affiché pour payer par virement | Optionnel |
 | `WAVSTATS_PARTNER_*`, `WAVSTATS_PROVISION_ENABLED` | Crédits WavStats de l'ancienne Academy | Inutiles : la nouvelle Academy n'en inclut plus |
 
 ## Ne jamais coller ici

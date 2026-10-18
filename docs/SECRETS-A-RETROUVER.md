@@ -25,7 +25,7 @@ Ce ne sont pas des secrets, juste des identifiants à recopier.
 
 | Nom | Comment | Test | Bascule |
 |---|---|---|---|
-| `STRIPE_SECRET_KEY_TEST` | Stripe (mode test) → Développeurs → Clés API → « Créer une clé restreinte » avec **Checkout Sessions : lecture** et **Payment Links : lecture**. Le code ne fait que lire chez Stripe. | oui | — |
+| `STRIPE_SECRET_KEY_TEST` | Stripe (mode test) → Développeurs → Clés API → « Créer une clé restreinte » avec **Checkout Sessions : écriture** et **Payment Links : lecture**. L'écriture sert à ouvrir le paiement des accompagnements (One Shot, Wav Academy, Wav Premium) au montant de la commande. | oui | — |
 | `STRIPE_SECRET_KEY` (live) | Même chose en mode live : **clé restreinte** (`rk_live_…`). Ne pas « faire tourner » la clé secrète standard : ça couperait le site actuel. | — | oui |
 | `STRIPE_WEBHOOK_SECRET_TEST` | Nouvelle destination webhook en mode test vers `https://ykcjzdqpvffdzlxxtjqc.supabase.co/functions/v1/stripe-webhook` (événements : `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `customer.subscription.deleted`) | oui | — |
 | `STRIPE_WEBHOOK_SECRET` (live) | Nouvelle destination webhook live vers le projet de production, créée le jour de la bascule | — | oui |
@@ -61,7 +61,7 @@ Les régénérer maintenant couperait immédiatement le site actuel.
 | `MAILERLITE_API_KEY`, `MAILERLITE_*_GROUP_ID` | Newsletter et guide gratuit des hooks retirés du site (en suspens) |
 | `WAV_SOCIAL_SCAN_API_KEY` | Ancien nom de `WAVSTATS_API_KEY` |
 | `EXPRESS_SAMPLE_CONTRACT_VERIFIED` | Jamais activé en production (toutes les analyses depuis mars 2026 sont au format « legacy ») : on le laisse absent |
-| `COMMERCE_ACADEMY_PAYMENT_URL`, `COMMERCE_PREMIUM_PAYMENT_URL`, `COMMERCE_*_PAYMENT_LINK_ID`, `COMMERCE_*_PRICE_ID`, `COMMERCE_SALES_ENABLED`, `COMMERCE_WAVSTATS_VERIFIED`, `COMMERCE_TRANSFER_INSTRUCTIONS` | Recréés au lot 1 avec la nouvelle gamme (One Shot, Academy à vie, Premium) |
+| `COMMERCE_ACADEMY_PAYMENT_URL`, `COMMERCE_PREMIUM_PAYMENT_URL`, `COMMERCE_*_PAYMENT_LINK_ID`, `COMMERCE_*_PRICE_ID`, `COMMERCE_WAVSTATS_VERIFIED` | Lot 1 : les accompagnements sont payés par une session Stripe créée au montant de la commande ; plus de lien ni de prix Stripe à recopier |
 
 ## Valeurs relevées dans Stripe le 17/10/2026
 

@@ -1,72 +1,72 @@
 import type Stripe from "https://esm.sh/stripe@18.5.0?target=deno";
 import { db, enqueue, logUnmatchedPayment, OWNER_EMAIL } from "./commerce.ts";
+import { OFFER_LABELS } from "./commerce-checkout.ts";
 
+const euros = (cents: number) =>
+  new Intl.NumberFormat("fr-FR", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: cents % 100 === 0 ? 0 : 2,
+  }).format(cents / 100);
+const parisDate = (date: string) =>
+  new Date(`${date}T12:00:00Z`).toLocaleDateString("fr-FR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    timeZone: "Europe/Paris",
+  });
+
+/**
+ * Paiement d'un accompagnement (sessions créées par openCheckout, reconnues à
+ * leur métadonnée commerce_order_id). Renvoie false pour une session d'un autre
+ * produit. Un paiement rejoué est sans effet : la référence Stripe est unique.
+ */
 export async function commerceCheckout(
-  stripe: Stripe,
+  _stripe: Stripe,
   session: Stripe.Checkout.Session,
   receivedAt: number,
 ) {
+  const orderId = session.metadata?.commerce_order_id;
+  if (!orderId) return false;
   const client = db();
-  const reference = session.client_reference_id;
-  const link = typeof session.payment_link === "string"
-    ? session.payment_link
-    : session.payment_link?.id;
-  const academyLink = Deno.env.get("COMMERCE_ACADEMY_PAYMENT_LINK_ID");
-  const premiumLink = Deno.env.get("COMMERCE_PREMIUM_PAYMENT_LINK_ID");
-  const knownLink = !!link && (link === academyLink || link === premiumLink);
-  const isUuid = reference && /^[a-f\d-]{36}$/i.test(reference);
-  const lookup = isUuid
-    ? await client.from("commerce_orders").select("*").eq("id", reference)
-      .maybeSingle()
-    : { data: null, error: null };
-  // Tant que le socle commerce v3 n'est pas déployé en base, la table est absente :
-  // on laisse alors la branche historique (Analyse Express) traiter la session.
-  if (lookup.error) {
-    const code = (lookup.error as { code?: string }).code;
-    // 42P01 (Postgres) et PGRST205 (cache de schéma PostgREST) = table absente.
-    if (code === "42P01" || code === "PGRST205") return false;
-    throw lookup.error;
-  }
+  const { data: o, error: lookupError } = await client.from("commerce_orders")
+    .select("*").eq("id", orderId).maybeSingle();
+  if (lookupError) throw lookupError;
 
-  const o = lookup.data;
-  if (!knownLink && !o) return false; // Historical checkout handled by the existing branch.
-  if (session.payment_status !== "paid") return true;
-  const expectedLink = o?.offer === "academy" ? academyLink : premiumLink;
-  let reason = !o
+  if (session.payment_status !== "paid") {
+    // Paiement différé (prélèvement, virement) : la place reste tenue le temps du règlement.
+    if (o && session.status === "complete") {
+      await client.rpc("commerce_hold", {
+        p_order: o.id,
+        p_until: new Date(Date.now() + 14 * 86400000).toISOString(),
+      });
+    }
+    return true;
+  }
+  const due = o ? o.amount_cents - o.amount_received : null;
+  const reason = !o
     ? "Commande non rattachée"
-    : !knownLink || link !== expectedLink
-    ? "Lien produit incorrect"
+    : session.metadata?.offer !== o.offer
+    ? "Offre incorrecte"
     : session.mode !== "payment" || session.currency !== "eur" ||
-        session.amount_total !== o.amount_cents
+        session.amount_total !== due
     ? "Montant, devise ou mode incorrect"
     : !o.consent_at
     ? "Consentement manquant"
     : !session.livemode && Deno.env.get("ALLOW_TEST_FULFILLMENT") !== "true"
     ? "Paiement test sans activation réelle"
     : null;
-  if (!reason && o) {
-    const items = await stripe.checkout.sessions.listLineItems(session.id, {
-      limit: 2,
-    });
-    const priceId = Deno.env.get(
-      o.offer === "academy"
-        ? "COMMERCE_ACADEMY_PRICE_ID"
-        : "COMMERCE_PREMIUM_PRICE_ID",
-    );
-    if (
-      !priceId || items.data.length !== 1 ||
-      items.data[0].price?.id !== priceId || items.data[0].quantity !== 1
-    ) reason = "Prix Stripe non reconnu";
-  }
-  if (reason) {
-    await logUnmatchedPayment(client, {
+  const unmatched = (why: string) =>
+    logUnmatchedPayment(client, {
       session_id: session.id,
-      reason,
+      reason: why,
       amount_cents: session.amount_total,
       currency: session.currency,
       email: session.customer_details?.email,
       received_at: new Date(receivedAt * 1000).toISOString(),
     });
+  if (reason || !o) {
+    await unmatched(reason ?? "Commande non rattachée");
     await enqueue(
       client,
       `unmatched:${session.id}`,
@@ -84,37 +84,28 @@ export async function commerceCheckout(
     p_received: new Date(receivedAt * 1000).toISOString(),
   });
   if (error) {
-    await logUnmatchedPayment(client, {
-      session_id: session.id,
-      reason: error.message,
-      amount_cents: session.amount_total,
-      currency: session.currency,
-      email: session.customer_details?.email,
-      received_at: new Date(receivedAt * 1000).toISOString(),
-    });
+    await unmatched(error.message);
     throw error;
   }
+  const offer = OFFER_LABELS[o.offer] ?? o.offer;
+  const next = o.offer === "academy"
+    ? (o.start_date <= new Date().toISOString().slice(0, 10)
+      ? "Tu reçois dans quelques minutes un second e-mail avec ton lien d'accès au Discord de la Wav Academy."
+      : `Ton accès s'ouvre le ${parisDate(o.start_date)} : tu recevras ce jour-là ton lien d'accès au Discord.`)
+    : `Rendez-vous convenu le ${parisDate(o.start_date)} à ${String(o.start_time).slice(0, 5)} (heure de Paris). Si le règlement est arrivé après cette date, Fred conviendra avec toi d'une nouvelle date.`;
   await enqueue(
     client,
     `paid:${session.id}`,
     o.email,
-    `Paiement reçu · ${o.offer === "academy" ? "Wav Academy" : "Wav Premium"}`,
-    `Bonjour ${o.first_name},\n\nTon paiement de ${
-      new Intl.NumberFormat("fr-FR", {
-        style: "currency",
-        currency: "EUR",
-        maximumFractionDigits: o.amount_cents % 100 === 0 ? 0 : 2,
-      }).format(o.amount_cents / 100)
-    } TTC pour ${
-      o.offer === "academy" ? "la Wav Academy" : "le Wav Premium"
-    } est bien reçu.\nDate convenue : ${
-      new Date(`${o.start_date}T12:00:00Z`).toLocaleDateString("fr-FR", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-        timeZone: "Europe/Paris",
-      })
-    }.\nTes accès seront ouverts à cette date. Si le règlement est arrivé après celle-ci, Fred conviendra avec toi d'une nouvelle date.\n\nRéférence de commande : ${o.id}`,
+    `Paiement reçu · ${offer}`,
+    `Bonjour ${o.first_name},\n\nTon paiement de ${euros(session.amount_total ?? 0)} TTC pour ${offer} est bien reçu.\n${next}\n\nRéférence de commande : ${o.id}\n\nFred Wav`,
+  );
+  await enqueue(
+    client,
+    `paid-owner:${session.id}`,
+    OWNER_EMAIL,
+    `Nouvelle vente · ${offer} · ${o.first_name}`,
+    `${o.first_name} · ${o.email}\n${euros(session.amount_total ?? 0)} TTC (Stripe ${session.id})\nDémarrage : ${o.start_date}\nCommande ${o.id}`,
   );
   return true;
 }

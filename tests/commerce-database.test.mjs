@@ -5,7 +5,7 @@ import { referenceDatabase } from "./reference-db.mjs";
 test("Premium : horaire Paris conservé, changement d'heure et consentement périmé", async () => {
   const db = await database();
   try {
-    const o = (await db.query(`INSERT INTO commerce_orders(offer,email,first_name,amount_cents,start_date,start_time) VALUES('premium','test@example.invalid','Test',199000,'2027-10-15','10:30') RETURNING *`)).rows[0];
+    const o = (await db.query(`INSERT INTO commerce_orders(offer,offer_version,email,first_name,amount_cents,start_date,start_time) VALUES('premium','2026-09-v3','test@example.invalid','Test',199000,'2027-10-15','10:30') RETURNING *`)).rows[0];
     assert.equal(new Date(o.starts_at).toISOString(), "2027-10-15T08:30:00.000Z");
     assert.equal(new Date(o.ends_at).toISOString(), "2027-11-14T09:30:00.000Z");
     await accept(db,o);
@@ -47,7 +47,7 @@ async function database() {
 }
 async function order(db, start = "2027-08-31") {
   return (await db.query(
-    `INSERT INTO commerce_orders(offer,email,first_name,amount_cents,start_date) VALUES('academy','test@example.invalid','Test',74900,$1) RETURNING *`,
+    `INSERT INTO commerce_orders(offer,offer_version,email,first_name,amount_cents,start_date) VALUES('academy','2026-09-v3','test@example.invalid','Test',74900,$1) RETURNING *`,
     [start],
   )).rows[0];
 }

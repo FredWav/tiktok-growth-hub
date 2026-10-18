@@ -42,6 +42,7 @@ Deno.serve(async (req) => {
         ).order("created_at", { ascending: false }).limit(100),
         client.from("commerce_mail").select("id,recipient,subject,state,error")
           .eq("state", "failed").limit(100),
+        client.rpc("commerce_places"),
       ]);
       if (results.some((r) => r.error)) throw new Error("Lecture indisponible");
       return json({
@@ -49,33 +50,65 @@ Deno.serve(async (req) => {
         applications: results[1].data,
         unmatched: results[2].data,
         failed_mail: results[3].data,
+        places: results[4].data,
       });
     }
     if (b.action === "create") {
-      if (!["academy", "premium"].includes(b.offer)) {
+      if (!["one_shot", "academy", "premium"].includes(b.offer)) {
         throw new Error("Offre invalide");
       }
       const start = text(b.start_date, 10, 10);
       if (!/^\d{4}-\d{2}-\d{2}$/.test(start)) throw new Error("Date invalide");
-      const { data, error } = await client.from("commerce_orders").insert({
-        offer: b.offer,
-        first_name: text(b.first_name, 1, 100),
-        email: email(b.email),
-        start_date: start,
-        start_time: b.offer === "premium" ? text(b.start_time, 5, 5) : "00:00",
-        invoice_reference: typeof b.invoice_reference === "string"
-          ? text(b.invoice_reference, 0, 200)
-          : null,
-        amount_cents: b.offer === "academy" ? 74900 : 199000,
-        ...(b.application_id ? { application_id: uuid(b.application_id) } : {}),
-      }).select("*").single();
-      if (error) throw error;
-      await client.from("commerce_audit").insert({
-        order_id: data.id,
-        actor,
-        action: "created",
+      const amount = b.amount_eur === undefined || b.amount_eur === "" || b.amount_eur === null
+        ? null
+        : Math.round(Number(b.amount_eur) * 100);
+      if (amount !== null && (!Number.isSafeInteger(amount) || amount <= 0)) {
+        throw new Error("Montant invalide");
+      }
+      const holdDays = Number(b.hold_days ?? 3);
+      if (!Number.isInteger(holdDays) || holdDays < 1 || holdDays > 30) {
+        throw new Error("Échéance de réservation invalide (1 à 30 jours)");
+      }
+      const { data, error } = await client.rpc("commerce_create_order", {
+        v: {
+          offer: b.offer,
+          first_name: text(b.first_name, 1, 100),
+          email: email(b.email),
+          start_date: start,
+          start_time: b.offer === "academy" ? "00:00" : text(b.start_time, 5, 5),
+          amount_cents: amount,
+          duration_weeks: b.offer === "premium" && b.duration_weeks ? Number(b.duration_weeks) : null,
+          invoice_reference: typeof b.invoice_reference === "string" && b.invoice_reference.trim()
+            ? text(b.invoice_reference, 1, 200)
+            : null,
+          application_id: b.application_id ? uuid(b.application_id) : null,
+          hold_until: new Date(Date.now() + holdDays * 86400000).toISOString(),
+          actor,
+        },
       });
+      if (error) throw new Error(error.message);
       return json({ order: data, url: `${site()}/inscription/${data.token}` });
+    }
+    if (b.action === "capacity") {
+      if (!["one_shot", "academy", "premium"].includes(b.offer)) throw new Error("Offre invalide");
+      const month = text(b.month, 7, 10).slice(0, 7);
+      if (!/^\d{4}-\d{2}$/.test(month)) throw new Error("Mois invalide");
+      const capacity = Number(b.capacity);
+      if (!Number.isInteger(capacity) || capacity < 0 || capacity > 100) throw new Error("Capacité invalide");
+      const { error } = await client.from("commerce_capacity").upsert({
+        offer: b.offer, month: `${month}-01`, capacity, updated_at: new Date().toISOString(),
+      }, { onConflict: "offer,month" });
+      if (error) throw error;
+      await client.from("commerce_audit").insert({ actor, action: "capacity", details: { offer: b.offer, month, capacity } });
+      return json({ ok: true, message: "Capacité du mois enregistrée." });
+    }
+    if (b.action === "grant_lifetime") {
+      const { data, error } = await client.rpc("commerce_grant_lifetime", {
+        p_email: email(b.email),
+        p_actor: actor,
+      });
+      if (error) throw new Error(error.message);
+      return json({ ok: true, message: `Accès Wav Academy passé à vie (${data} accès).` });
     }
     if (b.action === "stage") {
       if (!["received", "booked", "closed", "declined"].includes(b.stage)) {
@@ -102,7 +135,7 @@ Deno.serve(async (req) => {
       const stripe = new Stripe(getStripeSecretKey(), {
         apiVersion: "2025-08-27.basil",
       });
-      const [{ data: o, error: oe }, { data: p, error: pe }, session, items] =
+      const [{ data: o, error: oe }, { data: p, error: pe }, session] =
         await Promise.all([
           client.from("commerce_orders").select("*").eq("id", orderId).single(),
           client.from("commerce_unmatched_payments").select("*").eq(
@@ -110,23 +143,16 @@ Deno.serve(async (req) => {
             sessionId,
           ).single(),
           stripe.checkout.sessions.retrieve(sessionId),
-          stripe.checkout.sessions.listLineItems(sessionId, { limit: 2 }),
         ]);
       if (oe || pe || !o || !p) {
         throw new Error("Commande ou paiement à rapprocher introuvable");
       }
-      const priceId = Deno.env.get(
-        o.offer === "academy"
-          ? "COMMERCE_ACADEMY_PRICE_ID"
-          : "COMMERCE_PREMIUM_PRICE_ID",
-      );
       if (
-        !priceId || items.data.length !== 1 ||
-        items.data[0].price?.id !== priceId || items.data[0].quantity !== 1 ||
         session.mode !== "payment" || session.payment_status !== "paid" ||
-        session.currency !== "eur" || session.amount_total !== o.amount_cents ||
+        session.currency !== "eur" ||
+        session.amount_total !== o.amount_cents - o.amount_received ||
         (!session.livemode && Deno.env.get("ALLOW_TEST_FULFILLMENT") !== "true")
-      ) throw new Error("Produit, montant, mode ou règlement incompatible");
+      ) throw new Error("Montant, mode ou règlement incompatible");
       if (!p.received_at) {
         throw new Error(
           "Date d’encaissement non vérifiable : rapprochement manuel requis",
@@ -208,22 +234,15 @@ Deno.serve(async (req) => {
       return json({ ok: true });
     }
     if (b.action === "reschedule") {
-      const { data, error } = await client.from("commerce_orders").update({
-        start_date: text(b.start_date, 10, 10),
-        ...(b.start_time ? { start_time: text(b.start_time, 5, 5) } : {}),
-      }).eq("id", orderId).in("status", [
-        "pending",
-        "scheduled",
-        "needs_reschedule",
-      ]).or(`lock_until.is.null,lock_until.lt.${new Date().toISOString()}`)
-        .select("id").single();
-      if (error || !data) throw new Error("Replanification impossible");
-      await client.from("commerce_audit").insert({
-        order_id: orderId,
-        actor,
-        action: "rescheduled",
-        details: { start_date: b.start_date, start_time: b.start_time },
+      const start = text(b.start_date, 10, 10);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(start)) throw new Error("Date invalide");
+      const { error } = await client.rpc("commerce_reschedule", {
+        p_order: orderId,
+        p_start: start,
+        p_time: b.start_time ? text(b.start_time, 5, 5) : null,
+        p_actor: actor,
       });
+      if (error) throw new Error(error.hint === "capacity_full" ? "Mois complet pour cette offre : augmenter la capacité du mois ou choisir une autre date." : "Replanification impossible");
       return json({
         ok: true,
         message: "Le client doit confirmer la nouvelle date depuis son lien.",

@@ -725,6 +725,8 @@ type CsrDefinition = {
 
 const csrManifest: CsrRouteManifestEntry[] = ([
   { path: "/candidature", title: "Demande d’accompagnement | Fred Wav" },
+  { path: "/wavacademy/inscription", title: "Inscription à la Wav Academy | Fred Wav" },
+  { path: "/wavacademy/merci", title: "Paiement reçu | Wav Academy" },
   { path: "/inscription/:token", title: "Inscription personnelle | Fred Wav", private: true },
   { path: "/admin/commandes", title: "Commandes et demandes | Fred Wav", private: true, clientBoundary: "admin" },
   { path: "/auth", title: "Connexion | Fred Wav", clientBoundary: "auth" },

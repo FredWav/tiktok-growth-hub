@@ -2,7 +2,8 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/tracking";
-import { capacityLabel, launchLabel, type Offer, priceLabel } from "@/config/offers";
+import { launchLabel, type Offer, priceLabel } from "@/config/offers";
+import { PlacesLeft } from "@/components/offers/PlacesLeft";
 
 /**
  * Cartes de comparaison d'une famille d'offres (analyses ou accompagnements).
@@ -26,7 +27,6 @@ export function OfferComparison({
     <div className={`grid gap-6 ${columns} max-w-6xl mx-auto items-stretch`}>
       {offers.map((offer) => {
         const launch = launchLabel(offer);
-        const capacity = capacityLabel(offer);
         return (
           <div
             key={offer.id}
@@ -53,7 +53,7 @@ export function OfferComparison({
             <p className="font-display text-2xl font-bold text-primary">{priceLabel(offer)}</p>
             <p className="text-xs text-muted-foreground mb-1">{offer.priceNote}</p>
             {launch && <p className="text-xs font-medium text-foreground/80 mb-1">{launch}</p>}
-            {capacity && <p className="text-xs font-medium text-foreground/80">{capacity}</p>}
+            <PlacesLeft offer={offer} className="text-xs font-medium text-foreground/80" />
 
             <p className="text-sm text-muted-foreground mt-4 mb-4">{offer.summary}</p>
 

@@ -6,7 +6,8 @@ import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { ClientResults } from "@/components/ClientResults";
 import { trackEvent } from "@/lib/tracking";
-import { capacityLabel, launchLabel, type Offer, priceLabel } from "@/config/offers";
+import { launchLabel, type Offer, priceLabel } from "@/config/offers";
+import { PlacesLeft } from "@/components/offers/PlacesLeft";
 
 export type OfferStep = { title: string; body: string };
 export type OfferFaq = { question: string; answer: string };
@@ -42,7 +43,6 @@ export function OfferPage({
   showProofs?: boolean;
 }) {
   const launch = launchLabel(offer);
-  const capacity = capacityLabel(offer);
   const hub = offer.family === "analyses" ? { href: "/analyses", label: "Comparer les analyses" } : { href: "/accompagnements", label: "Comparer les accompagnements" };
   const track = (position: string) => trackEvent("offer_cta_click", { offer: offer.id, position });
 
@@ -53,7 +53,7 @@ export function OfferPage({
       </p>
       <p className="text-sm text-muted-foreground">{offer.priceNote}</p>
       {launch && <p className="mt-1 text-sm font-medium">{launch}</p>}
-      {capacity && <p className="mt-1 text-sm font-medium">{capacity}</p>}
+      <PlacesLeft offer={offer} className="mt-1 text-sm font-medium" />
     </div>
   );
 

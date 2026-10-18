@@ -196,6 +196,35 @@ export type Database = {
           },
         ]
       }
+      commerce_capacity: {
+        Row: {
+          capacity: number
+          month: string
+          offer: string
+          updated_at: string
+        }
+        Insert: {
+          capacity: number
+          month: string
+          offer: string
+          updated_at?: string
+        }
+        Update: {
+          capacity?: number
+          month?: string
+          offer?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commerce_capacity_offer_fkey"
+            columns: ["offer"]
+            isOneToOne: false
+            referencedRelation: "commerce_offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       commerce_mail: {
         Row: {
           attempts: number
@@ -238,20 +267,63 @@ export type Database = {
         }
         Relationships: []
       }
+      commerce_offers: {
+        Row: {
+          default_weeks: number | null
+          id: string
+          launch_until: string | null
+          monthly_capacity: number
+          name: string
+          next_price_cents: number | null
+          price_cents: number
+          purchase: string
+          updated_at: string
+          version: string
+        }
+        Insert: {
+          default_weeks?: number | null
+          id: string
+          launch_until?: string | null
+          monthly_capacity: number
+          name: string
+          next_price_cents?: number | null
+          price_cents: number
+          purchase: string
+          updated_at?: string
+          version: string
+        }
+        Update: {
+          default_weeks?: number | null
+          id?: string
+          launch_until?: string | null
+          monthly_capacity?: number
+          name?: string
+          next_price_cents?: number | null
+          price_cents?: number
+          purchase?: string
+          updated_at?: string
+          version?: string
+        }
+        Relationships: []
+      }
       commerce_orders: {
         Row: {
           amount_cents: number
           amount_received: number
           application_id: string | null
+          automation_done: boolean
+          checkout_session_id: string | null
           claim_token: string
           consent: Json | null
           consent_at: string | null
           created_at: string
           currency: string
           discord_status: string
+          duration_weeks: number | null
           email: string
-          ends_at: string
+          ends_at: string | null
           first_name: string
+          hold_until: string | null
           id: string
           invoice_reference: string | null
           last_error: string | null
@@ -260,6 +332,7 @@ export type Database = {
           offer: string
           offer_version: string
           paid_at: string | null
+          source: string
           start_date: string
           start_time: string
           starts_at: string
@@ -273,15 +346,19 @@ export type Database = {
           amount_cents: number
           amount_received?: number
           application_id?: string | null
+          automation_done?: boolean
+          checkout_session_id?: string | null
           claim_token?: string
           consent?: Json | null
           consent_at?: string | null
           created_at?: string
           currency?: string
           discord_status?: string
+          duration_weeks?: number | null
           email: string
-          ends_at: string
+          ends_at?: string | null
           first_name: string
+          hold_until?: string | null
           id?: string
           invoice_reference?: string | null
           last_error?: string | null
@@ -290,6 +367,7 @@ export type Database = {
           offer: string
           offer_version?: string
           paid_at?: string | null
+          source?: string
           start_date: string
           start_time?: string
           starts_at: string
@@ -303,15 +381,19 @@ export type Database = {
           amount_cents?: number
           amount_received?: number
           application_id?: string | null
+          automation_done?: boolean
+          checkout_session_id?: string | null
           claim_token?: string
           consent?: Json | null
           consent_at?: string | null
           created_at?: string
           currency?: string
           discord_status?: string
+          duration_weeks?: number | null
           email?: string
-          ends_at?: string
+          ends_at?: string | null
           first_name?: string
+          hold_until?: string | null
           id?: string
           invoice_reference?: string | null
           last_error?: string | null
@@ -320,6 +402,7 @@ export type Database = {
           offer?: string
           offer_version?: string
           paid_at?: string | null
+          source?: string
           start_date?: string
           start_time?: string
           starts_at?: string
@@ -1373,6 +1456,7 @@ export type Database = {
     }
     Functions: {
       call_cron_function: { Args: { p_function: string }; Returns: number }
+      commerce_academy_start: { Args: { v: Json }; Returns: Json }
       commerce_accept: {
         Args: {
           p_consent: Json
@@ -1382,7 +1466,74 @@ export type Database = {
         }
         Returns: undefined
       }
+      commerce_create_order: {
+        Args: { v: Json }
+        Returns: {
+          amount_cents: number
+          amount_received: number
+          application_id: string | null
+          automation_done: boolean
+          checkout_session_id: string | null
+          claim_token: string
+          consent: Json | null
+          consent_at: string | null
+          created_at: string
+          currency: string
+          discord_status: string
+          duration_weeks: number | null
+          email: string
+          ends_at: string | null
+          first_name: string
+          hold_until: string | null
+          id: string
+          invoice_reference: string | null
+          last_error: string | null
+          last_processed_at: string
+          lock_until: string | null
+          offer: string
+          offer_version: string
+          paid_at: string | null
+          source: string
+          start_date: string
+          start_time: string
+          starts_at: string
+          status: string
+          subscription_id: string | null
+          token: string
+          wavstats_activation_url: string | null
+          wavstats_status: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "commerce_orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      commerce_current_price: { Args: { p_offer: string }; Returns: number }
       commerce_format_euros: { Args: { p_cents: number }; Returns: string }
+      commerce_grant_lifetime: {
+        Args: { p_actor: string; p_email: string }
+        Returns: number
+      }
+      commerce_hold: {
+        Args: { p_order: string; p_until: string }
+        Returns: string
+      }
+      commerce_lock_month: {
+        Args: { p_month: string; p_offer: string }
+        Returns: undefined
+      }
+      commerce_month_capacity: {
+        Args: { p_month: string; p_offer: string }
+        Returns: number
+      }
+      commerce_month_taken: {
+        Args: { p_except?: string; p_month: string; p_offer: string }
+        Returns: number
+      }
+      commerce_offer_label: { Args: { p_offer: string }; Returns: string }
+      commerce_places: { Args: never; Returns: Json }
       commerce_record_payment: {
         Args: {
           p_actor?: string
@@ -1391,6 +1542,15 @@ export type Database = {
           p_order: string
           p_received: string
           p_reference: string
+        }
+        Returns: undefined
+      }
+      commerce_reschedule: {
+        Args: {
+          p_actor: string
+          p_order: string
+          p_start: string
+          p_time: string
         }
         Returns: undefined
       }

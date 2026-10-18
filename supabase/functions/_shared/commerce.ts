@@ -19,12 +19,8 @@ export const db = () =>
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
 export type Database = ReturnType<typeof db>;
-export const VERSION = "2026-09-08";
+export { CGV_TEXT, earlyText, EARLY_TEXT, VERSION } from "./consent-texts.ts";
 export { OWNER_EMAIL } from "./owner.ts";
-export const CGV_TEXT =
-  "J'ai lu et j'accepte les CGV et le récapitulatif de ma commande, avec sa date de démarrage.";
-export const EARLY_TEXT =
-  "Je demande le commencement à la date convenue, avant la fin des 14 jours. Pour le service, une rétractation reste soumise au prorata de ce qui est fourni ; la perte du droit intervient après exécution complète. Pour les contenus numériques Academy, je demande leur accès à cette date et reconnais perdre le droit de rétractation sur ces contenus dès cet accès.";
 export function text(value: unknown, min = 1, max = 2000): string {
   if (
     typeof value !== "string" || value.trim().length < min ||

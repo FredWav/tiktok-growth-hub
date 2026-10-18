@@ -21,6 +21,9 @@ export async function commerceCall<T>(
 export const commerceInput =
   "mt-2 w-full rounded-lg border border-border bg-background px-3 py-3 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary";
 export const money = (cents: number) =>
-  new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(
-    cents / 100,
-  );
+  // 74900 → « 749 € », 119050 → « 1 190,50 € ».
+  new Intl.NumberFormat("fr-FR", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: cents % 100 === 0 ? 0 : 2,
+  }).format(cents / 100);

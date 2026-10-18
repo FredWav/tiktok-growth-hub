@@ -47,6 +47,8 @@ const Analyses = lazy(() => import("./pages/Analyses"));
 const Accompagnements = lazy(() => import("./pages/Accompagnements"));
 const OneShot = lazy(() => import("./pages/OneShot"));
 const Candidature = lazy(() => import("./pages/Candidature"));
+const AcademyInscription = lazy(() => import("./pages/AcademyInscription"));
+const AcademyMerci = lazy(() => import("./pages/AcademyMerci"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Auth = lazy(() => import("./pages/Auth"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
@@ -115,6 +117,8 @@ const SSG_ROUTE_ELEMENTS: Record<string, ReactNode> = {
 /** Le manifeste décide quelles routes CSR existent ; cette map ne fournit que leur vue. */
 const CSR_ROUTE_ELEMENTS: Record<string, ReactNode> = {
   "/candidature": <Candidature />,
+  "/wavacademy/inscription": <AcademyInscription />,
+  "/wavacademy/merci": <AcademyMerci />,
   "/inscription/:token": <Enrollment />,
   "/admin/commandes": <AdminCommerce />,
   "/auth": <Auth />,

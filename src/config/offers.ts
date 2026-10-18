@@ -159,7 +159,7 @@ export const OFFERS: Record<OfferId, Offer> = {
     ],
     excludes: ["Pas d'accompagnement individuel (c'est le Wav Premium)", "Aucun crédit WavStats inclus"],
     purchase: "direct",
-    cta: { label: "Rejoindre la Wav Academy", href: "/candidature?offre=academy" },
+    cta: { label: "Rejoindre la Wav Academy", href: "/wavacademy/inscription" },
     featured: true,
   },
   premium: {

@@ -37,10 +37,16 @@ export function parseRange(from: unknown, to: unknown, today: string): StatsRang
   return { from, to };
 }
 
-/** Bornes de la période en heure de Paris : [from 00:00, to + 1 jour 00:00). */
-function within(range: StatsRange): string {
+const HOST = /^[a-z0-9.-]+$/;
+
+/**
+ * Bornes de la période en heure de Paris : [from 00:00, to + 1 jour 00:00), et, en
+ * production, seulement les visites du vrai site (pas celles du site de test).
+ */
+function within(range: StatsRange, siteHost?: string): string {
+  const host = siteHost && HOST.test(siteHost) ? ` AND properties.$host IN ('${siteHost}', 'www.${siteHost}')` : "";
   return `timestamp >= toDateTime('${range.from} 00:00:00', 'Europe/Paris')`
-    + ` AND timestamp < toDateTime('${addDays(range.to, 1)} 00:00:00', 'Europe/Paris')`;
+    + ` AND timestamp < toDateTime('${addDays(range.to, 1)} 00:00:00', 'Europe/Paris')${host}`;
 }
 
 /**
@@ -65,8 +71,8 @@ const list = (names: string[]) => names.map((n) => `'${n}'`).join(", ");
 export const FUNNEL_STEPS = Object.keys(STEP_EVENTS);
 
 /** Requêtes HogQL, une par bloc de la page Statistiques. */
-export function statsQueries(range: StatsRange): Record<string, string> {
-  const w = within(range);
+export function statsQueries(range: StatsRange, siteHost?: string): Record<string, string> {
+  const w = within(range, siteHost);
   const stepCase = `multiIf(${Object.entries(STEP_EVENTS).slice(0, -1)
     .map(([step, names]) => `event IN (${list(names)}), '${step}'`).join(", ")}, 'checkout_start')`;
   const offerCase = `multiIf(${Object.entries(LEGACY_OFFER)
@@ -100,7 +106,7 @@ export function statsQueries(range: StatsRange): Record<string, string> {
 }
 
 export type Block<T> = { available: true; rows: T } | { available: false; reason: string };
-export type PostHogConfig = { apiKey: string; projectId: string; host: string };
+export type PostHogConfig = { apiKey: string; projectId: string; host: string; siteHost?: string };
 type Fetch = (url: string, init: RequestInit) => Promise<Response>;
 
 /** Exécute une requête HogQL et renvoie ses lignes sous forme d'objets. */
@@ -111,7 +117,12 @@ export async function runHogQL(fetchFn: Fetch, config: PostHogConfig, query: str
     body: JSON.stringify({ query: { kind: "HogQLQuery", query }, name: "fredwav-admin-statistiques" }),
     signal: AbortSignal.timeout(20000),
   });
-  if (!response.ok) throw new Error(`PostHog a répondu ${response.status}`);
+  if (!response.ok) {
+    // Raison donnée par PostHog (portée manquante, projet non autorisé…), jamais la clé.
+    const detail = await response.json().then((b: { detail?: unknown }) => typeof b?.detail === "string" ? b.detail : "")
+      .catch(() => "");
+    throw new Error(`PostHog a répondu ${response.status}${detail ? ` : ${detail.slice(0, 200)}` : ""}`);
+  }
   const body = await response.json() as { columns?: string[]; results?: unknown[][] };
   if (!Array.isArray(body.columns) || !Array.isArray(body.results)) throw new Error("Réponse PostHog illisible");
   const columns = body.columns;
@@ -123,7 +134,7 @@ export async function runHogQL(fetchFn: Fetch, config: PostHogConfig, query: str
  * « indisponible » avec la raison, les autres restent affichés. Jamais de zéro par défaut.
  */
 export async function fetchSiteStats(fetchFn: Fetch, config: PostHogConfig | null, range: StatsRange) {
-  const queries = statsQueries(range);
+  const queries = statsQueries(range, config?.siteHost);
   const names = Object.keys(queries);
   if (!config) {
     const reason = "Clé de lecture PostHog non configurée (secret POSTHOG_PERSONAL_API_KEY).";

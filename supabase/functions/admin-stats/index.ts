@@ -49,8 +49,11 @@ Deno.serve(async (req) => {
       const config = apiKey
         ? {
           apiKey,
-          projectId: Deno.env.get("POSTHOG_PROJECT_ID") ?? "324948",
-          host: Deno.env.get("POSTHOG_API_HOST") ?? "https://us.posthog.com",
+          // Projet PostHog Europe (Francfort) du site.
+          projectId: Deno.env.get("POSTHOG_PROJECT_ID") ?? "312146",
+          host: Deno.env.get("POSTHOG_API_HOST") ?? "https://eu.posthog.com",
+          // En production : « fredwav.com », pour ne pas compter les visites du site de test.
+          siteHost: Deno.env.get("POSTHOG_SITE_HOST") ?? undefined,
         }
         : null;
       site = await fetchSiteStats(fetch, config, range);

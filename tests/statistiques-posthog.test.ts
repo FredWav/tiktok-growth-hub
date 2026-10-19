@@ -22,6 +22,10 @@ test("requêtes : bornes en heure de Paris, anciens événements rattachés au v
   assert.match(q.funnel, /'checkout_start', 'express_checkout_start', 'video_checkout_start', 'checkout_open'\) AND timestamp/);
   assert.match(q.funnel, /'application_submit', 'checkout_start'\) AS step/);
   assert.match(q.funnel, /event IN \('express_cta_click', 'express_checkout_start'\), 'express'/);
+  // En production, seules les visites de fredwav.com comptent ; une valeur douteuse est ignorée.
+  assert.match(statsQueries({ from: "2026-10-01", to: "2026-10-31" }, "fredwav.com").pages, /properties\.\$host IN \('fredwav\.com', 'www\.fredwav\.com'\)/);
+  assert.doesNotMatch(statsQueries({ from: "2026-10-01", to: "2026-10-31" }, "x' OR 1=1").pages, /\$host/);
+  assert.doesNotMatch(q.pages, /\$host/);
   // Aucune requête ne lit de donnée personnelle.
   for (const sql of Object.values(q)) assert.doesNotMatch(sql, /email|\$ip|distinct_id|properties\s*(,|FROM)/i);
 });

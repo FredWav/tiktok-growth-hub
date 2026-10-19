@@ -1,8 +1,10 @@
 type PostHogClient = typeof import("posthog-js")["default"];
 type PostHogProperties = import("posthog-js").Properties;
 
-const POSTHOG_KEY = "phc_PtioXOoY4oT3GYJsV7xTpI3a2fscFeJfX6mzFGMWGDj";
-const POSTHOG_HOST = "https://us.i.posthog.com";
+// Projet PostHog hébergé dans l'Union européenne (Francfort), projet 312146.
+// Clé publique d'envoi, faite pour être visible dans le site.
+const POSTHOG_KEY = "phc_swnuuDeiFeRg8sZzUH3wbVNeeh7a99Z6dmR2eLq95T9B";
+const POSTHOG_HOST = "https://eu.i.posthog.com";
 
 let client: PostHogClient | null = null;
 let loading: Promise<PostHogClient | null> | null = null;

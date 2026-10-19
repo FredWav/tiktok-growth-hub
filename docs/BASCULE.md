@@ -31,6 +31,7 @@ Compte « Fred Wav Productions » (`acct_1QrtW3BfuzQl0PTi`), mode live.
 | `SITE_URL` | `https://fredwav.com` |
 | `COMMERCE_SALES_ENABLED` | `true` |
 | `ALLOW_TEST_FULFILLMENT` | absent |
+| `POSTHOG_SITE_HOST` | `fredwav.com` (statistiques : ignore les visites du site de test) |
 
 Réglages des liens réels, inchangés : retour vers `https://fredwav.com/analyse-express/result?session_id={CHECKOUT_SESSION_ID}`
 et `https://fredwav.com/analyse-video/merci`, facture automatique, adresse de facturation,
@@ -54,8 +55,10 @@ La Wav Academy passe à 990 € automatiquement (table `commerce_offers`).
 | Fred | PostHog : clé personnelle en lecture seule pour la page Statistiques (voir ci-dessous), saisie dans fredwav-staging puis fredwav-prod |
 | Claude | Build de production (`.env.production` vers fredwav-prod) envoyé sur le VPS, testé sur une adresse privée avant le DNS |
 
-**PostHog** : dans PostHog, organisation « FredWav.com », menu du compte → Personal API keys →
-nouvelle clé limitée au projet « Default project » (324948) avec la seule portée **Query : Read**.
+**PostHog** (Europe, choix de Fred du 19/10/2026) : la v2 envoie ses statistiques au projet
+« Default project » (312146) de PostHog **Europe** (eu.posthog.com, Francfort). L'historique de
+l'ancien site reste dans le projet États-Unis (324948), consultable à part. Clé de lecture :
+eu.posthog.com → menu du compte → Personal API keys, accès au projet 312146, portée **Query : Read**.
 La saisir comme secret `POSTHOG_PERSONAL_API_KEY` du projet Supabase (Edge Functions → Secrets).
 Sans elle, la page Statistiques affiche les ventes et marque l'audience « indisponible ».
 

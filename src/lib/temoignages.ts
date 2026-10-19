@@ -61,6 +61,18 @@ export function forOffer(list: Temoignage[], offerId: string | undefined, count:
   return [...own, ...list.filter((t) => !own.includes(t))].slice(0, count);
 }
 
+/**
+ * Vidéos d'une page d'offre : les deux premières vidéos mises en avant (PlotBreaker,
+ * Lune de Lu), puis le premier client de l'offre, puis les autres dans l'ordre.
+ */
+export function videosForOffer(list: Temoignage[], offerId: string, count: number): Temoignage[] {
+  const tag = OFFER_TAGS[offerId] ?? offerId;
+  const picked = list.filter((t) => t.featured).slice(0, 2);
+  const own = list.find((t) => t.offers.includes(tag) && !picked.includes(t));
+  if (own) picked.push(own);
+  return [...picked, ...list.filter((t) => !picked.includes(t))].slice(0, count);
+}
+
 /** Témoignages vidéo. */
 export const withVideo = (t: Temoignage) => !!t.youtube_id;
 

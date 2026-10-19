@@ -90,21 +90,21 @@
     "anonymous": false
   },
   {
-    "id": "a67488e5-4a80-4a98-8565-958b915d4347",
-    "name": "Antoine Au Vietnam",
-    "avatar_url": "https://rdpykyvqcckxpygwblxf.supabase.co/storage/v1/object/public/trusted-avatars/86c65b4e-6bda-41ee-b86a-99d489cacf59.jpeg",
-    "tiktok_url": "https://www.tiktok.com/@antoineauvietnam",
+    "id": "ada0d206-30e6-45d7-ad6f-58856a0d3234",
+    "name": "Lucille",
+    "avatar_url": "https://rdpykyvqcckxpygwblxf.supabase.co/storage/v1/object/public/trusted-avatars/c7a20cd6-2ee9-4f3d-bfb7-c1ef37516b60.jpg",
+    "tiktok_url": "https://www.tiktok.com/@lunedelu",
     "offers": [
-      "one_shot"
+      "premium"
     ],
     "display_order": 2,
-    "niche": "Expatriation · Vietnam",
-    "metric": "1,3 M",
-    "result": "de vues sur sa meilleure vidéo",
-    "result_detail": null,
-    "youtube_id": "p3nCwuBZRGI",
-    "video_caption": "Vidéos jusqu'à 1,3 M de vues",
-    "featured": false,
+    "niche": "Films d'horreur",
+    "metric": "×16",
+    "result": "de 180 à 3 000+ abonnés",
+    "result_detail": "en 2 mois, sur une niche pointue",
+    "youtube_id": "Hgkn3ifjSS0",
+    "video_caption": "De 180 à 3 000+ abonnés en 2 mois",
+    "featured": true,
     "anonymous": false
   },
   {
@@ -126,21 +126,21 @@
     "anonymous": false
   },
   {
-    "id": "ada0d206-30e6-45d7-ad6f-58856a0d3234",
-    "name": "Lucille",
-    "avatar_url": "https://rdpykyvqcckxpygwblxf.supabase.co/storage/v1/object/public/trusted-avatars/c7a20cd6-2ee9-4f3d-bfb7-c1ef37516b60.jpg",
-    "tiktok_url": "https://www.tiktok.com/@lunedelu",
+    "id": "70149d6d-0e40-4c07-874a-ec3adc88c431",
+    "name": "Gautier",
+    "avatar_url": null,
+    "tiktok_url": null,
     "offers": [
-      "premium"
+      "one_shot"
     ],
     "display_order": 3,
-    "niche": "Films d'horreur",
-    "metric": "×16",
-    "result": "de 180 à 3 000+ abonnés",
-    "result_detail": "en 2 mois, sur une niche pointue",
-    "youtube_id": "Hgkn3ifjSS0",
-    "video_caption": "De 180 à 3 000+ abonnés en 2 mois",
-    "featured": true,
+    "niche": "Mythologie & histoire · Au nom des dieux",
+    "metric": "1 M",
+    "result": "de vues Instagram en 4 semaines",
+    "result_detail": "Facebook : +7 000 abonnés · couverture +76 %",
+    "youtube_id": "OmWZtVReYpc",
+    "video_caption": "1 M de vues Instagram en 4 semaines",
+    "featured": false,
     "anonymous": false
   },
   {
@@ -162,6 +162,24 @@
     "anonymous": false
   },
   {
+    "id": "a67488e5-4a80-4a98-8565-958b915d4347",
+    "name": "Antoine Au Vietnam",
+    "avatar_url": "https://rdpykyvqcckxpygwblxf.supabase.co/storage/v1/object/public/trusted-avatars/86c65b4e-6bda-41ee-b86a-99d489cacf59.jpeg",
+    "tiktok_url": "https://www.tiktok.com/@antoineauvietnam",
+    "offers": [
+      "one_shot"
+    ],
+    "display_order": 4,
+    "niche": "Expatriation · Vietnam",
+    "metric": "1,3 M",
+    "result": "de vues sur sa meilleure vidéo",
+    "result_detail": null,
+    "youtube_id": "p3nCwuBZRGI",
+    "video_caption": "Vidéos jusqu'à 1,3 M de vues",
+    "featured": false,
+    "anonymous": false
+  },
+  {
     "id": "ba4b01ca-e947-4dc1-a6ad-5e4723cf38f7",
     "name": "David Agaesse",
     "avatar_url": "https://rdpykyvqcckxpygwblxf.supabase.co/storage/v1/object/public/trusted-avatars/5b9130c6-e1de-4010-9921-33155cc22664.jpeg",
@@ -169,7 +187,7 @@
     "offers": [
       "premium"
     ],
-    "display_order": 4,
+    "display_order": 5,
     "niche": "Élevage canin · épagneul breton",
     "metric": "×4",
     "result": "abonnés qualifiés en 1 mois",
@@ -187,7 +205,7 @@
     "offers": [
       "premium"
     ],
-    "display_order": 5,
+    "display_order": 6,
     "niche": "Streaming · jeux vidéo (WoW)",
     "metric": "10–20k",
     "result": "vues régulières par vidéo",
@@ -205,49 +223,13 @@
     "offers": [
       "one_shot"
     ],
-    "display_order": 6,
+    "display_order": 7,
     "niche": null,
     "metric": "×3",
     "result": "abonnés triplés",
     "result_detail": null,
     "youtube_id": null,
     "video_caption": null,
-    "featured": false,
-    "anonymous": false
-  },
-  {
-    "id": "70149d6d-0e40-4c07-874a-ec3adc88c431",
-    "name": "Gautier",
-    "avatar_url": null,
-    "tiktok_url": null,
-    "offers": [
-      "one_shot"
-    ],
-    "display_order": 7,
-    "niche": "Mythologie & histoire · Au nom des dieux",
-    "metric": "1 M",
-    "result": "de vues Instagram en 4 semaines",
-    "result_detail": "Facebook : +7 000 abonnés · couverture +76 %",
-    "youtube_id": "OmWZtVReYpc",
-    "video_caption": "1 M de vues Instagram en 4 semaines",
-    "featured": false,
-    "anonymous": false
-  },
-  {
-    "id": "30688d18-43b8-4e61-b37b-490240160431",
-    "name": "Hugo",
-    "avatar_url": null,
-    "tiktok_url": null,
-    "offers": [
-      "one_shot"
-    ],
-    "display_order": 8,
-    "niche": "Rap · concept « Uber Rap »",
-    "metric": "8 %",
-    "result": "d'engagement sur son nouveau compte rap",
-    "result_detail": "≈ 1 000 vues par vidéo",
-    "youtube_id": "JmQDLrvGz1M",
-    "video_caption": "Nouveau compte rap : 8 % d'engagement",
     "featured": false,
     "anonymous": false
   },
@@ -364,5 +346,23 @@
     "video_caption": null,
     "featured": false,
     "anonymous": true
+  },
+  {
+    "id": "30688d18-43b8-4e61-b37b-490240160431",
+    "name": "Hugo",
+    "avatar_url": null,
+    "tiktok_url": null,
+    "offers": [
+      "one_shot"
+    ],
+    "display_order": 30,
+    "niche": "Rap · concept « Uber Rap »",
+    "metric": "8 %",
+    "result": "d'engagement sur son nouveau compte rap",
+    "result_detail": "≈ 1 000 vues par vidéo",
+    "youtube_id": "JmQDLrvGz1M",
+    "video_caption": "Nouveau compte rap : 8 % d'engagement",
+    "featured": false,
+    "anonymous": false
   }
 ]

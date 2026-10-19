@@ -13,24 +13,24 @@ CREATE TEMP TABLE temoignages_code (
 ) ON COMMIT DROP;
 
 INSERT INTO temoignages_code VALUES
-  -- Résultats documentés (même ordre que sur le site actuel).
+  -- Résultats documentés ; ordre choisi par Fred : PlotBreaker, Lune de Lu, Gautier en tête.
   ('PlotBreaker', 'PlotBreaker', '/plotbreaker.jpg', 'Analyse films & séries', '+3 000', 'abonnés supplémentaires',
     'cap des 10 000 abonnés franchi', 'XMMmmLLKue4', '+3 000 abonnés, cap des 10 000 franchi', '{academy}', 1, true, false),
   ('Antoine au Vietnam', 'Antoine Au Vietnam', NULL, 'Expatriation · Vietnam', '1,3 M', 'de vues sur sa meilleure vidéo',
-    NULL, 'p3nCwuBZRGI', 'Vidéos jusqu''à 1,3 M de vues', '{one_shot}', 2, false, false),
+    NULL, 'p3nCwuBZRGI', 'Vidéos jusqu''à 1,3 M de vues', '{one_shot}', 4, false, false),
   ('Lucille', 'Lucille', NULL, 'Films d''horreur', '×16', 'de 180 à 3 000+ abonnés',
-    'en 2 mois, sur une niche pointue', 'Hgkn3ifjSS0', 'De 180 à 3 000+ abonnés en 2 mois', '{premium}', 3, true, false),
+    'en 2 mois, sur une niche pointue', 'Hgkn3ifjSS0', 'De 180 à 3 000+ abonnés en 2 mois', '{premium}', 2, true, false),
   ('David', 'David Agaesse', NULL, 'Élevage canin · épagneul breton', '×4', 'abonnés qualifiés en 1 mois',
-    'portée ×2, surtout sur Facebook', 'LOi7RTx12nE', 'Abonnés qualifiés ×4 en 1 mois', '{premium}', 4, true, false),
+    'portée ×2, surtout sur Facebook', 'LOi7RTx12nE', 'Abonnés qualifiés ×4 en 1 mois', '{premium}', 5, true, false),
   ('Le Sapac', 'Le Sapac', NULL, 'Streaming · jeux vidéo (WoW)', '10–20k', 'vues régulières par vidéo',
-    '+ des revenus Twitch en hausse', 'wu2CPcqp-yU', 'Vidéos régulières à 10–20 k vues', '{premium}', 5, false, false),
-  ('Alex Brosse', 'Alex Brosse', NULL, NULL, '×3', 'abonnés triplés', NULL, NULL, NULL, '{one_shot}', 6, false, false),
+    '+ des revenus Twitch en hausse', 'wu2CPcqp-yU', 'Vidéos régulières à 10–20 k vues', '{premium}', 6, false, false),
+  ('Alex Brosse', 'Alex Brosse', NULL, NULL, '×3', 'abonnés triplés', NULL, NULL, NULL, '{one_shot}', 7, false, false),
   -- Nouveaux témoignages vidéo (chiffres des comptes rendus Granola de juin 2026).
   ('Gautier', 'Gautier', NULL, 'Mythologie & histoire · Au nom des dieux', '1 M', 'de vues Instagram en 4 semaines',
     'Facebook : +7 000 abonnés · couverture +76 %', 'OmWZtVReYpc',
-    '1 M de vues Instagram en 4 semaines', '{one_shot}', 7, false, false),
+    '1 M de vues Instagram en 4 semaines', '{one_shot}', 3, false, false),
   ('Hugo', 'Hugo', NULL, 'Rap · concept « Uber Rap »', '8 %', 'd''engagement sur son nouveau compte rap',
-    '≈ 1 000 vues par vidéo', 'JmQDLrvGz1M', 'Nouveau compte rap : 8 % d''engagement', '{one_shot}', 8, false, false),
+    '≈ 1 000 vues par vidéo', 'JmQDLrvGz1M', 'Nouveau compte rap : 8 % d''engagement', '{one_shot}', 30, false, false),
   -- Vidéos de personnes non nommées dans le code : pas de légende.
   ('Témoignage vidéo Bzw7nwqB2rQ', 'Témoignage vidéo Bzw7nwqB2rQ', NULL, NULL, NULL, NULL, NULL, 'Bzw7nwqB2rQ', NULL, '{}', 20, false, true),
   ('Témoignage vidéo Jh5yrsotoHM', 'Témoignage vidéo Jh5yrsotoHM', NULL, NULL, NULL, NULL, NULL, 'Jh5yrsotoHM', NULL, '{}', 21, false, true),

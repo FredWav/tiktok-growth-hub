@@ -24,7 +24,8 @@ test("reprise des témoignages du code : fiches complétées sans doublon, rejou
     assert.equal(byName["William Wood"].metric, null);
     assert.equal(byName["PlotBreaker"].avatar_url, "/plotbreaker.jpg");
     const results = rows.filter((r) => r.metric && r.result && !r.anonymous).map((r) => r.name);
-    assert.deepEqual(results.slice(0, 3), ["PlotBreaker", "Antoine au Vietnam", "Lucille"]);
+    assert.deepEqual(results.slice(0, 3), ["PlotBreaker", "Lucille", "Gautier"]);
+    assert.equal(rows.filter((r) => r.youtube_id && !r.anonymous).at(-1).name, "Hugo");
     assert.equal(rows.filter((r) => r.youtube_id).length, 14);
     assert.deepEqual(rows.filter((r) => r.featured).map((r) => r.name).sort(), ["David Agaesse", "Lucille", "PlotBreaker"]);
     await assert.rejects(() => db.query(`UPDATE trusted_clients SET youtube_id='pas-un-id' WHERE name='Hugo'`));

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Play } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
-import { forOffer, type Temoignage, useTemoignages, videoLegend, withVideo } from "@/lib/temoignages";
+import { type Temoignage, useTemoignages, videoLegend, videosForOffer, withVideo } from "@/lib/temoignages";
 
 interface VideoCardProps {
   id: string;
@@ -59,14 +59,15 @@ const altOf = (t: Temoignage) => (t.anonymous ? "Témoignage vidéo d'un client 
 /** Témoignages vidéo des fiches de l'admin ; `featured` : seulement ceux mis en avant sur l'accueil. */
 export function VideoTestimonials({ featured = false, offer, limit, location, className = "" }: {
   featured?: boolean;
-  /** Page d'offre : les vidéos des clients de cette offre d'abord. */
+  /** Page d'offre : PlotBreaker et Lune de Lu, puis un client de cette offre. */
   offer?: string;
   limit?: number;
   location: string;
   className?: string;
 }) {
   const all = useTemoignages().filter((t) => withVideo(t) && (!featured || t.featured));
-  const videos = forOffer(all, offer, limit ?? all.length);
+  const count = limit ?? all.length;
+  const videos = offer ? videosForOffer(all, offer, count) : all.slice(0, count);
   if (!videos.length) return null;
   return (
     <div className={className}>

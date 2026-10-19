@@ -119,7 +119,7 @@ export default function RessourceRetentionTikTok() {
             { label: "Fin", value: 24 },
           ]}
         />
-        <InlineExpressCta sourcePage="/ressources/retention-tiktok" contentSlug="retention_tiktok" />
+        <InlineExpressCta contentSlug="retention_tiktok" />
       </ArticleSection>
 
       <ArticleSection

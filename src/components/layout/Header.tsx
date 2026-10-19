@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/tracking";
+import { trackCtaClick } from "@/lib/funnel-events";
 
 /** Menu principal : cinq entrées, un seul niveau. Les pages d'offres sont sous leur famille. */
 const navItems = [
@@ -76,7 +77,7 @@ export function Header({ minimal = false }: { minimal?: boolean }) {
             <Button asChild className="min-h-11">
               <Link
                 to={CTA.href}
-                onClick={() => trackEvent("header_cta_click", { source_page: location.pathname, position: "header_desktop" })}
+                onClick={() => trackCtaClick(CTA.href, "header_desktop")}
               >
                 {CTA.label}
               </Link>
@@ -125,7 +126,7 @@ export function Header({ minimal = false }: { minimal?: boolean }) {
                 <Link
                   to={CTA.href}
                   onClick={() => {
-                    trackEvent("header_cta_click", { source_page: location.pathname, position: "header_mobile" });
+                    trackCtaClick(CTA.href, "header_mobile");
                     setIsOpen(false);
                   }}
                 >

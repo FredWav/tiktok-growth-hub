@@ -73,7 +73,7 @@ export function captureUtmParams() {
     // localStorage plein / bloqué : on ignore
   }
 
-  // Rétro-compat : page-tracker et getStoredUtmSource lisent encore ces clés simples.
+  // Rétro-compat : getStoredUtmSource et les anciennes demandes lisent encore ces clés simples.
   try {
     if (params.utm_source) localStorage.setItem("utm_source", params.utm_source);
     if (params.utm_medium) localStorage.setItem("utm_medium", params.utm_medium);
@@ -130,17 +130,6 @@ function freshLastTouch(): Touch | null {
   if (!last) return null;
   if (Date.now() - new Date(last.at).getTime() > ATTR_TTL_MS) return null;
   return last;
-}
-
-/** UTM à écrire sur une page_view (last-touch, expiration prise en compte). */
-export function getStoredUtmForPageView(): { utm_source: string | null; utm_medium: string | null; utm_campaign: string | null } {
-  const last = freshLastTouch();
-  const p = last?.params ?? {};
-  return {
-    utm_source: p.utm_source ?? null,
-    utm_medium: p.utm_medium ?? null,
-    utm_campaign: p.utm_campaign ?? null,
-  };
 }
 
 /** Chaîne source lisible pour rattacher un lead (last-touch non expiré). */

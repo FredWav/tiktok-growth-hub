@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { SEOHead } from "@/components/SEOHead";
 import { seoFor } from "@/config/seo";
 import { commerceCall, commerceInput } from "@/lib/commerce";
-import { trackEvent } from "@/lib/tracking";
+import { trackApplicationSubmit } from "@/lib/funnel-events";
 import { OFFERS, priceLabel } from "@/config/offers";
 
 type ApplicationOffer = "one_shot" | "academy" | "premium" | "conseil";
@@ -59,7 +59,7 @@ export default function Candidature() {
         ...commitments,
       });
       setSaved(true);
-      trackEvent("application_saved", { offer, source: "server_confirmation" });
+      trackApplicationSubmit(offer);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Enregistrement indisponible.");
     } finally {

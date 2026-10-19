@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/accordion";
 import { seoFor } from "@/config/seo";
 import { EXPRESS_PRICE_LABEL, VIDEO_ANALYSIS_PRICE_LABEL } from "@/config/offers";
-import { FUNNEL_EVENTS, trackFunnelEvent } from "@/lib/funnel-events";
+import { trackCtaClick, trackResourceView } from "@/lib/funnel-events";
 
 export type ResourceFaqItem = {
   question: string;
@@ -94,11 +94,7 @@ export function ResourceArticle({
 }: ResourceArticleProps) {
   const bottom = BOTTOM_CTA[cta];
   useEffect(() => {
-    trackFunnelEvent(FUNNEL_EVENTS.resourceView, {
-      source_page: path,
-      position: "page_view",
-      content_slug: slug,
-    });
+    trackResourceView(slug);
   }, [path, slug]);
 
   return (
@@ -268,13 +264,7 @@ export function ResourceArticle({
               variant="hero"
               size="xl"
               asChild
-              onClick={() =>
-                trackFunnelEvent(cta === "video" ? FUNNEL_EVENTS.videoCtaClick : FUNNEL_EVENTS.expressCtaClick, {
-                  source_page: path,
-                  position: "bottom",
-                  content_slug: slug,
-                })
-              }
+              onClick={() => trackCtaClick(bottom.href, "bottom", slug)}
             >
               <Link to={bottom.href}>
                 {bottom.label}
@@ -289,13 +279,7 @@ export function ResourceArticle({
               <Link
                 to="/wavacademy"
                 className="inline-flex min-h-11 items-center font-semibold text-primary underline underline-offset-4 hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                onClick={() =>
-                  trackFunnelEvent(FUNNEL_EVENTS.academyCtaClick, {
-                    source_page: path,
-                    position: "post_express_continuation",
-                    content_slug: slug,
-                  })
-                }
+                onClick={() => trackCtaClick("/wavacademy", "post_express_continuation", slug)}
               >
                 Découvrir la Wav Academy <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
@@ -375,13 +359,7 @@ export function NumberedSteps({
   );
 }
 
-export function InlineExpressCta({
-  sourcePage,
-  contentSlug,
-}: {
-  sourcePage: string;
-  contentSlug: string;
-}) {
+export function InlineExpressCta({ contentSlug }: { contentSlug: string }) {
   return (
     <aside className="my-10 rounded-2xl border border-primary/30 bg-primary/10 p-6 md:p-8" aria-label="Analyse Express">
       <div className="flex flex-col md:flex-row md:items-center gap-6">
@@ -397,13 +375,7 @@ export function InlineExpressCta({
           size="lg"
           className="shrink-0"
           asChild
-          onClick={() =>
-            trackFunnelEvent(FUNNEL_EVENTS.expressCtaClick, {
-              source_page: sourcePage,
-              position: "after_first_diagnostic",
-              content_slug: contentSlug,
-            })
-          }
+          onClick={() => trackCtaClick("/analyse-express", "after_first_diagnostic", contentSlug)}
         >
           <Link to="/analyse-express">
             Faire mon analyse : {EXPRESS_PRICE_LABEL}
@@ -456,13 +428,7 @@ export function ExampleDataChart({
 }
 
 /** Appel à l'action vers l'Analyse vidéo, au fil d'un article. */
-export function InlineVideoCta({
-  sourcePage,
-  contentSlug,
-}: {
-  sourcePage: string;
-  contentSlug: string;
-}) {
+export function InlineVideoCta({ contentSlug }: { contentSlug: string }) {
   return (
     <aside className="my-10 rounded-2xl border border-primary/30 bg-primary/10 p-6 md:p-8" aria-label="Analyse vidéo">
       <div className="flex flex-col md:flex-row md:items-center gap-6">
@@ -478,13 +444,7 @@ export function InlineVideoCta({
           size="lg"
           className="shrink-0"
           asChild
-          onClick={() =>
-            trackFunnelEvent(FUNNEL_EVENTS.videoCtaClick, {
-              source_page: sourcePage,
-              position: "inline",
-              content_slug: contentSlug,
-            })
-          }
+          onClick={() => trackCtaClick("/analyse-video", "inline", contentSlug)}
         >
           <Link to="/analyse-video">
             Analyser ma vidéo : {VIDEO_ANALYSIS_PRICE_LABEL}

@@ -16,7 +16,7 @@ import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { seoFor } from "@/config/seo";
 import { EXPRESS_PRICE_LABEL } from "@/config/offers";
-import { FUNNEL_EVENTS, trackFunnelEvent } from "@/lib/funnel-events";
+import { trackCtaClick, trackResourceView } from "@/lib/funnel-events";
 import { ARTICLES, PUBLISHED_THEMES, resourcesOfTheme } from "@/content/articles";
 
 const priorityResources = [
@@ -74,11 +74,7 @@ const method = [
 
 export default function Ressources() {
   useEffect(() => {
-    trackFunnelEvent(FUNNEL_EVENTS.resourceView, {
-      source_page: "/ressources",
-      position: "page_view",
-      content_slug: "ressources_hub",
-    });
+    trackResourceView("ressources_hub");
   }, []);
 
   return (
@@ -101,13 +97,7 @@ export default function Ressources() {
             variant="hero"
             size="xl"
             asChild
-            onClick={() =>
-              trackFunnelEvent(FUNNEL_EVENTS.expressCtaClick, {
-                source_page: "/ressources",
-                position: "hero",
-                content_slug: "ressources_hub",
-              })
-            }
+            onClick={() => trackCtaClick("/analyse-express", "hero", "ressources_hub")}
           >
             <Link to="/analyse-express">
               Analyser mon compte : {EXPRESS_PRICE_LABEL}
@@ -259,13 +249,7 @@ export default function Ressources() {
             variant="hero"
             size="xl"
             asChild
-            onClick={() =>
-              trackFunnelEvent(FUNNEL_EVENTS.expressCtaClick, {
-                source_page: "/ressources",
-                position: "bottom",
-                content_slug: "ressources_hub",
-              })
-            }
+            onClick={() => trackCtaClick("/analyse-express", "bottom", "ressources_hub")}
           >
             <Link to="/analyse-express">
               Faire mon Analyse Express : {EXPRESS_PRICE_LABEL}

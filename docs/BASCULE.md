@@ -51,7 +51,13 @@ La Wav Academy passe à 990 € automatiquement (table `commerce_offers`).
 | Fred | Stripe live : clé restreinte `rk_live_…` (Checkout Sessions : écriture, Payment Links : lecture), saisie dans fredwav-prod |
 | Fred | Mot de passe SMTP de `noreply@fredwav.com` (voir ci-dessous) |
 | Fred | Jeton du bot Discord et secret OAuth (régénérés le jour J) |
+| Fred | PostHog : clé personnelle en lecture seule pour la page Statistiques (voir ci-dessous), saisie dans fredwav-staging puis fredwav-prod |
 | Claude | Build de production (`.env.production` vers fredwav-prod) envoyé sur le VPS, testé sur une adresse privée avant le DNS |
+
+**PostHog** : dans PostHog, organisation « FredWav.com », menu du compte → Personal API keys →
+nouvelle clé limitée au projet « Default project » (324948) avec la seule portée **Query : Read**.
+La saisir comme secret `POSTHOG_PERSONAL_API_KEY` du projet Supabase (Edge Functions → Secrets).
+Sans elle, la page Statistiques affiche les ventes et marque l'audience « indisponible ».
 
 **SMTP** : OVH ne permet pas de relire un mot de passe existant. Deux possibilités :
 1. créer dans OVH une nouvelle adresse d'envoi (ex. `site@fredwav.com`) réservée à la v2,

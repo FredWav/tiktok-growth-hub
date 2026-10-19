@@ -126,7 +126,7 @@ export default function RessourceStatistiquesTikTok() {
             </p>
           </div>
         </div>
-        <InlineExpressCta sourcePage="/ressources/statistiques-tiktok" contentSlug="statistiques_tiktok" />
+        <InlineExpressCta contentSlug="statistiques_tiktok" />
       </ArticleSection>
 
       <ArticleSection

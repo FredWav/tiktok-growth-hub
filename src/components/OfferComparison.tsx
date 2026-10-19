@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { trackEvent } from "@/lib/tracking";
+import { trackCtaClick } from "@/lib/funnel-events";
 import { launchLabel, type Offer, priceLabel } from "@/config/offers";
 import { PlacesLeft } from "@/components/offers/PlacesLeft";
 import { AnalysisCount } from "@/components/offers/AnalysisCount";
@@ -83,7 +83,7 @@ export function OfferComparison({
                 size="lg"
                 className="w-full"
                 asChild
-                onClick={() => trackEvent("click_offer_compare", { offer: offer.id, location, target: "cta" })}
+                onClick={() => trackCtaClick(offer.cta.href, `compare_${location}`)}
               >
                 <Link to={offer.cta.href}>
                   {offer.cta.label}
@@ -94,7 +94,7 @@ export function OfferComparison({
                 <Link
                   to={offer.href}
                   className="flex min-h-11 items-center justify-center text-sm font-medium text-primary hover:underline"
-                  onClick={() => trackEvent("click_offer_compare", { offer: offer.id, location, target: "details" })}
+                  onClick={() => trackCtaClick(offer.href, `compare_${location}_details`)}
                 >
                   Voir le détail
                 </Link>

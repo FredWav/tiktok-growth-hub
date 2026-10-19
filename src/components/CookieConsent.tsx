@@ -60,7 +60,7 @@ export function CookieConsent() {
     return () => window.removeEventListener(COOKIE_SETTINGS_EVENT, onOpen);
   }, [pathname]);
 
-  const accept = async () => {
+  const accept = () => {
     localStorage.setItem("cookie_consent", "accepted");
     enableGA();
     initPostHog();
@@ -70,8 +70,6 @@ export function CookieConsent() {
     // Le pageview d'atterrissage a été sauté en attendant le consentement : on le
     // déclenche maintenant, sinon un visiteur qui accepte sans naviguer n'est jamais compté.
     capturePageview();
-    const { trackPageView } = await import("@/lib/page-tracker");
-    trackPageView(window.location.pathname);
     // Track après init pour que PostHog soit prêt
     setTimeout(() => trackPostHogEvent("cookie_consent_accepted"), 100);
     setVisible(false);

@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
-import { FUNNEL_EVENTS, trackFunnelEvent } from "@/lib/funnel-events";
+import { trackCheckoutStart, trackFormStart, trackOfferView } from "@/lib/funnel-events";
+import { trackEvent } from "@/lib/tracking";
 import { OFFERS, VIDEO_ANALYSIS_PRICE_LABEL, launchLabel } from "@/config/offers";
 import { useAnalysisCount } from "@/lib/analysis-counts";
 import { parseTikTokVideoUrl } from "../../supabase/functions/_shared/tiktok-video-url";
@@ -64,13 +65,13 @@ export default function AnalyseVideo() {
   const testMode = import.meta.env.VITE_STRIPE_TEST_MODE === "true" || searchParams.get("test") === "1";
 
   useEffect(() => {
-    trackFunnelEvent(FUNNEL_EVENTS.videoPageView, { source_page: "analyse_video" });
+    trackOfferView("video");
   }, []);
 
   const markFormStarted = () => {
     if (formStartedRef.current) return;
     formStartedRef.current = true;
-    trackFunnelEvent(FUNNEL_EVENTS.videoFormStarted, { source_page: "analyse_video" });
+    trackFormStart("video");
   };
 
   const validateUrl = (value: string) => {
@@ -93,7 +94,7 @@ export default function AnalyseVideo() {
     }
 
     setLoading(true);
-    trackFunnelEvent(FUNNEL_EVENTS.videoCheckoutStart, { source_page: "analyse_video" });
+    trackCheckoutStart("video");
     try {
       const { data, error: fnError } = await supabase.functions.invoke("create-video-checkout", {
         body: {
@@ -117,7 +118,7 @@ export default function AnalyseVideo() {
       window.location.href = data.url;
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Une erreur est survenue";
-      trackFunnelEvent(FUNNEL_EVENTS.videoError, { source_page: "analyse_video", step: "checkout" });
+      trackEvent("video_error", { step: "checkout" });
       toast.error(message);
       setLoading(false);
     }

@@ -2,6 +2,8 @@ project_id = "fredwav"
 
 [functions.commerce-admin]
 verify_jwt = false
+[functions.admin-stats]
+verify_jwt = false
 [functions.enrollment]
 verify_jwt = false
 [functions.commerce-process]

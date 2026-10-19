@@ -7,7 +7,7 @@ import { SEOHead } from "@/components/SEOHead";
 import { seoFor } from "@/config/seo";
 import { commerceCall, commerceInput, money } from "@/lib/commerce";
 import { loadPlaces, monthName, type Places } from "@/lib/places";
-import { trackEvent } from "@/lib/tracking";
+import { trackCheckoutStart } from "@/lib/funnel-events";
 import { INSTALLMENTS_LABEL, INSTALLMENTS_NOTE, launchLabel, OFFERS } from "@/config/offers";
 import { CGV_TEXT, earlyText } from "../../supabase/functions/_shared/consent-texts.ts";
 
@@ -64,7 +64,7 @@ export default function AcademyInscription() {
         consent_cgv: data.get("cgv") === "on",
         early_start: data.get("early") === "on",
       });
-      trackEvent("checkout_open", { offer: "academy" });
+      trackCheckoutStart("academy");
       window.location.assign(url);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Paiement momentanément indisponible.");

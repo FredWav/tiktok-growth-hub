@@ -8,20 +8,18 @@ import { seoFor } from "@/config/seo";
 import type { Theme } from "@/config/themes";
 import { EXPRESS_PRICE_LABEL, VIDEO_ANALYSIS_PRICE_LABEL } from "@/config/offers";
 import { resourcesOfTheme } from "@/content/articles";
-import { FUNNEL_EVENTS, trackFunnelEvent } from "@/lib/funnel-events";
+import { trackCtaClick } from "@/lib/funnel-events";
 
 const TOOL = {
   express: {
     text: "Pour savoir ce qui se passe sur ton compte, l’Analyse Express lit tes vidéos publiques et te donne tes priorités.",
     href: "/analyse-express",
     label: `Analyser mon compte : ${EXPRESS_PRICE_LABEL}`,
-    event: FUNNEL_EVENTS.expressCtaClick,
   },
   video: {
     text: "Pour comprendre une vidéo précise, l’Analyse vidéo passe au crible son accroche, sa structure et sa rétention.",
     href: "/analyse-video",
     label: `Analyser ma vidéo : ${VIDEO_ANALYSIS_PRICE_LABEL}`,
-    event: FUNNEL_EVENTS.videoCtaClick,
   },
 } as const;
 
@@ -78,7 +76,7 @@ export default function RessourceTheme({ theme }: { theme: Theme }) {
             variant="hero"
             size="xl"
             asChild
-            onClick={() => trackFunnelEvent(tool.event, { source_page: path, position: "theme_guide", content_slug: theme.slug })}
+            onClick={() => trackCtaClick(tool.href, "theme_guide", theme.slug)}
           >
             <Link to={tool.href}>{tool.label}<ArrowRight className="ml-2 h-5 w-5" /></Link>
           </Button>

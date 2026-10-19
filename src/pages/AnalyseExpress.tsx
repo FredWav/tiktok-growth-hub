@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Zap, BarChart3, FileText, TrendingUp, Search, Users } from "lucide-react";
-import { trackEvent } from "@/lib/tracking";
+import { trackCheckoutStart, trackFormStart, trackOfferView } from "@/lib/funnel-events";
 import { trackPostHogEvent } from "@/lib/posthog";
 import { SEOHead } from "@/components/SEOHead";
 import { seoFor } from "@/config/seo";
@@ -98,9 +98,18 @@ export default function AnalyseExpress() {
   const [searchParams] = useSearchParams();
   const testMode = import.meta.env.VITE_STRIPE_TEST_MODE === "true" || searchParams.get("test") === "1";
 
+  const formStartedRef = useRef(false);
+
   useEffect(() => {
     setExistingSessionId(window.localStorage.getItem("express_session_id"));
+    trackOfferView("express");
   }, []);
+
+  const markFormStarted = () => {
+    if (formStartedRef.current) return;
+    formStartedRef.current = true;
+    trackFormStart("express");
+  };
 
   // Forme canonique TikTok (minuscules) : c'est celle qui part au checkout puis
   // vers WavStats, donc c'est aussi celle qu'on affiche en confirmation.
@@ -129,7 +138,7 @@ export default function AnalyseExpress() {
 
     setShowConfirmModal(false);
     setLoading(true);
-    trackEvent("express_checkout_start", { product: "analyse_express_tiktok" });
+    trackCheckoutStart("express");
     try {
       const { data, error } = await supabase.functions.invoke("create-express-checkout", {
         body: {
@@ -196,7 +205,7 @@ export default function AnalyseExpress() {
           </p>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-3 md:space-y-4">
+          <form onSubmit={handleSubmit} onChangeCapture={markFormStarted} className="max-w-md mx-auto space-y-3 md:space-y-4">
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">@</span>
               <Input

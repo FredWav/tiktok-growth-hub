@@ -55,8 +55,8 @@ export default function RessourceArticlePage({ article }: { article: Article }) 
             index % 2 === 1 ? (
               <div key={index} className="not-prose">
                 {part === "video"
-                  ? <InlineVideoCta sourcePage={article.path} contentSlug={article.slug} />
-                  : <InlineExpressCta sourcePage={article.path} contentSlug={article.slug} />}
+                  ? <InlineVideoCta contentSlug={article.slug} />
+                  : <InlineExpressCta contentSlug={article.slug} />}
               </div>
             ) : (
               <Fragment key={index}>

@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { MailCheck } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
@@ -6,21 +5,10 @@ import { seoFor } from "@/config/seo";
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
-import { FUNNEL_EVENTS, trackFunnelEvent } from "@/lib/funnel-events";
 
 export default function AnalyseVideoMerci() {
-  useEffect(() => {
-    // Retour navigateur depuis Stripe : repère du funnel. Le paiement fait foi en base.
-    const key = "fw_video_payment_tracked";
-    try {
-      if (sessionStorage.getItem(key)) return;
-      sessionStorage.setItem(key, "1");
-    } catch {
-      // Stockage indisponible : on compte quand même la visite.
-    }
-    trackFunnelEvent(FUNNEL_EVENTS.videoPaymentSuccess, { source_page: "analyse_video_merci" });
-  }, []);
-
+  // Pas d'événement « paiement réussi » ici : arriver sur cette page ne prouve pas
+  // le paiement. Les ventes sont comptées en base, après confirmation de Stripe.
   return (
     <Layout>
       <SEOHead {...seoFor("/analyse-video/merci")} />

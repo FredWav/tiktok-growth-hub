@@ -20,21 +20,12 @@ function PostHogPageTracker() {
     if (localStorage.getItem("cookie_consent") === "accepted") {
       captureUtmParams();
       syncAttributionToPostHog();
-      void import("@/lib/page-tracker").then(({ setupBeforeUnloadTracking }) => {
-        setupBeforeUnloadTracking();
-      });
     }
   }, []);
 
   useEffect(() => {
     if (location.pathname.startsWith("/inscription/") || location.pathname.startsWith("/claim/") || location.pathname === "/analyse-express/result" || location.pathname === "/analyse-video/rapport" || location.pathname.startsWith("/admin")) return;
     capturePageview();
-
-    if (localStorage.getItem("cookie_consent") === "accepted") {
-      void import("@/lib/page-tracker").then(({ trackPageView }) => {
-        void trackPageView(location.pathname);
-      });
-    }
   }, [location.pathname]);
 
   return null;
@@ -79,7 +70,7 @@ const AdminOverview = lazy(() => import("./pages/admin/Overview"));
 const AdminOffersPlaces = lazy(() => import("./pages/admin/OffersPlaces"));
 const AdminExpressAnalyses = lazy(() => import("./pages/admin/ExpressAnalyses"));
 const AdminApplications = lazy(() => import("./pages/admin/Applications"));
-const AdminMarketing = lazy(() => import("./pages/admin/Marketing"));
+const AdminStatistiques = lazy(() => import("./pages/admin/Statistiques"));
 const AdminDeepLinks = lazy(() => import("./pages/admin/DeepLinks"));
 const AdminTestimonials = lazy(() => import("./pages/admin/Testimonials"));
 const AdminWavAcademyConsents = lazy(() => import("./pages/admin/WavAcademyConsents"));
@@ -135,7 +126,7 @@ const CSR_ROUTE_ELEMENTS: Record<string, ReactNode> = {
   "/admin/contenus": <AdminTestimonials />,
   "/admin/contenus/offres": <AdminOffersPlaces />,
   "/admin/contenus/liens": <AdminDeepLinks />,
-  "/admin/statistiques": <AdminMarketing />,
+  "/admin/statistiques": <AdminStatistiques />,
   "/admin/parametres": <AdminSettings />,
   // Anciennes adresses de l'admin.
   "/admin/commandes": <Navigate to="/admin/clients" replace />,

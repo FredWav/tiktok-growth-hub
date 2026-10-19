@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Lightbulb, BarChart3, TrendingUp, Shield, RefreshCw } from "lucide-react";
-import { trackEvent } from "@/lib/tracking";
+import { trackCtaClick } from "@/lib/funnel-events";
 import { SEOHead } from "@/components/SEOHead";
 import { seoFor } from "@/config/seo";
 import { CREATORS_COUNT } from "@/config/offers";
@@ -216,14 +216,14 @@ export default function APropos() {
             Tu veux un regard ponctuel sur ton compte, un cadre collectif dans la durée ou un suivi individuel ? Les trois façons de travailler avec moi sont présentées au même endroit, avec leurs prix.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="hero" size="lg" asChild onClick={() => trackEvent("cta_academy_click", { location: "apropos" })}>
+            <Button variant="hero" size="lg" asChild onClick={() => trackCtaClick("/accompagnements", "apropos")}>
               <Link to="/accompagnements">
                 Voir les accompagnements
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <Button variant="outline" size="lg" asChild onClick={() => trackEvent("cta_contact_click", { location: "apropos" })}>
-              <Link to="/analyses" onClick={() => trackEvent("cta_analyses_click", { location: "apropos" })}>
+            <Button variant="outline" size="lg" asChild>
+              <Link to="/analyses" onClick={() => trackCtaClick("/analyses", "apropos")}>
                 Commencer par une analyse
               </Link>
             </Button>

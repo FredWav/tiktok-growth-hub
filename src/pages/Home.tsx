@@ -37,7 +37,7 @@ import {
   priceLabel,
 } from "@/config/offers";
 import { trackEvent } from "@/lib/tracking";
-import { FUNNEL_EVENTS, trackFunnelEvent } from "@/lib/funnel-events";
+import { trackCtaClick } from "@/lib/funnel-events";
 
 const audiences = [
   {
@@ -129,7 +129,7 @@ export default function Home() {
               variant="hero"
               size="xl"
               asChild
-              onClick={() => trackEvent("home_cta_click", { position: "hero_primary", target: "/accompagnements" })}
+              onClick={() => trackCtaClick("/accompagnements", "hero_primary")}
             >
               <Link to="/accompagnements">
                 Voir les accompagnements
@@ -140,12 +140,7 @@ export default function Home() {
               variant="outline"
               size="xl"
               asChild
-              onClick={() =>
-                trackFunnelEvent(FUNNEL_EVENTS.expressCtaClick, {
-                  source_page: "/",
-                  position: "hero_secondary",
-                })
-              }
+              onClick={() => trackCtaClick("/analyse-express", "hero_secondary")}
             >
               <Link to="/analyses">Analyser mon TikTok, dès {priceLabel(OFFERS.analyse_video)}</Link>
             </Button>
@@ -218,7 +213,7 @@ export default function Home() {
         <ClientResults limit={3} />
         <VideoTestimonials featured location="home" className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mt-10" />
         <div className="text-center mt-10">
-          <Button variant="outline" size="lg" asChild onClick={() => trackEvent("proofs_cta_click", { source_page: "/", position: "results" })}>
+          <Button variant="outline" size="lg" asChild onClick={() => trackCtaClick("/temoignages", "results")}>
             <Link to="/temoignages">
               Voir tous les témoignages
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -344,12 +339,7 @@ export default function Home() {
             variant="hero"
             size="xl"
             asChild
-            onClick={() =>
-              trackFunnelEvent(FUNNEL_EVENTS.academyCtaClick, {
-                source_page: "/",
-                position: "bottom_primary",
-              })
-            }
+            onClick={() => trackCtaClick("/wavacademy", "bottom_primary")}
           >
             <Link to="/wavacademy">
               Découvrir la Wav Academy
@@ -366,12 +356,7 @@ export default function Home() {
               size="lg"
               className="border-gold-light text-gold-light hover:bg-gold-light hover:text-noir"
               asChild
-              onClick={() =>
-                trackFunnelEvent(FUNNEL_EVENTS.expressCtaClick, {
-                  source_page: "/",
-                  position: "bottom_secondary",
-                })
-              }
+              onClick={() => trackCtaClick("/analyse-express", "bottom_secondary")}
             >
               <Link to="/analyse-express">Faire mon Analyse Express : {priceLabel(OFFERS.analyse_express)}</Link>
             </Button>

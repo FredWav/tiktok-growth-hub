@@ -118,7 +118,7 @@ export default function RessourceVuesTikTok() {
             { label: "Fin", value: 17 },
           ]}
         />
-        <InlineExpressCta sourcePage="/ressources/vues-tiktok" contentSlug="vues_tiktok" />
+        <InlineExpressCta contentSlug="vues_tiktok" />
       </ArticleSection>
 
       <ArticleSection

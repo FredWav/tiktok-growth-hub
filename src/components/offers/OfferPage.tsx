@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Check, X } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
@@ -6,7 +6,7 @@ import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { ClientResults } from "@/components/ClientResults";
 import { VideoTestimonials } from "@/components/VideoCard";
-import { trackEvent } from "@/lib/tracking";
+import { trackCtaClick, trackOfferView, type OfferId } from "@/lib/funnel-events";
 import { launchLabel, type Offer, priceLabel } from "@/config/offers";
 import { PlacesLeft } from "@/components/offers/PlacesLeft";
 
@@ -45,7 +45,10 @@ export function OfferPage({
 }) {
   const launch = launchLabel(offer);
   const hub = offer.family === "analyses" ? { href: "/analyses", label: "Comparer les analyses" } : { href: "/accompagnements", label: "Comparer les accompagnements" };
-  const track = (position: string) => trackEvent("offer_cta_click", { offer: offer.id, position });
+  const track = (position: string) => trackCtaClick(offer.cta.href, position);
+  useEffect(() => {
+    trackOfferView(offer.id as OfferId);
+  }, [offer.id]);
 
   const priceBlock = (
     <div>

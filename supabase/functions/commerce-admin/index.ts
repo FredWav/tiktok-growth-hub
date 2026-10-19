@@ -69,6 +69,7 @@ Deno.serve(async (req) => {
             check("E-mails en échec", (failedMail.count ?? 0) === 0, String(failedMail.count ?? 0)),
           ] },
           { title: "Analyses", checks: [check("Clé API WavStats", has("WAVSTATS_API_KEY"))] },
+          { title: "Statistiques", checks: [check("Clé de lecture PostHog (audience du site)", has("POSTHOG_PERSONAL_API_KEY"))] },
           { title: "Wav Academy (Discord)", checks: [
             check("Bot Discord", has("DISCORD_BOT_TOKEN") && has("DISCORD_GUILD_ID")),
             check("Connexion Discord (OAuth)", has("DISCORD_CLIENT_ID") && has("DISCORD_CLIENT_SECRET") && has("DISCORD_OAUTH_REDIRECT_URI")),

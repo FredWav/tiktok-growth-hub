@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
-import { trackEvent } from "@/lib/tracking";
+import { trackCtaClick } from "@/lib/funnel-events";
 import { SEOHead } from "@/components/SEOHead";
 import { seoFor } from "@/config/seo";
 import { ScreenshotWall } from "@/components/ScreenshotWall";
@@ -80,7 +80,7 @@ export default function Temoignages() {
                 <Button
                   variant="hero"
                   asChild
-                  onClick={() => trackEvent("testimonials_cta_click", { target: item.href })}
+                  onClick={() => trackCtaClick(item.href, "temoignages")}
                 >
                   <Link to={item.href}>
                     {item.cta}

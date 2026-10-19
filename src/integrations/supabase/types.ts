@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_stats_cache: {
+        Row: {
+          fetched_at: string
+          key: string
+          payload: Json
+        }
+        Insert: {
+          fetched_at?: string
+          key: string
+          payload: Json
+        }
+        Update: {
+          fetched_at?: string
+          key?: string
+          payload?: Json
+        }
+        Relationships: []
+      }
       availability_slots: {
         Row: {
           created_at: string
@@ -1484,6 +1502,7 @@ export type Database = {
     Functions: {
       admin_cron_status: { Args: never; Returns: Json }
       admin_overview: { Args: never; Returns: Json }
+      admin_sales: { Args: { p_from: string; p_to: string }; Returns: Json }
       call_cron_function: { Args: { p_function: string }; Returns: number }
       commerce_academy_start: { Args: { v: Json }; Returns: Json }
       commerce_accept: {
@@ -1637,10 +1656,6 @@ export type Database = {
       }
       increment_deep_link_clicks: {
         Args: { p_slug: string }
-        Returns: undefined
-      }
-      update_page_view_duration: {
-        Args: { p_duration: number; p_id: string }
         Returns: undefined
       }
       upsert_diagnostic_lead: {

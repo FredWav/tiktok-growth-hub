@@ -19,7 +19,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { seoFor } from "@/config/seo";
-import { EXPRESS_PRICE_LABEL } from "@/config/offers";
+import { EXPRESS_PRICE_LABEL, VIDEO_ANALYSIS_PRICE_LABEL } from "@/config/offers";
 import { FUNNEL_EVENTS, trackFunnelEvent } from "@/lib/funnel-events";
 
 export type ResourceFaqItem = {
@@ -45,7 +45,34 @@ type ResourceArticleProps = {
   children: ReactNode;
   faq: ResourceFaqItem[];
   related: RelatedResource[];
+  /** Date de mise à jour affichée (« 11 août 2026 »). */
+  updatedLabel?: string;
+  /** Thème de l'article, inséré dans le fil d'Ariane (Accueil / Ressources / Thème / Article). */
+  theme?: { href: string; label: string };
+  /** Outil proposé en fin de page. */
+  cta?: "express" | "video";
+  /** Extrait du rapport de démonstration de l'Analyse Express. */
+  showReportExtract?: boolean;
+  /** Mention de rédaction assistée par l'IA, relue par Fred. */
+  aiAssisted?: boolean;
+  /** Titre de la FAQ (par défaut : « Questions fréquentes : <eyebrow> »). */
+  faqTitle?: string;
 };
+
+const BOTTOM_CTA = {
+  express: {
+    title: "Tes statistiques ont besoin de contexte, pas d’une règle magique.",
+    text: "L’Analyse Express lit ton compte TikTok, fait ressortir les signaux utiles et te donne un plan d’action clair.",
+    href: "/analyse-express",
+    label: `Analyser mon compte : ${EXPRESS_PRICE_LABEL}`,
+  },
+  video: {
+    title: "Une vidéo précise à comprendre ? Fais-la analyser.",
+    text: "L’Analyse vidéo passe ta vidéo TikTok au crible : accroche, structure, rétention et appel à l’action, avec des recommandations pour la suivante.",
+    href: "/analyse-video",
+    label: `Analyser ma vidéo : ${VIDEO_ANALYSIS_PRICE_LABEL}`,
+  },
+} as const;
 
 export function ResourceArticle({
   path,
@@ -58,7 +85,14 @@ export function ResourceArticle({
   children,
   faq,
   related,
+  updatedLabel = "11 août 2026",
+  theme,
+  cta = "express",
+  showReportExtract = true,
+  aiAssisted = false,
+  faqTitle,
 }: ResourceArticleProps) {
+  const bottom = BOTTOM_CTA[cta];
   useEffect(() => {
     trackFunnelEvent(FUNNEL_EVENTS.resourceView, {
       source_page: path,
@@ -87,6 +121,16 @@ export function ResourceArticle({
                   </Link>
                 </li>
                 <li aria-hidden="true">/</li>
+                {theme && (
+                  <>
+                    <li>
+                      <Link className="hover:text-primary transition-colors" to={theme.href}>
+                        {theme.label}
+                      </Link>
+                    </li>
+                    <li aria-hidden="true">/</li>
+                  </>
+                )}
                 <li aria-current="page" className="text-foreground font-medium">
                   {eyebrow}
                 </li>
@@ -108,11 +152,16 @@ export function ResourceArticle({
                 <BarChart3 className="h-4 w-4 text-primary" /> Par Fred Wav
               </span>
               <span className="inline-flex items-center gap-2">
-                <CalendarDays className="h-4 w-4 text-primary" /> Mis à jour le 11 août 2026
+                <CalendarDays className="h-4 w-4 text-primary" /> Mis à jour le {updatedLabel}
               </span>
               <span className="inline-flex items-center gap-2">
                 <Clock3 className="h-4 w-4 text-primary" /> {readingTime}
               </span>
+              {aiAssisted && (
+                <span className="inline-flex items-center gap-2">
+                  Rédigé avec l’aide de l’IA, relu et complété par Fred
+                </span>
+              )}
             </div>
           </div>
         </Section>
@@ -124,7 +173,7 @@ export function ResourceArticle({
           </aside>
         </Section>
 
-        <Section variant="cream" size="sm">
+        {showReportExtract && <Section variant="cream" size="sm">
           <figure className="mx-auto max-w-3xl overflow-hidden rounded-2xl border border-border bg-background shadow-sm">
             <img
               src="/ressources/extrait-rapport-analyse-express.png"
@@ -150,7 +199,7 @@ export function ResourceArticle({
               .
             </figcaption>
           </figure>
-        </Section>
+        </Section>}
 
         {children}
 
@@ -188,7 +237,7 @@ export function ResourceArticle({
 
         <Section variant="default" size="lg">
           <div className="max-w-3xl mx-auto">
-            <SectionHeader title={`Questions fréquentes : ${eyebrow.toLowerCase()}`} />
+            <SectionHeader title={faqTitle ?? `Questions fréquentes : ${eyebrow.toLowerCase()}`} />
             <Accordion type="single" collapsible className="w-full">
               {faq.map((item, index) => (
                 <AccordionItem key={item.question} value={`faq-${index}`}>
@@ -210,25 +259,25 @@ export function ResourceArticle({
               <CheckCircle2 className="h-3.5 w-3.5" /> Prochaine étape
             </span>
             <h2 className="font-display text-3xl md:text-4xl font-semibold text-cream text-balance mb-4">
-              Tes statistiques ont besoin de contexte, pas d’une règle magique.
+              {bottom.title}
             </h2>
             <p className="text-cream/70 text-lg leading-relaxed mb-8">
-              L’Analyse Express lit ton compte TikTok, fait ressortir les signaux utiles et te donne un plan d’action clair.
+              {bottom.text}
             </p>
             <Button
               variant="hero"
               size="xl"
               asChild
               onClick={() =>
-                trackFunnelEvent(FUNNEL_EVENTS.expressCtaClick, {
+                trackFunnelEvent(cta === "video" ? FUNNEL_EVENTS.videoCtaClick : FUNNEL_EVENTS.expressCtaClick, {
                   source_page: path,
                   position: "bottom",
                   content_slug: slug,
                 })
               }
             >
-              <Link to="/analyse-express">
-                Analyser mon compte : {EXPRESS_PRICE_LABEL}
+              <Link to={bottom.href}>
+                {bottom.label}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
@@ -403,5 +452,46 @@ export function ExampleDataChart({
         Ce schéma illustre une méthode de lecture. Il ne représente ni un client, ni un seuil de performance TikTok.
       </p>
     </figure>
+  );
+}
+
+/** Appel à l'action vers l'Analyse vidéo, au fil d'un article. */
+export function InlineVideoCta({
+  sourcePage,
+  contentSlug,
+}: {
+  sourcePage: string;
+  contentSlug: string;
+}) {
+  return (
+    <aside className="my-10 rounded-2xl border border-primary/30 bg-primary/10 p-6 md:p-8" aria-label="Analyse vidéo">
+      <div className="flex flex-col md:flex-row md:items-center gap-6">
+        <div className="flex-1">
+          <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">Une vidéo précise à comprendre ?</p>
+          <h3 className="font-display text-2xl font-semibold mb-2">Fais analyser ta vidéo TikTok.</h3>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Accroche, structure, rétention et appel à l’action passés au crible, avec des recommandations concrètes pour la suivante.
+          </p>
+        </div>
+        <Button
+          variant="hero"
+          size="lg"
+          className="shrink-0"
+          asChild
+          onClick={() =>
+            trackFunnelEvent(FUNNEL_EVENTS.videoCtaClick, {
+              source_page: sourcePage,
+              position: "inline",
+              content_slug: contentSlug,
+            })
+          }
+        >
+          <Link to="/analyse-video">
+            Analyser ma vidéo : {VIDEO_ANALYSIS_PRICE_LABEL}
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        </Button>
+      </div>
+    </aside>
   );
 }

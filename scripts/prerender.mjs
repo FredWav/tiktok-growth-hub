@@ -275,12 +275,16 @@ function assertRenderedPage(route, body, document) {
   }
 }
 
+function assertNoNullBytes(routePath, document) {
+  if (document.includes("\u0000")) throw new Error(`[ssg] ${routePath} : caractère nul dans le HTML généré.`);
+}
+
 function generateSitemap() {
   const lastmod = new Date().toISOString().slice(0, 10);
   const urls = SSG_ROUTES.filter((route) => route.indexable && route.sitemap !== false)
     .map((route) => {
       const priority = typeof route.sitemap === "number" ? route.sitemap.toFixed(1) : "0.5";
-      return `  <url><loc>${absoluteUrl(route.path)}</loc><lastmod>${lastmod}</lastmod><priority>${priority}</priority></url>`;
+      return `  <url><loc>${absoluteUrl(route.path)}</loc><lastmod>${route.lastmod ?? lastmod}</lastmod><priority>${priority}</priority></url>`;
     })
     .join("\n");
 
@@ -355,6 +359,7 @@ for (const route of SSG_ROUTES) {
   const body = await renderRoute(route.path);
   const document = renderMarketingDocument(template, route, body);
   assertRenderedPage(route, body, document);
+  assertNoNullBytes(route.path, document);
   const destination = outputPath(route.path);
   await mkdir(path.dirname(destination), { recursive: true });
   await writeFile(destination, document, "utf8");

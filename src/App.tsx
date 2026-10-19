@@ -1,3 +1,4 @@
+import { ARTICLES, PUBLISHED_THEMES } from "./content/articles";
 import { lazy, Suspense, useEffect, type ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
@@ -91,7 +92,12 @@ const AdminProtectedOutlet = lazy(() =>
 
 const DevPdfPreview = import.meta.env.DEV ? lazy(() => import("./pages/dev/PdfPreview")) : null;
 
+const RessourceArticlePage = lazy(() => import("./pages/RessourceArticle"));
+const RessourceTheme = lazy(() => import("./pages/RessourceTheme"));
+
 const SSG_ROUTE_ELEMENTS: Record<string, ReactNode> = {
+  ...Object.fromEntries(ARTICLES.map((article) => [article.path, <RessourceArticlePage article={article} />])),
+  ...Object.fromEntries(PUBLISHED_THEMES.map((theme) => [`/ressources/${theme.slug}`, <RessourceTheme theme={theme} />])),
   "/": <Home />,
   "/wavacademy": <WavAcademy />,
   "/analyse-express": <AnalyseExpress />,

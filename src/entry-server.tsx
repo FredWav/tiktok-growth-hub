@@ -83,7 +83,10 @@ export async function renderRoute(url: string): Promise<string> {
               if (settled) return;
               settled = true;
               if (timeoutRef.current) clearTimeout(timeoutRef.current);
-              resolve(html);
+              // React 18.3 (flux Node) : quand un caractère sur plusieurs octets tombe à la
+              // limite de son tampon interne, les octets restés vides du tampon sont émis
+              // (caractères nuls). Ils ne sont jamais légitimes dans le HTML : on les retire.
+              resolve(html.split("\u0000").join(""));
             });
             pipe(destination);
           },

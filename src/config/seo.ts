@@ -27,6 +27,8 @@ import {
   type Offer,
 } from "./offers";
 import { HOOKS_FAQ } from "./hooks-faq";
+import { THEME_BY_SLUG } from "./themes";
+import { ARTICLES, LEGACY_RESOURCES, PUBLISHED_THEMES, resourcesOfTheme } from "@/content/articles";
 import { HOOKS_BUNDLE, HOOKS_LIBRARY, HOOKS_PACKS_OFFER } from "./hooks-offer";
 
 
@@ -53,6 +55,8 @@ export type RouteSeo = {
     links?: { href: string; label: string }[];
   };
   schema?: Record<string, unknown> | Record<string, unknown>[];
+  /** Date de dernière modification (AAAA-MM-JJ) pour le sitemap ; à défaut, la date du build. */
+  lastmod?: string;
   /** Priorité sitemap. `false` = hors sitemap (mais la route reste prerendue). */
   sitemap?: number | false;
   /** Résumé une ligne pour llms.txt. `false` = exclue du fichier. */
@@ -664,6 +668,80 @@ const ROUTES: RouteSeo[] = [
   },
 ];
 
+/** Fil des articles : Accueil › Ressources › Thème › Article. */
+function articleBreadcrumb(path: string, name: string, themeSlug: string) {
+  const theme = THEME_BY_SLUG[themeSlug];
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Accueil", item: `${BASE_URL}/` },
+      { "@type": "ListItem", position: 2, name: "Ressources", item: `${BASE_URL}/ressources` },
+      { "@type": "ListItem", position: 3, name: theme.name, item: `${BASE_URL}/ressources/${theme.slug}` },
+      { "@type": "ListItem", position: 4, name, item: `${BASE_URL}${path}` },
+    ],
+  };
+}
+
+// Guides historiques : date de mise à jour réelle dans le sitemap.
+for (const resource of LEGACY_RESOURCES) {
+  const route = ROUTES.find((r) => r.path === resource.path);
+  if (route) route.lastmod ??= resource.updated;
+}
+
+// Guides de thème (publiés dès qu'un thème a une ressource) et articles Markdown.
+for (const theme of PUBLISHED_THEMES) {
+  const path = `/ressources/${theme.slug}`;
+  const resources = resourcesOfTheme(theme.slug);
+  ROUTES.push({
+    path,
+    title: `${theme.title} | Fred Wav`,
+    description: theme.description,
+    lastmod: resources.map((r) => r.updated).sort().at(-1),
+    noscript: {
+      h1: theme.title,
+      body: theme.description,
+      links: resources.map((r) => ({ href: r.path, label: r.title })),
+    },
+    sitemap: 0.7,
+    llms: theme.description,
+    llmsSection: "ressources",
+  });
+}
+for (const article of ARTICLES) {
+  ROUTES.push({
+    path: article.path,
+    title: article.seoTitle,
+    description: article.description,
+    ogType: "article",
+    lastmod: article.updated,
+    noscript: {
+      h1: article.title,
+      body: article.introduction,
+      links: [{ href: `/ressources/${article.theme}`, label: THEME_BY_SLUG[article.theme].title }],
+    },
+    schema: [
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: article.title,
+        description: article.description,
+        image: OG_IMAGE,
+        author: { "@type": "Person", name: "Fred Wav", url: `${BASE_URL}/a-propos` },
+        publisher: { "@type": "Person", name: "Fred Wav", url: BASE_URL },
+        datePublished: article.published,
+        dateModified: article.updated,
+        mainEntityOfPage: `${BASE_URL}${article.path}`,
+        inLanguage: "fr-FR",
+      },
+      articleBreadcrumb(article.path, article.title, article.theme),
+    ],
+    sitemap: 0.6,
+    llms: article.description,
+    llmsSection: "ressources",
+  });
+}
+
 const ALLOWED_SCHEMA_TYPES = new Set(["Product", "Service", "Person", "Article", "BreadcrumbList"]);
 
 function routeKind(path: string): Exclude<RouteKind, "redirect"> {
@@ -677,7 +755,7 @@ function buildRouteSchema(route: RouteSeo, indexable: boolean): Record<string, u
   if (!indexable) return undefined;
 
   const nodes = route.schema ? (Array.isArray(route.schema) ? [...route.schema] : [route.schema]) : [];
-  if (route.path.startsWith("/ressources/")) {
+  if (route.path.startsWith("/ressources/") && !nodes.some((node) => node["@type"] === "BreadcrumbList")) {
     const name = route.title.split(/[:|]/)[0].trim();
     nodes.push(breadcrumbSchema(route.path, name));
   }

@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { seoFor } from "@/config/seo";
 import { EXPRESS_PRICE_LABEL } from "@/config/offers";
 import { FUNNEL_EVENTS, trackFunnelEvent } from "@/lib/funnel-events";
+import { ARTICLES, PUBLISHED_THEMES, resourcesOfTheme } from "@/content/articles";
 
 const priorityResources = [
   {
@@ -146,6 +147,44 @@ export default function Ressources() {
           ))}
         </div>
       </Section>
+
+      {PUBLISHED_THEMES.length > 0 && (
+        <Section variant="cream" size="lg">
+          <SectionHeader
+            title="Les guides par thème"
+            subtitle="Chaque guide rassemble les articles d’un même sujet et mène vers l’outil qui règle le problème."
+          />
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-6xl mx-auto">
+            {PUBLISHED_THEMES.map((theme) => (
+              <Link
+                key={theme.slug}
+                to={`/ressources/${theme.slug}`}
+                className="group rounded-2xl border border-border bg-background p-6 transition-all hover:border-primary/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              >
+                <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+                  {resourcesOfTheme(theme.slug).length} ressource{resourcesOfTheme(theme.slug).length > 1 ? "s" : ""}
+                </span>
+                <h2 className="font-display text-xl font-semibold mt-2 mb-2 group-hover:text-primary transition-colors">{theme.name}</h2>
+                <p className="text-sm text-muted-foreground leading-relaxed">{theme.description}</p>
+              </Link>
+            ))}
+          </div>
+          {ARTICLES.length > 0 && (
+            <div className="max-w-6xl mx-auto mt-12">
+              <h2 className="font-display text-2xl font-semibold mb-5">Derniers articles</h2>
+              <ul className="grid md:grid-cols-2 gap-x-10 gap-y-3">
+                {ARTICLES.slice(0, 10).map((article) => (
+                  <li key={article.path}>
+                    <Link to={article.path} className="inline-flex min-h-11 items-center text-foreground hover:text-primary underline-offset-4 hover:underline">
+                      {article.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </Section>
+      )}
 
       <Section variant="cream" size="lg">
         <div className="grid lg:grid-cols-[0.8fr_1.2fr] gap-10 lg:gap-16 items-start max-w-6xl mx-auto">

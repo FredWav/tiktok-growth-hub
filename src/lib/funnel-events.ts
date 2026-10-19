@@ -13,6 +13,7 @@ export const FUNNEL_EVENTS = {
   expressCheckoutStart: "express_checkout_start",
   expressPurchase: "express_purchase",
   expressResultView: "express_result_view",
+  videoCtaClick: "video_cta_click",
   videoPageView: "video_page_view",
   videoFormStarted: "video_form_started",
   videoCheckoutStart: "video_checkout_start",

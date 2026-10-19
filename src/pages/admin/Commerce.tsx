@@ -1,8 +1,8 @@
+import { AdminTabs, CLIENT_TABS } from "@/components/admin/AdminTabs";
 import { type FormEvent, useCallback, useEffect, useState } from "react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { commerceCall, commerceInput, money } from "@/lib/commerce";
-import { monthName, type Places } from "@/lib/places";
 import { OFFERS, priceLabel } from "@/config/offers";
 
 const OFFER_NAMES: Record<string, string> = { one_shot: "One Shot", academy: "Wav Academy", premium: "Wav Premium" };
@@ -44,7 +44,6 @@ type Snapshot = {
     subject: string;
     error: string;
   }[];
-  places: Places | null;
 };
 const stages: Record<string, string> = {
   received: "Reçue",
@@ -128,7 +127,8 @@ export default function Commerce() {
   return (
     <AdminLayout>
       <div className="space-y-8 text-cream max-w-6xl">
-        <h1 className="font-display text-3xl">Commandes et demandes</h1>
+        <h1 className="font-display text-3xl">Clients</h1>
+        <AdminTabs items={CLIENT_TABS} />
         <p>
           Nouvelle gamme uniquement. Les anciennes candidatures et inscriptions
           restent dans leurs espaces historiques. Les listes affichent les 200
@@ -251,44 +251,6 @@ export default function Commerce() {
             <Button disabled={busy} type="submit">
               Créer le lien personnel
             </Button>
-          </form>
-        </section>
-        <section>
-          <h2 className="text-2xl font-display mb-4">Places par mois</h2>
-          <div className="grid sm:grid-cols-3 gap-4 mb-4">
-            {(["one_shot", "academy", "premium"] as const).map((id) => (
-              <div key={id} className="border border-primary/20 rounded-xl p-4">
-                <h3 className="font-semibold mb-2">{OFFER_NAMES[id]}</h3>
-                {snapshot?.places?.[id]?.months.map((m) => (
-                  <p key={m.month}>
-                    {monthName(m.month)} : {m.capacity - m.remaining} prise{m.capacity - m.remaining > 1 ? "s" : ""} / {m.capacity}
-                  </p>
-                )) ?? <p>Indisponible</p>}
-              </div>
-            ))}
-          </div>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              const f = new FormData(e.currentTarget);
-              void act({ action: "capacity", offer: f.get("offer"), month: f.get("month"), capacity: Number(f.get("capacity")) });
-            }}
-            className="grid sm:grid-cols-4 gap-4 items-end"
-          >
-            <label>
-              Offre<select name="offer" className={commerceInput}>
-                <option value="one_shot">One Shot</option>
-                <option value="academy">Wav Academy</option>
-                <option value="premium">Wav Premium</option>
-              </select>
-            </label>
-            <label>
-              Mois<input name="month" type="month" required className={commerceInput} />
-            </label>
-            <label>
-              Places ce mois-là<input name="capacity" type="number" min="0" max="100" required className={commerceInput} />
-            </label>
-            <Button disabled={busy} type="submit">Modifier la capacité</Button>
           </form>
         </section>
         <section>

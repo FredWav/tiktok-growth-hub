@@ -1,3 +1,4 @@
+import { AdminTabs, CONTENT_TABS } from "@/components/admin/AdminTabs";
 import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
@@ -93,7 +94,8 @@ const DeepLinks = () => {
   return (
     <AdminLayout>
       <div className="space-y-8">
-        <h1 className="font-display text-3xl text-primary">Deep Links YouTube</h1>
+        <h1 className="font-display text-3xl text-primary">Liens de campagne</h1>
+        <AdminTabs items={CONTENT_TABS} />
 
         {/* Create form */}
         <form onSubmit={handleCreate} className="bg-noir-light border border-primary/20 rounded-xl p-6 space-y-4">

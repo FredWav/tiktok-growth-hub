@@ -1,18 +1,18 @@
 import { useState } from "react";
 import { Play } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
-import { VIDEO_META } from "@/data/videoTestimonials";
+import { forOffer, type Temoignage, useTemoignages, videoLegend, withVideo } from "@/lib/temoignages";
 
 interface VideoCardProps {
   id: string;
   alt: string;
   location?: string;
+  /** Légende (nom, niche, résultat) ; absente pour une personne non nommée. */
+  legend?: { name: string; sub: string } | null;
 }
 
-export function VideoCard({ id, alt, location = "home" }: VideoCardProps) {
+export function VideoCard({ id, alt, location = "home", legend }: VideoCardProps) {
   const [playing, setPlaying] = useState(false);
-  const meta = VIDEO_META[id];
-  const sub = meta ? [meta.niche, meta.result].filter(Boolean).join(" · ") : "";
 
   if (playing) {
     return (
@@ -44,12 +44,35 @@ export function VideoCard({ id, alt, location = "home" }: VideoCardProps) {
           <Play className="h-6 w-6 text-primary-foreground ml-0.5" fill="currentColor" />
         </div>
       </div>
-      {meta?.name && (
+      {legend && (
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/85 to-transparent p-3 text-left pointer-events-none">
-          <p className="text-white text-sm font-semibold leading-tight">{meta.name}</p>
-          {sub && <p className="text-white/85 text-xs mt-0.5">{sub}</p>}
+          <p className="text-white text-sm font-semibold leading-tight">{legend.name}</p>
+          {legend.sub && <p className="text-white/85 text-xs mt-0.5">{legend.sub}</p>}
         </div>
       )}
     </button>
+  );
+}
+
+const altOf = (t: Temoignage) => (t.anonymous ? "Témoignage vidéo d'un client de Fred Wav" : `Témoignage vidéo de ${t.name}`);
+
+/** Témoignages vidéo des fiches de l'admin ; `featured` : seulement ceux mis en avant sur l'accueil. */
+export function VideoTestimonials({ featured = false, offer, limit, location, className = "" }: {
+  featured?: boolean;
+  /** Page d'offre : les vidéos des clients de cette offre d'abord. */
+  offer?: string;
+  limit?: number;
+  location: string;
+  className?: string;
+}) {
+  const all = useTemoignages().filter((t) => withVideo(t) && (!featured || t.featured));
+  const videos = forOffer(all, offer, limit ?? all.length);
+  if (!videos.length) return null;
+  return (
+    <div className={className}>
+      {videos.map((t) => (
+        <VideoCard key={t.id} id={t.youtube_id!} alt={altOf(t)} legend={videoLegend(t)} location={location} />
+      ))}
+    </div>
   );
 }

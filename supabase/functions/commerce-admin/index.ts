@@ -10,7 +10,8 @@ import {
   uuid,
 } from "../_shared/commerce.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0?target=deno";
-import { getStripeSecretKey } from "../_shared/stripe-config.ts";
+import { getStripeMode, getStripeSecretKey } from "../_shared/stripe-config.ts";
+import { salesEnabled } from "../_shared/commerce-checkout.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers });
@@ -27,6 +28,64 @@ Deno.serve(async (req) => {
       const { data, error } = await client.rpc("commerce_revenue");
       if (error) throw error;
       return json(data);
+    }
+    if (b.action === "overview") {
+      const { data, error } = await client.rpc("admin_overview");
+      if (error) throw error;
+      return json(data);
+    }
+    if (b.action === "status") {
+      // État réellement vérifié : présence des réglages (jamais leur valeur, sauf
+      // les réglages publics comme le mode Stripe ou l'adresse du site).
+      const has = (name: string) => !!Deno.env.get(name);
+      const live = getStripeMode() === "live";
+      const suffix = live ? "LIVE" : "TEST";
+      const [cron, lastEvent, failedEvents, lastMail, failedMail] = await Promise.all([
+        client.rpc("admin_cron_status"),
+        client.from("stripe_events").select("received_at,type").order("received_at", { ascending: false }).limit(1).maybeSingle(),
+        client.from("stripe_events").select("id", { count: "exact", head: true }).is("processed_at", null)
+          .lt("received_at", new Date(Date.now() - 3600000).toISOString()),
+        client.from("commerce_mail").select("sent_at").eq("state", "sent").order("sent_at", { ascending: false }).limit(1).maybeSingle(),
+        client.from("commerce_mail").select("id", { count: "exact", head: true }).eq("state", "failed"),
+      ]);
+      const check = (label: string, ok: boolean, detail?: string | null) => ({ label, ok, detail: detail ?? null });
+      type CronJob = { name: string; schedule: string; active: boolean; last_status: string | null; last_start: string | null };
+      return json({
+        groups: [
+          { title: "Paiements Stripe", checks: [
+            check("Mode", true, live ? "Réel (live)" : "Test"),
+            check("Clé Stripe", has(live ? "STRIPE_SECRET_KEY" : "STRIPE_SECRET_KEY_TEST") || has("STRIPE_SECRET_KEY")),
+            check("Secret du webhook", has(live ? "STRIPE_WEBHOOK_SECRET" : "STRIPE_WEBHOOK_SECRET_TEST")),
+            check("Lien et prix Analyse Express", has(`STRIPE_EXPRESS_PAYMENT_LINK_${suffix}`) && has(`STRIPE_EXPRESS_PRICE_ID_${suffix}`)),
+            check("Lien et produit Analyse vidéo", has(`STRIPE_VIDEO_PAYMENT_LINK_${suffix}`) && has(`STRIPE_VIDEO_PRODUCT_ID_${suffix}`)),
+            check("Ventes d'accompagnements ouvertes", salesEnabled()),
+            check("Dernier événement Stripe reçu", !!lastEvent.data,
+              lastEvent.data ? `${lastEvent.data.type}, ${lastEvent.data.received_at}` : "aucun"),
+            check("Événements Stripe en échec depuis plus d'une heure", (failedEvents.count ?? 0) === 0, String(failedEvents.count ?? 0)),
+          ] },
+          { title: "E-mails", checks: [
+            check("Mot de passe SMTP (noreply@fredwav.com)", has("SMTP_PASSWORD")),
+            check("Dernier e-mail envoyé", !!lastMail.data, lastMail.data?.sent_at ?? "aucun"),
+            check("E-mails en échec", (failedMail.count ?? 0) === 0, String(failedMail.count ?? 0)),
+          ] },
+          { title: "Analyses", checks: [check("Clé API WavStats", has("WAVSTATS_API_KEY"))] },
+          { title: "Wav Academy (Discord)", checks: [
+            check("Bot Discord", has("DISCORD_BOT_TOKEN") && has("DISCORD_GUILD_ID")),
+            check("Connexion Discord (OAuth)", has("DISCORD_CLIENT_ID") && has("DISCORD_CLIENT_SECRET") && has("DISCORD_OAUTH_REDIRECT_URI")),
+            check("Rôle des membres", has("DISCORD_VIP2_ROLE_ID")),
+          ] },
+          { title: "Tâches planifiées", checks: [
+            check("Secret des tâches planifiées", has("RECONCILE_CRON_SECRET")),
+            ...((cron.data ?? []) as CronJob[]).map((j) =>
+              check(`${j.name} (${j.schedule})`, j.active && j.last_status === "succeeded",
+                j.last_start ? `${j.last_status}, ${j.last_start}` : "jamais exécutée")),
+          ] },
+          { title: "Site", checks: [
+            check("Adresse du site", has("SITE_URL"), Deno.env.get("SITE_URL") ?? "https://fredwav.com (par défaut)"),
+            check("Clé d'empreinte des consentements", has("CONSENT_FINGERPRINT_KEY")),
+          ] },
+        ],
+      });
     }
     if (b.action === "list") {
       const results = await Promise.all([

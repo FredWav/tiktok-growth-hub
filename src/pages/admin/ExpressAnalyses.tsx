@@ -25,6 +25,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { normalizeTikTokUsername } from "@/lib/tiktok-username";
 import { useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
+import { expressIncident, videoIncident } from "@/lib/analysis-incidents";
 import { canRetryExpress, isExpressActive, isExpressComplete } from "../../../supabase/functions/_shared/express-state";
 
 const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
@@ -49,10 +50,13 @@ const videoStatusConfig: Record<string, { label: string; variant: "default" | "s
   refunded: { label: "Remboursée", variant: "outline" },
 };
 
-type TypeFilter = "all" | "account" | "video";
+type TypeFilter = "incidents" | "all" | "account" | "video";
 type Row =
   | { kind: "account"; date: string; analysis: ExpressAnalysis }
   | { kind: "video"; date: string; video: VideoAnalysis };
+
+/** Raison pour laquelle une analyse est à vérifier (null si tout va bien). */
+const incidentOf = (row: Row) => row.kind === "account" ? expressIncident(row.analysis) : videoIncident(row.video);
 
 /** « @compte » quand le lien est complet, sinon le lien court tel quel. */
 function videoLabel(url: string): string {
@@ -269,8 +273,14 @@ const ExpressAnalyses = () => {
       ...(typeFilter === "video" ? [] : (analyses ?? []).map((analysis): Row => ({ kind: "account", date: analysis.created_at, analysis }))),
       ...(typeFilter === "account" ? [] : (videoData?.rows ?? []).map((video): Row => ({ kind: "video", date: video.created_at, video }))),
     ];
-    return merged.sort((a, b) => b.date.localeCompare(a.date));
+    const visible = typeFilter === "incidents" ? merged.filter((row) => incidentOf(row)) : merged;
+    return visible.sort((a, b) => b.date.localeCompare(a.date));
   }, [analyses, videoData, typeFilter]);
+
+  const incidentCount = useMemo(
+    () => (analyses ?? []).filter((a) => expressIncident(a)).length + (videoData?.rows ?? []).filter((v) => videoIncident(v)).length,
+    [analyses, videoData],
+  );
 
   const stats = useMemo(() => {
     if (!analyses) return null;
@@ -323,8 +333,8 @@ const ExpressAnalyses = () => {
           <p role="alert" className="text-amber-300 text-sm">Impossible de charger les analyses vidéo. Les analyses de compte restent affichées.</p>
         )}
 
-        <div className="flex gap-2">
-          {([["all", "Tout"], ["account", "Comptes"], ["video", "Vidéos"]] as const).map(([value, label]) => (
+        <div className="flex flex-wrap gap-2">
+          {([["incidents", `À vérifier (${incidentCount})`], ["all", "Tout"], ["account", "Comptes"], ["video", "Vidéos"]] as const).map(([value, label]) => (
             <Button key={value} size="sm" variant={typeFilter === value ? "default" : "outline"} onClick={() => setTypeFilter(value)}>
               {label}
             </Button>
@@ -432,6 +442,7 @@ const ExpressAnalyses = () => {
                         ) : (
                           <Badge variant={config.variant}>{config.label}</Badge>
                         )}
+                        <IncidentNote reason={expressIncident(analysis)} />
                       </TableCell>
                       <TableCell className="text-cream/80">
                         {analysis.health_score != null ? `${analysis.health_score}/100` : "-"}
@@ -483,6 +494,11 @@ const ExpressAnalyses = () => {
   );
 };
 
+/** Raison affichée sous le statut d'une analyse à vérifier. */
+function IncidentNote({ reason }: { reason: string | null }) {
+  return reason ? <p className="mt-1 text-xs font-medium text-red-300">À vérifier : {reason}</p> : null;
+}
+
 function VideoRowView({ video, copiedEmail, onCopyEmail }: {
   video: VideoAnalysis;
   copiedEmail: string | null;
@@ -518,6 +534,7 @@ function VideoRowView({ video, copiedEmail, onCopyEmail }: {
       </TableCell>
       <TableCell>
         <Badge variant={config.variant}>{config.label}</Badge>
+        <IncidentNote reason={videoIncident(video)} />
         {(video.report_viewed_at || video.pdf_downloaded_at) && (
           <p className="mt-1 text-xs text-cream/50">
             {[video.report_viewed_at && "Rapport ouvert", video.pdf_downloaded_at && "PDF téléchargé"].filter(Boolean).join(" · ")}

@@ -944,34 +944,61 @@ export type Database = {
       }
       trusted_clients: {
         Row: {
+          anonymous: boolean
           avatar_url: string | null
           created_at: string
           display_order: number
+          featured: boolean
           id: string
           is_active: boolean
+          metric: string | null
           name: string
+          niche: string | null
           offers: string[]
+          result: string | null
+          result_detail: string | null
           tiktok_url: string | null
+          updated_at: string
+          video_caption: string | null
+          youtube_id: string | null
         }
         Insert: {
+          anonymous?: boolean
           avatar_url?: string | null
           created_at?: string
           display_order?: number
+          featured?: boolean
           id?: string
           is_active?: boolean
+          metric?: string | null
           name: string
+          niche?: string | null
           offers?: string[]
+          result?: string | null
+          result_detail?: string | null
           tiktok_url?: string | null
+          updated_at?: string
+          video_caption?: string | null
+          youtube_id?: string | null
         }
         Update: {
+          anonymous?: boolean
           avatar_url?: string | null
           created_at?: string
           display_order?: number
+          featured?: boolean
           id?: string
           is_active?: boolean
+          metric?: string | null
           name?: string
+          niche?: string | null
           offers?: string[]
+          result?: string | null
+          result_detail?: string | null
           tiktok_url?: string | null
+          updated_at?: string
+          video_caption?: string | null
+          youtube_id?: string | null
         }
         Relationships: []
       }
@@ -1455,6 +1482,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_cron_status: { Args: never; Returns: Json }
+      admin_overview: { Args: never; Returns: Json }
       call_cron_function: { Args: { p_function: string }; Returns: number }
       commerce_academy_start: { Args: { v: Json }; Returns: Json }
       commerce_accept: {
@@ -1556,6 +1585,10 @@ export type Database = {
       }
       commerce_revenue: { Args: never; Returns: Json }
       commerce_submit_application: { Args: { v: Json }; Returns: string }
+      express_is_paid: {
+        Args: { ea: Database["public"]["Tables"]["express_analyses"]["Row"] }
+        Returns: boolean
+      }
       express_paid_since: { Args: never; Returns: number }
       get_express_analysis_by_session: {
         Args: { p_session_id: string }

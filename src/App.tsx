@@ -11,7 +11,6 @@ import { capturePageview } from "@/lib/posthog";
 import { captureUtmParams, syncAttributionToPostHog } from "@/lib/tracking";
 import { CLIENT_ONLY_ROUTES, LEGACY_REDIRECTS, SSG_ROUTES, manifestRouteForPath } from "@/config/routes";
 import type { ClientBoundary } from "@/config/seo";
-import { DiagnosticProvider } from "./contexts/DiagnosticContext";
 
 function PostHogPageTracker() {
   const location = useLocation();
@@ -64,8 +63,6 @@ const AnalyseVideoRapport = lazy(() => import("./pages/AnalyseVideoRapport"));
 const WavPremium = lazy(() => import("./pages/WavPremium"));
 const Enrollment = lazy(() => import("./pages/Enrollment"));
 const AdminCommerce = lazy(() => import("./pages/admin/Commerce"));
-const DiagnosticProcessing = lazy(() => import("./pages/DiagnosticProcessing"));
-const DiagnosticResult = lazy(() => import("./pages/DiagnosticResult"));
 const HooksTikTok = lazy(() => import("./pages/HooksTikTok"));
 const WavAcademy = lazy(() => import("./pages/WavAcademy"));
 const Claim = lazy(() => import("./pages/Claim"));
@@ -77,6 +74,8 @@ const RessourceRetentionTikTok = lazy(() => import("./pages/RessourceRetentionTi
 const Retractation = lazy(() => import("./pages/Retractation"));
 
 const AdminSettings = lazy(() => import("./pages/admin/Settings"));
+const AdminOverview = lazy(() => import("./pages/admin/Overview"));
+const AdminOffersPlaces = lazy(() => import("./pages/admin/OffersPlaces"));
 const AdminExpressAnalyses = lazy(() => import("./pages/admin/ExpressAnalyses"));
 const AdminApplications = lazy(() => import("./pages/admin/Applications"));
 const AdminMarketing = lazy(() => import("./pages/admin/Marketing"));
@@ -120,22 +119,29 @@ const CSR_ROUTE_ELEMENTS: Record<string, ReactNode> = {
   "/wavacademy/inscription": <AcademyInscription />,
   "/wavacademy/merci": <AcademyMerci />,
   "/inscription/:token": <Enrollment />,
-  "/admin/commandes": <AdminCommerce />,
   "/auth": <Auth />,
   "/auth/reset-password": <ResetPassword />,
-  "/admin": <Navigate to="/admin/marketing" replace />,
-  "/admin/settings": <AdminSettings />,
+  "/admin": <AdminOverview />,
   "/admin/analyses": <AdminExpressAnalyses />,
-  "/admin/applications": <AdminApplications />,
-  "/admin/marketing": <AdminMarketing />,
-  "/admin/deep-links": <AdminDeepLinks />,
-  "/admin/testimonials": <AdminTestimonials />,
-  "/admin/wavacademy-consents": <AdminWavAcademyConsents />,
+  "/admin/clients": <AdminCommerce />,
+  "/admin/clients/historique": <AdminApplications />,
+  "/admin/clients/consentements": <AdminWavAcademyConsents />,
+  "/admin/contenus": <AdminTestimonials />,
+  "/admin/contenus/offres": <AdminOffersPlaces />,
+  "/admin/contenus/liens": <AdminDeepLinks />,
+  "/admin/statistiques": <AdminMarketing />,
+  "/admin/parametres": <AdminSettings />,
+  // Anciennes adresses de l'admin.
+  "/admin/commandes": <Navigate to="/admin/clients" replace />,
+  "/admin/applications": <Navigate to="/admin/clients/historique" replace />,
+  "/admin/wavacademy-consents": <Navigate to="/admin/clients/consentements" replace />,
+  "/admin/testimonials": <Navigate to="/admin/contenus" replace />,
+  "/admin/deep-links": <Navigate to="/admin/contenus/liens" replace />,
+  "/admin/marketing": <Navigate to="/admin/statistiques" replace />,
+  "/admin/settings": <Navigate to="/admin/parametres" replace />,
   "/analyse-express/result": <AnalyseExpressResult />,
   "/analyse-video/merci": <AnalyseVideoMerci />,
   "/analyse-video/rapport": <AnalyseVideoRapport />,
-  "/processing": <DiagnosticProcessing />,
-  "/result": <DiagnosticResult />,
   "/claim/error": <Claim />,
   "/claim/:token": <Claim />,
   "/go/:slug": <GoRedirect />,
@@ -209,7 +215,7 @@ export function AppRouterContent() {
       <CookieConsent />
       <ScrollToTop />
       <PostHogPageTracker />
-      <DiagnosticProvider>
+      <>
         <Suspense fallback={null}>
           <Routes>
               {SSG_ROUTES.map((route) => {
@@ -242,7 +248,7 @@ export function AppRouterContent() {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
-      </DiagnosticProvider>
+      </>
     </>
   );
 }

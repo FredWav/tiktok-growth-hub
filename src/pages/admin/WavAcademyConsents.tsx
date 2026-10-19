@@ -1,3 +1,4 @@
+import { AdminTabs, CLIENT_TABS } from "@/components/admin/AdminTabs";
 import { useState, useMemo } from "react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { useWavAcademyConsents, WavAcademyConsent } from "@/hooks/useWavAcademyConsents";
@@ -105,8 +106,9 @@ const WavAcademyConsents = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
+        <AdminTabs items={CLIENT_TABS} />
         <div className="flex items-center justify-between flex-wrap gap-3">
-          <h1 className="font-display text-3xl text-primary">Consentements Wav Academy</h1>
+          <h1 className="font-display text-3xl text-primary">Consentements Wav Academy (archive)</h1>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"

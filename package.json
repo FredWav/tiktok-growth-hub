@@ -8,7 +8,7 @@
     "test:commerce:database": "node --test tests/commerce-database.test.mjs",
     "test:prerender": "node --test tests/prerender.test.mjs",
     "dev": "vite",
-    "build": "npm run build:client && npm run build:ssr && npm run build:prerender",
+    "build": "node scripts/export-temoignages.mjs && npm run build:client && npm run build:ssr && npm run build:prerender",
     "build:client": "vite build",
     "build:ssr": "vite build --ssr src/entry-server.tsx --outDir dist-ssr --emptyOutDir",
     "build:prerender": "node scripts/prerender.mjs",

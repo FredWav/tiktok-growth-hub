@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { useTrustedClients } from "@/hooks/useTrustedClients";
-import { CLIENT_RESULTS, type ClientResult } from "@/data/clientResults";
+import { forOffer, type Temoignage, useTemoignages, withResult } from "@/lib/temoignages";
 
 function initialsOf(name: string) {
   const parts = name.trim().split(/\s+/);
@@ -12,16 +11,9 @@ function initialsOf(name: string) {
     .toUpperCase();
 }
 
-export function ClientResultCard({
-  result,
-  avatarUrl,
-}: {
-  result: ClientResult;
-  avatarUrl?: string | null;
-}) {
-  // Priorité : avatar trusted_clients, puis photo locale (result.avatarUrl), puis initiales.
-  const src = avatarUrl ?? result.avatarUrl ?? null;
+export function ClientResultCard({ result }: { result: Temoignage }) {
   const [imgFailed, setImgFailed] = useState(false);
+  const src = result.avatar_url;
   return (
     <div className="rounded-2xl bg-background border border-border shadow-sm p-6 flex flex-col h-full">
       <div className="flex items-center gap-3 mb-4">
@@ -48,27 +40,24 @@ export function ClientResultCard({
         <span className="font-display text-xl font-bold text-primary whitespace-nowrap">{result.metric}</span>
         <div className="min-w-0">
           <p className="text-sm font-semibold text-foreground leading-snug">{result.result}</p>
-          {result.detail && <p className="text-xs text-muted-foreground mt-0.5">{result.detail}</p>}
+          {result.result_detail && <p className="text-xs text-muted-foreground mt-0.5">{result.result_detail}</p>}
         </div>
       </div>
     </div>
   );
 }
 
-export function ClientResults({ className = "", limit }: { className?: string; limit?: number }) {
-  const { data: clients } = useTrustedClients();
-  const avatarFor = (r: ClientResult) =>
-    clients?.find(
-      (c) => c.name.trim().toLowerCase() === (r.avatarName ?? r.name).trim().toLowerCase()
-    )?.avatar_url ?? null;
-
-  const items = limit ? CLIENT_RESULTS.slice(0, limit) : CLIENT_RESULTS;
+/** Résultats chiffrés des fiches de témoignage (admin : Site et contenus). */
+export function ClientResults({ className = "", limit, offer }: { className?: string; limit?: number; offer?: string }) {
+  const results = useTemoignages().filter(withResult);
+  const items = forOffer(results, offer, limit ?? results.length);
+  if (!items.length) return null;
 
   return (
     <div className={`grid sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto ${className}`}>
       <p className="sm:col-span-2 lg:col-span-3 text-sm text-muted-foreground">Résultats historiques d’accompagnements avec Fred. Leurs modalités peuvent différer des programmes actuels ; ils ne garantissent pas tes résultats.</p>
       {items.map((r) => (
-        <ClientResultCard key={r.name} result={r} avatarUrl={avatarFor(r)} />
+        <ClientResultCard key={r.id} result={r} />
       ))}
     </div>
   );

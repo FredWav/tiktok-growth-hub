@@ -8,24 +8,7 @@ import { SEOHead } from "@/components/SEOHead";
 import { seoFor } from "@/config/seo";
 import { ScreenshotWall } from "@/components/ScreenshotWall";
 import { ClientResults } from "@/components/ClientResults";
-import { VideoCard } from "@/components/VideoCard";
-
-// Les légendes (nom + niche + résultat) viennent de src/data/videoTestimonials.ts,
-// indexées par ID YouTube. Une vidéo sans fiche reste affichée sans légende.
-const videoTestimonials = [
-  { id: "LOi7RTx12nE", alt: "Témoignage client - Retour d'expérience récent" },
-  { id: "Hgkn3ifjSS0", alt: "Témoignage client - Retour d'expérience récent" },
-  { id: "Bzw7nwqB2rQ", alt: "Témoignage client - Nouveau retour d'expérience" },
-  { id: "XMMmmLLKue4", alt: "Témoignage client - Nouveau retour d'expérience" },
-  { id: "Jh5yrsotoHM", alt: "Témoignage client - Retour d'expérience récent" },
-  { id: "p3nCwuBZRGI", alt: "Témoignage client - Nouveau retour d'expérience" },
-  { id: "g9QYqO-xiqw", alt: "Témoignage client - Retour d'expérience Wav Premium" },
-  { id: "cc1cRfCEJGE", alt: "Témoignage client - Résultats après coaching stratégie de contenu" },
-  { id: "hwTyjA6BORY", alt: "Témoignage client - Transformation de présence en ligne" },
-  { id: "FrMFqiAqAkU", alt: "Témoignage client - impact sur la stratégie de contenu" },
-  { id: "s-VaJvfFqbM", alt: "Témoignage client - Croissance après accompagnement" },
-  { id: "wu2CPcqp-yU", alt: "Témoignage client - Avis sur le Wav Premium de Fred Wav" },
-];
+import { VideoTestimonials } from "@/components/VideoCard";
 
 export default function Temoignages() {
   return (
@@ -59,11 +42,7 @@ export default function Temoignages() {
           subtitle="Des retours authentiques, face caméra."
         />
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {videoTestimonials.map((video) => (
-            <VideoCard key={video.id} id={video.id} alt={video.alt} location="temoignages" />
-          ))}
-        </div>
+        <VideoTestimonials location="temoignages" className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto" />
       </Section>
 
       {/* Screenshot Wall */}

@@ -1,80 +1,61 @@
-import React from "react";
+import { useCallback, useEffect, useState } from "react";
+import { CheckCircle2, XCircle } from "lucide-react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, Save } from "lucide-react";
+import { commerceCall } from "@/lib/commerce";
 
-const Settings: React.FC = () => {
+type Status = { groups: { title: string; checks: { label: string; ok: boolean; detail: string | null }[] }[] };
+
+/**
+ * État réellement vérifié par le serveur : réglages présents (jamais leur valeur),
+ * dernier paiement reçu, dernier e-mail envoyé, tâches planifiées.
+ */
+export default function Settings() {
+  const [status, setStatus] = useState<Status | null>(null);
+  const [error, setError] = useState("");
+  const load = useCallback(async () => {
+    setError("");
+    try {
+      setStatus(await commerceCall<Status>("commerce-admin", { action: "status" }));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Lecture impossible");
+    }
+  }, []);
+  useEffect(() => {
+    void load();
+  }, [load]);
+
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="font-display text-3xl text-cream">Paramètres</h1>
-          <p className="text-cream/60 mt-1">Configurez votre espace de travail</p>
+      <div className="space-y-8 text-cream max-w-4xl">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="font-display text-3xl">Paramètres</h1>
+          <Button variant="outline" onClick={() => void load()}>Vérifier à nouveau</Button>
         </div>
-
-        {/* Availability section */}
-        <Card className="bg-noir-light border-primary/20 p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <Calendar className="h-5 w-5 text-primary" />
-            <h2 className="font-display text-xl text-cream">Disponibilités</h2>
-          </div>
-          
-          <p className="text-cream/60 text-sm mb-4">
-            Définissez vos créneaux de disponibilité pour les rendez-vous
-          </p>
-
-          <div className="space-y-4">
-            {["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"].map((day) => (
-              <div
-                key={day}
-                className="flex items-center justify-between py-3 border-b border-primary/10 last:border-0"
-              >
-                <span className="text-cream">{day}</span>
-                <div className="flex items-center gap-2 text-cream/60">
-                  <Clock className="h-4 w-4" />
-                  <span className="text-sm">Non configuré</span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <Button variant="outline" className="mt-6">
-            <Save className="h-4 w-4 mr-2" />
-            Configurer les créneaux
-          </Button>
-        </Card>
-
-        {/* Integrations section */}
-        <Card className="bg-noir-light border-primary/20 p-6">
-          <h2 className="font-display text-xl text-cream mb-4">Intégrations</h2>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between py-3 border-b border-primary/10">
-              <div>
-                <p className="text-cream">Stripe</p>
-                <p className="text-cream/60 text-sm">Paiements en ligne</p>
-              </div>
-              <span className="text-cream/40 text-sm">Non connecté</span>
-            </div>
-            <div className="flex items-center justify-between py-3 border-b border-primary/10">
-              <div>
-                <p className="text-cream">Google Calendar</p>
-                <p className="text-cream/60 text-sm">Synchronisation des RDV</p>
-              </div>
-              <span className="text-cream/40 text-sm">Non connecté</span>
-            </div>
-            <div className="flex items-center justify-between py-3">
-              <div>
-                <p className="text-cream">OVH Mail</p>
-                <p className="text-cream/60 text-sm">Envoi d'emails (SMTP)</p>
-              </div>
-              <span className="text-cream/40 text-sm">Non connecté</span>
-            </div>
-          </div>
-        </Card>
+        <p className="text-cream/70">
+          Chaque ligne est vérifiée par le serveur à l'instant. Les clés secrètes se saisissent dans Supabase, jamais ici.
+        </p>
+        {error && <p role="alert" className="text-red-300">{error}</p>}
+        {!status && !error && <p role="status">Vérification en cours…</p>}
+        {status?.groups.map((group) => (
+          <section key={group.title} className="rounded-xl border border-primary/20 p-5">
+            <h2 className="font-display text-xl mb-3">{group.title}</h2>
+            <ul className="space-y-2">
+              {group.checks.map((c) => (
+                <li key={c.label} className="flex items-start gap-3">
+                  {c.ok
+                    ? <CheckCircle2 className="h-5 w-5 shrink-0 text-green-400" aria-label="Vérifié" />
+                    : <XCircle className="h-5 w-5 shrink-0 text-red-400" aria-label="À régler" />}
+                  <span>
+                    {c.label}
+                    {c.detail && <span className="text-cream/60"> · {c.detail}</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
       </div>
     </AdminLayout>
   );
-};
-
-export default Settings;
+}

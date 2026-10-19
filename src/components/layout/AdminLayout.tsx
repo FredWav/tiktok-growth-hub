@@ -8,11 +8,10 @@ import {
   Menu,
   X,
   Zap,
-  ClipboardList,
+  LayoutDashboard,
+  Users,
+  FileText,
   BarChart3,
-  Star,
-  ShieldCheck,
-  Link as LinkIcon,
 } from "lucide-react";
 import { useState } from "react";
 import { AdminChatbot } from "@/components/admin/AdminChatbot";
@@ -21,15 +20,14 @@ interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
+// Menu organisé par tâche ; chaque rubrique regroupe ses sous-pages (onglets).
 const navItems = [
-  { label: "Commandes & demandes", href: "/admin/commandes", icon: ClipboardList },
+  { label: "Vue d'ensemble", href: "/admin", icon: LayoutDashboard },
   { label: "Analyses", href: "/admin/analyses", icon: Zap },
-  { label: "Candidatures", href: "/admin/applications", icon: ClipboardList },
-  { label: "Marketing", href: "/admin/marketing", icon: BarChart3 },
-  { label: "Deep Links", href: "/admin/deep-links", icon: LinkIcon },
-  { label: "Témoignages", href: "/admin/testimonials", icon: Star },
-  { label: "Consentements WA", href: "/admin/wavacademy-consents", icon: ShieldCheck },
-  { label: "Paramètres", href: "/admin/settings", icon: Settings },
+  { label: "Clients", href: "/admin/clients", icon: Users },
+  { label: "Site et contenus", href: "/admin/contenus", icon: FileText },
+  { label: "Statistiques", href: "/admin/statistiques", icon: BarChart3 },
+  { label: "Paramètres", href: "/admin/parametres", icon: Settings },
 ];
 
 export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
@@ -47,7 +45,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     <div className="min-h-screen bg-noir">
       {/* Mobile header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-noir-light border-b border-primary/20 z-50 flex items-center justify-between px-4">
-        <h1 className="font-display text-xl text-primary">Admin</h1>
+        <p className="font-display text-xl text-primary">Admin</p>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="text-cream p-2"
@@ -65,13 +63,15 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         `}
       >
         <div className="p-6">
-          <h1 className="font-display text-2xl text-primary">Admin Panel</h1>
+          <p className="font-display text-2xl text-primary">Admin Fred Wav</p>
           <p className="text-cream/60 text-sm mt-1 truncate">{user?.email}</p>
         </div>
 
         <nav className="px-4 space-y-1">
           {navItems.map((item) => {
-            const isActive = location.pathname === item.href;
+            const isActive = item.href === "/admin"
+              ? location.pathname === "/admin"
+              : location.pathname.startsWith(item.href);
             const Icon = item.icon;
             return (
               <Link

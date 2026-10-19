@@ -1,3 +1,4 @@
+import { AdminTabs, CONTENT_TABS } from "@/components/admin/AdminTabs";
 import { useState } from "react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { useAllTrustedClients, useCreateTrustedClient, useUpdateTrustedClient, useDeleteTrustedClient, TrustedClient } from "@/hooks/useTrustedClients";
@@ -15,10 +16,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { AdminScreenshots } from "@/components/admin/AdminScreenshots";
 
 const OFFER_OPTIONS = [
+  { value: "one_shot", label: "One Shot" },
+  { value: "academy", label: "Wav Academy" },
   { value: "premium", label: "Wav Premium" },
-  { value: "diagnostic", label: "Diagnostic" },
   { value: "express", label: "Analyse Express" },
-  { value: "one_shot", label: "One Shot (archivé)" },
+  { value: "video", label: "Analyse vidéo" },
 ];
 
 const emptyForm = {
@@ -28,7 +30,25 @@ const emptyForm = {
   offers: [] as string[],
   display_order: 0,
   is_active: true,
+  niche: "",
+  metric: "",
+  result: "",
+  result_detail: "",
+  youtube: "",
+  video_caption: "",
+  featured: false,
+  anonymous: false,
 };
+
+/** Identifiant YouTube depuis un lien (watch, youtu.be, shorts) ou l'identifiant seul. */
+function youtubeIdOf(value: string): string | null {
+  const v = value.trim();
+  if (!v) return null;
+  if (/^[A-Za-z0-9_-]{11}$/.test(v)) return v;
+  const m = v.match(/(?:youtu\.be\/|v=|shorts\/|embed\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+const blank = (v: string) => (v.trim() ? v.trim() : null);
 
 const Testimonials = () => {
   const { data: clients, isLoading } = useAllTrustedClients();
@@ -56,6 +76,14 @@ const Testimonials = () => {
       offers: c.offers || [],
       display_order: c.display_order,
       is_active: c.is_active,
+      niche: c.niche || "",
+      metric: c.metric || "",
+      result: c.result || "",
+      result_detail: c.result_detail || "",
+      youtube: c.youtube_id || "",
+      video_caption: c.video_caption || "",
+      featured: c.featured,
+      anonymous: c.anonymous,
     });
     setDialogOpen(true);
   };
@@ -92,13 +120,35 @@ const Testimonials = () => {
       toast.error("Le nom est requis");
       return;
     }
+    const youtube_id = youtubeIdOf(form.youtube);
+    if (form.youtube.trim() && !youtube_id) {
+      toast.error("Lien YouTube non reconnu");
+      return;
+    }
+    if (!!form.metric.trim() !== !!form.result.trim()) {
+      toast.error("Un résultat a besoin des deux champs : le chiffre et sa description");
+      return;
+    }
+    const { youtube: _youtube, ...rest } = form;
+    const record = {
+      ...rest,
+      name: form.name.trim(),
+      avatar_url: blank(form.avatar_url),
+      tiktok_url: blank(form.tiktok_url),
+      niche: blank(form.niche),
+      metric: blank(form.metric),
+      result: blank(form.result),
+      result_detail: blank(form.result_detail),
+      video_caption: blank(form.video_caption),
+      youtube_id,
+    };
     try {
       if (editingId) {
-        await updateMutation.mutateAsync({ id: editingId, ...form });
-        toast.success("Client modifié");
+        await updateMutation.mutateAsync({ id: editingId, ...record });
+        toast.success("Témoignage modifié");
       } else {
-        await createMutation.mutateAsync(form);
-        toast.success("Client ajouté");
+        await createMutation.mutateAsync(record);
+        toast.success("Témoignage ajouté");
       }
       setDialogOpen(false);
     } catch {
@@ -123,12 +173,16 @@ const Testimonials = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <h1 className="text-2xl font-display font-bold text-cream">Témoignages & Preuves sociales</h1>
-        <p className="text-cream/60 text-sm">Gérez les clients et captures affichés sur les pages publiques.</p>
+        <h1 className="text-2xl font-display font-bold text-cream">Site et contenus</h1>
+        <AdminTabs items={CONTENT_TABS} />
+        <p className="text-cream/60 text-sm">
+          Une fiche par personne : photo, résultat chiffré et vidéo YouTube. Le site affiche les fiches actives
+          (résultats chiffrés et vidéos) ; les changements apparaissent tout de suite pour les visiteurs.
+        </p>
 
         <Tabs defaultValue="clients" className="w-full">
           <TabsList className="bg-noir border border-primary/10">
-            <TabsTrigger value="clients">Clients de confiance</TabsTrigger>
+            <TabsTrigger value="clients">Témoignages</TabsTrigger>
             <TabsTrigger value="screenshots">Captures d'écran</TabsTrigger>
           </TabsList>
 
@@ -156,7 +210,21 @@ const Testimonials = () => {
 
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-cream truncate">{c.name}</p>
+                  {(c.metric || c.niche) && (
+                    <p className="text-sm text-cream/70 truncate">
+                      {[c.niche, c.metric && c.result ? `${c.metric} ${c.result}` : null].filter(Boolean).join(" · ")}
+                    </p>
+                  )}
                   <div className="flex flex-wrap gap-1 mt-1">
+                    {c.youtube_id && (
+                      <span className="text-[10px] bg-red-500/20 text-red-300 px-2 py-0.5 rounded-full">Vidéo</span>
+                    )}
+                    {c.metric && c.result && !c.anonymous && (
+                      <span className="text-[10px] bg-green-500/20 text-green-300 px-2 py-0.5 rounded-full">Résultat</span>
+                    )}
+                    {c.featured && (
+                      <span className="text-[10px] bg-primary/30 text-primary px-2 py-0.5 rounded-full">Accueil</span>
+                    )}
                     {c.offers.map((o) => (
                       <span key={o} className="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full">
                         {OFFER_OPTIONS.find((opt) => opt.value === o)?.label || o}
@@ -192,10 +260,12 @@ const Testimonials = () => {
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="bg-noir-light border-primary/20 text-cream">
+        <DialogContent className="bg-noir-light border-primary/20 text-cream max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingId ? "Modifier" : "Ajouter"} un client</DialogTitle>
-            <DialogDescription className="text-cream/50">Remplissez les informations du client à afficher.</DialogDescription>
+            <DialogTitle>{editingId ? "Modifier" : "Ajouter"} un témoignage</DialogTitle>
+            <DialogDescription className="text-cream/50">
+              Seuls des chiffres réels, avec l'accord de la personne. Le résultat s'affiche si le chiffre et sa description sont remplis.
+            </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
@@ -231,6 +301,46 @@ const Testimonials = () => {
                 ))}
               </div>
             </div>
+
+            <div>
+              <Label className="text-cream">Niche ou activité</Label>
+              <Input value={form.niche} onChange={(e) => setForm((f) => ({ ...f, niche: e.target.value }))} placeholder="Films d'horreur" className="mt-1 text-cream bg-noir border-primary/20 placeholder:text-cream/30" />
+            </div>
+
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <Label className="text-cream">Chiffre</Label>
+                <Input value={form.metric} onChange={(e) => setForm((f) => ({ ...f, metric: e.target.value }))} placeholder="×16" className="mt-1 text-cream bg-noir border-primary/20 placeholder:text-cream/30" />
+              </div>
+              <div className="col-span-2">
+                <Label className="text-cream">Résultat</Label>
+                <Input value={form.result} onChange={(e) => setForm((f) => ({ ...f, result: e.target.value }))} placeholder="de 180 à 3 000+ abonnés" className="mt-1 text-cream bg-noir border-primary/20 placeholder:text-cream/30" />
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-cream">Précision (facultatif)</Label>
+              <Input value={form.result_detail} onChange={(e) => setForm((f) => ({ ...f, result_detail: e.target.value }))} placeholder="en 2 mois, sur une niche pointue" className="mt-1 text-cream bg-noir border-primary/20 placeholder:text-cream/30" />
+            </div>
+
+            <div>
+              <Label className="text-cream">Vidéo YouTube (lien ou identifiant)</Label>
+              <Input value={form.youtube} onChange={(e) => setForm((f) => ({ ...f, youtube: e.target.value }))} placeholder="https://youtube.com/shorts/…" className="mt-1 text-cream bg-noir border-primary/20 placeholder:text-cream/30" />
+            </div>
+
+            <div>
+              <Label className="text-cream">Légende de la vidéo (facultatif)</Label>
+              <Input value={form.video_caption} onChange={(e) => setForm((f) => ({ ...f, video_caption: e.target.value }))} placeholder="De 180 à 3 000+ abonnés en 2 mois" className="mt-1 text-cream bg-noir border-primary/20 placeholder:text-cream/30" />
+            </div>
+
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
+              <Checkbox checked={form.featured} onCheckedChange={(v) => setForm((f) => ({ ...f, featured: v === true }))} />
+              Vidéo mise en avant sur l'accueil
+            </label>
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
+              <Checkbox checked={form.anonymous} onCheckedChange={(v) => setForm((f) => ({ ...f, anonymous: v === true }))} />
+              Personne non nommée (vidéo sans légende, pas de carte résultat)
+            </label>
 
             <div>
               <Label className="text-cream">Ordre d'affichage</Label>

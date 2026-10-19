@@ -1,6 +1,7 @@
+import { AdminTabs, CLIENT_TABS } from "@/components/admin/AdminTabs";
 import { useState } from "react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
-import { useWavPremiumApplications, usePurgeEmptyApplications, WavPremiumApplication } from "@/hooks/useWavPremiumApplications";
+import { useWavPremiumApplications, WavPremiumApplication } from "@/hooks/useWavPremiumApplications";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Loader2, Trash2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { BUDGET_LABELS, ORIENTATION_BUDGET_LABELS, PREMIUM_BUDGET_LABELS } from "@/config/offers";
 
 const budgetLabels: Record<string, string> = {
@@ -72,46 +73,14 @@ function applicationNetworks(application: WavPremiumApplication) {
 const Applications = () => {
   const { data: applications, isLoading } = useWavPremiumApplications();
   const [selected, setSelected] = useState<WavPremiumApplication | null>(null);
-  const [confirmPurge, setConfirmPurge] = useState(false);
-  const purge = usePurgeEmptyApplications();
-
-  const handlePurge = async () => {
-    await purge.mutateAsync();
-    setConfirmPurge(false);
-  };
-
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="font-display text-3xl text-primary">Demandes d'accompagnement</h1>
-          {!confirmPurge ? (
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-red-500/40 text-red-400 hover:bg-red-500/10 hover:text-red-300"
-              onClick={() => setConfirmPurge(true)}
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Purger les vides
-            </Button>
-          ) : (
-            <div className="flex items-center gap-2">
-              <span className="text-cream/60 text-sm">Supprimer toutes les entrées sans email ?</span>
-              <Button
-                size="sm"
-                variant="destructive"
-                disabled={purge.isPending}
-                onClick={handlePurge}
-              >
-                {purge.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Confirmer"}
-              </Button>
-              <Button size="sm" variant="outline" onClick={() => setConfirmPurge(false)}>
-                Annuler
-              </Button>
-            </div>
-          )}
-        </div>
+        <h1 className="font-display text-3xl text-primary">Anciennes candidatures</h1>
+        <AdminTabs items={CLIENT_TABS} />
+        <p className="text-cream/60 text-sm">
+          Candidatures Wav Premium reçues avant la nouvelle gamme, conservées en lecture seule.
+        </p>
 
         {applications && (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">

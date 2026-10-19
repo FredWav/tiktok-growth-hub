@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { SEOHead } from "@/components/SEOHead";
 import { OfferComparison } from "@/components/OfferComparison";
 import { ClientResults } from "@/components/ClientResults";
-import { VideoCard } from "@/components/VideoCard";
+import { VideoTestimonials } from "@/components/VideoCard";
 import {
   Accordion,
   AccordionContent,
@@ -106,11 +106,6 @@ const resources = [
   },
 ];
 
-const featuredVideos = [
-  { id: "XMMmmLLKue4", alt: "Témoignage de PlotBreaker sur la Wav Academy" },
-  { id: "Hgkn3ifjSS0", alt: "Témoignage de Lucille après son accompagnement" },
-  { id: "LOi7RTx12nE", alt: "Témoignage de David sur sa stratégie multiréseaux" },
-];
 
 export default function Home() {
   return (
@@ -221,11 +216,7 @@ export default function Home() {
           subtitle="Des chiffres replacés dans leur contexte et les mots des personnes accompagnées. Aucun résultat n’est présenté comme une garantie."
         />
         <ClientResults limit={3} />
-        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mt-10">
-          {featuredVideos.map((video) => (
-            <VideoCard key={video.id} id={video.id} alt={video.alt} location="home" />
-          ))}
-        </div>
+        <VideoTestimonials featured location="home" className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mt-10" />
         <div className="text-center mt-10">
           <Button variant="outline" size="lg" asChild onClick={() => trackEvent("proofs_cta_click", { source_page: "/", position: "results" })}>
             <Link to="/temoignages">

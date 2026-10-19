@@ -87,6 +87,8 @@ vers le nouveau projet. Résultat : « Reprise conforme ».
      node scripts/reprise-fichiers.mjs <export.backup>
    ```
    Les deux scripts doivent finir par « Reprise conforme » et « Fichiers conformes ».
+   Puis reprendre les résultats et vidéos de témoignages dans les fiches de l'admin :
+   `psql <connexion fredwav-prod> -f scripts/sql/temoignages-2026-10.sql` (rejouable).
    Recréer ensuite le compte admin (page /auth, code `ADMIN_SETUP_CODE`).
 4. Stripe live : créer le webhook vers `https://<fredwav-prod>.supabase.co/functions/v1/stripe-webhook`
    (`checkout.session.completed`, `checkout.session.async_payment_succeeded`,

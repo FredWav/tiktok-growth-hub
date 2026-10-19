@@ -1,0 +1,368 @@
+[
+  {
+    "id": "c5220157-645b-4505-a1e6-9bce104540cb",
+    "name": "Brouteur Hunter",
+    "avatar_url": "https://rdpykyvqcckxpygwblxf.supabase.co/storage/v1/object/public/trusted-avatars/6e60b12f-d4ca-4cf3-aab1-0f6d18dcffd7.jpeg",
+    "tiktok_url": "https://www.tiktok.com/@brouteur_hunter",
+    "offers": [
+      "one_shot"
+    ],
+    "display_order": 0,
+    "niche": null,
+    "metric": null,
+    "result": null,
+    "result_detail": null,
+    "youtube_id": null,
+    "video_caption": null,
+    "featured": false,
+    "anonymous": false
+  },
+  {
+    "id": "2c043488-624e-4f71-aa0e-c543c8b67990",
+    "name": "Corinne Fountis",
+    "avatar_url": "https://rdpykyvqcckxpygwblxf.supabase.co/storage/v1/object/public/trusted-avatars/0103423a-d833-461f-901b-77d55ffe6216.jpeg",
+    "tiktok_url": "https://www.tiktok.com/@corinne.fountis",
+    "offers": [
+      "one_shot"
+    ],
+    "display_order": 0,
+    "niche": null,
+    "metric": null,
+    "result": null,
+    "result_detail": null,
+    "youtube_id": null,
+    "video_caption": null,
+    "featured": false,
+    "anonymous": false
+  },
+  {
+    "id": "9855f2bc-1346-431b-8e8e-48b85263a011",
+    "name": "Julien Blackout",
+    "avatar_url": "https://rdpykyvqcckxpygwblxf.supabase.co/storage/v1/object/public/trusted-avatars/89b81bb4-9b98-42f7-829d-5d46f2db0a20.jpeg",
+    "tiktok_url": "https://www.tiktok.com/@julienblackout",
+    "offers": [
+      "one_shot"
+    ],
+    "display_order": 0,
+    "niche": null,
+    "metric": null,
+    "result": null,
+    "result_detail": null,
+    "youtube_id": null,
+    "video_caption": null,
+    "featured": false,
+    "anonymous": false
+  },
+  {
+    "id": "019ebfe6-52cc-4187-aa99-1a2fffdcf641",
+    "name": "PlotBreaker",
+    "avatar_url": "/plotbreaker.jpg",
+    "tiktok_url": null,
+    "offers": [
+      "academy"
+    ],
+    "display_order": 1,
+    "niche": "Analyse films & séries",
+    "metric": "+3 000",
+    "result": "abonnés supplémentaires",
+    "result_detail": "cap des 10 000 abonnés franchi",
+    "youtube_id": "XMMmmLLKue4",
+    "video_caption": "+3 000 abonnés, cap des 10 000 franchi",
+    "featured": true,
+    "anonymous": false
+  },
+  {
+    "id": "64006f12-e177-4467-9d12-045b5d51a622",
+    "name": "William Wood",
+    "avatar_url": "https://rdpykyvqcckxpygwblxf.supabase.co/storage/v1/object/public/trusted-avatars/8425f036-65f5-48ad-9bf3-902dace201c4.jpeg",
+    "tiktok_url": "https://www.tiktok.com/@williamwoodskull",
+    "offers": [
+      "premium"
+    ],
+    "display_order": 1,
+    "niche": null,
+    "metric": null,
+    "result": null,
+    "result_detail": null,
+    "youtube_id": null,
+    "video_caption": null,
+    "featured": false,
+    "anonymous": false
+  },
+  {
+    "id": "a67488e5-4a80-4a98-8565-958b915d4347",
+    "name": "Antoine Au Vietnam",
+    "avatar_url": "https://rdpykyvqcckxpygwblxf.supabase.co/storage/v1/object/public/trusted-avatars/86c65b4e-6bda-41ee-b86a-99d489cacf59.jpeg",
+    "tiktok_url": "https://www.tiktok.com/@antoineauvietnam",
+    "offers": [
+      "one_shot"
+    ],
+    "display_order": 2,
+    "niche": "Expatriation · Vietnam",
+    "metric": "1,3 M",
+    "result": "de vues sur sa meilleure vidéo",
+    "result_detail": null,
+    "youtube_id": "p3nCwuBZRGI",
+    "video_caption": "Vidéos jusqu'à 1,3 M de vues",
+    "featured": false,
+    "anonymous": false
+  },
+  {
+    "id": "779c812d-cb23-41d8-99e8-4f5c53010839",
+    "name": "Renaud Dekode",
+    "avatar_url": "https://rdpykyvqcckxpygwblxf.supabase.co/storage/v1/object/public/trusted-avatars/f7e3aca3-c350-4114-85fa-b254c150cf5a.jpg",
+    "tiktok_url": "https://www.tiktok.com/@renauddekode",
+    "offers": [
+      "premium"
+    ],
+    "display_order": 2,
+    "niche": null,
+    "metric": null,
+    "result": null,
+    "result_detail": null,
+    "youtube_id": null,
+    "video_caption": null,
+    "featured": false,
+    "anonymous": false
+  },
+  {
+    "id": "ada0d206-30e6-45d7-ad6f-58856a0d3234",
+    "name": "Lucille",
+    "avatar_url": "https://rdpykyvqcckxpygwblxf.supabase.co/storage/v1/object/public/trusted-avatars/c7a20cd6-2ee9-4f3d-bfb7-c1ef37516b60.jpg",
+    "tiktok_url": "https://www.tiktok.com/@lunedelu",
+    "offers": [
+      "premium"
+    ],
+    "display_order": 3,
+    "niche": "Films d'horreur",
+    "metric": "×16",
+    "result": "de 180 à 3 000+ abonnés",
+    "result_detail": "en 2 mois, sur une niche pointue",
+    "youtube_id": "Hgkn3ifjSS0",
+    "video_caption": "De 180 à 3 000+ abonnés en 2 mois",
+    "featured": true,
+    "anonymous": false
+  },
+  {
+    "id": "3e13b73a-8769-4d12-b9cf-7c8b18196766",
+    "name": "Mama Nina",
+    "avatar_url": "https://rdpykyvqcckxpygwblxf.supabase.co/storage/v1/object/public/trusted-avatars/b5da82cf-1b90-4ff9-85d2-8e5bd32022b6.jpeg",
+    "tiktok_url": "https://www.tiktok.com/@official.mama.nina",
+    "offers": [
+      "premium"
+    ],
+    "display_order": 3,
+    "niche": null,
+    "metric": null,
+    "result": null,
+    "result_detail": null,
+    "youtube_id": null,
+    "video_caption": null,
+    "featured": false,
+    "anonymous": false
+  },
+  {
+    "id": "ba4b01ca-e947-4dc1-a6ad-5e4723cf38f7",
+    "name": "David Agaesse",
+    "avatar_url": "https://rdpykyvqcckxpygwblxf.supabase.co/storage/v1/object/public/trusted-avatars/5b9130c6-e1de-4010-9921-33155cc22664.jpeg",
+    "tiktok_url": "https://www.tiktok.com/@fiefdeskallistos",
+    "offers": [
+      "premium"
+    ],
+    "display_order": 4,
+    "niche": "Élevage canin · épagneul breton",
+    "metric": "×4",
+    "result": "abonnés qualifiés en 1 mois",
+    "result_detail": "portée ×2, surtout sur Facebook",
+    "youtube_id": "LOi7RTx12nE",
+    "video_caption": "Abonnés qualifiés ×4 en 1 mois",
+    "featured": true,
+    "anonymous": false
+  },
+  {
+    "id": "46b02a2b-8577-4c09-8b4b-fe2f36a10531",
+    "name": "Le Sapac",
+    "avatar_url": "https://rdpykyvqcckxpygwblxf.supabase.co/storage/v1/object/public/trusted-avatars/8af35348-f301-4341-a985-5a960603aa99.jpeg",
+    "tiktok_url": "https://www.tiktok.com/@lesapac_twitch",
+    "offers": [
+      "premium"
+    ],
+    "display_order": 5,
+    "niche": "Streaming · jeux vidéo (WoW)",
+    "metric": "10–20k",
+    "result": "vues régulières par vidéo",
+    "result_detail": "+ des revenus Twitch en hausse",
+    "youtube_id": "wu2CPcqp-yU",
+    "video_caption": "Vidéos régulières à 10–20 k vues",
+    "featured": false,
+    "anonymous": false
+  },
+  {
+    "id": "c45e47e3-cc6b-406a-b69b-065d3b1b8044",
+    "name": "Alex Brosse",
+    "avatar_url": "https://rdpykyvqcckxpygwblxf.supabase.co/storage/v1/object/public/trusted-avatars/25d52516-f149-49a2-97a9-8f59b0fd0e5b.jpeg",
+    "tiktok_url": "https://www.tiktok.com/@alexbrosse",
+    "offers": [
+      "one_shot"
+    ],
+    "display_order": 6,
+    "niche": null,
+    "metric": "×3",
+    "result": "abonnés triplés",
+    "result_detail": null,
+    "youtube_id": null,
+    "video_caption": null,
+    "featured": false,
+    "anonymous": false
+  },
+  {
+    "id": "70149d6d-0e40-4c07-874a-ec3adc88c431",
+    "name": "Gautier",
+    "avatar_url": null,
+    "tiktok_url": null,
+    "offers": [
+      "one_shot"
+    ],
+    "display_order": 7,
+    "niche": "Mythologie & histoire · Au nom des dieux",
+    "metric": "1 M",
+    "result": "de vues Instagram en 4 semaines",
+    "result_detail": "Facebook : +7 000 abonnés · couverture +76 %",
+    "youtube_id": "OmWZtVReYpc",
+    "video_caption": "1 M de vues Instagram en 4 semaines",
+    "featured": false,
+    "anonymous": false
+  },
+  {
+    "id": "30688d18-43b8-4e61-b37b-490240160431",
+    "name": "Hugo",
+    "avatar_url": null,
+    "tiktok_url": null,
+    "offers": [
+      "one_shot"
+    ],
+    "display_order": 8,
+    "niche": "Rap · concept « Uber Rap »",
+    "metric": "8 %",
+    "result": "d'engagement sur son nouveau compte rap",
+    "result_detail": "≈ 1 000 vues par vidéo",
+    "youtube_id": "JmQDLrvGz1M",
+    "video_caption": "Nouveau compte rap : 8 % d'engagement",
+    "featured": false,
+    "anonymous": false
+  },
+  {
+    "id": "718c7605-b993-4c2d-81c2-f5811416e5e4",
+    "name": "Témoignage vidéo Bzw7nwqB2rQ",
+    "avatar_url": null,
+    "tiktok_url": null,
+    "offers": [],
+    "display_order": 20,
+    "niche": null,
+    "metric": null,
+    "result": null,
+    "result_detail": null,
+    "youtube_id": "Bzw7nwqB2rQ",
+    "video_caption": null,
+    "featured": false,
+    "anonymous": true
+  },
+  {
+    "id": "5e2a4084-e93c-47a1-bc87-c89911d872e8",
+    "name": "Témoignage vidéo Jh5yrsotoHM",
+    "avatar_url": null,
+    "tiktok_url": null,
+    "offers": [],
+    "display_order": 21,
+    "niche": null,
+    "metric": null,
+    "result": null,
+    "result_detail": null,
+    "youtube_id": "Jh5yrsotoHM",
+    "video_caption": null,
+    "featured": false,
+    "anonymous": true
+  },
+  {
+    "id": "7207e687-71df-4a10-a4b4-312c26a11e7f",
+    "name": "Témoignage vidéo g9QYqO-xiqw",
+    "avatar_url": null,
+    "tiktok_url": null,
+    "offers": [
+      "premium"
+    ],
+    "display_order": 22,
+    "niche": null,
+    "metric": null,
+    "result": null,
+    "result_detail": null,
+    "youtube_id": "g9QYqO-xiqw",
+    "video_caption": null,
+    "featured": false,
+    "anonymous": true
+  },
+  {
+    "id": "626efaa1-a69b-4009-bd11-012f5272aa2a",
+    "name": "Témoignage vidéo cc1cRfCEJGE",
+    "avatar_url": null,
+    "tiktok_url": null,
+    "offers": [],
+    "display_order": 23,
+    "niche": null,
+    "metric": null,
+    "result": null,
+    "result_detail": null,
+    "youtube_id": "cc1cRfCEJGE",
+    "video_caption": null,
+    "featured": false,
+    "anonymous": true
+  },
+  {
+    "id": "dfe0715f-a98b-4a5f-bda9-01a49a6ff0f4",
+    "name": "Témoignage vidéo hwTyjA6BORY",
+    "avatar_url": null,
+    "tiktok_url": null,
+    "offers": [],
+    "display_order": 24,
+    "niche": null,
+    "metric": null,
+    "result": null,
+    "result_detail": null,
+    "youtube_id": "hwTyjA6BORY",
+    "video_caption": null,
+    "featured": false,
+    "anonymous": true
+  },
+  {
+    "id": "0a272a3b-f4a2-489f-93c8-78828910d660",
+    "name": "Témoignage vidéo FrMFqiAqAkU",
+    "avatar_url": null,
+    "tiktok_url": null,
+    "offers": [],
+    "display_order": 25,
+    "niche": null,
+    "metric": null,
+    "result": null,
+    "result_detail": null,
+    "youtube_id": "FrMFqiAqAkU",
+    "video_caption": null,
+    "featured": false,
+    "anonymous": true
+  },
+  {
+    "id": "26911b93-ec96-4cb3-82e4-acb0e07f8800",
+    "name": "Témoignage vidéo s-VaJvfFqbM",
+    "avatar_url": null,
+    "tiktok_url": null,
+    "offers": [],
+    "display_order": 26,
+    "niche": null,
+    "metric": null,
+    "result": null,
+    "result_detail": null,
+    "youtube_id": "s-VaJvfFqbM",
+    "video_caption": null,
+    "featured": false,
+    "anonymous": true
+  }
+]

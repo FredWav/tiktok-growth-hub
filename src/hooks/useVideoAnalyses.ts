@@ -21,11 +21,14 @@ export interface VideoAnalysis {
   report_viewed_at: string | null;
   pdf_downloaded_at: string | null;
   created_at: string;
+  support_requested_at: string | null;
+  processing_started_at: string | null;
 }
 
 const LIST_COLUMNS = [
   "id", "email", "tiktok_url", "status", "checkout_mode", "job_id", "error_message", "report_token",
   "paid_at", "completed_at", "result_email_queued_at", "report_viewed_at", "pdf_downloaded_at", "created_at",
+  "support_requested_at", "processing_started_at",
 ].join(", ");
 
 const LIST_LIMIT = 100;

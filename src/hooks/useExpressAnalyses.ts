@@ -20,6 +20,11 @@ export interface ExpressAnalysis {
   health_score: number | null;
   created_at: string;
   completed_at: string | null;
+  refunded_at: string | null;
+  support_requested_at: string | null;
+  processing_started_at: string | null;
+  launch_started_at: string | null;
+  result_email_sent_at: string | null;
 }
 
 const LIST_COLUMNS = [
@@ -33,6 +38,11 @@ const LIST_COLUMNS = [
   "health_score",
   "created_at",
   "completed_at",
+  "refunded_at",
+  "support_requested_at",
+  "processing_started_at",
+  "launch_started_at",
+  "result_email_sent_at",
 ].join(", ");
 
 /** Au-delà, la liste n'est plus lisible et la requête coûte cher pour rien. */

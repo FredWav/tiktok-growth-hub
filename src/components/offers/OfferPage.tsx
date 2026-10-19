@@ -5,6 +5,7 @@ import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { ClientResults } from "@/components/ClientResults";
+import { VideoTestimonials } from "@/components/VideoCard";
 import { trackEvent } from "@/lib/tracking";
 import { launchLabel, type Offer, priceLabel } from "@/config/offers";
 import { PlacesLeft } from "@/components/offers/PlacesLeft";
@@ -162,7 +163,13 @@ export function OfferPage({
             title="Ce qu'en disent les personnes accompagnées"
             subtitle="Résultats historiques, replacés dans leur contexte. Ils ne garantissent pas les tiens."
           />
-          <ClientResults limit={3} />
+          <ClientResults limit={3} offer={offer.id} />
+          <VideoTestimonials
+            offer={offer.id}
+            limit={3}
+            location={`offre_${offer.id}`}
+            className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mt-10"
+          />
           <div className="mt-8 text-center">
             <Link to="/temoignages" className="inline-flex min-h-11 items-center text-primary underline">
               Voir tous les témoignages

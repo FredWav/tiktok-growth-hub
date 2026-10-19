@@ -349,7 +349,7 @@ export default function AdminMarketing() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <h1 className="font-display text-2xl font-semibold text-primary">Marketing</h1>
+        <h1 className="font-display text-2xl font-semibold text-primary">Statistiques</h1>
 
         {/* ===== NEW: Analytics KPIs ===== */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

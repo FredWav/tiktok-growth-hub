@@ -242,7 +242,11 @@ test("les emails Express utilisent une file durable avec déduplication et cinq 
   const scheduler = readFileSync(new URL("../supabase/migrations/20261017130000_cron_v2.sql", import.meta.url), "utf8");
   assert.match(commerce, /state\.in\.\(pending,failed\)/);
   assert.match(commerce, /\.lt\("attempts", 5\)/);
-  assert.match(commerce, /SMTP_PASSWORD/);
+  // L'envoi passe par le réglage SMTP commun, qui refuse d'envoyer sans mot de passe.
+  const smtp = readFileSync(new URL("../supabase/functions/_shared/smtp.ts", import.meta.url), "utf8");
+  assert.match(commerce, /smtpTransport\(\)/);
+  assert.match(smtp, /if \(!password\) throw new Error\("SMTP_PASSWORD non configuré"\)/);
+  assert.match(commerce, /withNoReplyHtml\(item\.body\)/);
   assert.match(reconciliation, /await deliverMail\(client\)/);
   assert.match(migration, /dedupe_key text NOT NULL,/);
   assert.match(migration, /UNIQUE \(dedupe_key\)/);

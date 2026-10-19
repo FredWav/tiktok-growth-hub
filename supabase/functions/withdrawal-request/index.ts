@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import nodemailer from "https://esm.sh/nodemailer@6.9.16";
+import { sender, smtpSettings, smtpTransport } from "../_shared/smtp.ts";
+import { withNoReplyHtml, withNoReplyText } from "../_shared/mail-notice.ts";
 import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
@@ -210,10 +211,9 @@ async function deliverPendingEmails(
 
   const attemptAt = new Date().toISOString();
   const attempts = row.email_delivery_attempts + 1;
-  const smtpPassword = Deno.env.get("SMTP_PASSWORD") ?? "";
   const notificationEmail = Deno.env.get("WITHDRAWAL_NOTIFICATION_EMAIL") || "contact@fredwav.com";
 
-  if (!smtpPassword) {
+  if (!smtpSettings().configured) {
     const deliveryError = "SMTP_PASSWORD non configuré";
     const acknowledgementStatus = sendAcknowledgement ? "failed" : row.acknowledgement_status;
     const notificationStatus = sendNotification ? "failed" : row.notification_status;
@@ -228,27 +228,22 @@ async function deliverPendingEmails(
     return { acknowledgementStatus, notificationStatus, attempts, trackingError };
   }
 
-  const transporter = nodemailer.createTransport({
-    host: "ssl0.ovh.net",
-    port: 465,
-    secure: true,
-    auth: { user: "noreply@fredwav.com", pass: smtpPassword },
-  });
+  const transporter = smtpTransport();
   const messages = buildDeliveryMessages(row);
 
   const acknowledgementPromise = sendAcknowledgement
     ? transporter.sendMail({
-        from: "Fred Wav <noreply@fredwav.com>",
+        from: sender(),
         to: row.email,
         replyTo: "contact@fredwav.com",
         subject: `Rétractation reçue — ${row.request_reference}`,
-        text: messages.customerText,
-        html: messages.customerHtml,
+        text: withNoReplyText(messages.customerText),
+        html: withNoReplyHtml(messages.customerHtml),
       })
     : Promise.resolve(null);
   const notificationPromise = sendNotification
     ? transporter.sendMail({
-        from: "FredWav.com <noreply@fredwav.com>",
+        from: sender("FredWav.com"),
         to: notificationEmail,
         replyTo: row.email,
         subject: `[Rétractation] ${row.request_reference} — ${OFFER_LABELS[row.offer] ?? "Autre prestation"}`,

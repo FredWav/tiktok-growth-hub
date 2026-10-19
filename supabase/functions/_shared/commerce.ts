@@ -1,5 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import * as nodemailer from "https://esm.sh/nodemailer@6.9.16";
+import { sender, smtpTransport } from "./smtp.ts";
+import { CONTACT_EMAIL, withNoReplyHtml, withNoReplyText } from "./mail-notice.ts";
+import { OWNER_EMAIL as OWNER } from "./owner.ts";
 // File d'e-mails et utilitaires sans dépendance réseau : importables par les tests Node.
 export { enqueue, missingCommerceTable, site } from "./mail-queue.ts";
 import { missingCommerceTable } from "./mail-queue.ts";
@@ -111,18 +113,7 @@ export async function deliverMail(client: Database) {
       .maybeSingle();
     if (lockError || !owned) continue;
     try {
-      if (!Deno.env.get("SMTP_PASSWORD")) throw new Error("SMTP non configuré");
-      const mail = nodemailer.createTransport({
-        host: "ssl0.ovh.net",
-        port: 465,
-        secure: true,
-        connectionTimeout: 10000,
-        socketTimeout: 20000,
-        auth: {
-          user: "noreply@fredwav.com",
-          pass: Deno.env.get("SMTP_PASSWORD"),
-        },
-      });
+      const mail = smtpTransport();
       const isHtml = /<\w+[^>]*>/.test(item.body);
       const textFallback = item.body
         .replace(/<br\s*\/?>/gi, "\n")
@@ -130,12 +121,16 @@ export async function deliverMail(client: Database) {
         .replace(/<[^>]+>/g, "")
         .replace(/\n{3,}/g, "\n\n")
         .trim();
+      // Clients : rappel de ne pas répondre à noreply@ et de passer par contact@.
+      const toClient = String(item.recipient).trim().toLowerCase() !== OWNER;
+      const html = toClient ? withNoReplyHtml(item.body) : item.body;
+      const text = (body: string) => toClient ? withNoReplyText(body) : body;
       await mail.sendMail({
-        from: "Fred Wav <noreply@fredwav.com>",
-        replyTo: "contact@fredwav.com",
+        from: sender(),
+        replyTo: CONTACT_EMAIL,
         to: item.recipient,
         subject: item.subject,
-        ...(isHtml ? { html: item.body, text: textFallback } : { text: item.body }),
+        ...(isHtml ? { html, text: text(textFallback) } : { text: text(item.body) }),
         messageId: `<${item.id}@fredwav.com>`,
       });
       const { error: sentError } = await client.from("commerce_mail").update({

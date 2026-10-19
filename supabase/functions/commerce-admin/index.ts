@@ -12,6 +12,9 @@ import {
 import Stripe from "https://esm.sh/stripe@18.5.0?target=deno";
 import { getStripeMode, getStripeSecretKey } from "../_shared/stripe-config.ts";
 import { salesEnabled } from "../_shared/commerce-checkout.ts";
+import { sender, smtpSettings, smtpTransport } from "../_shared/smtp.ts";
+import { OWNER_EMAIL } from "../_shared/owner.ts";
+import { withNoReplyText } from "../_shared/mail-notice.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers });
@@ -33,6 +36,21 @@ Deno.serve(async (req) => {
       const { data, error } = await client.rpc("admin_overview");
       if (error) throw error;
       return json(data);
+    }
+    if (b.action === "mail_test") {
+      // Envoi réel vers l'adresse de Fred : prouve que l'adresse d'envoi et son mot de passe marchent.
+      try {
+        await smtpTransport().sendMail({
+          from: sender(),
+          to: OWNER_EMAIL,
+          subject: "Test d'envoi du site fredwav.com",
+          // Même mention qu'aux clients, pour voir le rendu.
+          text: withNoReplyText(`Cet e-mail confirme que l'envoi fonctionne depuis ${smtpSettings().user}.`),
+        });
+        return json({ ok: true, to: OWNER_EMAIL, from: smtpSettings().user });
+      } catch (e) {
+        return json({ ok: false, error: String(e instanceof Error ? e.message : e).slice(0, 300) });
+      }
     }
     if (b.action === "status") {
       // État réellement vérifié : présence des réglages (jamais leur valeur, sauf
@@ -64,7 +82,7 @@ Deno.serve(async (req) => {
             check("Événements Stripe en échec depuis plus d'une heure", (failedEvents.count ?? 0) === 0, String(failedEvents.count ?? 0)),
           ] },
           { title: "E-mails", checks: [
-            check("Mot de passe SMTP (noreply@fredwav.com)", has("SMTP_PASSWORD")),
+            check(`Mot de passe SMTP (${smtpSettings().user})`, has("SMTP_PASSWORD"), `${smtpSettings().host}:${smtpSettings().port}`),
             check("Dernier e-mail envoyé", !!lastMail.data, lastMail.data?.sent_at ?? "aucun"),
             check("E-mails en échec", (failedMail.count ?? 0) === 0, String(failedMail.count ?? 0)),
           ] },

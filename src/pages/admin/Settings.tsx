@@ -24,6 +24,19 @@ export default function Settings() {
   useEffect(() => {
     void load();
   }, [load]);
+  const [mailTest, setMailTest] = useState<{ sending: boolean; message: string }>({ sending: false, message: "" });
+  const sendTestMail = async () => {
+    setMailTest({ sending: true, message: "" });
+    try {
+      const r = await commerceCall<{ ok: boolean; to?: string; from?: string; error?: string }>("commerce-admin", { action: "mail_test" });
+      setMailTest({
+        sending: false,
+        message: r.ok ? `E-mail envoyé de ${r.from} à ${r.to} : vérifie ta boîte (et les spams).` : `Échec de l'envoi : ${r.error}`,
+      });
+    } catch (e) {
+      setMailTest({ sending: false, message: e instanceof Error ? e.message : "Envoi impossible" });
+    }
+  };
 
   return (
     <AdminLayout>
@@ -53,6 +66,14 @@ export default function Settings() {
                 </li>
               ))}
             </ul>
+            {group.title === "E-mails" && (
+              <div className="mt-4 space-y-2">
+                <Button variant="outline" disabled={mailTest.sending} onClick={() => void sendTestMail()}>
+                  {mailTest.sending ? "Envoi…" : "Envoyer un e-mail de test"}
+                </Button>
+                {mailTest.message && <p role="status" className="text-sm text-cream/80">{mailTest.message}</p>}
+              </div>
+            )}
           </section>
         ))}
       </div>

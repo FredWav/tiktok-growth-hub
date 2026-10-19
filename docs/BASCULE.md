@@ -59,11 +59,19 @@ nouvelle clé limitée au projet « Default project » (324948) avec la seule po
 La saisir comme secret `POSTHOG_PERSONAL_API_KEY` du projet Supabase (Edge Functions → Secrets).
 Sans elle, la page Statistiques affiche les ventes et marque l'audience « indisponible ».
 
-**SMTP** : OVH ne permet pas de relire un mot de passe existant. Deux possibilités :
-1. créer dans OVH une nouvelle adresse d'envoi (ex. `site@fredwav.com`) réservée à la v2,
-   sans rien changer au site actuel (recommandé : testable tout de suite) ;
-2. changer le mot de passe de `noreply@` le jour J et le saisir au même moment dans
-   Lovable et dans fredwav-prod.
+**SMTP** (choix de Fred, 19/10/2026) : on garde `noreply@fredwav.com`. OVH ne permet pas de
+relire son mot de passe : Fred le change dans OVH et saisit aussitôt le nouveau dans Lovable
+(site actuel), fredwav-staging et fredwav-prod, pour que le site actuel ne cesse pas d'envoyer.
+Chaque e-mail client rappelle de ne pas répondre à cette adresse et d'écrire à
+contact@fredwav.com (les réponses y sont de toute façon redirigées).
+
+Secrets Supabase (Edge Functions → Secrets) : `SMTP_USER` (adresse d'envoi, `noreply@fredwav.com`
+si absent) et `SMTP_PASSWORD`. Serveur OVH par défaut (`ssl0.ovh.net`, port 465). Ensuite :
+admin → Paramètres → « Envoyer un e-mail de test » (envoi réel vers contact@fredwav.com).
+
+Les e-mails de connexion (mot de passe oublié) passent par Supabase Auth, réglé à part :
+Authentication → Emails → SMTP Settings, mêmes serveur, port, adresse et mot de passe,
+expéditeur « Fred Wav ».
 
 ## Répétition de la reprise (18/10/2026, export du 17/10)
 

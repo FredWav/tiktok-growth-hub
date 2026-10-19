@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import nodemailer from "https://esm.sh/nodemailer@6.9.16";
+import { sender, smtpTransport } from "../_shared/smtp.ts";
+import { CONTACT_EMAIL, withNoReplyHtml } from "../_shared/mail-notice.ts";
 import { notifyError } from "../_shared/itpush.ts";
 
 const corsHeaders = {
@@ -57,8 +58,7 @@ serve(async (req) => {
     } = await req.json();
     if (!email || !token) throw new Error("Missing email or token");
 
-    const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD") || "";
-    if (!SMTP_PASSWORD) throw new Error("SMTP_PASSWORD not configured");
+    const transporter = smtpTransport();
 
     const siteUrl = Deno.env.get("SITE_URL") || "https://fredwav.com";
     const claimUrl = `${siteUrl}/claim/${token}`;
@@ -144,22 +144,16 @@ serve(async (req) => {
           ${consentSummary}
         </div>
         <div style="border-top: 1px solid #333; padding-top: 20px; text-align: center;">
-          <p style="color: #666; font-size: 12px;">FredWav · Coaching TikTok · noreply@fredwav.com</p>
+          <p style="color: #666; font-size: 12px;">FredWav · Coaching TikTok · fredwav.com</p>
         </div>
       </div>`;
 
-    const transporter = nodemailer.createTransport({
-      host: "ssl0.ovh.net",
-      port: 465,
-      secure: true,
-      auth: { user: "noreply@fredwav.com", pass: SMTP_PASSWORD },
-    });
-
     await transporter.sendMail({
-      from: "FredWav <noreply@fredwav.com>",
+      from: sender("FredWav"),
+      replyTo: CONTACT_EMAIL,
       to: email,
       subject: `🎉 Active ton accès ${planLabel}${durationLabel}`,
-      html: htmlBody,
+      html: withNoReplyHtml(htmlBody),
     });
 
     console.log("Claim email sent");
@@ -169,10 +163,11 @@ serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
     console.error("send-claim-email error:", error);
-    await notifyError("Send Claim Email", error.message);
+    await notifyError("Send Claim Email", message);
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ success: false, error: message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

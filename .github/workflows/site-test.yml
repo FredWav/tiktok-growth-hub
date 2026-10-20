@@ -42,13 +42,14 @@ jobs:
       - name: Typage
         run: npx tsc -b
 
-      - name: Tests
-        run: node --test tests/*.test.mjs tests/articles.test.ts tests/statistiques-posthog.test.ts tests/mail-notice.test.ts tests/analysis-incidents.test.ts
-
       - name: Construction
         run: |
           npm run build
           node scripts/caddy-routes.mjs
+
+      # Après la construction : une partie des tests vérifie les pages générées (dist/).
+      - name: Tests
+        run: node --test tests/*.test.mjs tests/articles.test.ts tests/statistiques-posthog.test.ts tests/mail-notice.test.ts tests/analysis-incidents.test.ts
 
       - name: Paquet
         run: |

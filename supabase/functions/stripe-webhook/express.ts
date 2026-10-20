@@ -46,7 +46,8 @@ async function sendExpressOrderConfirmation(
   ].join("\n\n");
 
   await enqueue(db(), `express-contract:${session.id}`, consent.email,
-    `Commande Analyse Express confirmée — ${session.id}`, text);
+    // La référence Stripe reste dans le texte (rétractation, support), pas dans l'objet.
+    "Commande Analyse Express confirmée", text);
 }
 
 function getExpectedExpressPriceId(livemode: boolean): string {

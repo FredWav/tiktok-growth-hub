@@ -1,5 +1,6 @@
 type PostHogClient = typeof import("posthog-js")["default"];
 type PostHogProperties = import("posthog-js").Properties;
+type CaptureOptions = import("posthog-js").CaptureOptions;
 
 // Projet PostHog hébergé dans l'Union européenne (Francfort), projet 312146.
 // Clé publique d'envoi, faite pour être visible dans le site.
@@ -34,8 +35,14 @@ export function initPostHog(): Promise<void> {
         posthog.init(POSTHOG_KEY, {
           api_host: POSTHOG_HOST,
           capture_pageview: false,
+          // Fin de page : temps passé et profondeur de défilement ($prev_pageview_max_scroll_percentage).
           capture_pageleave: true,
           autocapture: true,
+          // Cartes de chaleur, clics sans effet et clics répétés (frustration).
+          enable_heatmaps: true,
+          capture_dead_clicks: true,
+          // Enregistrements de sessions : tout ce qui est saisi reste masqué.
+          session_recording: { maskAllInputs: true, maskTextSelector: "[data-ph-mask]" },
           persistence: "localStorage+cookie",
           before_send: (event) => {
             if (typeof window !== "undefined" && /^\/(inscription|claim|admin)(\/|$)|^\/analyse-express\/result|^\/analyse-video\/rapport/.test(window.location.pathname)) return null;
@@ -55,8 +62,8 @@ export function initPostHog(): Promise<void> {
   return loading.then(() => undefined);
 }
 
-export function trackPostHogEvent(event: string, properties?: PostHogProperties) {
-  runWhenReady((posthog) => posthog.capture(event, properties));
+export function trackPostHogEvent(event: string, properties?: PostHogProperties, options?: CaptureOptions) {
+  runWhenReady((posthog) => posthog.capture(event, properties, options));
 }
 
 export function identifyUser(distinctId: string, properties?: PostHogProperties) {

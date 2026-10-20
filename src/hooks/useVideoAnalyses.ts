@@ -23,6 +23,9 @@ export interface VideoAnalysis {
   created_at: string;
   support_requested_at: string | null;
   processing_started_at: string | null;
+  /** État réel de l'e-mail « rapport prêt » (file commerce_mail), null s'il n'a pas été mis en file. */
+  mail_state: "pending" | "sending" | "sent" | "failed" | null;
+  mail_error: string | null;
 }
 
 const LIST_COLUMNS = [
@@ -54,7 +57,20 @@ export function useVideoAnalyses() {
         if (error.code === "PGRST205" || error.code === "42P01") return { rows: [] as VideoAnalysis[], tableMissing: true };
         throw error;
       }
-      return { rows: (data ?? []) as unknown as VideoAnalysis[], tableMissing: false };
+      const rows = (data ?? []) as unknown as Omit<VideoAnalysis, "mail_state" | "mail_error">[];
+      // « Rapport mis en file » ne veut pas dire « e-mail reçu » : on lit l'état réel de l'envoi.
+      const keys = rows.map((r) => `video-report:${r.id}`);
+      const mails = keys.length
+        ? await (supabase as unknown as SupabaseClient).from("commerce_mail").select("dedupe_key, state, error").in("dedupe_key", keys)
+        : { data: [] as { dedupe_key: string; state: string; error: string | null }[] };
+      const byKey = new Map((mails.data ?? []).map((m) => [m.dedupe_key as string, m]));
+      return {
+        rows: rows.map((r) => {
+          const mail = byKey.get(`video-report:${r.id}`);
+          return { ...r, mail_state: (mail?.state ?? null) as VideoAnalysis["mail_state"], mail_error: mail?.error ?? null };
+        }),
+        tableMissing: false,
+      };
     },
     staleTime: 5_000,
     refetchInterval: 10_000,

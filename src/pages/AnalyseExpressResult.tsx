@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useCallback, type ComponentProps } from "r
 import { useSearchParams, Link } from "react-router-dom";
 import { trackEvent } from "@/lib/tracking";
 import { trackPostHogEvent } from "@/lib/posthog";
+import { clearCheckoutPending } from "@/lib/funnel-events";
 import { Download, Loader2, AlertCircle, RefreshCw, ArrowRight } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
 import { Layout } from "@/components/layout/Layout";
@@ -56,6 +57,7 @@ type ExpressAnalysisData = {
 export default function AnalyseExpressResult() {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("session_id");
+  useEffect(() => clearCheckoutPending("express"), []);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -287,7 +289,7 @@ export default function AnalyseExpressResult() {
               <div className="border border-border rounded-xl p-5 space-y-3">
                 <h2 className="font-semibold">Périmètre et méthode</h2>
                 <p>Analyse automatisée. Les observations chiffrées sont distinctes des hypothèses et objectifs de test. Aucun résultat n’est garanti.</p>
-                {data.sample ? <><p>{data.sample.count} vidéos réellement exploitées, du {new Date(data.sample.from).toLocaleDateString("fr-FR")} au {new Date(data.sample.to).toLocaleDateString("fr-FR")}. Les compteurs du profil portent sur l’ensemble du compte.</p>{data.sample.limited && <p role="status">Historique limité : les tendances sont fragiles et doivent être confirmées par de nouveaux essais.</p>}<p className="text-sm text-muted-foreground">{data.sample.methodology}</p></> : <p>Rapport historique : son périmètre ne démontre pas l’usage uniforme de 120 vidéos.</p>}
+                {data.sample ? <><p>{data.sample.count} vidéos réellement exploitées, du {new Date(data.sample.from).toLocaleDateString("fr-FR")} au {new Date(data.sample.to).toLocaleDateString("fr-FR")}. Les compteurs du profil portent sur l’ensemble du compte.</p>{data.sample.limited && <p role="status">Historique limité : les tendances sont fragiles et doivent être confirmées par de nouveaux essais.</p>}<p className="text-sm text-muted-foreground">{data.sample.methodology}</p></> : <p>Analyse des vidéos publiques récentes du compte. Les compteurs du profil portent sur l’ensemble du compte.</p>}
               </div>
               {/* Health Score */}
               {healthScore && <HealthScoreSection healthScore={healthScore} />}

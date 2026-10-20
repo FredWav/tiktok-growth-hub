@@ -45,7 +45,7 @@ const videoStatusConfig: Record<string, { label: string; variant: "default" | "s
   starting: { label: "Démarrage", variant: "secondary" },
   processing: { label: "En cours", variant: "secondary" },
   completed: { label: "Terminée, envoi du mail", variant: "secondary" },
-  delivered: { label: "Rapport envoyé", variant: "default" },
+  delivered: { label: "Rapport prêt, e-mail en file", variant: "secondary" },
   failed: { label: "Échouée", variant: "destructive" },
   refunded: { label: "Remboursée", variant: "outline" },
 };
@@ -504,7 +504,12 @@ function VideoRowView({ video, copiedEmail, onCopyEmail }: {
   copiedEmail: string | null;
   onCopyEmail: (email: string) => void;
 }) {
-  const config = videoStatusConfig[video.status] || { label: "Statut inconnu", variant: "outline" as const };
+  // Une fois le rapport prêt, l'étiquette suit l'état réel de l'e-mail.
+  const config = video.status === "delivered" && video.mail_state === "sent"
+    ? { label: "Rapport envoyé", variant: "default" as const }
+    : video.status === "delivered" && video.mail_state === "failed"
+      ? { label: "Rapport prêt, e-mail en échec", variant: "destructive" as const }
+      : videoStatusConfig[video.status] || { label: "Statut inconnu", variant: "outline" as const };
   return (
     <TableRow className="border-primary/10">
       <TableCell className="text-cream/80">

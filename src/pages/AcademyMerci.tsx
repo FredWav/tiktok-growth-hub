@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { clearCheckoutPending } from "@/lib/funnel-events";
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
 import { SEOHead } from "@/components/SEOHead";
@@ -6,6 +8,7 @@ import { seoFor } from "@/config/seo";
 
 /** Retour de Stripe après le paiement de la Wav Academy. La confirmation vient du serveur, par e-mail. */
 export default function AcademyMerci() {
+  useEffect(() => clearCheckoutPending("academy"), []);
   return (
     <Layout>
       <SEOHead {...seoFor("/wavacademy/merci")} />

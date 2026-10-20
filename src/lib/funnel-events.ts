@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { trackEvent } from "./tracking";
 import { offerFromHref, type OfferId } from "./funnel-offers";
+import { markFormDone } from "./form-tracking";
 
 export { offerFromHref, type OfferId };
 
@@ -45,19 +47,60 @@ export function trackCtaClick(href: string, position: string, contentSlug?: stri
   });
 }
 
-/** Première saisie dans un formulaire (une fois par affichage de la page). */
-export function trackFormStart(offer: OfferId) {
-  trackEvent(FUNNEL_EVENTS.formStart, { offer, source_page: currentPath() });
-}
+// form_start, form_field, form_error, form_abandon : voir src/lib/form-tracking.ts.
 
 /** Demande enregistrée par le serveur (candidature, demande de conseil). */
 export function trackApplicationSubmit(offer: OfferId) {
+  markFormDone(offer);
   trackEvent(FUNNEL_EVENTS.applicationSubmit, { offer, source_page: currentPath() });
 }
 
+const checkoutKey = (offer: OfferId) => `fw_checkout_${offer}`;
+
 /** Le visiteur part vers la page de paiement Stripe. */
 export function trackCheckoutStart(offer: OfferId) {
+  markFormDone(offer);
+  try {
+    sessionStorage.setItem(checkoutKey(offer), String(Date.now()));
+  } catch {
+    // Stockage indisponible : le retour sans paiement ne sera pas repéré.
+  }
   trackEvent(FUNNEL_EVENTS.checkoutStart, { offer, source_page: currentPath() });
+}
+
+/**
+ * Revenu sur la page de commande après être parti payer, sans passer par la page
+ * de confirmation : retour arrière ou annulation sur Stripe. À appeler à l'affichage
+ * de la page de commande (et à son retour depuis le cache du navigateur).
+ */
+export function detectCheckoutBack(offer: OfferId) {
+  try {
+    const at = Number(sessionStorage.getItem(checkoutKey(offer)));
+    if (!at) return;
+    sessionStorage.removeItem(checkoutKey(offer));
+    trackEvent("checkout_back", { offer, seconds_away: String(Math.round((Date.now() - at) / 1000)), source_page: currentPath() });
+  } catch {
+    // Stockage indisponible.
+  }
+}
+
+/** Repère un retour sans paiement, y compris quand le navigateur réaffiche la page depuis son cache. */
+export function useCheckoutBack(offer: OfferId) {
+  useEffect(() => {
+    detectCheckoutBack(offer);
+    const onShow = (e: PageTransitionEvent) => { if (e.persisted) detectCheckoutBack(offer); };
+    window.addEventListener("pageshow", onShow);
+    return () => window.removeEventListener("pageshow", onShow);
+  }, [offer]);
+}
+
+/** Page de confirmation atteinte : ce n'est pas un retour sans paiement (le paiement fait foi en base). */
+export function clearCheckoutPending(offer: OfferId) {
+  try {
+    sessionStorage.removeItem(checkoutKey(offer));
+  } catch {
+    // Stockage indisponible.
+  }
 }
 
 /** Un article ou la page des ressources est lu. */

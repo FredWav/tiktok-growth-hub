@@ -33,7 +33,7 @@ test("requêtes : bornes en heure de Paris, anciens événements rattachés au v
 test("PostHog absent ou en panne : bloc indisponible avec sa raison, jamais zéro", async () => {
   const range = { from: "2026-10-01", to: "2026-10-02" };
   const none = await fetchSiteStats(fetch, null, range);
-  assert.deepEqual(Object.values(none).map((b) => b.available), Array(7).fill(false));
+  assert.deepEqual(Object.values(none).map((b) => b.available), Array(8).fill(false));
   assert.match((none.audience as { reason: string }).reason, /POSTHOG_PERSONAL_API_KEY/);
 
   const calls: string[] = [];

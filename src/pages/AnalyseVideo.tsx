@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
-import { trackCheckoutStart, trackFormStart, trackOfferView } from "@/lib/funnel-events";
+import { trackCheckoutStart, trackOfferView, useCheckoutBack } from "@/lib/funnel-events";
+import { trackFormError, useFormTracking } from "@/lib/form-tracking";
 import { trackEvent } from "@/lib/tracking";
 import { OFFERS, VIDEO_ANALYSIS_PRICE_LABEL, launchLabel } from "@/config/offers";
 import { useAnalysisCount } from "@/lib/analysis-counts";
@@ -60,7 +61,9 @@ export default function AnalyseVideo() {
   // Compteur de preuve sociale : base vérifiée + paiements valides depuis.
   const usersCount = useAnalysisCount("analyse_video");
 
-  const formStartedRef = useRef(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  useFormTracking(formRef, "video", "analyse_video");
+  useCheckoutBack("video");
   const [searchParams] = useSearchParams();
   const testMode = import.meta.env.VITE_STRIPE_TEST_MODE === "true" || searchParams.get("test") === "1";
 
@@ -68,11 +71,6 @@ export default function AnalyseVideo() {
     trackOfferView("video");
   }, []);
 
-  const markFormStarted = () => {
-    if (formStartedRef.current) return;
-    formStartedRef.current = true;
-    trackFormStart("video");
-  };
 
   const validateUrl = (value: string) => {
     const parsed = parseTikTokVideoUrl(value);
@@ -83,12 +81,17 @@ export default function AnalyseVideo() {
     e.preventDefault();
     const error = validateUrl(tiktokUrl);
     setUrlError(error);
-    if (error) return;
+    if (error) {
+      trackFormError("video", "analyse_video", "url_invalide");
+      return;
+    }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      trackFormError("video", "analyse_video", "email_invalide");
       toast.error("Entre une adresse e-mail valide");
       return;
     }
     if (!consentCgv || !consentImmediateDelivery) {
+      trackFormError("video", "analyse_video", "consentements_manquants");
       toast.error("Coche les deux cases pour continuer vers le paiement");
       return;
     }
@@ -119,6 +122,7 @@ export default function AnalyseVideo() {
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Une erreur est survenue";
       trackEvent("video_error", { step: "checkout" });
+      trackFormError("video", "analyse_video", "paiement_indisponible");
       toast.error(message);
       setLoading(false);
     }
@@ -150,7 +154,7 @@ export default function AnalyseVideo() {
             de sa structure et de son message, avec un plan d'action concret. Sans compte, sans abonnement.
           </p>
 
-          <form onSubmit={handleSubmit} className="mx-auto max-w-md space-y-4 text-left" noValidate>
+          <form ref={formRef} onSubmit={handleSubmit} className="mx-auto max-w-md space-y-4 text-left" noValidate>
             <div className="space-y-1.5">
               <label htmlFor="video-url" className="text-sm font-medium">Lien de ta vidéo TikTok</label>
               <Input
@@ -162,7 +166,6 @@ export default function AnalyseVideo() {
                 spellCheck={false}
                 placeholder="https://www.tiktok.com/@toncompte/video/..."
                 value={tiktokUrl}
-                onFocus={markFormStarted}
                 onChange={(e) => { setTiktokUrl(e.target.value); if (urlError) setUrlError(null); }}
                 onBlur={() => tiktokUrl.trim() && setUrlError(validateUrl(tiktokUrl))}
                 aria-invalid={!!urlError}
@@ -183,7 +186,6 @@ export default function AnalyseVideo() {
                 autoComplete="email"
                 placeholder="ton@email.com"
                 value={email}
-                onFocus={markFormStarted}
                 onChange={(e) => setEmail(e.target.value)}
                 className="h-12 text-base"
                 disabled={loading}

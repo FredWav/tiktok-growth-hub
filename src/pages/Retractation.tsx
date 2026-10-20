@@ -165,6 +165,8 @@ export default function Retractation() {
                     disabled={loading}
                   >
                     <option value="analyse_express">Analyse Express</option>
+                    <option value="analyse_video">Analyse vidéo</option>
+                    <option value="one_shot">One Shot</option>
                     <option value="wav_academy">Wav Academy</option>
                     <option value="wav_premium">Wav Premium</option>
                     <option value="hooks_packs">Packs de hooks</option>

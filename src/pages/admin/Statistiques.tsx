@@ -23,7 +23,7 @@ type Sales = {
 type Stats = {
   range: { from: string; to: string };
   sales: Sales;
-  site: Record<"audience" | "daily" | "pages" | "sources" | "campaigns" | "funnel" | "articles", Block>;
+  site: Record<"audience" | "daily" | "pages" | "sources" | "campaigns" | "funnel" | "friction" | "articles", Block>;
   site_fetched_at: string | null;
 };
 
@@ -44,6 +44,16 @@ const STEPS = [
   { id: "application_submit", label: "Demande envoyée" },
   { id: "checkout_start", label: "Départ au paiement" },
 ] as const;
+
+const FRICTION_NAMES: Record<string, string> = {
+  form_abandon: "Formulaire abandonné",
+  form_error: "Erreur affichée",
+  checkout_back: "Revenu de Stripe sans payer",
+};
+const OFFER_NAMES: Record<string, string> = Object.fromEntries(
+  [["express", "Analyse Express"], ["video", "Analyse vidéo"], ["one_shot", "One Shot"], ["academy", "Wav Academy"],
+    ["premium", "Wav Premium"], ["conseil", "Demande de conseil"]],
+);
 
 const nf = new Intl.NumberFormat("fr-FR");
 const n = (value: unknown) => nf.format(Number(value ?? 0));
@@ -334,6 +344,27 @@ export default function AdminStatistiques() {
                 ])}
                 empty=""
               />
+            </Panel>
+
+            <Panel
+              title="Points de blocage"
+              note="Où les visiteurs abandonnent : dernier champ touché avant de quitter un formulaire, erreurs affichées, retours depuis la page de paiement sans payer. Les enregistrements de sessions et cartes de chaleur se consultent dans PostHog."
+            >
+              <BlockView block={data.site.friction}>
+                {(rows) => (
+                  <Table
+                    head={["Blocage", "Offre", "Détail", "Fois", "Personnes"]}
+                    rows={rows.map((r) => [
+                      FRICTION_NAMES[String(r.event)] ?? String(r.event),
+                      OFFER_NAMES[String(r.offer)] ?? String(r.offer || "—"),
+                      String(r.detail || "—"),
+                      n(r.events),
+                      n(r.people),
+                    ])}
+                    empty="Aucun blocage relevé sur la période."
+                  />
+                )}
+              </BlockView>
             </Panel>
 
             <Panel title="Articles et ressources" note="Lectures et clics vers une offre depuis chaque article.">

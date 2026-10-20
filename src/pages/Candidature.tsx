@@ -7,6 +7,7 @@ import { SEOHead } from "@/components/SEOHead";
 import { seoFor } from "@/config/seo";
 import { commerceCall, commerceInput } from "@/lib/commerce";
 import { trackApplicationSubmit } from "@/lib/funnel-events";
+import { trackFormError, useFormTracking } from "@/lib/form-tracking";
 import { OFFERS, priceLabel } from "@/config/offers";
 
 type ApplicationOffer = "one_shot" | "academy" | "premium" | "conseil";
@@ -34,6 +35,8 @@ export default function Candidature() {
   const [refused, setRefused] = useState(false);
   const [saved, setSaved] = useState(false);
   const requestId = useRef(crypto.randomUUID());
+  const formRef = useRef<HTMLFormElement>(null);
+  useFormTracking(formRef, offer, "candidature");
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -42,6 +45,7 @@ export default function Candidature() {
     const data = new FormData(event.currentTarget);
     const commitments = { price: data.get("price") === "on", practice: data.get("practice") === "on" };
     if (!commitments.price || !commitments.practice) {
+      trackFormError(offer, "candidature", "engagements_non_coches");
       setRefused(true);
       return;
     }
@@ -61,6 +65,7 @@ export default function Candidature() {
       setSaved(true);
       trackApplicationSubmit(offer);
     } catch (e) {
+      trackFormError(offer, "candidature", "enregistrement_refuse");
       setError(e instanceof Error ? e.message : "Enregistrement indisponible.");
     } finally {
       setBusy(false);
@@ -91,7 +96,7 @@ export default function Candidature() {
               </p>
             </div>
           ) : (
-            <form onSubmit={submit} className="mt-8 space-y-6">
+            <form ref={formRef} onSubmit={submit} className="mt-8 space-y-6">
               <fieldset>
                 <legend className="font-semibold mb-4">Ce qui t'intéresse</legend>
                 <div className="grid gap-3 sm:grid-cols-2">

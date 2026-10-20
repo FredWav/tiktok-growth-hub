@@ -353,7 +353,7 @@ export function buildReportModel(input: unknown): ReportModel {
       generatedAtLabel: fmtDateFr(),
       sampleLabel: (() => {
         const sample = asRecord(raw.sample);
-        if (!sample.count) return "Rapport historique : périmètre uniforme non documenté.";
+        if (!sample.count) return "Analyse des vidéos publiques récentes du compte. Compteurs du profil : ensemble du compte.";
         return `${sample.count} vidéos exploitées · du ${fmtDateFr(String(sample.from))} au ${fmtDateFr(String(sample.to))}. ${sample.limited ? "Historique limité : tendances à confirmer." : ""} Compteurs du profil : ensemble du compte.`;
       })(),
     },

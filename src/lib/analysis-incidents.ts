@@ -37,6 +37,7 @@ export type VideoIncidentFields = {
   completed_at: string | null;
   support_requested_at?: string | null;
   processing_started_at?: string | null;
+  mail_state?: string | null;
 };
 
 export function videoIncident(v: VideoIncidentFields, now = Date.now()): string | null {
@@ -47,5 +48,6 @@ export function videoIncident(v: VideoIncidentFields, now = Date.now()): string 
     return "bloquée depuis plus de 30 minutes";
   }
   if (v.status === "completed" && olderThan(v.completed_at, now)) return "rapport prêt mais e-mail non envoyé";
+  if (v.status === "delivered" && v.mail_state === "failed") return "e-mail du rapport en échec";
   return null;
 }

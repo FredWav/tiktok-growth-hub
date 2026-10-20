@@ -16,6 +16,8 @@ const DECLARATION_TEXT =
 
 const OFFER_LABELS: Record<string, string> = {
   analyse_express: "Analyse Express",
+  analyse_video: "Analyse vidéo",
+  one_shot: "One Shot",
   wav_academy: "Wav Academy",
   wav_premium: "Wav Premium",
   hooks_packs: "Packs de hooks",

@@ -7,14 +7,15 @@ declare global {
   }
 }
 
-export function trackEvent(event: string, data?: Record<string, string>) {
+/** `beacon` : envoi garanti même si la page se ferme (abandon de formulaire). */
+export function trackEvent(event: string, data?: Record<string, string>, options?: { beacon?: boolean }) {
   if (typeof window !== "undefined" && /^\/(inscription|claim|admin)(\/|$)|^\/analyse-express\/result|^\/analyse-video\/rapport/.test(window.location.pathname)) return;
   // Google Analytics
   if (typeof window !== "undefined" && window.gtag) {
     window.gtag("event", event, data);
   }
   // PostHog
-  trackPostHogEvent(event, data);
+  trackPostHogEvent(event, data, options?.beacon ? { transport: "sendBeacon", send_instantly: true } : undefined);
 }
 
 // ── Attribution ──────────────────────────────────────────────────────────────

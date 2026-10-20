@@ -1,4 +1,4 @@
-import { type FormEvent, useEffect, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Section } from "@/components/ui/section";
@@ -7,7 +7,8 @@ import { SEOHead } from "@/components/SEOHead";
 import { seoFor } from "@/config/seo";
 import { commerceCall, commerceInput, money } from "@/lib/commerce";
 import { loadPlaces, monthName, type Places } from "@/lib/places";
-import { trackCheckoutStart } from "@/lib/funnel-events";
+import { trackCheckoutStart, useCheckoutBack } from "@/lib/funnel-events";
+import { trackFormError, useFormTracking } from "@/lib/form-tracking";
 import { INSTALLMENTS_LABEL, INSTALLMENTS_NOTE, launchLabel, OFFERS } from "@/config/offers";
 import { CGV_TEXT, earlyText } from "../../supabase/functions/_shared/consent-texts.ts";
 
@@ -49,6 +50,10 @@ export default function AcademyInscription() {
   const launch = launchLabel(offer);
   const current = places?.academy?.months[0];
 
+  const formRef = useRef<HTMLFormElement>(null);
+  useFormTracking(formRef, "academy", "academy_inscription");
+  useCheckoutBack("academy");
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!start) return;
@@ -67,6 +72,7 @@ export default function AcademyInscription() {
       trackCheckoutStart("academy");
       window.location.assign(url);
     } catch (e) {
+      trackFormError("academy", "academy_inscription", "paiement_indisponible");
       setError(e instanceof Error ? e.message : "Paiement momentanément indisponible.");
       await refresh(true);
       setBusy(false);
@@ -132,7 +138,7 @@ export default function AcademyInscription() {
           )}
 
           {start && (
-            <form onSubmit={submit} className="space-y-5">
+            <form ref={formRef} onSubmit={submit} className="space-y-5">
               <label className="block">
                 Prénom
                 <input name="first_name" required maxLength={100} autoComplete="given-name" className={commerceInput} />

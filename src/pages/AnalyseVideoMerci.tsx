@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { clearCheckoutPending } from "@/lib/funnel-events";
 import { MailCheck } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
 import { seoFor } from "@/config/seo";
@@ -7,6 +9,7 @@ import { Section } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 
 export default function AnalyseVideoMerci() {
+  useEffect(() => clearCheckoutPending("video"), []);
   // Pas d'événement « paiement réussi » ici : arriver sur cette page ne prouve pas
   // le paiement. Les ventes sont comptées en base, après confirmation de Stripe.
   return (

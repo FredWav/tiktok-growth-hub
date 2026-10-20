@@ -26,6 +26,16 @@ function PostHogPageTracker() {
   useEffect(() => {
     if (location.pathname.startsWith("/inscription/") || location.pathname.startsWith("/claim/") || location.pathname === "/analyse-express/result" || location.pathname === "/analyse-video/rapport" || location.pathname.startsWith("/admin")) return;
     capturePageview();
+    // Sections lues et questions de FAQ ouvertes sur cette page.
+    let stop: (() => void) | null = null;
+    let left = false;
+    void import("@/lib/journey-tracking").then(({ setupJourneyTracking }) => {
+      if (!left) stop = setupJourneyTracking(location.pathname);
+    });
+    return () => {
+      left = true;
+      stop?.();
+    };
   }, [location.pathname]);
 
   return null;

@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Zap, BarChart3, FileText, TrendingUp, Search, Users } from "lucide-react";
-import { trackCheckoutStart, trackFormStart, trackOfferView } from "@/lib/funnel-events";
+import { trackCheckoutStart, trackOfferView, useCheckoutBack } from "@/lib/funnel-events";
+import { trackFormError, useFormTracking } from "@/lib/form-tracking";
 import { trackPostHogEvent } from "@/lib/posthog";
 import { SEOHead } from "@/components/SEOHead";
 import { seoFor } from "@/config/seo";
@@ -98,18 +99,15 @@ export default function AnalyseExpress() {
   const [searchParams] = useSearchParams();
   const testMode = import.meta.env.VITE_STRIPE_TEST_MODE === "true" || searchParams.get("test") === "1";
 
-  const formStartedRef = useRef(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  useFormTracking(formRef, "express", "analyse_express");
+  useCheckoutBack("express");
 
   useEffect(() => {
     setExistingSessionId(window.localStorage.getItem("express_session_id"));
     trackOfferView("express");
   }, []);
 
-  const markFormStarted = () => {
-    if (formStartedRef.current) return;
-    formStartedRef.current = true;
-    trackFormStart("express");
-  };
 
   // Forme canonique TikTok (minuscules) : c'est celle qui part au checkout puis
   // vers WavStats, donc c'est aussi celle qu'on affiche en confirmation.
@@ -118,11 +116,13 @@ export default function AnalyseExpress() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!isValidTikTokUsername(cleanUsername)) {
+      trackFormError("express", "analyse_express", "username_invalide");
       toast.error("Entre ton identifiant TikTok (lettres, chiffres, _ ou ., sans espace), pas ton nom d'affichage");
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
+      trackFormError("express", "analyse_express", "email_invalide");
       toast.error("Entre une adresse email valide");
       return;
     }
@@ -132,6 +132,7 @@ export default function AnalyseExpress() {
 
   const proceedToPayment = async () => {
     if (!consentCgv || !consentImmediateDelivery) {
+      trackFormError("express", "analyse_express", "consentements_manquants");
       toast.error("Les deux consentements sont nécessaires avant le paiement");
       return;
     }
@@ -162,6 +163,7 @@ export default function AnalyseExpress() {
 
       window.location.href = data.url;
     } catch (err: unknown) {
+      trackFormError("express", "analyse_express", "paiement_indisponible");
       toast.error(err instanceof Error ? err.message : "Une erreur est survenue");
       setLoading(false);
     }
@@ -205,7 +207,7 @@ export default function AnalyseExpress() {
           </p>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} onChangeCapture={markFormStarted} className="max-w-md mx-auto space-y-3 md:space-y-4">
+          <form ref={formRef} onSubmit={handleSubmit} className="max-w-md mx-auto space-y-3 md:space-y-4">
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">@</span>
               <Input

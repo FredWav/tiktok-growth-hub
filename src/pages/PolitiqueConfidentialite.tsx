@@ -74,7 +74,7 @@ export default function PolitiqueConfidentialite() {
             <li><strong>Site et base de données :</strong> Lovable Labs Incorporated (États-Unis) pour l'hébergement et la publication du site, et Supabase Inc. (États-Unis) pour la base de données et les fonctions serveur connectées à Lovable.</li>
             <li><strong>Emails transactionnels :</strong> OVHcloud, via la messagerie noreply@fredwav.com.</li>
             <li><strong>Mesure d'audience :</strong> Google Analytics (Google LLC, États-Unis), activé uniquement avec votre consentement.</li>
-            <li><strong>Analyse comportementale :</strong> PostHog, avec des données hébergées dans l'Union européenne (Francfort, Allemagne), utilisé pour comprendre l'usage du site et améliorer l'expérience, activé uniquement avec votre consentement.</li>
+            <li><strong>Analyse comportementale :</strong> PostHog, avec des données hébergées dans l'Union européenne (Francfort, Allemagne), utilisé pour comprendre le parcours sur le site et l'améliorer : pages et sections consultées, clics, cartes de chaleur, étapes des formulaires (sans leur contenu) et enregistrement de la navigation, dans lequel tout ce qui est saisi au clavier est masqué. Activé uniquement avec votre consentement.</li>
             <li><strong>Vidéos :</strong> YouTube (Google LLC, États-Unis). Les aperçus sont chargés depuis les serveurs YouTube et le lecteur en mode confidentialité renforcée n'est chargé qu'après votre clic.</li>
           </ul>
           <p className="text-muted-foreground mb-4">
@@ -109,7 +109,7 @@ export default function PolitiqueConfidentialite() {
           <ul className="list-disc pl-6 text-muted-foreground mb-4 space-y-1">
             <li><strong>Cookies techniques :</strong> Essentiels à la navigation et à la mémorisation de votre session.</li>
             <li><strong>Mesure d'audience :</strong> Google Analytics (identifiant G-E361JPZX7D), activé uniquement avec votre consentement explicite via le bandeau cookies. Aucune donnée n'est collectée à des fins publicitaires.</li>
-            <li><strong>Analyse comportementale :</strong> PostHog, utilisé pour comprendre les parcours utilisateur et améliorer l'expérience du site. Activé uniquement avec votre consentement via le bandeau cookies. Les données collectées incluent les pages visitées, les clics et les interactions, sans finalité publicitaire.</li>
+            <li><strong>Analyse comportementale :</strong> PostHog, utilisé pour comprendre les parcours utilisateur et améliorer l'expérience du site. Activé uniquement avec votre consentement via le bandeau cookies. Les données collectées incluent les pages visitées, les clics et les interactions, ainsi qu'un enregistrement de la navigation où tout ce qui est saisi est masqué, sans finalité publicitaire.</li>
           </ul>
           <p className="text-muted-foreground mb-4">
             Vous pouvez modifier ou retirer votre choix à tout moment grâce au lien « Gérer mes cookies » présent dans le pied de page. Le retrait est aussi simple que l'acceptation et n'affecte pas les cookies strictement nécessaires.

@@ -85,7 +85,7 @@ async function handleVideoCheckout(
       .format(new Date((data as { accepted_at: string }).accepted_at));
     const consent = data as { cgv_version: string; cgv_accepted_text: string; immediate_delivery_notice_version: string; immediate_delivery_accepted_text: string };
     const siteUrl = Deno.env.get("SITE_URL") || "https://fredwav.com";
-    await enqueue(client, `video-contract:${session.id}`, row.email, `Commande Analyse Vidéo confirmée — ${session.id}`, [
+    await enqueue(client, `video-contract:${session.id}`, row.email, "Commande Analyse vidéo confirmée", [
       "Confirmation de ta commande Analyse Vidéo TikTok",
       `Paiement confirmé : ${new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format((session.amount_total ?? 0) / 100)}`,
       `Vidéo analysée : ${row.tiktok_url}`,

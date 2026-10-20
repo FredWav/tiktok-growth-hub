@@ -55,7 +55,7 @@ export function PublicationPatternSection({ pp }: { pp: PublicationPattern }) {
         {pp.days_since_last_post != null ? (
           <div>
             <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1 flex items-center gap-1"><Calendar className="h-3 w-3" /> Dernière publication</p>
-            <p className="text-sm font-medium">Il y a {pp.days_since_last_post} {pp.days_since_last_post > 1 ? "jours" : "jour"}</p>
+            <p className="text-sm font-medium">{pp.days_since_last_post === 0 ? "Aujourd'hui" : `Il y a ${pp.days_since_last_post} ${pp.days_since_last_post > 1 ? "jours" : "jour"}`}</p>
           </div>
         ) : null}
       </div>

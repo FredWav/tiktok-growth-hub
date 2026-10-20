@@ -97,6 +97,15 @@ export function statsQueries(range: StatsRange, siteHost?: string): Record<strin
         SELECT person_id, ${stepCase} AS step, ${offerCase} AS offer
         FROM events WHERE event IN (${list(Object.values(STEP_EVENTS).flat())}) AND ${w})
       GROUP BY step, offer`,
+    // Points de blocage : abandons de formulaire (dernier champ touché), erreurs
+    // affichées, retours depuis Stripe sans payer.
+    friction: `SELECT event, toString(properties.offer) AS offer,
+        multiIf(event = 'form_abandon', toString(properties.last_field),
+          event = 'form_error', concat(if(notEmpty(toString(properties.field)), concat(toString(properties.field), ' : '), ''), toString(properties.reason)),
+          '') AS detail,
+        count() AS events, uniq(person_id) AS people
+      FROM events WHERE event IN ('form_abandon', 'form_error', 'checkout_back') AND ${w}
+      GROUP BY event, offer, detail ORDER BY events DESC LIMIT 30`,
     articles: `SELECT toString(properties.content_slug) AS slug, countIf(event = 'resource_view') AS views,
         uniqIf(person_id, event = 'resource_view') AS readers, countIf(event != 'resource_view') AS clicks
       FROM events WHERE event IN (${list(["resource_view", ...STEP_EVENTS.cta_click])})

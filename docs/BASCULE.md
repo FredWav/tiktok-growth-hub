@@ -88,6 +88,11 @@ Les e-mails de connexion (mot de passe oublié) passent par Supabase Auth, régl
 Authentication → Emails → SMTP Settings, mêmes serveur, port, adresse et mot de passe,
 expéditeur « Fred Wav ».
 
+**Adresses du site** (20/10/2026, site de test `https://fredwav.164-68-118-130.sslip.io`). Le jour J,
+les trois passent à `https://fredwav.com` : le secret `SITE_URL` (liens des e-mails, retour
+Discord), Authentication → URL Configuration → « Site URL », et la liste « Redirect URLs »
+(`https://fredwav.com/**`, à la place de l'adresse de test ; `http://localhost:8080/**` peut rester).
+
 **Discord** (20/10/2026) : nouvelle application **« Wav Academy »** (`1562098628158562325`), privée,
 invitée sur le serveur Academy (`1409660758324805654`) avec « Créer une invitation » et « Gérer les
 rôles ». C'est l'application définitive : le bot de l'ancien site n'est pas touché. Adresse de retour

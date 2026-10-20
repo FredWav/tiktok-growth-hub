@@ -25,7 +25,7 @@ jobs:
       VITE_SUPABASE_PUBLISHABLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrY2p6ZHFwdmZmZHpseHh0anFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyMzAzMzgsImV4cCI6MjEwNzgwNjMzOH0.NSEhEZ6I6kVxdhxwKuG5aa3JsVJRcJghKgao7cHEeXQ
       VITE_STRIPE_TEST_MODE: "true"
       VITE_DISCORD_OAUTH_REDIRECT_URI: https://ykcjzdqpvffdzlxxtjqc.supabase.co/functions/v1/wavacademy-claim-callback
-      VITE_DISCORD_CLIENT_ID: ${{ vars.DISCORD_CLIENT_ID_TEST }}
+      VITE_DISCORD_CLIENT_ID: ${{ vars.DISCORD_CLIENT_ID }}
     steps:
       - uses: actions/checkout@v4
 

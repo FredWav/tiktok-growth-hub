@@ -71,7 +71,7 @@ export default function PolitiqueConfidentialite() {
           <ul className="list-disc pl-6 text-muted-foreground mb-4 space-y-1">
             <li><strong>Paiement :</strong> Stripe Inc. (San Francisco, USA).</li>
             <li><strong>Communication :</strong> WhatsApp (Meta Platforms Inc., USA), Discord Inc. (USA).</li>
-            <li><strong>Site et base de données :</strong> Lovable Labs Incorporated (États-Unis) pour l'hébergement et la publication du site, et Supabase Inc. (États-Unis) pour la base de données et les fonctions serveur connectées à Lovable.</li>
+            <li><strong>Site et base de données :</strong> Contabo GmbH (Allemagne) pour le serveur du site, situé en France, et Supabase pour la base de données et les fonctions serveur, avec des données hébergées dans l'Union européenne (Francfort, Allemagne).</li>
             <li><strong>Emails transactionnels :</strong> OVHcloud, via la messagerie noreply@fredwav.com.</li>
             <li><strong>Mesure d'audience :</strong> Google Analytics (Google LLC, États-Unis), activé uniquement avec votre consentement.</li>
             <li><strong>Analyse comportementale :</strong> PostHog, avec des données hébergées dans l'Union européenne (Francfort, Allemagne), utilisé pour comprendre le parcours sur le site et l'améliorer : pages et sections consultées, clics, cartes de chaleur, étapes des formulaires (sans leur contenu) et enregistrement de la navigation, dans lequel tout ce qui est saisi au clavier est masqué. Activé uniquement avec votre consentement.</li>

@@ -4,6 +4,7 @@ import { SEOHead } from "@/components/SEOHead";
 import { seoFor } from "@/config/seo";
 import { ACADEMY_LIVE_SLOT, ACADEMY_SUPPORT_DAYS, LAUNCH_END_LABEL } from "@/config/offers";
 import { Link } from "react-router-dom";
+import { VERSION, VERSION_LABEL } from "../../supabase/functions/_shared/consent-texts.ts";
 
 export default function CGV() {
   return (
@@ -12,7 +13,7 @@ export default function CGV() {
       <Section variant="default" size="lg">
         <div className="max-w-3xl mx-auto prose prose-neutral">
           <h1 className="font-display text-3xl md:text-4xl font-semibold mb-2">Conditions Générales de Vente (CGV) : Fred Wav</h1>
-          <p className="text-sm text-muted-foreground mb-10">Dernière mise à jour : 17 octobre 2026, version 2026-10-17</p>
+          <p className="text-sm text-muted-foreground mb-10">Dernière mise à jour : {VERSION_LABEL}, version {VERSION}</p>
 
           {/* ARTICLE 1 */}
           <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 1 : Identification du vendeur</h2>
@@ -22,6 +23,7 @@ export default function CGV() {
             <li><strong>Adresse :</strong> 2 route de Malagué, 86270 Coussay-les-Bois, France</li>
             <li><strong>Contact :</strong> <a href="mailto:contact@fredwav.com" className="text-primary underline">contact@fredwav.com</a></li>
             <li><strong>TVA :</strong> Non applicable, article 293 B du CGI (franchise en base)</li>
+            <li><strong>Données personnelles :</strong> leur traitement est décrit dans la <Link to="/politique-de-confidentialite" className="text-primary underline">politique de confidentialité</Link>.</li>
           </ul>
 
           {/* ARTICLE 2 */}
@@ -67,7 +69,7 @@ export default function CGV() {
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">5.3 Analyse Express</h3>
           <p className="text-muted-foreground mb-4">
-            Analyse automatisée à 19,90 € TTC pour un compte TikTok public, sur les vidéos disponibles, jusqu’à 120. Toutes les sections portent sur le même échantillon, dont le nombre et la période sont indiqués ; les compteurs globaux du profil en sont distingués. Un historique limité est signalé. Un compte privé ou sans vidéo exploitable ne produit pas un rapport présenté comme complet. Traitement normal en cinq minutes maximum après confirmation du paiement. En cas de dépassement ou d’échec, Fred intervient sous deux jours ouvrés. Si la résolution échoue, il valide le remboursement intégral.
+            Analyse automatisée à 19,90 € TTC pour un compte TikTok public, sur les vidéos disponibles, jusqu’à 120. Toutes les sections portent sur le même échantillon, dont le nombre et la période sont indiqués ; les compteurs globaux du profil en sont distingués. Un historique limité est signalé. Un compte privé ou sans vidéo exploitable ne produit pas un rapport présenté comme complet. Le rapport est en général envoyé par email en moins de trois minutes après confirmation du paiement, et en cinq minutes au plus en fonctionnement normal. En cas de dépassement ou d’échec, Fred intervient sous deux jours ouvrés. Si la résolution échoue, il valide le remboursement intégral.
           </p>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">5.4 Analyse vidéo</h3>
@@ -100,7 +102,7 @@ export default function CGV() {
           <h2 className="font-display text-xl font-semibold mt-10 mb-3">Article 6 : Commande et candidature</h2>
           <p className="text-muted-foreground mb-4">
             Le processus de commande suit la règle du "double clic" (sélection, validation des CGV, confirmation de paiement).
-            Pour le One Shot, le Wav Premium et, jusqu'à l'ouverture de l'inscription en ligne, la Wav Academy, le Client adresse d'abord une demande via le formulaire du site. Fred Wav y répond personnellement ; la commande n'est formée qu'après acceptation par le Client de la proposition (offre, prix, date de démarrage) et règlement. En cas de refus de la demande, aucun débit n'est effectué.
+            Pour le One Shot et le Wav Premium, le Client adresse d'abord une demande via le formulaire du site. Fred Wav y répond personnellement ; la commande n'est formée qu'après acceptation par le Client de la proposition (offre, prix, date de démarrage) et règlement. En cas de refus de la demande, aucun débit n'est effectué. La Wav Academy s'achète directement en ligne, dans la limite des places du mois de démarrage choisi : la place est réservée pendant le paiement, et la commande est formée à la confirmation du règlement.
           </p>
           <p className="text-muted-foreground mb-4">
             Lorsque l'offre doit être exécutée avant la fin du délai de rétractation, l'acceptation des CGV et la demande d'exécution immédiate font l'objet de cases distinctes, non précochées. Leur texte exact, leur version et leur horodatage sont enregistrés avant la redirection vers le paiement puis rattachés à la commande et à la référence de paiement en ligne ou de virement. Une confirmation est ensuite envoyée par email sur un support durable.
@@ -167,7 +169,7 @@ export default function CGV() {
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">8.2 Durée de validité (accompagnements individuels à durée déterminée)</h3>
           <p className="text-muted-foreground mb-4">
-            L'accompagnement individuel à durée déterminée (Wav Premium), hors suspension prévue à l'article 8.3, doit être pleinement réalisé dans la durée prévue par la proposition acceptée, à compter de la date du premier rendez-vous. Le rendez-vous du One Shot doit être réalisé dans les trois mois suivant le paiement. Passé ces délais, les sessions non consommées sont caduques et ne peuvent donner lieu ni à exécution ni à remboursement.
+            L'accompagnement individuel à durée déterminée (Wav Premium), hors suspension prévue à l'article 8.3, doit être pleinement réalisé dans la durée prévue par la proposition acceptée, à compter de la date du premier rendez-vous. Le rendez-vous du One Shot doit être réalisé dans les trois mois suivant le paiement. Passé ces délais, les sessions non consommées du fait du Client sont caduques et ne peuvent donner lieu ni à exécution ni à remboursement. Un report imputable au Vendeur prolonge ces délais d'autant.
           </p>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">8.3 Suspension à la demande du Client (accompagnements individuels)</h3>
@@ -257,8 +259,12 @@ export default function CGV() {
             Il ne peut être tenu responsable des changements d'algorithme, des bannissements de compte, des décisions de modération, des pannes de plateformes tierces, ni du manque de mise en application des conseils par le client.
           </p>
           <p className="text-muted-foreground mb-4">
-            La responsabilité totale de Fred Wav, lorsque sa responsabilité serait retenue, est limitée au montant effectivement payé par le client pour la prestation litigieuse.
-            Cette limitation ne s'applique pas en cas de faute lourde ou dolosive, ni aux dispositions d'ordre public.
+            À l'égard des clients professionnels, la responsabilité totale de Fred Wav, lorsqu'elle est retenue, est limitée au montant effectivement payé pour la prestation litigieuse, sauf faute lourde ou dolosive. À l'égard des clients consommateurs, aucune limitation n'est opposée au droit à réparation du préjudice résultant d'un manquement du Vendeur.
+          </p>
+
+          <h3 className="font-display text-lg font-medium mt-4 mb-2">Garanties légales (B2C)</h3>
+          <p className="text-muted-foreground mb-4">
+            Le client consommateur bénéficie de la garantie légale de conformité des contenus et services numériques (articles L224-25-12 et suivants du Code de la consommation) pour les rapports d'analyse, les Packs de hooks et les contenus de la Wav Academy, et, le cas échéant, de la garantie des vices cachés (articles 1641 et suivants du Code civil). En cas de défaut de conformité, il peut obtenir la mise en conformité ou, à défaut, une réduction du prix ou la résolution du contrat. Ces garanties s'exercent auprès de <a href="mailto:contact@fredwav.com" className="text-primary underline">contact@fredwav.com</a>.
           </p>
 
           {/* ARTICLE 11 */}
@@ -310,6 +316,7 @@ export default function CGV() {
             <li>Adresse : 222 chemin de la Bergerie, 01800 Saint Jean de Niost, France</li>
             <li>Email : <a href="mailto:contact@sasmediationsolution-conso.fr" className="text-primary underline">contact@sasmediationsolution-conso.fr</a></li>
             <li>Téléphone : +33 (0)4 82 53 93 06</li>
+            <li>Site : <a href="https://www.sasmediationsolution-conso.fr" className="text-primary underline" target="_blank" rel="noopener noreferrer">www.sasmediationsolution-conso.fr</a></li>
           </ul>
           <p className="text-muted-foreground mb-4">
             Modalités : saisie via le formulaire disponible sur le site du médiateur.
@@ -336,7 +343,7 @@ export default function CGV() {
           </p>
           <div className="bg-muted/50 rounded-lg p-4 mb-4 space-y-2 text-sm text-muted-foreground">
             <p>À l'attention de Frédéric Olalde (Fred Wav), 2 route de Malagué, 86270 Coussay-les-Bois.</p>
-            <p>Je vous notifie par la présente ma rétractation du contrat portant sur la prestation :</p>
+            <p>Je vous notifie par la présente ma rétractation du contrat portant sur la prestation : ___</p>
             <p>Commandée le : ___</p>
             <p>Nom du client : ___</p>
             <p>Adresse du client : ___</p>

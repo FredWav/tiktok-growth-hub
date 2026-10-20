@@ -5,8 +5,11 @@
  * Repris de l'annexe des CGV (src/pages/CGV.tsx) : une case distincte, jamais précochée.
  */
 
-// Version des CGV conservée avec chaque consentement.
-export const VERSION = "2026-10-17";
+// Version des CGV, unique pour tout le site : affichée sur la page CGV et conservée avec
+// chaque consentement (accompagnements, Analyse Express, Analyse vidéo). À changer à
+// chaque modification des CGV.
+export const VERSION = "2026-10-20";
+export const VERSION_LABEL = "20 octobre 2026";
 
 export const CGV_TEXT =
   "J'ai lu et j'accepte les CGV et le récapitulatif de ma commande, avec sa date de démarrage.";

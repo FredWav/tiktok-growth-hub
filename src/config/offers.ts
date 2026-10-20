@@ -142,7 +142,7 @@ export const OFFERS: Record<OfferId, Offer> = {
     summary: "L'accompagnement collectif à vie : suivi sur Discord, deux lives par semaine, tous les cours et une stratégie construite dans le temps, que tu ajustes avec tes résultats.",
     href: "/wavacademy",
     price: 749,
-    priceNote: "paiement unique, accès à vie",
+    priceNote: "paiement unique, accès à vie tant que l'Academy existe",
     launch: { untilLabel: LAUNCH_END_LABEL, nextPrice: 990 },
     capacityPerMonth: 5,
     format: "Collectif",

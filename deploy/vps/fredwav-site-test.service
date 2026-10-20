@@ -1,0 +1,9 @@
+[Unit]
+Description=Mise à jour automatique du site de test fredwav (depuis GitHub)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/fredwav-site-test
+TimeoutStartSec=600

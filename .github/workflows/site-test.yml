@@ -1,0 +1,70 @@
+# Site de test (v2) : à chaque envoi sur la branche v2, GitHub vérifie le code, construit
+# le site et publie le résultat dans la version « site-test » du dépôt. Le VPS la récupère
+# lui-même (deploy/vps/fredwav-site-test.sh) : GitHub n'a aucun accès au serveur.
+name: Site de test
+
+on:
+  push:
+    branches: [v2]
+  workflow_dispatch:
+
+permissions:
+  contents: write # publier la version construite
+
+concurrency:
+  group: site-test
+  cancel-in-progress: true
+
+jobs:
+  construire:
+    runs-on: ubuntu-latest
+    env:
+      # Projet Supabase de test. Valeurs publiques (présentes dans le code du site) ;
+      # elles remplacent celles de .env, qui désignent l'ancien site.
+      VITE_SUPABASE_URL: https://ykcjzdqpvffdzlxxtjqc.supabase.co
+      VITE_SUPABASE_PUBLISHABLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrY2p6ZHFwdmZmZHpseHh0anFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyMzAzMzgsImV4cCI6MjEwNzgwNjMzOH0.NSEhEZ6I6kVxdhxwKuG5aa3JsVJRcJghKgao7cHEeXQ
+      VITE_STRIPE_TEST_MODE: "true"
+      VITE_DISCORD_OAUTH_REDIRECT_URI: https://ykcjzdqpvffdzlxxtjqc.supabase.co/functions/v1/wavacademy-claim-callback
+      VITE_DISCORD_CLIENT_ID: ${{ vars.DISCORD_CLIENT_ID_TEST }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Dépendances
+        run: |
+          npm ci
+          npm ci --prefix tests
+
+      - name: Typage
+        run: npx tsc -b
+
+      - name: Tests
+        run: node --test tests/*.test.mjs tests/articles.test.ts tests/statistiques-posthog.test.ts tests/mail-notice.test.ts tests/analysis-incidents.test.ts
+
+      - name: Construction
+        run: |
+          npm run build
+          node scripts/caddy-routes.mjs
+
+      - name: Paquet
+        run: |
+          mkdir paquet
+          cp -r dist paquet/dist
+          cp dist-caddy/routes.caddy paquet/routes.caddy
+          echo "$GITHUB_SHA" > paquet/VERSION
+          tar -C paquet -czf site-test.tgz .
+          sha256sum site-test.tgz | cut -d' ' -f1 > site-test.tgz.sha256
+
+      - name: Publication
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view site-test >/dev/null 2>&1 || \
+            gh release create site-test --prerelease --target v2 --title "Site de test" --notes "En préparation"
+          gh release upload site-test site-test.tgz site-test.tgz.sha256 --clobber
+          # La version annoncée en dernier : le VPS ne prend le paquet que si les deux concordent.
+          gh release edit site-test --notes "Construit automatiquement depuis v2, ne pas modifier. sha=$GITHUB_SHA"

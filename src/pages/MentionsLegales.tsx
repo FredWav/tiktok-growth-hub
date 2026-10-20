@@ -24,12 +24,12 @@ export default function MentionsLegales() {
 
           <h2 className="font-display text-xl font-semibold mt-8 mb-3">Hébergement</h2>
           <p className="text-muted-foreground mb-4">
-            Ce site est hébergé et publié via Lovable Cloud.<br />
-            Prestataire : Lovable Labs Incorporated<br />
-            Adresse : 1111B South Governors Avenue, Dover, DE 19904, États-Unis<br />
-            Contact : <a href="https://lovable.dev/support" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">support Lovable</a><br />
-            Protection des données : <a href="mailto:privacy@lovable.dev" className="text-primary hover:underline">privacy@lovable.dev</a><br />
-            Représentant dans l'Union européenne : Lovable Labs AB, Regeringsgatan 25, 111 53 Stockholm, Suède
+            Site : serveur loué chez Contabo GmbH, Aschauer Straße 32a, 81549 Munich, Allemagne
+            (<a href="https://contabo.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">contabo.com</a>),
+            centre de données situé en France (Lauterbourg).<br />
+            Base de données et fonctions serveur : Supabase Inc.
+            (<a href="https://supabase.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">supabase.com</a>),
+            données hébergées dans l'Union européenne (Francfort, Allemagne).
           </p>
 
           <h2 className="font-display text-xl font-semibold mt-8 mb-3">Propriété intellectuelle</h2>

@@ -327,7 +327,7 @@ export default function Home() {
       <Section variant="dark" size="lg">
         <div className="max-w-4xl mx-auto text-center">
           <span className="mb-5 inline-flex items-center gap-2 rounded-full bg-gold-light/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-gold-light">
-            <ShieldCheck className="h-3.5 w-3.5" /> Accès à vie, sans abonnement
+            <ShieldCheck className="h-3.5 w-3.5" /> Accès à vie tant que l'Academy existe, sans abonnement
           </span>
           <h2 className="font-display text-3xl md:text-4xl font-semibold mb-4 text-cream text-balance">
             Ne reste plus seul face à tes contenus et à tes statistiques.

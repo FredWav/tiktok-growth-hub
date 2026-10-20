@@ -90,7 +90,7 @@ export default function AcademyInscription() {
           <dl className="rounded-xl border border-border bg-background p-6 space-y-3">
             <div>
               <dt className="text-sm text-muted-foreground">Prix</dt>
-              <dd className="font-semibold">{money(price)} TTC, paiement unique, accès à vie</dd>
+              <dd className="font-semibold">{money(price)} TTC, paiement unique, accès à vie tant que la Wav Academy existe</dd>
               {launch && <dd className="text-sm">{launch}</dd>}
               <dd className="text-sm text-muted-foreground">Possible {INSTALLMENTS_LABEL} ({INSTALLMENTS_NOTE}).</dd>
             </div>

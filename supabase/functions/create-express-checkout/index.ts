@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import { VERSION as CGV_VERSION } from "../_shared/consent-texts.ts";
 import { isValidTikTokUsername, normalizeTikTokUsername } from "../_shared/tiktok-username.ts";
 
 const corsHeaders = {
@@ -12,7 +13,6 @@ const corsHeaders = {
 const LIVE_PAYMENT_LINK = Deno.env.get("STRIPE_EXPRESS_PAYMENT_LINK_LIVE") ||
   "https://buy.stripe.com/cNi5kCfBy7Hb3eO0z6cMM0J";
 // Versions conservées avec la preuve d'acceptation. À modifier à chaque changement matériel.
-const CGV_VERSION = "2026-09-08";
 const IMMEDIATE_DELIVERY_NOTICE_VERSION = "2026-08-11";
 const CGV_ACCEPTED_TEXT = "J'ai lu et j'accepte les Conditions Générales de Vente.";
 const IMMEDIATE_DELIVERY_ACCEPTED_TEXT = "Je demande expressément l'exécution immédiate de l'Analyse Express avant la fin du délai de 14 jours et je reconnais perdre mon droit de rétractation lorsque la prestation est pleinement exécutée et le rapport mis à disposition.";

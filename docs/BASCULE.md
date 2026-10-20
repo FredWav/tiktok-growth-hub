@@ -62,9 +62,11 @@ eu.posthog.com → menu du compte → Personal API keys, accès au projet 312146
 La saisir comme secret `POSTHOG_PERSONAL_API_KEY` du projet Supabase (Edge Functions → Secrets).
 Sans elle, la page Statistiques affiche les ventes et marque l'audience « indisponible ».
 
-**SMTP** (choix de Fred, 19/10/2026) : on garde `noreply@fredwav.com`. OVH ne permet pas de
-relire son mot de passe : Fred le change dans OVH et saisit aussitôt le nouveau dans Lovable
-(site actuel), fredwav-staging et fredwav-prod, pour que le site actuel ne cesse pas d'envoyer.
+**SMTP** (choix de Fred, 19/10/2026) : en production, on garde `noreply@fredwav.com`. Le site
+actuel s'en sert : **son mot de passe ne change pas avant la bascule**. OVH ne permet pas de le
+relire : il est changé pendant le gel des ventes de la bascule, saisi dans fredwav-prod (et dans
+Lovable, pour un éventuel retour arrière). D'ici là, le site de test envoie depuis une adresse
+dédiée (secret `SMTP_USER`), sans lien avec le site actuel.
 Chaque e-mail client rappelle de ne pas répondre à cette adresse et d'écrire à
 contact@fredwav.com (les réponses y sont de toute façon redirigées).
 

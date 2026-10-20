@@ -88,6 +88,14 @@ Les e-mails de connexion (mot de passe oublié) passent par Supabase Auth, régl
 Authentication → Emails → SMTP Settings, mêmes serveur, port, adresse et mot de passe,
 expéditeur « Fred Wav ».
 
+**Discord** (20/10/2026) : nouvelle application **« Wav Academy »** (`1562098628158562325`), privée,
+invitée sur le serveur Academy (`1409660758324805654`) avec « Créer une invitation » et « Gérer les
+rôles ». C'est l'application définitive : le bot de l'ancien site n'est pas touché. Adresse de retour
+OAuth : `https://ykcjzdqpvffdzlxxtjqc.supabase.co/functions/v1/wavacademy-claim-callback`.
+D'ici la bascule, elle donne le rôle de test « Academy test » (`DISCORD_VIP2_ROLE_ID` =
+`1409885742598983863`, aucun salon). Le jour J : `DISCORD_VIP2_ROLE_ID` = identifiant du vrai rôle
+des membres, et vérifier que le rôle du bot est placé au-dessus.
+
 ## Répétition de la reprise (18/10/2026, export du 17/10)
 
 `node scripts/reprise-donnees.mjs ~/Downloads/fredwav_261017.backup` sur une copie jetable

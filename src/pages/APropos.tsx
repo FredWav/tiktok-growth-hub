@@ -74,7 +74,7 @@ export default function APropos() {
               TikTok est une grosse partie de mon parcours et de mon expertise. Mais une stratégie cohérente peut aussi faire travailler Instagram, YouTube et Facebook ensemble, selon ton activité et ton audience.
             </p>
             <p className="text-muted-foreground">
-              Mon approche : du contexte, des données, du feedback et des décisions que tu comprends. Pas de hacks miracles ni de viralité garantie. Tu peux voir les <Link to="/temoignages" className="text-primary underline hover:no-underline">résultats documentés</Link> avec leur contexte.
+              Mon approche : du contexte, des données, du feedback et des décisions que tu comprends. Et des résultats concrets : tu peux voir les <Link to="/temoignages" className="text-primary underline hover:no-underline">résultats documentés</Link> avec leur contexte.
             </p>
           </div>
 

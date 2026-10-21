@@ -8,5 +8,5 @@ export const WAVACADEMY_FAQ = [
   { question: "Pourquoi 5 places par mois ?", answer: "Pour que chaque nouveau membre soit réellement suivi pendant ses premières semaines. Quand le mois est complet, tu peux réserver ta place pour le mois suivant." },
   { question: "Combien de temps dois-je prévoir chaque semaine ?", answer: "Tu choisis librement les lives utiles et tu as leurs résumés. L'Academy n'exécute pas à ta place : prévois du temps pour créer, publier et tester les ajustements retenus." },
   { question: "Les crédits WavStats sont-ils inclus ?", answer: "Non. WavStats est un service distinct. Tu peux l'utiliser en parallèle si tu le souhaites, mais il n'est pas compris dans la Wav Academy." },
-  { question: "Est-ce que l'Academy cherche uniquement à faire plus de vues ?", answer: "Non. Selon ton projet, un contenu peut servir l'autorité, la qualification de l'audience, la confiance, les demandes ou les ventes. La portée est un signal parmi d'autres et aucun résultat n'est garanti." },
+  { question: "Est-ce que l'Academy cherche uniquement à faire plus de vues ?", answer: "Non : on vise ce qui compte pour ton projet. Autorité, confiance, demandes ou ventes : tes contenus sont construits pour ton objectif, et les vues deviennent un moyen d'y arriver, pas une fin." },
 ];

@@ -245,7 +245,7 @@ const ROUTES: RouteSeo[] = [
     description: `Accompagnement collectif à vie sur TikTok, Instagram et YouTube : Discord en semaine, deux lives par semaine, tous les cours. ${priceLabel(academy)} TTC en paiement unique.`,
     noscript: {
       h1: "Progresse dans la durée, avec un cadre et un groupe, sans y passer ta vie",
-      body: `Accompagnement collectif à vie, tant que la Wav Academy existe : deux lives par semaine ${ACADEMY_LIVE_SLOT}, Discord ${ACADEMY_SUPPORT_DAYS}, ${ACADEMY_MODULES_COUNT} modules, ${ACADEMY_GUIDES_COUNT} guides et une stratégie construite avec le collectif. ${academyPrice}. ${academy.capacityPerMonth} nouveaux membres par mois. Sans garantie de vues ou de revenus.`,
+      body: `Accompagnement collectif à vie, tant que la Wav Academy existe : deux lives par semaine ${ACADEMY_LIVE_SLOT}, Discord ${ACADEMY_SUPPORT_DAYS}, ${ACADEMY_MODULES_COUNT} modules, ${ACADEMY_GUIDES_COUNT} guides et une stratégie construite avec le collectif. ${academyPrice}. ${academy.capacityPerMonth} nouveaux membres par mois pour progresser plus vite, entouré.`,
       links: [{ href: "/wavacademy", label: "Voir la Wav Academy" }, { href: "/accompagnements", label: "Comparer les accompagnements" }],
     },
     schema: [
@@ -253,19 +253,19 @@ const ROUTES: RouteSeo[] = [
       offerBreadcrumb("/wavacademy", "Wav Academy"),
     ],
     sitemap: 0.9,
-    llms: `Accompagnement collectif à vie (Wav Academy) : deux lives par semaine, Discord en semaine, ${ACADEMY_MODULES_COUNT} modules, ${ACADEMY_GUIDES_COUNT} guides, stratégie construite avec le collectif. ${academyPrice}. Pas d'individuel, pas de crédits WavStats, pas de garantie de résultat.`,
+    llms: `Accompagnement collectif à vie (Wav Academy) : deux lives par semaine, Discord en semaine, ${ACADEMY_MODULES_COUNT} modules, ${ACADEMY_GUIDES_COUNT} guides, stratégie construite avec le collectif. ${academyPrice}. Collectif (pas d'individuel), sans crédits WavStats.`,
     llmsSection: "offres",
   },
   {
     path: "/analyse-express",
     title: "Analyse Express : audit de compte TikTok en 5 min | Fred Wav",
-    description: `Audit automatisé de ton compte TikTok : jusqu’à 120 vidéos publiques comparées, points faibles, hypothèses et tests à lancer. Rapport PDF à ${EXPRESS_PRICE.toFixed(2).replace(".", ",")} €.`,
+    description: `Audit automatisé de ton compte TikTok : jusqu’à 120 vidéos publiques comparées, ce qui marche, ce qui bloque et quoi changer. Rapport PDF à ${EXPRESS_PRICE.toFixed(2).replace(".", ",")} €.`,
     noscript: {
       h1: "Tes statistiques TikTok sont visibles : que dois-tu tester ensuite ?",
-      body: "Analyse automatisée des données publiques de ton profil et de tes vidéos disponibles, jusqu’à 120, sur un même échantillon documenté. Le rapport distingue les observations des hypothèses, ne remplace ni les statistiques privées de TikTok ni une analyse humaine et ne garantit aucune vue ou vente. En moins de 3 minutes dans ta boîte mail en fonctionnement normal après paiement, rapport PDF pour 19,90 € TTC.",
+      body: "Analyse automatisée des données publiques de ton profil et de tes vidéos disponibles, jusqu’à 120, sur un même échantillon documenté : tes formats gagnants, tes meilleurs créneaux, ce qui fait décrocher ton audience et un plan d’action concret. En moins de 3 minutes dans ta boîte mail en fonctionnement normal après paiement, rapport PDF pour 19,90 € TTC.",
       sections: [
         { h2: "Qu’est-ce que l’Analyse Express ?", body: "Un audit de compte TikTok automatisé : tu indiques ton @, l’outil compare tes vidéos publiques (vues, engagement, régularité, formats) et identifie ce qui performe, ce qui décroche et quoi tester ensuite." },
-        { h2: "Ce que contient le rapport", body: "Score de santé du compte, comparaison des vidéos, observations chiffrées, hypothèses et pistes de test prioritaires, au format PDF téléchargeable et envoyé par e-mail." },
+        { h2: "Ce que contient le rapport", body: "Score de santé du compte, comparaison des vidéos, constats chiffrés et plan d’action prioritaire, au format PDF téléchargeable et envoyé par e-mail." },
         { h2: "Pour qui ?", body: "Créateurs, entrepreneurs et indépendants qui publient sur TikTok et veulent un diagnostic rapide et objectif de leur compte, sans abonnement ni rendez-vous." },
         { h2: "Prix et délai", body: "19,90 € TTC, paiement unique. Rapport reçu dans ta boîte mail en moins de 3 minutes après paiement. Pour une seule vidéo, voir l’Analyse Vidéo TikTok." },
       ],
@@ -280,7 +280,7 @@ const ROUTES: RouteSeo[] = [
         "@type": "Product",
         name: "Analyse Express - audit de compte TikTok",
         description:
-          "Audit automatisé d’un compte TikTok à partir des données publiques : jusqu’à 120 vidéos comparées, score, observations, hypothèses, pistes de test et rapport PDF.",
+          "Audit automatisé d’un compte TikTok à partir des données publiques : jusqu’à 120 vidéos comparées, score de santé, constats, plan d’action et rapport PDF.",
         image: OG_IMAGE,
         category: "Audit de compte TikTok",
         brand: { "@type": "Brand", name: "Fred Wav" },
@@ -297,7 +297,7 @@ const ROUTES: RouteSeo[] = [
       offerBreadcrumb("/analyse-express", "Analyse Express"),
     ],
     sitemap: 0.9,
-    llms: "Audit automatisé de compte TikTok à 19,90 € (Analyse Express) : jusqu’à 120 vidéos publiques comparées, score de santé, observations distinctes des hypothèses et pistes de test, rapport PDF reçu dans ta boîte mail en moins de 3 minutes. Ne remplace ni les statistiques privées de TikTok ni un audit humain ; aucune garantie de résultat.",
+    llms: "Audit automatisé de compte TikTok à 19,90 € (Analyse Express) : jusqu’à 120 vidéos publiques comparées, score de santé, constats chiffrés et plan d’action, rapport PDF reçu dans ta boîte mail en moins de 3 minutes.",
     llmsSection: "offres",
   },
   {
@@ -306,7 +306,7 @@ const ROUTES: RouteSeo[] = [
     description: `Envoie le lien d’une vidéo TikTok : analyse de l’accroche, de la structure, du message et du CTA, plan d’action et rapport PDF par e-mail. ${VIDEO_ANALYSIS_PRICE_LABEL}, sans abonnement.`,
     noscript: {
       h1: "Envoie ta vidéo TikTok. On te dit ce qui fonctionne, ce qui bloque et quoi changer.",
-      body: `Analyse automatisée d’une vidéo TikTok publique : accroche, structure, message et recommandations prioritaires. Rapport livré par e-mail avec un PDF téléchargeable, ${VIDEO_ANALYSIS_PRICE_LABEL} TTC, sans compte ni abonnement. Aucune garantie de vues.`,
+      body: `Analyse automatisée d’une vidéo TikTok publique : accroche, structure, message et recommandations prioritaires. Rapport livré par e-mail avec un PDF téléchargeable, ${VIDEO_ANALYSIS_PRICE_LABEL} TTC, sans compte ni abonnement.`,
       sections: [
         { h2: "Comment analyser une vidéo TikTok ?", body: "Colle le lien public de ta vidéo, paie, et l’analyse démarre automatiquement. Le rapport arrive par e-mail en quelques minutes." },
         { h2: "Ce qui est analysé", body: "Le hook des premières secondes, la structure du script, la clarté du message, le rythme, l’appel à l’action et les performances publiques de la vidéo, avec un score global." },
@@ -340,7 +340,7 @@ const ROUTES: RouteSeo[] = [
       offerBreadcrumb("/analyse-video", "Analyse Vidéo TikTok"),
     ],
     sitemap: 0.9,
-    llms: `Analyse automatisée d’une seule vidéo TikTok publique à ${VIDEO_ANALYSIS_PRICE_LABEL} : hook, structure, message, CTA, score et plan d’action, rapport PDF envoyé par e-mail en quelques minutes. Aucune garantie de résultat.`,
+    llms: `Analyse automatisée d’une seule vidéo TikTok publique à ${VIDEO_ANALYSIS_PRICE_LABEL} : hook, structure, message, CTA, score et plan d’action, rapport PDF envoyé par e-mail en quelques minutes.`,
     llmsSection: "offres",
   },
   {
@@ -357,7 +357,7 @@ const ROUTES: RouteSeo[] = [
       offerBreadcrumb("/wav-premium", "Wav Premium"),
     ],
     sitemap: 0.9,
-    llms: `Accompagnement individuel (Wav Premium) d'au moins six semaines, dès ${priceLabel(premium)} TTC : rendez-vous tous les quinze jours, WhatsApp en semaine, retours sur les contenus. Sur demande, sans garantie de résultat.`,
+    llms: `Accompagnement individuel (Wav Premium) d'au moins six semaines, dès ${priceLabel(premium)} TTC : rendez-vous tous les quinze jours, WhatsApp en semaine, retours sur les contenus. Sur demande, ${premium.capacityPerMonth} nouveaux accompagnements par mois.`,
     llmsSection: "offres",
   },
   {
@@ -419,11 +419,11 @@ const ROUTES: RouteSeo[] = [
       "Découvre des résultats clients contextualisés, des témoignages vidéo et des retours directs après accompagnement avec Fred Wav.",
     noscript: {
       h1: "Des résultats, pas des promesses",
-      body: "Ce qui s'est réellement passé chez des créateurs accompagnés : résultats contextualisés, témoignages vidéo et captures de retours. Aucun résultat n'est présenté comme une garantie.",
+      body: "Ce qui s'est réellement passé chez des créateurs accompagnés : abonnés gagnés, vidéos à des centaines de milliers de vues, premiers revenus, en vidéo et dans leurs propres messages.",
       links: [{ href: "/temoignages", label: "Voir tous les témoignages" }],
     },
     sitemap: 0.7,
-    llms: "Résultats clients contextualisés, témoignages vidéo et captures de retours, sans garantie ni cas générique inventé.",
+    llms: "Résultats réels de clients de Fred Wav : chiffres, témoignages vidéo et captures de leurs messages.",
     llmsSection: "principales",
   },
   {
@@ -460,7 +460,7 @@ const ROUTES: RouteSeo[] = [
         })),
     },
     sitemap: 0.8,
-    llms: `Bibliothèque de ${HOOKS_LIBRARY.total} hooks TikTok réels, tirés de vidéos d'au moins 100 000 vues et au moins 5 fois les vues habituelles du compte, avec structure réutilisable et lien vers chaque vidéo. Packs de 100, 250 et 500 hooks sans doublon (${HOOKS_PACKS_OFFER.map((p) => `${p.price} €`).join(", ")}) ou bibliothèque complète à ${HOOKS_BUNDLE.price} €. PDF et tableur envoyés par email. Aucune garantie de vues.`,
+    llms: `Bibliothèque de ${HOOKS_LIBRARY.total} hooks TikTok réels, tirés de vidéos d'au moins 100 000 vues et au moins 5 fois les vues habituelles du compte, avec structure réutilisable et lien vers chaque vidéo. Packs de 100, 250 et 500 hooks sans doublon (${HOOKS_PACKS_OFFER.map((p) => `${p.price} €`).join(", ")}) ou bibliothèque complète à ${HOOKS_BUNDLE.price} €. PDF et tableur envoyés par email.`,
     llmsSection: "offres",
   },
   {

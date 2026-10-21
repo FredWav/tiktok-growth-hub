@@ -46,8 +46,8 @@ const faqs = [
     answer: "Quelques minutes en fonctionnement normal après le paiement. Pense à vérifier tes spams. En cas de souci, Fred est prévenu et revient vers toi sous deux jours ouvrés, sans nouveau paiement.",
   },
   {
-    question: "L'analyse garantit-elle plus de vues ?",
-    answer: "Non. Elle est automatisée à partir des données publiques de la vidéo et donne des pistes concrètes à tester. Les résultats dépendent ensuite de ton contenu et de la plateforme.",
+    question: "Ça va m'aider à faire de meilleures vidéos ?",
+    answer: "Oui, c'est fait pour ça : tu sais enfin pourquoi ta vidéo a décroché ou cartonné, et ce que tu dois refaire ou changer sur la suivante. L'analyse est automatisée et ne promet pas de vues, mais tu ne publies plus à l'aveugle.",
   },
 ];
 

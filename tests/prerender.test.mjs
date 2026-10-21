@@ -23,7 +23,7 @@ test("gamme publique cohérente : prix du catalogue, lancement annoncé, aucune 
   assert.match(academy, /749 €/);
   assert.match(academy, /Prix de lancement jusqu'au 31\/12\/2026, puis 990 €/);
   assert.match(academy, /à vie/);
-  assert.match(academy, /Pas de recette magique/);
+  assert.match(academy, /Un cadre, un collectif et Fred à tes côtés/);
   assert.doesNotMatch(academy, /(?:299|499|899)\s*€|six mois|crédits WavStats au démarrage/);
   const premium = await text("wav-premium");
   assert.match(premium, /Dès 1 499 €/);

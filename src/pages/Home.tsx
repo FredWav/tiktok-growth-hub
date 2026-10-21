@@ -156,7 +156,7 @@ export default function Home() {
           {[
             [CREATORS_COUNT, "créateurs accompagnés"],
             ["Sans abonnement", "paiement unique, analyses comme accompagnements"],
-            ["Cas contextualisés", "des résultats, jamais une garantie"],
+            ["Résultats réels", "des créateurs qui progressent, preuves à l'appui"],
           ].map(([value, label]) => (
             <div key={value} className="text-center sm:text-left sm:border-l sm:border-cream/15 sm:pl-6 first:border-l-0 first:pl-0">
               <p className="font-display text-2xl font-semibold text-primary mb-1">{value}</p>
@@ -207,8 +207,8 @@ export default function Home() {
 
       <Section variant="default" size="lg">
         <SectionHeader
-          title="Pas des promesses. Des résultats documentés."
-          subtitle="Des chiffres replacés dans leur contexte et les mots des personnes accompagnées. Aucun résultat n’est présenté comme une garantie."
+          title="Ils l’ont fait. Ils en parlent."
+          subtitle="Des abonnés gagnés, des vidéos qui explosent, des premiers revenus : les résultats et les mots des personnes accompagnées par Fred."
         />
         <ClientResults limit={3} />
         <VideoTestimonials featured location="home" className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mt-10" />

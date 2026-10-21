@@ -59,8 +59,8 @@ const faqs = [
     answer: "L'Analyse Express est automatisée à partir de la méthode de Fred. Elle ne comprend pas de relecture humaine ni de rendez-vous individuel ; ces besoins relèvent du Wav Premium.",
   },
   {
-    question: "Les recommandations garantissent-elles plus de vues ?",
-    answer: "Non. Le rapport fournit un diagnostic et des pistes d'amélioration à partir d'un instantané des données publiques. Les résultats dépendent ensuite du contenu, de l'exécution et des évolutions de la plateforme.",
+    question: "Est-ce que ça va vraiment m'aider à faire plus de vues ?",
+    answer: "C'est tout l'objectif. Le rapport te montre ce qui marche déjà chez toi et ce qui freine tes vidéos, avec des actions concrètes à appliquer dès ta prochaine publication. Personne ne peut te promettre une vidéo virale, mais tu avances avec un plan au lieu de tâtonner.",
   },
   {
     question: "Que faire si mon rapport ne se génère pas ?",
@@ -68,15 +68,15 @@ const faqs = [
   },
   {
     question: "Pourquoi payer alors que TikTok affiche déjà mes statistiques ?",
-    answer: "TikTok reste la meilleure source pour ses statistiques natives, notamment celles qui ne sont pas publiques. L’Analyse Express rassemble les données publiques disponibles dans un périmètre cohérent, compare les vidéos et transforme ces observations en hypothèses et priorités. Elle ne prétend pas remplacer les données privées de TikTok.",
+    answer: "TikTok te donne des chiffres vidéo par vidéo. L’Analyse Express les met côte à côte sur jusqu’à 120 vidéos, fait ressortir tes formats gagnants, tes meilleurs créneaux et ce qui fait décrocher ton audience, puis te dit quoi faire. C’est le recul qui te manque, pour le prix d’un menu.",
   },
   {
     question: "Quelle différence avec une question posée à ChatGPT ?",
-    answer: "Une IA généraliste ne connaît que les chiffres et les contenus que tu lui transmets. L’Analyse Express récupère elle-même les données publiques disponibles du compte et applique une méthode de rapport structurée. Elle reste toutefois automatisée : pour confronter les conclusions à ton métier, à ton offre ou à tes statistiques privées, il faut une analyse humaine.",
+    answer: "ChatGPT ne voit que ce que tu lui colles. L’Analyse Express va chercher elle-même les données publiques de ton compte, les compare avec la méthode de Fred et te livre un rapport structuré en moins de 3 minutes. Et pour aller plus loin, Fred peut reprendre ton compte avec toi en One Shot.",
   },
   {
     question: "Mon marché est très particulier : les conseils seront-ils pertinents ?",
-    answer: "Le rapport est contextualisé par les contenus et résultats publics du compte, mais il ne peut pas connaître tout ton métier, tes clients ni tes contraintes commerciales. Il formule donc des hypothèses à tester, pas des vérités universelles. Si cette contextualisation métier est décisive, l’Academy ou le Premium sont plus adaptés.",
+    answer: "Oui : le rapport part de tes propres vidéos et de leurs résultats, il s’adapte donc à ton compte, quel que soit ton domaine. Et si tu veux un regard humain sur ton métier précis, le One Shot, l’Academy ou le Premium prennent le relais.",
   },
 ];
 
@@ -199,8 +199,8 @@ export default function AnalyseExpress() {
           <p className="text-sm md:text-lg text-muted-foreground max-w-xl mx-auto mb-4 md:mb-4">
             <span className="font-semibold text-foreground">Analyse Express</span>{" "}
             rassemble les données publiques de ton profil et de jusqu’à 120 vidéos
-            disponibles pour produire un diagnostic automatisé,
-            des hypothèses et un plan d’action.
+            disponibles pour te livrer un diagnostic automatisé
+            et un plan d’action concret, en moins de 3 minutes.
           </p>
           <p className="hidden md:block text-sm text-muted-foreground/70 mb-10">
             Disponible uniquement pour TikTok pour le moment, d'autres plateformes arrivent bientôt.
@@ -309,7 +309,7 @@ export default function AnalyseExpress() {
         </div>
       </Section>
 
-      {/* Données et limites */}
+      {/* Données et bon à savoir */}
       <Section className="pb-20">
         <div className="mx-auto grid max-w-4xl gap-6 md:grid-cols-2">
           <div className="rounded-xl border border-border bg-card p-6 md:p-8">
@@ -322,12 +322,12 @@ export default function AnalyseExpress() {
             </ul>
           </div>
           <div className="rounded-xl border border-border bg-muted/40 p-6 md:p-8">
-            <h2 className="font-display text-2xl font-semibold">Les limites à connaître</h2>
+            <h2 className="font-display text-2xl font-semibold">Bon à savoir</h2>
             <ul className="mt-4 space-y-3 text-sm leading-relaxed text-muted-foreground">
-              <li>• Le rapport est automatisé : il ne remplace pas un audit humain avec entretien.</li>
-              <li>• Il décrit un instantané du compte au moment de la commande.</li>
-              <li>• La disponibilité et la précision dépendent des données rendues publiques par TikTok.</li>
-              <li>• Les recommandations constituent des pistes de travail, pas une garantie de vues ou de revenus.</li>
+              <li>• Analyse 100 % automatisée : ton rapport arrive en moins de 3 minutes.</li>
+              <li>• Elle photographie ton compte au moment de la commande : relance-la après tes changements pour mesurer tes progrès.</li>
+              <li>• Elle s’appuie sur les données publiques de TikTok, sans jamais accéder à ton compte.</li>
+              <li>• Le rapport te donne un plan d’action ; les résultats viennent de sa mise en pratique (aucun résultat garanti).</li>
             </ul>
           </div>
         </div>
@@ -337,7 +337,7 @@ export default function AnalyseExpress() {
       <Section className="pb-20">
         <SectionHeader
           title="Ce que tu obtiens"
-          subtitle="Un premier diagnostic automatisé pour organiser les observations et choisir des pistes à tester, sans le présenter comme l’équivalent d’un audit humain"
+          subtitle="Un diagnostic complet de ton compte et un plan d’action concret, livrés en PDF dans ta boîte mail."
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
           {features.map((f) => (

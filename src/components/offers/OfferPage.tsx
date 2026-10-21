@@ -165,7 +165,7 @@ export function OfferPage({
         <Section variant="cream" size="lg">
           <SectionHeader
             title="Ce qu'en disent les personnes accompagnées"
-            subtitle="Résultats historiques, replacés dans leur contexte. Ils ne garantissent pas les tiens."
+            subtitle="Des créateurs qui ont franchi un cap avec Fred, et qui en parlent."
           />
           <ClientResults limit={3} offer={offer.id} />
           <VideoTestimonials

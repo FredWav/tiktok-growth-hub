@@ -17,11 +17,11 @@ export default function Temoignages() {
       <Section variant="cream" size="lg">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-6">
-            Témoignages : <span className="text-gold-gradient">des résultats, pas des promesses</span>
+            Témoignages : <span className="text-gold-gradient">ils l’ont fait, ils en parlent</span>
           </h1>
           <p className="text-lg text-muted-foreground">
-            Ce que des créateurs, entrepreneurs et experts accompagnés par Fred ont obtenu, avec leur contexte.
-            Pas de chiffres gonflés, et aucun résultat présenté comme une garantie.
+            Abonnés gagnés, vidéos à des centaines de milliers de vues, premiers revenus : ce que des créateurs,
+            entrepreneurs et experts accompagnés par Fred ont obtenu, avec leurs propres mots.
           </p>
         </div>
       </Section>

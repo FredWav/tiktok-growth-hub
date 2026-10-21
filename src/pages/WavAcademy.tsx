@@ -42,8 +42,8 @@ export default function WavAcademy() {
           <Section variant="dark" size="lg">
             <div className="mx-auto max-w-5xl">
               <SectionHeader
-                title="Pas de recette magique. Une façon plus lucide d'avancer."
-                subtitle="L'Academy ne décide ni de ton expertise ni de tes opinions. Elle t'aide à mieux les transmettre et à sortir de l'essai-erreur aveugle."
+                title="Un cadre, un collectif et Fred à tes côtés, à vie."
+                subtitle="Deux lives par semaine, des retours sur tes vraies vidéos et un groupe qui avance avec toi : tu progresses plus vite que seul, et tu ne lâches plus."
                 className="[&_h2]:text-cream [&_p]:text-cream/70"
               />
               <ObjectionCards
@@ -51,19 +51,19 @@ export default function WavAcademy() {
                 items={[
                   {
                     question: "Mon métier est trop particulier pour les recettes TikTok.",
-                    answer: "On part de ton projet, de tes contenus et de ton objectif. Les méthodes servent à structurer tes essais, pas à effacer ton contexte.",
+                    answer: "Tant mieux : on part de ton projet, de tes contenus et de ton objectif. Ta stratégie est construite pour toi, pas copiée sur celle d'un autre.",
                   },
                   {
-                    question: "Personne ne peut prédire l'algorithme.",
-                    answer: "C'est vrai. L'objectif est de lire les signaux disponibles, formuler une hypothèse et choisir le prochain test. Tu réduis la part de hasard sans prétendre la supprimer.",
+                    question: "Je publie déjà, sans résultats.",
+                    answer: "C'est le cas de beaucoup de membres à leur arrivée. En live, Fred et le collectif analysent tes vidéos, repèrent ce qui bloque et te disent quoi tester ensuite. Tu sais enfin quoi changer, vidéo après vidéo.",
                   },
                   {
                     question: "Je n'ai pas le temps d'apprendre un deuxième métier.",
-                    answer: "Tu choisis les lives utiles, tu as leurs résumés et tu poses tes questions sur Discord. Il faut seulement garder du temps pour créer, publier et appliquer.",
+                    answer: "Pas besoin : tu choisis les lives utiles, tu as leurs résumés et tu poses tes questions sur Discord. Fred t'évite des mois d'essais et d'erreurs, toi tu te concentres sur tes vidéos.",
                   },
                   {
                     question: "Pourquoi pas simplement les statistiques et ChatGPT ?",
-                    answer: "Ils restent utiles, mais ne suivent pas tes essais dans le temps. L'Academy ajoute un regard humain, un collectif et un cadre pour décider quoi tester ensuite.",
+                    answer: "Ils ne suivent pas tes essais dans le temps et ne te disent pas quoi faire de tes chiffres. L'Academy, c'est un regard humain, un collectif motivant et un cadre pour progresser chaque semaine.",
                   },
                 ]}
               />

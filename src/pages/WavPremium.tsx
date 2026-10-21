@@ -59,14 +59,14 @@ export default function WavPremium() {
         notFor={[
           "Tu cherches un cadre collectif à petit prix (vois la Wav Academy)",
           "Tu veux un seul avis ponctuel sur ton compte (vois le One Shot)",
-          "Tu attends une garantie de viralité",
+          "Tu cherches une recette miracle sans t'impliquer",
         ]}
         middle={
           <Section variant="dark" size="lg">
             <div className="mx-auto max-w-5xl">
               <SectionHeader
-                title="Les objections sérieuses méritent mieux qu'une promesse."
-                subtitle="Le Premium ne prédit pas l'algorithme et ne remplace pas ton expertise. Il concentre l'analyse, les décisions et les ajustements."
+                title="Fred à tes côtés, pour avancer vite et dans la bonne direction."
+                subtitle="Analyse de tes contenus, décisions rapides et ajustements toutes les deux semaines : tu ne perds plus de temps à tâtonner, tu as quelqu'un qui connaît ton projet par cœur."
                 className="[&_h2]:text-cream [&_p]:text-cream/70"
               />
               <ObjectionCards
@@ -74,19 +74,19 @@ export default function WavPremium() {
                 items={[
                   {
                     question: "Je ne veux pas devenir un influenceur.",
-                    answer: "Tu restes un expert ou un entrepreneur qui utilise les réseaux pour servir son projet. Le but est de rendre ton travail plus visible et plus clair.",
+                    answer: "Pas besoin. Tu restes l'expert ou l'entrepreneur que tu es : on fait des réseaux un levier pour ton projet, avec des contenus qui te ressemblent et qui attirent les bonnes personnes.",
                   },
                   {
                     question: "Une méthode marketing va appauvrir mon sujet.",
-                    answer: "Un hook ne doit pas rendre une affirmation fausse. On travaille la porte d'entrée, la structure et la preuve, en gardant les nuances qui comptent.",
+                    answer: "Au contraire : on garde toute la richesse de ton sujet et on travaille l'accroche, la structure et la preuve pour qu'il touche enfin le public qu'il mérite.",
                   },
                   {
-                    question: "Personne ne peut prédire ce qui va fonctionner.",
-                    answer: "Exact. On analyse les résultats, on hiérarchise les explications possibles et on conçoit des tests qui apprennent quelque chose, même sans viralité.",
+                    question: "Je n'ai pas le temps de tester au hasard.",
+                    answer: "Justement : Fred analyse tes résultats avec toi, repère ce qui marche et te dit quoi faire ensuite. Chaque vidéo te rapproche de ton objectif au lieu de repartir de zéro.",
                   },
                   {
                     question: "Les vues ne paient pas mes factures.",
-                    answer: "Le cadrage fixe ce que tes contenus doivent produire : autorité, confiance, demandes ou ventes. La portée est lue en fonction de cet objectif.",
+                    answer: "On part de ton objectif : autorité, demandes ou ventes. Tes contenus sont construits pour le servir, et chaque résultat est lu à travers lui. Des vues qui rapportent, pas juste des vues.",
                   },
                 ]}
               />

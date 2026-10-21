@@ -40,8 +40,8 @@ export default function Accompagnements() {
             Travailler avec Fred : trois façons, selon ton besoin.
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground">
-            Un audit ponctuel, un accompagnement collectif à vie ou un suivi individuel. Les trois partent de tes
-            contenus réels, pas d'une théorie d'algorithme.
+            Un audit ponctuel, un accompagnement collectif à vie ou un suivi individuel : choisis la formule qui te
+            fera passer un cap. Les trois partent de tes vraies vidéos et de ton objectif.
           </p>
         </div>
       </Section>

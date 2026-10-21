@@ -41,7 +41,7 @@ CREATE TEMP TABLE resultats (
 INSERT INTO resultats VALUES
   ('Bidjad', NULL, '700 → 4 000', 'vues en moyenne par vidéo', '19 % d''engagement', '{premium}', 8),
   ('Maxime', 'IA & automatisation', '×2', 'abonnés Instagram en un mois (600 → 1 223)',
-    'Facebook : 54 → 1 000 abonnés · 160 000 vues Instagram en 30 jours', '{premium}', 9),
+    'Facebook : 54 → 1 000 abonnés · 160 000 vues Instagram en un mois', '{premium}', 9),
   ('Créateur survivalisme', 'Survivalisme · 31k abonnés', '+10 000', 'abonnés et premiers revenus TikTok',
     'RPM × 4, record à 11 € · 9 séances', '{premium}', 10),
   ('Sophie', 'Miss Stinguette', '+6 000', 'abonnés en un mois et demi',

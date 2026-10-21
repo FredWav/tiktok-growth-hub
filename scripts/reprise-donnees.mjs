@@ -58,7 +58,8 @@ async function connect() {
     const psql = (args) => run("psql", ["--no-psqlrc", "-X", "-q", "-v", "ON_ERROR_STOP=1", url, ...args]);
     return {
       label: "base réelle",
-      rows: async (sql) => psql(["-At", "-F", "\t", "-c", sql]).split("\n").filter(Boolean).map((l) => l.split("\t")),
+      // Sous Windows, psql termine ses lignes par CRLF.
+      rows: async (sql) => psql(["-At", "-F", "\t", "-c", sql]).replace(/\r\n/g, "\n").split("\n").filter(Boolean).map((l) => l.split("\t")),
       load: async (file) => { psql(["--single-transaction", "-f", file]); },
       copyOut: async (table, columns) =>
         psql([...DUMP_SETTINGS.map((c) => ["-c", c]).flat(), "-c", `COPY public."${table}" (${columns}) TO STDOUT`])

@@ -1,5 +1,28 @@
 # Bascule de fredwav.com vers la v2
 
+## Bascule faite le 21/10/2026 (feu vert de Fred)
+
+Le projet Lovable était en pause faute de crédits : son serveur ne répondait plus (adresse
+supprimée), l'export du jour était impossible. Reprise faite depuis l'export du 17/10
+(`fredwav_261017.backup`) : 19 tables conformes ligne à ligne, puis vente réelle du 21/10 remise
+et témoignages appliqués. Connexion à la base : rôle temporaire de la CLI
+(`supabase db dump --linked --dry-run`, variables `PG*`) avec `PGOPTIONS="-c role=postgres"`.
+
+- Données de test effacées (accord de Fred) ; catalogue, compte admin et surveillance gardés.
+- Packs de hooks (6) envoyés depuis le disque E: avec `supabase storage cp` (chemins relatifs).
+- **Perdus avec le stockage Lovable** : 11 photos de témoignages (le site affiche les initiales)
+  et 10 captures (masquées : `is_active = false`), à renvoyer depuis l'admin.
+- **Non repris** : 7 Analyses Express vendues sur l'ancien site du 17/10 (après l'export) au
+  20/10, servies par Lovable avant sa panne ; visibles dans Stripe. Si Lovable est rechargé :
+  nouvel export, puis reprise de ces lignes.
+- DNS OVH : `fredwav.com` et `www.fredwav.com` en A vers `164.68.118.130` ; Caddy : blocs
+  `fredwav.com` (mêmes fichiers que le site de test, mis à jour depuis `v2`) et `www` (redirection).
+- `SITE_URL`, `POSTHOG_SITE_HOST`, Auth (Site URL et Redirect URLs) et surveillance sur
+  `https://fredwav.com`.
+- Reste : désactiver l'ancien webhook Lovable dans Stripe (Fred), vrai rôle Discord
+  (`DISCORD_VIP2_ROLE_ID`), passage des e-mails sur noreply@, nouveau secret cron.
+
+
 Rien de ce document n'est exécuté sans le feu vert explicite de Fred. Le site actuel
 (Lovable, `C:\Users\Fred\FWcom`, branche `main`) reste en ligne et intact jusqu'au jour J,
 puis reste disponible pour un retour arrière pendant 2 à 4 semaines.

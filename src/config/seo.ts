@@ -197,6 +197,13 @@ function offerBreadcrumb(path: string, name: string) {
   };
 }
 
+/** Profils publics de Fred Wav (données structurées). */
+const SOCIAL_PROFILES = [
+  "https://www.tiktok.com/@fredwav",
+  "https://www.instagram.com/levraifredwav/",
+  "https://www.youtube.com/@Fredwavconseils",
+];
+
 const ROUTES: RouteSeo[] = [
   {
     path: "/",
@@ -220,21 +227,42 @@ const ROUTES: RouteSeo[] = [
     // Pas de fil d'Ariane sur l'accueil : c'est la racine. Le précédent
     // annonçait Accueil > Academy > Témoignages, un chemin de navigation
     // qui n'existe nulle part sur le site.
-    // Identité de l'auteur sur la racine : seul noeud JSON-LD de l'accueil.
-    schema: {
-      "@context": "https://schema.org",
-      "@type": "Person",
-      name: "Fred Wav",
-      url: `${BASE_URL}/`,
-      jobTitle: "Stratège contenu et réseaux sociaux",
-      description:
-        "Fred Wav accompagne les créateurs et entrepreneurs sur leur stratégie de contenu et de réseaux sociaux, à partir de leurs statistiques réelles.",
-      sameAs: [
-        "https://www.tiktok.com/@fredwav",
-        "https://www.instagram.com/levraifredwav/",
-        "https://www.youtube.com/@Fredwavconseils",
-      ],
-    },
+    // Identité sur la racine : Fred Wav (personne), la marque (organisation) et le site,
+    // reliés par leurs @id pour que Google les rattache aux autres pages.
+    schema: [
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "@id": `${BASE_URL}/#fred-wav`,
+        name: "Fred Wav",
+        url: `${BASE_URL}/`,
+        jobTitle: "Stratège contenu et réseaux sociaux",
+        description:
+          "Fred Wav accompagne les créateurs et entrepreneurs sur leur stratégie de contenu et de réseaux sociaux, à partir de leurs statistiques réelles.",
+        sameAs: SOCIAL_PROFILES,
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "@id": `${BASE_URL}/#organisation`,
+        name: "Fred Wav",
+        url: `${BASE_URL}/`,
+        logo: `${BASE_URL}/favicon-192.png`,
+        image: `${BASE_URL}/og-image.png`,
+        email: "contact@fredwav.com",
+        founder: { "@id": `${BASE_URL}/#fred-wav` },
+        sameAs: SOCIAL_PROFILES,
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "@id": `${BASE_URL}/#site`,
+        name: "Fred Wav",
+        url: `${BASE_URL}/`,
+        inLanguage: "fr-FR",
+        publisher: { "@id": `${BASE_URL}/#organisation` },
+      },
+    ],
     sitemap: 1.0,
     llms: "Stratégie de contenu et réseaux sociaux avec Fred Wav : analyses TikTok automatisées (vidéo, compte) et accompagnements (One Shot, Wav Academy à vie, Wav Premium individuel) sur TikTok, Instagram et YouTube.",
     llmsSection: "principales",
@@ -742,7 +770,7 @@ for (const article of ARTICLES) {
   });
 }
 
-const ALLOWED_SCHEMA_TYPES = new Set(["Product", "Service", "Person", "Article", "BreadcrumbList"]);
+const ALLOWED_SCHEMA_TYPES = new Set(["Product", "Service", "Person", "Organization", "WebSite", "Article", "BreadcrumbList"]);
 
 function routeKind(path: string): Exclude<RouteKind, "redirect"> {
   if (["/analyses", "/accompagnements", "/one-shot", "/wavacademy", "/analyse-express", "/analyse-video", "/wav-premium"].includes(path)) return "commercial";

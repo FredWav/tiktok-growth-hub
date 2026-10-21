@@ -74,4 +74,11 @@ SELECT r.name, r.niche, r.metric, r.result, r.result_detail, r.offers, r.display
 FROM resultats r
 WHERE NOT EXISTS (SELECT 1 FROM public.trusted_clients t WHERE lower(t.name) = lower(r.name));
 
+-- 3. Avis Discord (salon « vos-avis » de l'ancien serveur Wav Academy), captures sans les dates.
+UPDATE public.client_screenshots s SET
+  image_url = 'https://ykcjzdqpvffdzlxxtjqc.supabase.co/storage/v1/object/public/client-screenshots/2026-10/discord-' || d.file,
+  is_active = true
+FROM (VALUES ('Estelle', 'estelle.png'), ('Delphine', 'delphine.png'), ('Alex', 'alex.png'), ('Betty', 'betty.png')) AS d(client_name, file)
+WHERE s.client_name = d.client_name;
+
 COMMIT;

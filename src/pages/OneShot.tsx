@@ -27,7 +27,7 @@ const oneShotFaq = [
   },
   {
     question: "Pourquoi seulement 10 places par mois ?",
-    answer: "Chaque audit est préparé à la main par Fred. Dix démarrages par mois, c'est ce qui permet de garder ce niveau de préparation.",
+    answer: "Chaque audit est préparé à la main par Fred. Dix places par mois, c'est ce qui permet de garder ce niveau de préparation.",
   },
 ];
 

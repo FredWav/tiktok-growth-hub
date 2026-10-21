@@ -211,9 +211,9 @@ export function launchLabel(offer: Offer): string | null {
   return `Prix de lancement jusqu'au ${offer.launch.untilLabel}, puis ${formatEuros(offer.launch.nextPrice)}`;
 }
 
-/** Capacité : « 5 démarrages par mois ». */
+/** Capacité : « 5 places par mois ». */
 export function capacityLabel(offer: Offer): string | null {
-  return offer.capacityPerMonth ? `${offer.capacityPerMonth} démarrages par mois` : null;
+  return offer.capacityPerMonth ? `${offer.capacityPerMonth} places par mois` : null;
 }
 
 /**

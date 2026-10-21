@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Section, SectionHeader } from "@/components/ui/section";
@@ -5,18 +6,28 @@ import { SEOHead } from "@/components/SEOHead";
 import { OfferComparison } from "@/components/OfferComparison";
 import { seoFor } from "@/config/seo";
 import { ACCOMPAGNEMENTS, OFFERS, priceLabel } from "@/config/offers";
+import { monthName, usePlaces } from "@/lib/places";
 
-const rows: [string, (id: keyof typeof OFFERS) => string][] = [
+const ids = ["one_shot", "academy", "premium"] as const;
+
+/** Places réelles du mois en cours ; capacité mensuelle tant que la lecture n'a pas abouti. */
+function PlacesThisMonth({ id }: { id: (typeof ids)[number] }) {
+  const [current, ...later] = usePlaces()?.[id]?.months ?? [];
+  if (!current) return <>Jusqu'à {OFFERS[id].capacityPerMonth}</>;
+  if (current.remaining > 0) return <>{current.remaining} sur {current.capacity}</>;
+  const next = later.find((m) => m.remaining > 0);
+  return <>Complet{next ? ` · places en ${monthName(next.month)}` : " · liste d'attente"}</>;
+}
+
+const rows: [string, (id: (typeof ids)[number]) => ReactNode][] = [
   ["Format", (id) => OFFERS[id].format],
   ["Durée", (id) => OFFERS[id].duration],
   ["Rendez-vous", (id) => ({ one_shot: "1 rendez-vous de 1 h 30", academy: "2 lives collectifs par semaine", premium: "3 minimum : 1 h 30 puis 1 h tous les 15 jours" } as Record<string, string>)[id]],
   ["Suivi entre les rendez-vous", (id) => ({ one_shot: "Résumé écrit dans l'heure", academy: "Discord en semaine, réponse sous 2 jours ouvrés", premium: "WhatsApp en semaine, réponse sous 1 jour ouvré" } as Record<string, string>)[id]],
-  ["Démarrages par mois", (id) => String(OFFERS[id].capacityPerMonth ?? "")],
+  ["Places disponibles ce mois-ci", (id) => <PlacesThisMonth id={id} />],
   ["Prix", (id) => priceLabel(OFFERS[id])],
   ["Pour commencer", (id) => (OFFERS[id].cta.href.startsWith("/candidature") ? "Demande, puis réponse de Fred" : "Inscription directe")],
 ];
-
-const ids = ["one_shot", "academy", "premium"] as const;
 
 export default function Accompagnements() {
   return (

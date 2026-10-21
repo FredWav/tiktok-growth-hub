@@ -349,7 +349,7 @@ const ROUTES: RouteSeo[] = [
     description: `Accompagnement individuel d'au moins six semaines : rendez-vous tous les quinze jours, suivi WhatsApp et retours sur tes contenus au jour le jour. ${priceLabel(premium)} TTC.`,
     noscript: {
       h1: "Ton expertise est solide : tes contenus doivent enfin la rendre visible",
-      body: `Accompagnement individuel avec Fred, six semaines minimum (12 ou 18 sur devis) : un rendez-vous de 1 h 30 puis un rendez-vous d'une heure tous les quinze jours, suivi WhatsApp du lundi au vendredi avec réponse sous un jour ouvré, analyse des contenus à la demande. ${priceLabel(premium)} TTC pour six semaines. ${premium.capacityPerMonth} démarrages par mois, sur demande étudiée par Fred.`,
+      body: `Accompagnement individuel avec Fred, six semaines minimum (12 ou 18 sur devis) : un rendez-vous de 1 h 30 puis un rendez-vous d'une heure tous les quinze jours, suivi WhatsApp du lundi au vendredi avec réponse sous un jour ouvré, analyse des contenus à la demande. ${priceLabel(premium)} TTC pour six semaines. ${premium.capacityPerMonth} places par mois, sur demande étudiée par Fred.`,
       links: [{ href: "/candidature?offre=premium", label: "Demander mon accompagnement" }, { href: "/accompagnements", label: "Comparer les accompagnements" }],
     },
     schema: [

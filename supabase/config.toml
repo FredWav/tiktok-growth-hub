@@ -9,9 +9,6 @@ verify_jwt = false
 [functions.commerce-process]
 verify_jwt = false
 
-[functions.admin-assistant]
-verify_jwt = false
-
 [functions.setup-admin]
 verify_jwt = false
 

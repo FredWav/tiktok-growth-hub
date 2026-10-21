@@ -30,7 +30,6 @@ Ce ne sont pas des secrets, juste des identifiants à recopier.
 | `STRIPE_WEBHOOK_SECRET_TEST` | Nouvelle destination webhook en mode test vers `https://ykcjzdqpvffdzlxxtjqc.supabase.co/functions/v1/stripe-webhook` (événements : `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `customer.subscription.deleted`) | oui | — |
 | `STRIPE_WEBHOOK_SECRET` (live) | Nouvelle destination webhook live vers le projet de production, créée le jour de la bascule | — | oui |
 | `WAVSTATS_API_KEY` | Nouvelle clé API dans WavStats | oui | oui |
-| `OPENAI_API_KEY` | platform.openai.com → API keys → « Create new secret key » (assistant de l'admin) | optionnel | optionnel |
 | `ITPUSH_API_KEY` | itpush.dev → nouvelle clé (notifications push sur ton téléphone) | optionnel | optionnel |
 | `DISCORD_WEBHOOK_URL` | Discord → salon → Intégrations → Webhooks → « Nouveau webhook » | optionnel | optionnel |
 

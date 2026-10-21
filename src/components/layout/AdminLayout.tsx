@@ -14,7 +14,6 @@ import {
   BarChart3,
 } from "lucide-react";
 import { useState } from "react";
-import { AdminChatbot } from "@/components/admin/AdminChatbot";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -118,9 +117,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       <main className="lg:ml-64 pt-16 lg:pt-0 min-h-screen">
         <div className="p-6 lg:p-8">{children}</div>
       </main>
-
-      {/* Admin Chatbot */}
-      <AdminChatbot />
     </div>
   );
 };

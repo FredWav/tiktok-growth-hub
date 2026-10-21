@@ -46,7 +46,6 @@ Dans chaque lien de paiement test, l'URL de redirection après paiement doit poi
 | `ADMIN_SETUP_CODE` | Code pour créer ton compte admin sur le site de test | Au premier test de l'admin |
 | `DISCORD_*` (bot, serveur, OAuth, rôle) | Accès Academy | Avec un serveur Discord de test, au lot 1 |
 | `ITPUSH_*`, `DISCORD_WEBHOOK_URL`, `DISCORD_PING_USER_ID` | Notifications push | Optionnel |
-| `OPENAI_API_KEY` | Assistant de l'admin | Optionnel |
 | `COMMERCE_SALES_ENABLED` = `true` | Interrupteur des ventes d'accompagnements (déjà posé par Claude) | — |
 | `COMMERCE_TRANSFER_INSTRUCTIONS` | Texte affiché pour payer par virement | Optionnel |
 | `WAVSTATS_PARTNER_*`, `WAVSTATS_PROVISION_ENABLED` | Crédits WavStats de l'ancienne Academy | Inutiles : la nouvelle Academy n'en inclut plus |

@@ -56,7 +56,7 @@ INSERT INTO resultats VALUES
   ('Élodie', 'Yoga', '177 000', 'vues sur une vidéo', '2 000 likes', '{}', 18),
   ('Sébastien', NULL, '1 M', 'de vues sur une série de vidéos', NULL, '{}', 19),
   ('Guigui & Jojo', 'Rock & metal français · live sessions', '4 962', 'abonnés TikTok et 57K j''aime',
-    'meilleure vidéo à 185 600 vues · YouTube : de 100 à 665 abonnés', '{}', 27),
+    'meilleure vidéo à 185 600 vues · YouTube : de 100 à 3 670 abonnés', '{}', 27),
   ('Alex (Le Zinzin)', NULL, '×4', 'vues par vidéo (1 500 → 6 000)', 'lancé sur quatre réseaux', '{}', 28),
   ('Bernard', 'Le Prévoyant', '10k', 'vues organiques avec 131 abonnés', NULL, '{}', 29),
   ('Expatrié en Thaïlande', 'Expatriation · Thaïlande', '40 000', 'vues en moins de 24 h, à 100 abonnés',

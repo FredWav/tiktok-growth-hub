@@ -92,6 +92,7 @@ expéditeur « Fred Wav ».
 les trois passent à `https://fredwav.com` : le secret `SITE_URL` (liens des e-mails, retour
 Discord), Authentication → URL Configuration → « Site URL », et la liste « Redirect URLs »
 (`https://fredwav.com/**`, à la place de l'adresse de test ; `http://localhost:8080/**` peut rester).
+Surveillance (alerte e-mail si le site tombe) : `UPDATE surveillance SET cible = 'https://fredwav.com' WHERE cle = 'site';`
 
 **Discord** (20/10/2026) : nouvelle application **« Wav Academy »** (`1562098628158562325`), privée,
 invitée sur le serveur Academy (`1409660758324805654`) avec « Créer une invitation » et « Gérer les

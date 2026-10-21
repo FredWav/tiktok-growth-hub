@@ -5,6 +5,7 @@
 # version que Supabase) copie les schémas public, auth et storage avec le rôle en lecture
 # seule « sauvegarde » (migration 20261021100000_role_sauvegarde.sql), dans
 # /var/backups/fredwav (accès root seul). Les 14 dernières sauvegardes vérifiées sont gardées.
+# Chaque réussite est signalée à Supabase, qui alerte par e-mail si le signal manque.
 # Les fichiers stockés (photos, captures, packs) ne sont pas copiés : seulement leurs fiches.
 #
 #   fredwav-sauvegarde --empreinte
@@ -67,4 +68,9 @@ date -Iseconds > "$DEST/.derniere-reussie"
 # 3. Seules les KEEP dernières sauvegardes vérifiées sont gardées.
 ls -1t "$DEST"/fredwav-*.dump | tail -n +$((KEEP + 1)) | xargs -r rm -f --
 
-echo "Sauvegarde $name : $(du -h "$DEST/$name" | cut -f1), $tables tables du site"
+detail="Sauvegarde $name : $(du -h "$DEST/$name" | cut -f1), $tables tables du site"
+echo "$detail"
+
+# 4. Signal à Supabase (migration 20261021110000_surveillance.sql) : sans signal depuis
+#    26 heures, Supabase envoie une alerte à contact@fredwav.com.
+podman run --rm --network host -e PGPASSFILE=/pgpass -v "$CONF/pgpass:/pgpass:ro" --entrypoint psql "$IMAGE"   "host=$HOST port=5432 dbname=postgres user=sauvegarde sslmode=require" -qAt -v ON_ERROR_STOP=1   -c "SET default_transaction_read_only = off" -c "SELECT public.sauvegarde_signal('$detail')" >/dev/null   || echo "Signal non transmis à Supabase : alerte e-mail sous 26 heures" >&2

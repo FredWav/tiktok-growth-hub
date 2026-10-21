@@ -41,8 +41,17 @@ prochain envoi sur `v2`.
   `/var/backups/fredwav/.derniere-reussie`.
 - Essai de restauration dans une base jetable : `sudo fredwav-restauration-essai`
   (21/10/2026 : lignes identiques à la base réelle).
+- Chaque réussite est signalée à Supabase (`sauvegarde_signal`) : sans signal depuis 26 heures,
+  e-mail d'alerte à contact@fredwav.com.
 - Restaurer une table dans le projet : `pg_restore --data-only --table=<table> <fichier>` vers
   la connexion du projet, après accord de Fred.
+
+## Alerte si le site tombe
+
+Supabase (hébergé ailleurs que le VPS) vérifie le site toutes les 5 minutes (tâche `surveillance`,
+migration `20261021110000_surveillance.sql`). Deux échecs de suite : e-mail d'alerte à
+contact@fredwav.com, puis un e-mail quand il répond de nouveau. État : table `surveillance`.
+Essai du 21/10/2026 (adresse volontairement fausse) : alerte et retour reçus en moins de 2 minutes.
 
 ## Production
 

@@ -6,7 +6,7 @@ introduction: Il n'y a pas de bouton secret pour arriver sur le « Pour toi ». 
 theme: probleme-vues-tiktok
 date: 2026-10-21
 mise_a_jour: 2026-10-21
-statut: brouillon
+statut: publie
 note_de_fred: Une créatrice séries avait une vidéo bloquée à 345 vues. On a juste supprimé sa première phrase : la vidéo est montée à 1 800. La simplicité, c'est souvent la meilleure recette.
 redige_avec_ia: true
 liens:

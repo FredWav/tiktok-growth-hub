@@ -6,7 +6,7 @@ introduction: Neuf fois sur dix, ce qu'on appelle un shadowban n'en est pas un. 
 theme: probleme-vues-tiktok
 date: 2026-10-21
 mise_a_jour: 2026-10-21
-statut: brouillon
+statut: publie
 note_de_fred: Une créatrice m'a montré une vidéo bloquée à 200 vues en pensant à un shadowban. En live, on a vu le vrai problème en une minute : sujet trop petit dans le cadre, fond plus lumineux que son visage, rythme trop lent. Elle l'a refaite, et la diffusion est repartie.
 redige_avec_ia: true
 liens:

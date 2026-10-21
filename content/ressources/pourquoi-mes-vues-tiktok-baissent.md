@@ -6,7 +6,7 @@ introduction: Une baisse de vues n'est pas une malédiction de l'algorithme. C'e
 theme: probleme-vues-tiktok
 date: 2026-10-21
 mise_a_jour: 2026-10-21
-statut: brouillon
+statut: publie
 note_de_fred: Un créateur m'a envoyé une vidéo bloquée à 1 500 vues. On a retiré une seule phrase au début, il l'a republiée : 60 000 vues. Le problème n'était ni l'algorithme ni le sujet, juste une phrase de trop.
 redige_avec_ia: true
 liens:

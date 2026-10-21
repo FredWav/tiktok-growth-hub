@@ -105,4 +105,15 @@ FROM (SELECT id, unnest(offer) AS offre FROM public.client_screenshots) o
 WHERE o.id = s.id AND s.is_active AND o.offre IN ('one_shot', 'academy', 'premium')
   AND NOT o.offre = ANY (s.display_locations);
 
+-- 5. William Wood : compte renommé (@williamwoodlesquelette1), sa vidéo où il parle de l'accompagnement.
+UPDATE public.trusted_clients SET tiktok_url = 'https://www.tiktok.com/@williamwoodlesquelette1',
+  tiktok_video_id = '7685414525285256480'
+WHERE name = 'William Wood';
+
+-- 6. Fiches retirées du site à la demande de Fred (masquées, réactivables dans l'admin).
+UPDATE public.trusted_clients SET is_active = false
+WHERE name IN ('Sophie', 'Vanessa', 'Florence', 'Célia', 'Bob', 'Sébastien', 'Alex (Le Zinzin)', 'Hugo',
+  'Expatrié en Thaïlande', 'Clara');
+UPDATE public.client_screenshots SET is_active = false WHERE client_name = 'Florence';
+
 COMMIT;

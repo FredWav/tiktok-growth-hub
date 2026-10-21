@@ -55,13 +55,19 @@ INSERT INTO resultats VALUES
   ('Bob', NULL, '350k', 'vues sur une vidéo en deux jours', NULL, '{}', 17),
   ('Élodie', 'Yoga', '177 000', 'vues sur une vidéo', '2 000 likes', '{}', 18),
   ('Sébastien', NULL, '1 M', 'de vues sur une série de vidéos', NULL, '{}', 19),
-  ('Guillaume', 'Metal', '100 → 665', 'abonnés YouTube', 'une vidéo à 21 000 vues et 400 commentaires', '{}', 27),
+  ('Guigui & Jojo', 'Rock & metal français · live sessions', '4 962', 'abonnés TikTok et 57K j''aime',
+    'YouTube : de 100 à 665 abonnés · une vidéo à 21 000 vues et 400 commentaires', '{}', 27),
   ('Alex (Le Zinzin)', NULL, '×4', 'vues par vidéo (1 500 → 6 000)', 'lancé sur quatre réseaux', '{}', 28),
   ('Bernard', 'Le Prévoyant', '10k', 'vues organiques avec 131 abonnés', NULL, '{}', 29),
   ('Expatrié en Thaïlande', 'Expatriation · Thaïlande', '40 000', 'vues en moins de 24 h, à 100 abonnés',
     'compte reparti de zéro', '{}', 31),
   ('Clara', 'Freelance', '1re vente', 'après le repositionnement de son message', 'conclue en message privé', '{}', 32),
   ('Brouteur Hunter', NULL, '1,5 M', 'de vues sur une vidéo', 'un premier post au-delà du million de vues', '{one_shot}', 7);
+
+-- Guillaume = le duo Guigui & Jojo (précision de Fred, 21/10).
+UPDATE public.trusted_clients SET name = 'Guigui & Jojo', tiktok_url = 'https://www.tiktok.com/@guiguiandjojo',
+  avatar_url = 'https://ykcjzdqpvffdzlxxtjqc.supabase.co/storage/v1/object/public/trusted-avatars/guigui-and-jojo.jpg'
+WHERE name IN ('Guillaume', 'Guigui & Jojo');
 
 UPDATE public.trusted_clients t SET
   niche = coalesce(r.niche, t.niche), metric = r.metric, result = r.result, result_detail = r.result_detail,

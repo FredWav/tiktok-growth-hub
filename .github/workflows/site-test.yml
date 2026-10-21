@@ -23,7 +23,8 @@ jobs:
       # elles remplacent celles de .env, qui désignent l'ancien site.
       VITE_SUPABASE_URL: https://ykcjzdqpvffdzlxxtjqc.supabase.co
       VITE_SUPABASE_PUBLISHABLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrY2p6ZHFwdmZmZHpseHh0anFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyMzAzMzgsImV4cCI6MjEwNzgwNjMzOH0.NSEhEZ6I6kVxdhxwKuG5aa3JsVJRcJghKgao7cHEeXQ
-      VITE_STRIPE_TEST_MODE: "true"
+      # Paiements réels depuis le 21/10/2026 (second webhook Stripe live vers ce projet).
+      VITE_STRIPE_TEST_MODE: "false"
       VITE_DISCORD_OAUTH_REDIRECT_URI: https://ykcjzdqpvffdzlxxtjqc.supabase.co/functions/v1/wavacademy-claim-callback
       VITE_DISCORD_CLIENT_ID: ${{ vars.DISCORD_CLIENT_ID }}
     steps:

@@ -4,17 +4,19 @@ Rien de ce document n'est exécuté sans le feu vert explicite de Fred. Le site 
 (Lovable, `C:\Users\Fred\FWcom`, branche `main`) reste en ligne et intact jusqu'au jour J,
 puis reste disponible pour un retour arrière pendant 2 à 4 semaines.
 
-## Pourquoi les liens de paiement réels ne sont pas branchés avant le jour J
+## Paiements réels (depuis le 21/10/2026, décision de Fred)
 
-Les liens de paiement Stripe réels des analyses sont **partagés** avec le site actuel :
-chaque paiement est confirmé par le webhook Stripe « live », qui pointe aujourd'hui vers
-le backend Lovable. Tant que ce webhook n'est pas déplacé, un paiement lancé depuis la v2
-serait encaissé sans que l'analyse ne parte. Le basculement des paiements se fait donc
-**en une fois**, au jour J, en même temps que le DNS.
+Le nouveau site encaisse en réel avant la bascule, avec les **mêmes** liens de paiement que le
+site actuel. Stripe prévient deux serveurs : l'ancien webhook Lovable (`we_1T0ozpBfuzQl0PTiL9APvenY`,
+inchangé) et un second webhook vers le nouveau projet (`we_1USzEoBfuzQl0PTiekQYmxei`, 4 événements
+de paiement). Chaque serveur ne traite que ses propres commandes (`client_reference_id`) et range
+celles de l'autre en « paiement à rapprocher » (alerte e-mail) : c'est attendu jusqu'à la bascule.
+Clé restreinte `fredwav-v2` (Checkout Sessions : écriture, Payment Links : lecture) dans
+`STRIPE_SECRET_KEY`, secret du nouveau webhook dans `STRIPE_WEBHOOK_SECRET` (saisis par Fred).
 
-Le parcours reste celui de l'ancien site : même lien de paiement, même page de retour
-(`/analyse-express/result?session_id=…`, `/analyse-video/merci`), même déclenchement de
-l'analyse par le webhook, même e-mail de rapport.
+Limite connue : les liens renvoient après paiement vers `fredwav.com/analyse-express/result` et
+`fredwav.com/analyse-video/merci`, donc l'ancien site jusqu'au DNS. L'analyse achetée sur le
+nouveau site part quand même (webhook) et le client reçoit son rapport par e-mail.
 
 ## Projet Supabase de production
 
@@ -32,7 +34,7 @@ Compte « Fred Wav Productions » (`acct_1QrtW3BfuzQl0PTi`), mode live.
 
 | Secret du projet (jour J) | Valeur |
 |---|---|
-| `STRIPE_MODE` | `live` |
+| `STRIPE_MODE` | `live` (fait le 21/10) |
 | `STRIPE_EXPRESS_PAYMENT_LINK_LIVE` | `https://buy.stripe.com/cNi5kCfBy7Hb3eO0z6cMM0J` |
 | `STRIPE_EXPRESS_PRICE_ID_LIVE` | `price_1UI2AuBfuzQl0PTixTSsMijh` |
 | `STRIPE_VIDEO_PAYMENT_LINK_LIVE` | `https://buy.stripe.com/8x2aEW2OM4uZ4iSepWcMM0O` |
@@ -40,10 +42,10 @@ Compte « Fred Wav Productions » (`acct_1QrtW3BfuzQl0PTi`), mode live.
 | `STRIPE_VIDEO_PRICE_ID_LIVE` | `price_1UPga0BfuzQl0PTipaAVi1cc` (2,90 €) |
 | `SITE_URL` | `https://fredwav.com` |
 | `COMMERCE_SALES_ENABLED` | `true` |
-| `ALLOW_TEST_FULFILLMENT` | absent |
+| `ALLOW_TEST_FULFILLMENT` | absent (fait le 21/10) |
 | `POSTHOG_SITE_HOST` | `fredwav.com` (statistiques : ignore les visites de test) |
 | `SMTP_USER` | supprimé (retour à `noreply@fredwav.com`) ; `SMTP_PASSWORD` = mot de passe de noreply@ |
-| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | clé restreinte live et secret du nouveau webhook (saisis par Fred) |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | clé restreinte live et secret du nouveau webhook (saisis par Fred le 21/10) |
 | `RECONCILE_CRON_SECRET` | régénéré (et mis à jour dans les tâches planifiées) |
 
 Réglages des liens réels, inchangés : retour vers `https://fredwav.com/analyse-express/result?session_id={CHECKOUT_SESSION_ID}`
@@ -60,7 +62,6 @@ La Wav Academy passe à 990 € automatiquement (table `commerce_offers`).
 | Qui | Quoi |
 |---|---|
 | Claude | Script de reprise des données Lovable, répété sur une copie jetable (fait le 18/10) |
-| Fred | Stripe live : clé restreinte `rk_live_…` (Checkout Sessions : écriture, Payment Links : lecture), saisie le jour J |
 | Fred | Mot de passe SMTP de `noreply@fredwav.com`, changé le jour J seulement (voir ci-dessous) |
 | Fred | Jeton du bot Discord et secret OAuth, saisis le jour J |
 | Claude | Build de production envoyé sur le VPS, testé sur une adresse privée avant le DNS |
@@ -122,8 +123,8 @@ vers le nouveau projet. Résultat : « Reprise conforme ».
 
 1. Baisser le TTL DNS de fredwav.com la veille (feu vert de Fred).
 2. Mettre en pause les liens de paiement réels (Stripe) : plus aucun paiement pendant la bascule.
-3. Vider les données de recette du projet (garder le catalogue des offres, les places par mois
-   et le compte admin), avec le feu vert de Fred. La reprise refuse une base non vide.
+3. Vider les données de recette du projet (garder le catalogue des offres, les places par mois,
+   le compte admin **et les vraies ventes faites depuis le 21/10**), avec le feu vert de Fred. La reprise refuse une base non vide.
    Exporter la base Lovable (même méthode que `fredwav_261017.backup`), puis :
    ```
    DATABASE_URL=<connexion du projet> NEW_SUPABASE_URL=https://ykcjzdqpvffdzlxxtjqc.supabase.co \
@@ -135,11 +136,8 @@ vers le nouveau projet. Résultat : « Reprise conforme ».
    Puis reprendre les résultats et vidéos de témoignages dans les fiches de l'admin :
    `psql <connexion du projet> -f scripts/sql/temoignages-2026-10.sql` (rejouable).
    Remplacer les réglages de test par ceux de production (tableau plus haut).
-4. Stripe live : créer le webhook vers `https://ykcjzdqpvffdzlxxtjqc.supabase.co/functions/v1/stripe-webhook`
-   (`checkout.session.completed`, `checkout.session.async_payment_succeeded`,
-   `checkout.session.async_payment_failed`, `customer.subscription.deleted`), saisir son secret,
-   puis **désactiver** l'ancien webhook Lovable `we_1T0ozpBfuzQl0PTiL9APvenY`
-   (`https://rdpykyvqcckxpygwblxf.supabase.co/functions/v1/stripe-webhook`).
+4. Stripe live : le webhook du nouveau site existe déjà (`we_1USzEoBfuzQl0PTiekQYmxei`). **Désactiver**
+   l'ancien webhook Lovable `we_1T0ozpBfuzQl0PTiL9APvenY` (`https://rdpykyvqcckxpygwblxf.supabase.co/functions/v1/stripe-webhook`).
    Ne pas toucher au webhook `https://wavstats.com/api/webhooks/stripe` (WavStats).
 5. Discord : bot et adresse de retour OAuth de production (voir « Discord » ci-dessous).
 6. Ajouter `fredwav.com` et `www.fredwav.com` au Caddy du VPS (même méthode : sauvegarde,

@@ -61,8 +61,8 @@ type ResourceArticleProps = {
 
 const BOTTOM_CTA = {
   express: {
-    title: "Tes statistiques ont besoin de contexte, pas d’une règle magique.",
-    text: "L’Analyse Express lit ton compte TikTok, fait ressortir les signaux utiles et te donne un plan d’action clair.",
+    title: "Tu veux faire plus de vues ? Commence par une analyse de ton compte TikTok.",
+    text: "L’Analyse Express compare jusqu’à 120 de tes vidéos, montre ce qui bloque tes vues et te donne un plan d’action clair, en 3 minutes.",
     href: "/analyse-express",
     label: `Analyser mon compte : ${EXPRESS_PRICE_LABEL}`,
   },

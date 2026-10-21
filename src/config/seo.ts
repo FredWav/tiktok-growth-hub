@@ -286,10 +286,10 @@ const ROUTES: RouteSeo[] = [
   },
   {
     path: "/analyse-express",
-    title: "Analyse Express : audit de compte TikTok en 5 min | Fred Wav",
-    description: `Audit automatisé de ton compte TikTok : jusqu’à 120 vidéos publiques comparées, ce qui marche, ce qui bloque et quoi changer. Rapport PDF à ${EXPRESS_PRICE.toFixed(2).replace(".", ",")} €.`,
+    title: "Analyse de compte TikTok : faire plus de vues | Fred Wav",
+    description: `Analyse de ton compte TikTok en 3 minutes : jusqu’à 120 vidéos comparées pour savoir ce qui bloque tes vues et comment en faire plus. Rapport PDF à ${EXPRESS_PRICE.toFixed(2).replace(".", ",")} €.`,
     noscript: {
-      h1: "Tes statistiques TikTok sont visibles : que dois-tu tester ensuite ?",
+      h1: "Analyse de compte TikTok : découvre ce qui bloque tes vues et comment en faire plus",
       body: "Analyse automatisée des données publiques de ton profil et de tes vidéos disponibles, jusqu’à 120, sur un même échantillon documenté : tes formats gagnants, tes meilleurs créneaux, ce qui fait décrocher ton audience et un plan d’action concret. En moins de 3 minutes dans ta boîte mail en fonctionnement normal après paiement, rapport PDF pour 19,90 € TTC.",
       sections: [
         { h2: "Qu’est-ce que l’Analyse Express ?", body: "Un audit de compte TikTok automatisé : tu indiques ton @, l’outil compare tes vidéos publiques (vues, engagement, régularité, formats) et identifie ce qui performe, ce qui décroche et quoi tester ensuite." },

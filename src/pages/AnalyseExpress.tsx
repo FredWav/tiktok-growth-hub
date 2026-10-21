@@ -59,6 +59,10 @@ const faqs = [
     answer: "L'Analyse Express est automatisée à partir de la méthode de Fred. Elle ne comprend pas de relecture humaine ni de rendez-vous individuel ; ces besoins relèvent du Wav Premium.",
   },
   {
+    question: "Comment faire plus de vues sur TikTok ?",
+    answer: "Commence par savoir ce qui marche déjà chez toi. L'analyse de compte TikTok compare jusqu'à 120 de tes vidéos : tes formats qui font le plus de vues, tes meilleurs créneaux, les débuts qui retiennent et ceux qui font décrocher. Tu repars avec un plan d'action pour tes prochaines vidéos.",
+  },
+  {
     question: "Est-ce que ça va vraiment m'aider à faire plus de vues ?",
     answer: "C'est tout l'objectif. Le rapport te montre ce qui marche déjà chez toi et ce qui freine tes vidéos, avec des actions concrètes à appliquer dès ta prochaine publication. Personne ne peut te promettre une vidéo virale, mais tu avances avec un plan au lieu de tâtonner.",
   },
@@ -193,7 +197,7 @@ export default function AnalyseExpress() {
           </div>
 
           <h1 className="font-display text-2xl md:text-5xl font-semibold tracking-tight mb-3 md:mb-6">
-            Tes chiffres sont visibles. Mais que dois-tu tester ensuite ?
+            Analyse ton compte TikTok : découvre ce qui bloque tes vues et comment en faire plus.
           </h1>
 
           <p className="text-sm md:text-lg text-muted-foreground max-w-xl mx-auto mb-4 md:mb-4">

@@ -1,0 +1,11 @@
+[Unit]
+Description=Sauvegarde de la base fredwav (Supabase) sur le VPS
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/fredwav-sauvegarde
+TimeoutStartSec=1800
+Nice=10
+IOSchedulingClass=idle

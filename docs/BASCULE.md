@@ -146,6 +146,8 @@ vers le nouveau projet. Résultat : « Reprise conforme ».
 7. DNS : faire pointer fredwav.com vers le VPS (feu vert de Fred).
 8. Réactiver les liens de paiement ; achat réel d'une Analyse vidéo, puis remboursement.
 9. Régénérer le secret `x-cron-secret` (l'ancien a été affiché une fois pendant la préparation).
+10. Sauvegarde : `sudo systemctl start fredwav-sauvegarde` puis `sudo fredwav-restauration-essai`
+    (vraies données dans la copie). Elle tourne ensuite seule chaque nuit (deploy/README.md).
 
 ## Retour arrière
 

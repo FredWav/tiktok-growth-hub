@@ -26,6 +26,24 @@ GitHub n'a aucun accès au VPS : c'est le VPS qui va chercher la version publié
 Pendant que la mise à jour automatique tourne, un retour arrière manuel est remplacé au
 prochain envoi sur `v2`.
 
+## Sauvegarde de la base (chaque nuit)
+
+`fredwav-sauvegarde.timer` lance vers 3 h 15 `/usr/local/bin/fredwav-sauvegarde`
+(`deploy/vps/fredwav-sauvegarde.sh`) : `pg_dump` (image `postgres:17-alpine`) des schémas
+`public`, `auth` et `storage`, vérifié puis rangé dans `/var/backups/fredwav` (root seul,
+14 dernières sauvegardes). Les fichiers stockés (photos, captures, packs) ne sont pas copiés.
+
+- Rôle Supabase `sauvegarde` en lecture seule (migration `20261021100000_role_sauvegarde.sql`).
+  Son mot de passe est créé sur le VPS (`/etc/fredwav-sauvegarde`) et n'en sort pas : seule son
+  empreinte SCRAM est appliquée dans Supabase (`ALTER ROLE sauvegarde PASSWORD '<empreinte>'`).
+- Installation : `SSH_CONFIG=… bash scripts/installer-sauvegarde.sh` (affiche l'empreinte).
+- Journal : `sudo journalctl -u fredwav-sauvegarde -n 20` ; dernière réussite :
+  `/var/backups/fredwav/.derniere-reussie`.
+- Essai de restauration dans une base jetable : `sudo fredwav-restauration-essai`
+  (21/10/2026 : lignes identiques à la base réelle).
+- Restaurer une table dans le projet : `pg_restore --data-only --table=<table> <fichier>` vers
+  la connexion du projet, après accord de Fred.
+
 ## Production
 
 Au moment de la bascule seulement (docs/BASCULE.md) : même principe pour `main`, avec le

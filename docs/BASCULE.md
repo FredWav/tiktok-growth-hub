@@ -10,8 +10,9 @@ et témoignages appliqués. Connexion à la base : rôle temporaire de la CLI
 
 - Données de test effacées (accord de Fred) ; catalogue, compte admin et surveillance gardés.
 - Packs de hooks (6) envoyés depuis le disque E: avec `supabase storage cp` (chemins relatifs).
-- **Perdus avec le stockage Lovable** : 11 photos de témoignages (le site affiche les initiales)
-  et 10 captures (masquées : `is_active = false`), à renvoyer depuis l'admin.
+- **Perdus avec le stockage Lovable** : photos de témoignages, remplacées le 21/10 par la photo de
+  profil TikTok actuelle de chaque client (10 sur 11 ; compte introuvable : initiales), et 10 captures
+  (masquées : `is_active = false`), à renvoyer depuis l'admin avec les originaux.
 - **Non repris** : 7 Analyses Express vendues sur l'ancien site du 17/10 (après l'export) au
   20/10, servies par Lovable avant sa panne ; visibles dans Stripe. Si Lovable est rechargé :
   nouvel export, puis reprise de ces lignes.
@@ -19,8 +20,7 @@ et témoignages appliqués. Connexion à la base : rôle temporaire de la CLI
   `fredwav.com` (mêmes fichiers que le site de test, mis à jour depuis `v2`) et `www` (redirection).
 - `SITE_URL`, `POSTHOG_SITE_HOST`, Auth (Site URL et Redirect URLs) et surveillance sur
   `https://fredwav.com`.
-- Reste : désactiver l'ancien webhook Lovable dans Stripe (Fred), vrai rôle Discord
-  (`DISCORD_VIP2_ROLE_ID`), passage des e-mails sur noreply@, nouveau secret cron.
+- Reste : désactiver l'ancien webhook Lovable dans Stripe (Fred), passage des e-mails sur noreply@, nouveau secret cron.
 
 
 Rien de ce document n'est exécuté sans le feu vert explicite de Fred. Le site actuel
@@ -122,9 +122,8 @@ Surveillance (alerte e-mail si le site tombe) : `UPDATE surveillance SET cible =
 invitée sur le serveur Academy (`1409660758324805654`) avec « Créer une invitation » et « Gérer les
 rôles ». C'est l'application définitive : le bot de l'ancien site n'est pas touché. Adresse de retour
 OAuth : `https://ykcjzdqpvffdzlxxtjqc.supabase.co/functions/v1/wavacademy-claim-callback`.
-D'ici la bascule, elle donne le rôle de test « Academy test » (`DISCORD_VIP2_ROLE_ID` =
-`1409885742598983863`, aucun salon). Le jour J : `DISCORD_VIP2_ROLE_ID` = identifiant du vrai rôle
-des membres, et vérifier que le rôle du bot est placé au-dessus.
+Elle donne le vrai rôle des membres (`DISCORD_VIP2_ROLE_ID` = `1409885742598983863`, créé le
+26/08/2025) ; le rôle du bot doit rester placé au-dessus.
 
 ## Répétition de la reprise (18/10/2026, export du 17/10)
 

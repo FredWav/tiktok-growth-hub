@@ -16,6 +16,7 @@ export interface TrustedClient {
   result: string | null;
   result_detail: string | null;
   youtube_id: string | null;
+  tiktok_video_id: string | null;
   video_caption: string | null;
   featured: boolean;
   anonymous: boolean;

@@ -15,7 +15,7 @@ const env = { ...loadEnv(process.env.MODE || "production", root, "VITE_"), ...pr
 const url = env.VITE_SUPABASE_URL;
 const key = env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
-const COLUMNS = "id,name,avatar_url,tiktok_url,offers,display_order,niche,metric,result,result_detail,youtube_id,video_caption,featured,anonymous";
+const COLUMNS = "id,name,avatar_url,tiktok_url,offers,display_order,niche,metric,result,result_detail,youtube_id,tiktok_video_id,video_caption,featured,anonymous";
 
 try {
   if (!url || !key) throw new Error("adresse ou clé publique Supabase absente");

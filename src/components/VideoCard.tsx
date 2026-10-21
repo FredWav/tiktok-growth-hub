@@ -6,13 +6,30 @@ import { type Temoignage, useTemoignages, videoLegend, videosForOffer, withVideo
 interface VideoCardProps {
   id: string;
   alt: string;
+  /** YouTube (vignette fournie par YouTube) ou TikTok (vidéo verticale, photo du client en vignette). */
+  platform?: "youtube" | "tiktok";
+  cover?: string | null;
   location?: string;
   /** Légende (nom, niche, résultat) ; absente pour une personne non nommée. */
   legend?: { name: string; sub: string } | null;
 }
 
-export function VideoCard({ id, alt, location = "home", legend }: VideoCardProps) {
+export function VideoCard({ id, alt, platform = "youtube", cover, location = "home", legend }: VideoCardProps) {
   const [playing, setPlaying] = useState(false);
+
+  if (playing && platform === "tiktok") {
+    return (
+      <div className="mx-auto aspect-[9/16] w-full max-w-[340px] rounded-xl overflow-hidden shadow-lg bg-black">
+        <iframe
+          src={`https://www.tiktok.com/player/v1/${id}?autoplay=1&description=0&music_info=0&rel=0`}
+          title={alt}
+          allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+          allowFullScreen
+          className="w-full h-full"
+        />
+      </div>
+    );
+  }
 
   if (playing) {
     return (
@@ -33,12 +50,19 @@ export function VideoCard({ id, alt, location = "home", legend }: VideoCardProps
       onClick={() => { trackEvent("click_video_play", { video_id: id, location }); setPlaying(true); }}
       className="group relative aspect-video rounded-xl overflow-hidden shadow-lg cursor-pointer w-full"
     >
-      <img
-        src={`https://img.youtube.com/vi/${id}/hqdefault.jpg`}
-        alt={alt}
-        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-        loading="lazy"
-      />
+      {platform === "tiktok" ? (
+        <div className="w-full h-full bg-gradient-to-br from-noir via-noir to-primary/40 flex items-center justify-center">
+          {cover && <img src={cover} alt={alt} className="h-20 w-20 rounded-full object-cover ring-2 ring-primary/60 opacity-90" loading="lazy" />}
+          <span className="absolute top-3 right-3 rounded-full bg-black/60 px-2 py-0.5 text-[11px] font-semibold text-white">TikTok</span>
+        </div>
+      ) : (
+        <img
+          src={`https://img.youtube.com/vi/${id}/hqdefault.jpg`}
+          alt={alt}
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          loading="lazy"
+        />
+      )}
       <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors flex items-center justify-center">
         <div className="w-14 h-14 rounded-full bg-primary/90 flex items-center justify-center group-hover:scale-110 transition-transform shadow-xl">
           <Play className="h-6 w-6 text-primary-foreground ml-0.5" fill="currentColor" />
@@ -72,7 +96,15 @@ export function VideoTestimonials({ featured = false, offer, limit, location, cl
   return (
     <div className={className}>
       {videos.map((t) => (
-        <VideoCard key={t.id} id={t.youtube_id!} alt={altOf(t)} legend={videoLegend(t)} location={location} />
+        <VideoCard
+          key={t.id}
+          id={(t.youtube_id ?? t.tiktok_video_id)!}
+          platform={t.youtube_id ? "youtube" : "tiktok"}
+          cover={t.avatar_url}
+          alt={altOf(t)}
+          legend={videoLegend(t)}
+          location={location}
+        />
       ))}
     </div>
   );

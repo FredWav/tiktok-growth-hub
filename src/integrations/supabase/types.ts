@@ -976,6 +976,7 @@ export type Database = {
           result: string | null
           result_detail: string | null
           tiktok_url: string | null
+          tiktok_video_id: string | null
           updated_at: string
           video_caption: string | null
           youtube_id: string | null
@@ -995,6 +996,7 @@ export type Database = {
           result?: string | null
           result_detail?: string | null
           tiktok_url?: string | null
+          tiktok_video_id?: string | null
           updated_at?: string
           video_caption?: string | null
           youtube_id?: string | null
@@ -1014,6 +1016,7 @@ export type Database = {
           result?: string | null
           result_detail?: string | null
           tiktok_url?: string | null
+          tiktok_video_id?: string | null
           updated_at?: string
           video_caption?: string | null
           youtube_id?: string | null

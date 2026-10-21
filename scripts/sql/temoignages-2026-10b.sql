@@ -42,7 +42,7 @@ INSERT INTO resultats VALUES
   ('Bidjad', NULL, '700 → 4 000', 'vues en moyenne par vidéo', '19 % d''engagement', '{premium}', 8),
   ('Maxime', 'IA & automatisation', '×2', 'abonnés Instagram en un mois (600 → 1 223)',
     'Facebook : 54 → 1 000 abonnés · 160 000 vues Instagram en un mois', '{premium}', 9),
-  ('Créateur survivalisme', 'Survivalisme · 31k abonnés', '+10 000', 'abonnés et premiers revenus TikTok',
+  ('Bernard Le Prévoyant', 'Survivalisme · 36,4k abonnés', '+10 000', 'abonnés et premiers revenus TikTok',
     'RPM × 4, record à 11 € · 9 séances', '{premium}', 10),
   ('Sophie', 'Miss Stinguette', '+6 000', 'abonnés en un mois et demi',
     'première collaboration rémunérée : 250 €', '{academy}', 11),
@@ -58,11 +58,20 @@ INSERT INTO resultats VALUES
   ('Guigui & Jojo', 'Rock & metal français · live sessions', '4 962', 'abonnés TikTok et 57K j''aime',
     'meilleure vidéo à 185 600 vues · YouTube : de 100 à 3 670 abonnés', '{}', 27),
   ('Alex (Le Zinzin)', NULL, '×4', 'vues par vidéo (1 500 → 6 000)', 'lancé sur quatre réseaux', '{}', 28),
-  ('Bernard', 'Le Prévoyant', '10k', 'vues organiques avec 131 abonnés', NULL, '{}', 29),
   ('Expatrié en Thaïlande', 'Expatriation · Thaïlande', '40 000', 'vues en moins de 24 h, à 100 abonnés',
     'compte reparti de zéro', '{}', 31),
   ('Clara', 'Freelance', '1re vente', 'après le repositionnement de son message', 'conclue en message privé', '{}', 32),
   ('Brouteur Hunter', NULL, '1,5 M', 'de vues sur une vidéo', 'un premier post au-delà du million de vues', '{one_shot}', 7);
+
+-- Le créateur survivalisme est Bernard Le Prévoyant (précision de Fred, 21/10) : une seule fiche.
+UPDATE public.trusted_clients SET name = 'Bernard Le Prévoyant', tiktok_url = 'https://www.tiktok.com/@bernard.le.prevoyant',
+  avatar_url = 'https://ykcjzdqpvffdzlxxtjqc.supabase.co/storage/v1/object/public/trusted-avatars/bernard-le-prevoyant.jpg'
+WHERE name IN ('Créateur survivalisme', 'Bernard Le Prévoyant');
+-- Sa vidéo TikTok où il parle de l'accompagnement (lien donné par Fred).
+UPDATE public.trusted_clients SET tiktok_video_id = '7665660459088940320',
+  video_caption = '+10 000 abonnés et premiers revenus TikTok'
+WHERE name = 'Bernard Le Prévoyant';
+UPDATE public.trusted_clients SET is_active = false WHERE name = 'Bernard';
 
 -- Guillaume = le duo Guigui & Jojo (précision de Fred, 21/10).
 UPDATE public.trusted_clients SET name = 'Guigui & Jojo', tiktok_url = 'https://www.tiktok.com/@guiguiandjojo',

@@ -35,6 +35,7 @@ const emptyForm = {
   result: "",
   result_detail: "",
   youtube: "",
+  tiktok_video: "",
   video_caption: "",
   featured: false,
   anonymous: false,
@@ -46,6 +47,14 @@ function youtubeIdOf(value: string): string | null {
   if (!v) return null;
   if (/^[A-Za-z0-9_-]{11}$/.test(v)) return v;
   const m = v.match(/(?:youtu\.be\/|v=|shorts\/|embed\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+/** Identifiant d'une vidéo TikTok depuis son lien (…/video/<identifiant>) ou l'identifiant seul. */
+function tiktokVideoIdOf(value: string): string | null {
+  const v = value.trim();
+  if (!v) return null;
+  if (/^[0-9]{15,22}$/.test(v)) return v;
+  const m = v.match(/\/video\/([0-9]{15,22})/);
   return m ? m[1] : null;
 }
 const blank = (v: string) => (v.trim() ? v.trim() : null);
@@ -81,6 +90,7 @@ const Testimonials = () => {
       result: c.result || "",
       result_detail: c.result_detail || "",
       youtube: c.youtube_id || "",
+      tiktok_video: c.tiktok_video_id || "",
       video_caption: c.video_caption || "",
       featured: c.featured,
       anonymous: c.anonymous,
@@ -125,11 +135,16 @@ const Testimonials = () => {
       toast.error("Lien YouTube non reconnu");
       return;
     }
+    const tiktok_video_id = tiktokVideoIdOf(form.tiktok_video);
+    if (form.tiktok_video.trim() && !tiktok_video_id) {
+      toast.error("Lien de vidéo TikTok non reconnu (https://www.tiktok.com/@compte/video/…)");
+      return;
+    }
     if (!!form.metric.trim() !== !!form.result.trim()) {
       toast.error("Un résultat a besoin des deux champs : le chiffre et sa description");
       return;
     }
-    const { youtube: _youtube, ...rest } = form;
+    const { youtube: _youtube, tiktok_video: _tiktokVideo, ...rest } = form;
     const record = {
       ...rest,
       name: form.name.trim(),
@@ -141,6 +156,7 @@ const Testimonials = () => {
       result_detail: blank(form.result_detail),
       video_caption: blank(form.video_caption),
       youtube_id,
+      tiktok_video_id,
     };
     try {
       if (editingId) {
@@ -216,7 +232,7 @@ const Testimonials = () => {
                     </p>
                   )}
                   <div className="flex flex-wrap gap-1 mt-1">
-                    {c.youtube_id && (
+                    {(c.youtube_id || c.tiktok_video_id) && (
                       <span className="text-[10px] bg-red-500/20 text-red-300 px-2 py-0.5 rounded-full">Vidéo</span>
                     )}
                     {c.metric && c.result && !c.anonymous && (
@@ -326,6 +342,11 @@ const Testimonials = () => {
             <div>
               <Label className="text-cream">Vidéo YouTube (lien ou identifiant)</Label>
               <Input value={form.youtube} onChange={(e) => setForm((f) => ({ ...f, youtube: e.target.value }))} placeholder="https://youtube.com/shorts/…" className="mt-1 text-cream bg-noir border-primary/20 placeholder:text-cream/30" />
+            </div>
+
+            <div>
+              <Label className="text-cream">Vidéo TikTok (lien)</Label>
+              <Input value={form.tiktok_video} onChange={(e) => setForm((f) => ({ ...f, tiktok_video: e.target.value }))} placeholder="https://www.tiktok.com/@compte/video/…" className="mt-1 text-cream bg-noir border-primary/20 placeholder:text-cream/30" />
             </div>
 
             <div>

@@ -20,13 +20,14 @@ export type Temoignage = {
   result: string | null;
   result_detail: string | null;
   youtube_id: string | null;
+  tiktok_video_id: string | null;
   video_caption: string | null;
   featured: boolean;
   anonymous: boolean;
 };
 
 const COLUMNS =
-  "id,name,avatar_url,tiktok_url,offers,display_order,niche,metric,result,result_detail,youtube_id,video_caption,featured,anonymous";
+  "id,name,avatar_url,tiktok_url,offers,display_order,niche,metric,result,result_detail,youtube_id,tiktok_video_id,video_caption,featured,anonymous";
 
 export function useTemoignages(): Temoignage[] {
   const hydrated = useHydrated();
@@ -73,8 +74,8 @@ export function videosForOffer(list: Temoignage[], offerId: string, count: numbe
   return [...picked, ...list.filter((t) => !picked.includes(t))].slice(0, count);
 }
 
-/** Témoignages vidéo. */
-export const withVideo = (t: Temoignage) => !!t.youtube_id;
+/** Témoignages vidéo (YouTube ou TikTok). */
+export const withVideo = (t: Temoignage) => !!t.youtube_id || !!t.tiktok_video_id;
 
 /** Légende d'une vidéo : nom et précision (rien pour une personne non nommée). */
 export function videoLegend(t: Temoignage): { name: string; sub: string } | null {

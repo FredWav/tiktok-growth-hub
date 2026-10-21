@@ -47,8 +47,6 @@ INSERT INTO resultats VALUES
   ('Sophie', 'Miss Stinguette', '+6 000', 'abonnés en un mois et demi',
     'première collaboration rémunérée : 250 €', '{academy}', 11),
   ('Vanessa', 'Jox Art', '500k', 'vues sur une vidéo ASMR', '+800 abonnés', '{academy}', 12),
-  ('David (quiz cinéma)', 'Cinéma · quiz Instagram', '+2 000', 'abonnés en une semaine',
-    'cap des 10 000 franchi · de 5 à 50 réponses par story', '{academy}', 13),
   ('Florence', 'Voyage', '10 000+', 'vues sur sa vidéo avis Amsterdam', '+30 abonnés Instagram', '{}', 14),
   ('Eddy Maniez', NULL, '34 000', 'vues sur une vidéo', '3 ventes et contacts qualifiés', '{}', 15),
   ('Célia', 'Audacieuse Nature', '27 000', 'vues avec 377 abonnés', '316 enregistrements, 120 partages', '{}', 16),
@@ -115,5 +113,11 @@ UPDATE public.trusted_clients SET is_active = false
 WHERE name IN ('Sophie', 'Vanessa', 'Florence', 'Célia', 'Bob', 'Sébastien', 'Alex (Le Zinzin)', 'Hugo',
   'Expatrié en Thaïlande', 'Clara');
 UPDATE public.client_screenshots SET is_active = false WHERE client_name = 'Florence';
+
+-- 7. « David (quiz cinéma) » est PlotBreaker (précision de Fred) : ses résultats rejoignent sa fiche.
+UPDATE public.trusted_clients SET
+  result_detail = 'cap des 10 000 abonnés franchi · +2 000 abonnés en une semaine avec ses quiz Instagram'
+WHERE name = 'PlotBreaker';
+UPDATE public.trusted_clients SET is_active = false WHERE name = 'David (quiz cinéma)';
 
 COMMIT;

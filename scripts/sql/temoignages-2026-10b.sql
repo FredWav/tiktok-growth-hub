@@ -120,4 +120,12 @@ UPDATE public.trusted_clients SET
 WHERE name = 'PlotBreaker';
 UPDATE public.trusted_clients SET is_active = false WHERE name = 'David (quiz cinéma)';
 
+-- 8. Gautier = Bilskirnir (@bilskirnir.fr) : chiffres actuels du compte (capture de Fred, 21/10).
+UPDATE public.trusted_clients SET
+  niche = 'Bilskirnir · mythologie & histoire',
+  result_detail = '169,2k abonnés TikTok et 2,2 M de j''aime · Facebook : +7 000 abonnés',
+  tiktok_url = 'https://www.tiktok.com/@bilskirnir.fr',
+  avatar_url = 'https://ykcjzdqpvffdzlxxtjqc.supabase.co/storage/v1/object/public/trusted-avatars/gautier-bilskirnir.jpg'
+WHERE name = 'Gautier';
+
 COMMIT;

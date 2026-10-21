@@ -277,32 +277,32 @@ export default function AnalyseExpress() {
       <Section variant="dark" size="lg">
         <div className="mx-auto max-w-5xl">
           <SectionHeader
-            title="Ce n’est ni un oracle, ni un ChatGPT avec un autre logo."
-            subtitle="La valeur vient du périmètre réel de ton compte, de la comparaison de tes contenus et d’une méthode de lecture explicite. Les limites restent visibles."
+            title="Tes vraies vidéos, analysées en 3 minutes."
+            subtitle="Des centaines de créateurs l’ont déjà lancée avant toi. Le rapport part de ton compte, compare tes contenus entre eux et te donne un plan d’action clair, prêt à appliquer dès ta prochaine vidéo."
             className="[&_h2]:text-cream [&_p]:text-cream/70"
           />
           <ObjectionCards
             tone="dark"
             items={[
               {
-                question: "Personne ne peut prédire TikTok.",
+                question: "Je ne sais pas pourquoi mes vidéos plafonnent.",
                 answer:
-                  "Exact. Le rapport ne prédit pas la prochaine vidéo virale. Il sépare les observations des hypothèses et propose des tests pour prendre une décision moins aveugle.",
+                  "C’est exactement le rôle de l’Express : jusqu’à 120 de tes vidéos comparées, tes formats qui marchent le mieux mis en avant, et les points qui freinent ta portée identifiés. Tu vois enfin ce qui fonctionne chez toi, et quoi changer.",
               },
               {
                 question: "J’ai déjà les statistiques dans TikTok.",
                 answer:
-                  "TikTok fournit des mesures natives plus riches que les données publiques. L’Express apporte une lecture transversale de l’échantillon disponible ; il ne remplace pas tes courbes privées de rétention ni leur interprétation métier.",
+                  "TikTok te donne des chiffres. L’Express te dit quoi en faire : il compare tes vidéos entre elles, repère tes meilleurs créneaux, hashtags et formats, et te livre des pistes concrètes à tester tout de suite.",
               },
               {
                 question: "Une IA va me donner des conseils génériques.",
                 answer:
-                  "Le rapport est construit à partir des vidéos effectivement exploitées et indique leur nombre ainsi que la période couverte. S’il ne peut pas attester ce périmètre, il n’est pas présenté comme complet.",
+                  "Chaque recommandation part de TES vidéos. Le rapport indique les contenus analysés et la période couverte : tu sais exactement d’où vient chaque conseil, et pourquoi il s’applique à ton compte.",
               },
               {
                 question: "Les vues ne disent rien sur mon chiffre d’affaires.",
                 answer:
-                  "C’est vrai. Les données publiques ne permettent pas de mesurer tes prospects ou tes ventes. Le rapport aide à lire la diffusion et les réactions visibles ; la décision commerciale doit être confrontée à tes propres données.",
+                  "Des vues qui ne rapportent rien, c’est souvent un problème de format ou de message. L’Express te montre quels contenus captent vraiment ton audience, pour construire des vidéos qui attirent les bonnes personnes.",
               },
             ]}
           />

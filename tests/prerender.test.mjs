@@ -39,7 +39,7 @@ test("gamme publique cohérente : prix du catalogue, lancement annoncé, aucune 
     assert.doesNotMatch(await text(path), /1 990|trente jours|30 jours/, path || "accueil");
   }
   const express = await page("analyse-express");
-  assert.match(express, /ni un ChatGPT avec un autre logo/);
+  assert.match(express, /Tes vraies vidéos, analysées en 3 minutes/);
   assert.match(express, /Les vues ne disent rien sur mon chiffre d’affaires/);
 });
 test("redirection HTML start conserve la campagne et le fragment", async () => {

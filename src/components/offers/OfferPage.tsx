@@ -6,6 +6,7 @@ import { Section, SectionHeader } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
 import { ClientResults } from "@/components/ClientResults";
 import { VideoTestimonials } from "@/components/VideoCard";
+import { ScreenshotWall } from "@/components/ScreenshotWall";
 import { trackCtaClick, trackOfferView, type OfferId } from "@/lib/funnel-events";
 import { launchLabel, type Offer, priceLabel } from "@/config/offers";
 import { PlacesLeft } from "@/components/offers/PlacesLeft";
@@ -172,6 +173,14 @@ export function OfferPage({
             limit={3}
             location={`offre_${offer.id}`}
             className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mt-10"
+          />
+          {/* Messages de clients rattachés à l'offre (display_locations contient son identifiant). */}
+          <ScreenshotWall
+            location={offer.id}
+            title="Leurs messages"
+            subtitle="Des retours authentiques, sans filtre."
+            className="mt-12"
+            cols={2}
           />
           <div className="mt-8 text-center">
             <Link to="/temoignages" className="inline-flex min-h-11 items-center text-primary underline">

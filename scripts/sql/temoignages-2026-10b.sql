@@ -81,4 +81,13 @@ UPDATE public.client_screenshots s SET
 FROM (VALUES ('Estelle', 'estelle.png'), ('Delphine', 'delphine.png'), ('Alex', 'alex.png'), ('Betty', 'betty.png')) AS d(client_name, file)
 WHERE s.client_name = d.client_name;
 
+-- 4. Captures affichées aussi sur la page de leur offre (OfferPage : display_locations contient l'offre).
+-- Les avis Discord sont ceux de membres de la Wav Academy.
+UPDATE public.client_screenshots SET offer = '{academy}'
+WHERE client_name IN ('Estelle', 'Delphine', 'Alex', 'Betty') AND image_url LIKE '%/2026-10/discord-%';
+UPDATE public.client_screenshots s SET display_locations = s.display_locations || o.offre
+FROM (SELECT id, unnest(offer) AS offre FROM public.client_screenshots) o
+WHERE o.id = s.id AND s.is_active AND o.offre IN ('one_shot', 'academy', 'premium')
+  AND NOT o.offre = ANY (s.display_locations);
+
 COMMIT;

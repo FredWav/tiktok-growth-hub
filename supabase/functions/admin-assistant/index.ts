@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { todayInParis } from "../_shared/posthog-stats.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -84,7 +85,7 @@ const tools = [
     type: "function",
     function: {
       name: "get_monthly_revenue",
-      description: "Récupère le chiffre d'affaires du mois en cours (somme des bookings payés en euros).",
+      description: "Ventes du mois en cours (heure de Paris), paiements confirmés par Stripe : montant encaissé par accompagnement (One Shot, Academy, Premium, remboursements déduits) et nombre d'analyses Express et vidéo vendues (leur montant n'est pas enregistré).",
       parameters: { type: "object", properties: {}, required: [] }
     }
   },
@@ -125,7 +126,7 @@ Tu as accès en LECTURE SEULE aux données suivantes :
 - Analyses Express TikTok (express_analyses)
 - Candidatures Wav Premium (wav_premium_applications)
 - Stats marketing & trafic (page_views, sources UTM, top pages)
-- Chiffre d'affaires (bookings payés)
+- Ventes du mois (accompagnements encaissés, nombre d'analyses vendues)
 - Étapes du funnel diagnostic
 
 Tu peux aussi analyser des images (captures d'écran TikTok, stats, screenshots) via analyze_image.
@@ -281,23 +282,24 @@ async function executeTool(supabase: any, toolName: string, args: any): Promise<
       }
 
       case 'get_monthly_revenue': {
-        const monthStart = new Date();
-        monthStart.setDate(1);
-        monthStart.setHours(0, 0, 0, 0);
-
-        const { data, error } = await supabase
-          .from('bookings')
-          .select('amount_cents')
-          .eq('payment_status', 'paid')
-          .gte('paid_at', monthStart.toISOString());
-
+        // Même source que la page Statistiques : paiements confirmés, heure de Paris.
+        const today = todayInParis();
+        const monthStart = `${today.slice(0, 8)}01`;
+        const { data, error } = await supabase.rpc('admin_sales', { p_from: monthStart, p_to: today });
         if (error) return JSON.stringify({ error: error.message });
 
-        const totalCents = (data || []).reduce((sum: number, b: any) => sum + (b.amount_cents || 0), 0);
+        const accompagnements = Object.fromEntries(
+          Object.entries(data.accompagnements as Record<string, { orders: number; revenue_cents: number }>)
+            .map(([offer, a]) => [offer, { orders: a.orders, revenue_euros: a.revenue_cents / 100 }]),
+        );
+        const totalCents = Object.values(data.accompagnements as Record<string, { revenue_cents: number }>)
+          .reduce((sum, a) => sum + a.revenue_cents, 0);
         return JSON.stringify({
-          month_start: monthStart.toISOString().slice(0, 10),
-          paid_bookings_count: data?.length || 0,
-          revenue_euros: totalCents / 100
+          period: { from: monthStart, to: today },
+          accompagnements_revenue_euros: totalCents / 100,
+          accompagnements,
+          analyses_sold: data.analyses,
+          note: "Montant des analyses non enregistré : seul leur nombre est connu.",
         });
       }
 

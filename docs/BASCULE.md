@@ -63,6 +63,7 @@ La Wav Academy passe à 990 € automatiquement (table `commerce_offers`).
 | Fred | Stripe live : clé restreinte `rk_live_…` (Checkout Sessions : écriture, Payment Links : lecture), saisie le jour J |
 | Fred | Mot de passe SMTP de `noreply@fredwav.com`, changé le jour J seulement (voir ci-dessous) |
 | Fred | Jeton du bot Discord et secret OAuth, saisis le jour J |
+| Fred | Clé OpenAI (secret `OPENAI_API_KEY`) : sans elle, l'assistant de l'admin répond « OPENAI_API_KEY non configurée ». Peut être saisie dès maintenant, elle n'est pas partagée avec un réglage du site actuel |
 | Claude | Build de production envoyé sur le VPS, testé sur une adresse privée avant le DNS |
 
 **PostHog** (Europe, choix de Fred du 19/10/2026) : la v2 envoie ses statistiques au projet

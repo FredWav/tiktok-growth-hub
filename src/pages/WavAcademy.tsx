@@ -98,7 +98,6 @@ export default function WavAcademy() {
                 Deux lives par semaine, des cours et un suivi sur Discord.
               </p>
               <div className="mt-5 space-y-4">
-                <Price />
                 <p className="text-sm text-muted-foreground">Accès tant que la Wav Academy existe.</p>
                 <BookingButton position="hero" className="w-full sm:w-auto" />
                 <p className="text-sm">{ACADEMY_CALL_FORMAT}. Sans engagement.</p>

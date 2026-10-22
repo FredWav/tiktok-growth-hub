@@ -1,0 +1,22 @@
+# Publication programmée des articles : chaque matin, relance la construction du site
+# depuis la branche v2 (.github/workflows/site-test.yml), qui met en ligne les articles
+# dont la date est arrivée. Placé sur main : GitHub n'exécute les tâches planifiées
+# que depuis la branche par défaut du dépôt.
+name: Publication quotidienne
+
+on:
+  schedule:
+    - cron: "15 4 * * *" # 5 h 15 ou 6 h 15 à Paris selon l'heure d'été
+  workflow_dispatch:
+
+permissions:
+  actions: write
+
+jobs:
+  relancer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reconstruire le site depuis v2
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run site-test.yml --ref v2 --repo "$GITHUB_REPOSITORY"

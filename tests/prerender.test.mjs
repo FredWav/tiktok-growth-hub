@@ -13,7 +13,7 @@ test("pages d'offres indexées, formulaire de demande exclu du sitemap", async (
   }
   assert.doesNotMatch(sitemap, /candidature|reserverunappel|wavacademy\/appel|inscription|preuves/);
   assert.match(await page("candidature"), /noindex/);
-  for (const [from, to] of [["preuves", "/temoignages"], ["reserverunappel", "/candidature"], ["wavacademy/appel", "/candidature?offre=academy"]]) {
+  for (const [from, to] of [["preuves", "/temoignages"], ["reserverunappel", "/candidature"], ["wavacademy/appel", "/wavacademy"]]) {
     assert.ok((await page(from)).includes(`url=${to}"`), `${from} doit rediriger vers ${to}`);
   }
 });
@@ -23,7 +23,8 @@ test("gamme publique cohérente : prix du catalogue, lancement annoncé, aucune 
   assert.match(academy, /749 €/);
   assert.match(academy, /Prix de lancement jusqu'au 31\/12\/2026, puis 990 €/);
   assert.match(academy, /à vie/);
-  assert.match(academy, /Un cadre, un collectif et Fred à tes côtés/);
+  assert.match(academy, /Sais quoi améliorer dans tes prochaines vidéos/);
+  assert.match(await page("wavacademy"), /https:\/\/calendar\.app\.google\/iMhgVmjSyHJjdBxd8/);
   assert.doesNotMatch(academy, /(?:299|499|899)\s*€|six mois|crédits WavStats au démarrage/);
   const premium = await text("wav-premium");
   assert.match(premium, /Dès 1 499 €/);

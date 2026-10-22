@@ -272,8 +272,8 @@ const ROUTES: RouteSeo[] = [
     title: "Wav Academy : accompagnement collectif à vie | Fred Wav",
     description: `Accompagnement collectif à vie sur TikTok, Instagram et YouTube : Discord en semaine, deux lives par semaine, tous les cours. ${priceLabel(academy)} TTC en paiement unique.`,
     noscript: {
-      h1: "Progresse dans la durée, avec un cadre et un groupe, sans y passer ta vie",
-      body: `Accompagnement collectif à vie, tant que la Wav Academy existe : deux lives par semaine ${ACADEMY_LIVE_SLOT}, Discord ${ACADEMY_SUPPORT_DAYS}, ${ACADEMY_MODULES_COUNT} modules, ${ACADEMY_GUIDES_COUNT} guides et une stratégie construite avec le collectif. ${academyPrice}. ${academy.capacityPerMonth} nouveaux membres par mois pour progresser plus vite, entouré.`,
+      h1: "Sais quoi améliorer dans tes prochaines vidéos.",
+      body: `Accompagnement collectif à vie, tant que la Wav Academy existe : deux lives par semaine ${ACADEMY_LIVE_SLOT}, Discord ${ACADEMY_SUPPORT_DAYS}, ${ACADEMY_MODULES_COUNT} modules, ${ACADEMY_GUIDES_COUNT} guides et une stratégie construite avec le collectif. ${academyPrice}. Réserve un appel de 30 minutes, en audio ou en visio selon disponibilité, pour parler de ton inscription. Sans engagement.`,
       links: [{ href: "/wavacademy", label: "Voir la Wav Academy" }, { href: "/accompagnements", label: "Comparer les accompagnements" }],
     },
     schema: [
@@ -883,7 +883,7 @@ const redirectDefinitions: [string, string, 307 | 308][] = [
   ["/offres", "/accompagnements", 308],
   ["/preuves", "/temoignages", 308],
   ["/reserverunappel", "/candidature", 308],
-  ["/wavacademy/appel", "/candidature?offre=academy", 308],
+  ["/wavacademy/appel", "/wavacademy", 308],
   ["/wav-premium/candidature", "/candidature?offre=premium", 308],
   ["/45-jours", "/accompagnements", 308],
   ["/offres/45-jours", "/accompagnements", 308],

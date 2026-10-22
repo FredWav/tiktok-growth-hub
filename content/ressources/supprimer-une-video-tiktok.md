@@ -4,9 +4,9 @@ titre_seo: Supprimer une vidéo TikTok : bonne ou mauvaise idée ? | Fred Wav
 description: Supprimer une vidéo qui a fait peu de vues ne relance pas ton compte. Voici pourquoi je conseille de la mettre en privé, et dans quels cas faire autrement.
 introduction: La tentation est forte d'effacer une vidéo qui a fait 200 vues. Je conseille presque toujours de la mettre en privé à la place.
 theme: probleme-vues-tiktok
-date: 2026-10-22
-mise_a_jour: 2026-10-22
-statut: brouillon
+date: 2026-10-28
+mise_a_jour: 2026-10-28
+statut: publie
 note_de_fred: Quand un client veut nettoyer son compte, je lui fais passer en privé les vidéos hors de sa thématique. Son profil redevient cohérent, et il garde toutes les statistiques pour comparer.
 redige_avec_ia: true
 liens:

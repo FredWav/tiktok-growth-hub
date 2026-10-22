@@ -4,9 +4,9 @@ titre_seo: Mots interdits TikTok : sous-titres et censure | Fred Wav
 description: Certains mots peuvent réduire la diffusion d'une vidéo TikTok. Voici comment la modération fonctionne et comment adapter tes sous-titres sans changer ce que tu dis.
 introduction: Il n'existe pas de liste officielle et complète des mots interdits sur TikTok. La modération dépend du contexte, et c'est surtout dans tes sous-titres qu'il faut faire attention.
 theme: probleme-vues-tiktok
-date: 2026-10-22
-mise_a_jour: 2026-10-22
-statut: brouillon
+date: 2026-10-29
+mise_a_jour: 2026-10-29
+statut: publie
 note_de_fred: Je dis à mes élèves de garder leur façon de parler à l'oral et de corriger les sous-titres. Un « connard » devient un « canard » à l'écran, la vidéo garde son ton et la modération ne bloque pas.
 redige_avec_ia: true
 liens:

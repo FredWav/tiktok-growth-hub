@@ -4,9 +4,9 @@ titre_seo: Sources de trafic TikTok : les lire et les utiliser | Fred Wav
 description: Pour toi, profil, abonnés, recherche : ce que chaque source de trafic TikTok te dit sur ta vidéo, et les repères pour savoir si ta diffusion est freinée.
 introduction: Les sources de trafic disent d'où viennent les vues de ta vidéo. C'est le moyen le plus rapide de savoir si TikTok la pousse ou s'il la freine.
 theme: analyser-stats-tiktok
-date: 2026-10-22
-mise_a_jour: 2026-10-22
-statut: brouillon
+date: 2026-10-26
+mise_a_jour: 2026-10-26
+statut: publie
 note_de_fred: Sur une vidéo d'un client cinéma, 87 % des vues venaient du Pour toi, 11 % de la recherche et moins de 1 % du profil. La recherche, que personne ne regarde, lui apportait plus d'une vue sur dix.
 redige_avec_ia: true
 liens:

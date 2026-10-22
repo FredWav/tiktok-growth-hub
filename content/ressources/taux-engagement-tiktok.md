@@ -4,9 +4,9 @@ titre_seo: Taux d'engagement TikTok : calcul et repères | Fred Wav
 description: Comment calculer ton taux d'engagement sur TikTok, quelles interactions comptent vraiment pour l'algorithme, et comment faire monter les plus importantes.
 introduction: Le taux d'engagement se calcule en une ligne. Le plus utile, c'est de savoir quelles interactions regarder en premier, parce qu'elles ne pèsent pas toutes pareil.
 theme: analyser-stats-tiktok
-date: 2026-10-22
-mise_a_jour: 2026-10-22
-statut: brouillon
+date: 2026-10-24
+mise_a_jour: 2026-10-24
+statut: publie
 note_de_fred: J'ai analysé un compte à 2 % d'engagement. Une bonne partie des likes venait de proches qui likaient sans regarder la vidéo. Ça gonflait les likes et ça faisait baisser le temps de visionnage, donc la diffusion.
 redige_avec_ia: true
 liens:

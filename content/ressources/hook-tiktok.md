@@ -4,9 +4,9 @@ titre_seo: Hook TikTok : 7 structures qui marchent | Fred Wav
 description: Le hook décide en 2 à 3 secondes si on regarde ta vidéo. Voici les 7 structures que j'utilise en coaching, avec des exemples à adapter à ton sujet.
 introduction: Tu as 2 à 3 secondes pour qu'on arrête de scroller. Voici comment je construis un hook avec mes clients, et les structures qui reviennent le plus souvent dans les vidéos qui décollent.
 theme: creer-videos-tiktok
-date: 2026-10-22
-mise_a_jour: 2026-10-22
-statut: brouillon
+date: 2026-10-23
+mise_a_jour: 2026-10-23
+statut: publie
 note_de_fred: Un jeune créateur avait une vidéo à 900 vues. Il l'a republiée avec une nouvelle phrase d'accroche, rien d'autre de changé, et elle a fait 48 900 vues. Une seule phrase peut niquer toute une vidéo, et une seule phrase peut aussi la sauver.
 redige_avec_ia: true
 liens:

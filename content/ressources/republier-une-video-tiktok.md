@@ -4,9 +4,9 @@ titre_seo: Republier une vidéo TikTok : la bonne méthode | Fred Wav
 description: Une vidéo qui a fait peu de vues mérite souvent une deuxième chance. Voici quand la republier, ce qu'il faut changer, et pourquoi ne changer qu'une seule chose.
 introduction: Republier une vidéo n'a rien de honteux. C'est même un des tests les plus efficaces, à condition de corriger le bon défaut.
 theme: probleme-vues-tiktok
-date: 2026-10-22
-mise_a_jour: 2026-10-22
-statut: brouillon
+date: 2026-10-27
+mise_a_jour: 2026-10-27
+statut: publie
 note_de_fred: Une vidéo d'un de mes élèves stagnait à 900 vues. Il a seulement changé la phrase d'accroche et l'a republiée : 48 900 vues. Même sujet, même tournage.
 redige_avec_ia: true
 liens:

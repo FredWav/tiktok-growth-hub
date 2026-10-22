@@ -4,9 +4,9 @@ titre_seo: Vidéo TikTok bloquée à 200 vues : les causes | Fred Wav
 description: Ta vidéo plafonne à 200 ou 300 vues ? Ce n'est presque jamais un shadowban. Voici comment trouver la cause en quelques minutes et relancer ta diffusion.
 introduction: Une vidéo qui reste à 200 vues a été testée sur un petit groupe, et ce groupe n'a pas accroché. La bonne nouvelle, c'est que la raison se voit souvent dans la vidéo elle-même.
 theme: probleme-vues-tiktok
-date: 2026-10-22
-mise_a_jour: 2026-10-22
-statut: brouillon
+date: 2026-10-25
+mise_a_jour: 2026-10-25
+statut: publie
 note_de_fred: En live, une créatrice m'a montré une vidéo bloquée à 200 vues après 24 heures. Le cadre était vide, son ouvrage tout petit au milieu, le fond plus lumineux que le sujet, et le rythme lent. On a revu le cadrage et la lumière, elle l'a refaite.
 redige_avec_ia: true
 liens:

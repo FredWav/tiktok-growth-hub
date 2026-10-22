@@ -4,9 +4,9 @@ titre_seo: Durée idéale d'une vidéo TikTok en 2026 | Fred Wav
 description: 15 secondes, 1 minute, 3 minutes ? Voici les vues médianes par durée sur 1,3 million de vidéos, et comment choisir la bonne durée pour ton sujet.
 introduction: Les vidéos très courtes ont longtemps été la règle sur TikTok. Les chiffres racontent autre chose aujourd'hui, et la bonne durée reste celle que ton sujet justifie.
 theme: creer-videos-tiktok
-date: 2026-10-22
-mise_a_jour: 2026-10-22
-statut: brouillon
+date: 2026-10-30
+mise_a_jour: 2026-10-30
+statut: publie
 note_de_fred: Je ne demande jamais à un élève de viser une durée. Je lui demande de couper tout ce qui n'apporte rien, et la vidéo prend la durée de sa matière.
 redige_avec_ia: true
 liens:

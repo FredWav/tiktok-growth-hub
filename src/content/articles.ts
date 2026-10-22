@@ -62,8 +62,18 @@ checkArticles(parsed, new Set([
   ...LEGACY_RESOURCES.map((r) => r.path),
 ]));
 
+/**
+ * Publication programmée : un article « publie » dont la date est future n'apparaît qu'à
+ * partir de ce jour (heure de Paris). Le site est reconstruit chaque matin
+ * (.github/workflows/publication-quotidienne.yml) ; en local, tout reste visible.
+ */
+const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(new Date());
+const visible = parsed.filter((a) => a.published <= today || import.meta.env.DEV);
+const visibleSlugs = new Set(visible.map((a) => a.slug));
+for (const a of visible) a.related = a.related.filter((slug) => visibleSlugs.has(slug) || !parsed.some((p) => p.slug === slug));
+
 /** Articles publiés (et brouillons en local), du plus récent au plus ancien. */
-export const ARTICLES: Article[] = parsed.sort((a, b) => b.published.localeCompare(a.published) || a.slug.localeCompare(b.slug));
+export const ARTICLES: Article[] = visible.sort((a, b) => b.published.localeCompare(a.published) || a.slug.localeCompare(b.slug));
 export const ARTICLE_BY_PATH: Record<string, Article> = Object.fromEntries(ARTICLES.map((a) => [a.path, a]));
 
 /** Toutes les ressources d'un thème : articles Markdown et guides historiques. */

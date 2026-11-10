@@ -1,10 +1,9 @@
 import type Stripe from "https://esm.sh/stripe@18.5.0?target=deno";
-import { deliverMail, logUnmatchedPayment } from "../_shared/commerce.ts";
+import { deliverMail } from "../_shared/commerce.ts";
 import {
   buildHooksEmail,
-  hasHooksConsent,
-  HOOKS_CHECKOUT_CONSENT,
-  HOOKS_CONSENT_VERSION,
+  HOOKS_BUCKET,
+  HOOKS_LINK_TTL_SECONDS,
   hooksPackFor,
   type HooksPack,
 } from "../_shared/hooks-delivery.ts";
@@ -26,8 +25,9 @@ async function resolveHooksPack(stripe: Stripe, session: Stripe.Checkout.Session
 }
 
 /**
- * Archive l'accord de la session payée et envoie sa confirmation sur support durable.
- * Les fichiers sont remis par hooks-download, après l'envoi de cette confirmation.
+ * Met en file l'email de livraison (liens signés + rappel de la renonciation, qui vaut
+ * confirmation sur support durable). En cas d'échec on répond 500 : Stripe renvoie
+ * l'événement, et la dedupe_key évite tout doublon d'email.
  */
 async function deliverHooksPack(
   supabase: any,
@@ -46,64 +46,40 @@ async function deliverHooksPack(
   const email = session.customer_details?.email;
   try {
     if (!email) throw new Error("email client absent de la session");
-    const mailKey = `hooks:${session.id}`;
-    const { data: previous, error: previousError } = await supabase.from("commerce_mail")
-      .select("state").eq("dedupe_key", mailKey).maybeSingle();
-    if (previousError) throw previousError;
-    if (previous?.state === "sent") {
-      return jsonResponse({ received: true, product: pack.code, fulfilment: "already_sent" });
+    const links: { label: string; url: string }[] = [];
+    for (const file of pack.files) {
+      const { data, error } = await supabase.storage.from(HOOKS_BUCKET)
+        .createSignedUrl(file.path, HOOKS_LINK_TTL_SECONDS, { download: true });
+      if (error || !data?.signedUrl) {
+        throw new Error(`fichier ${HOOKS_BUCKET}/${file.path} : ${error ? getErrorMessage(error) : "introuvable"}`);
+      }
+      links.push({ label: file.label, url: data.signedUrl });
     }
 
-    if (!hasHooksConsent(session)) {
-      await logUnmatchedPayment(supabase, {
-        session_id: session.id,
-        reason: `hooks_consent_review:${pack.code}`,
-        amount_cents: session.amount_total,
-        currency: session.currency,
-        email,
-        received_at: new Date(eventCreated * 1000).toISOString(),
-      });
-      await safeNotifyError(
-        "Livraison hooks suspendue",
-        `Accord non vérifiable • ${pack.name} • ${email} • session=${session.id}. Vérifier le Checkout et traiter la commande.`,
-      );
-      return jsonResponse({ received: true, product: pack.code, fulfilment: "consent_review" });
-    }
-
-    const { error: orderError } = await supabase.from("hooks_orders").upsert({
-      stripe_session_id: session.id,
-      pack_code: pack.code,
-      email,
-      paid_at: new Date(eventCreated * 1000).toISOString(),
-      consent_version: HOOKS_CONSENT_VERSION,
-      checkout_consent_text: HOOKS_CHECKOUT_CONSENT,
-    }, { onConflict: "stripe_session_id", ignoreDuplicates: true });
-    if (orderError) throw orderError;
-    const { data: order, error: lookupError } = await supabase.from("hooks_orders")
-      .select("access_token,paid_at").eq("stripe_session_id", session.id).single();
-    if (lookupError) throw lookupError;
-
-    const siteUrl = (Deno.env.get("SITE_URL") || "https://fredwav.com").replace(/\/$/, "");
-    const accessUrl = `${siteUrl}/claim/hooks#${order.access_token}`;
+    const consentAccepted = session.consent?.terms_of_service === "accepted";
     const { subject, html } = buildHooksEmail({
       pack,
-      accessUrl,
+      links,
       customerName: session.customer_details?.name,
       amountCents: session.amount_total,
       currency: session.currency,
       sessionId: session.id,
-      paidAt: new Date(order.paid_at),
-      siteUrl,
+      paidAt: new Date(eventCreated * 1000),
+      consentAccepted,
+      siteUrl: Deno.env.get("SITE_URL") || "https://fredwav.com",
     });
 
     // Pas enqueue() : il ignore une file absente, et le client ne recevrait rien.
     const { data: queued, error: mailError } = await supabase.from("commerce_mail").upsert(
-      { dedupe_key: mailKey, recipient: email, subject, body: html },
+      { dedupe_key: `hooks:${session.id}`, recipient: email, subject, body: html },
       { onConflict: "dedupe_key", ignoreDuplicates: true },
     ).select("id");
     if (mailError) throw mailError;
 
     if (queued?.length) {
+      if (!consentAccepted) {
+        await safeNotifyError("Livraison hooks", `Renonciation absente • session=${session.id} • vérifier le Payment Link`);
+      }
       await safeNotifySuccess("Vente hooks", `${pack.name} • ${email} • session=${session.id}`);
     }
     // Envoi immédiat (sinon le mail attend le passage automatique de 5 min).

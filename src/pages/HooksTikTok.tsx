@@ -291,7 +291,7 @@ export default function HooksTikTok() {
 
         <p className="max-w-3xl mx-auto mt-8 text-center text-sm text-muted-foreground">
           Paiement sécurisé par Stripe. Fichiers envoyés par email dès le paiement validé, liens valables 1 an.
-          Produit numérique : tu reçois par email un lien vers tes fichiers. En cochant la case au paiement, tu demandes à pouvoir les télécharger immédiatement et tu reconnais perdre ton droit de rétractation au début du premier téléchargement
+          Produit numérique à livraison immédiate : en validant la case au paiement, tu demandes l'envoi immédiat et tu renonces à ton droit de rétractation dès l'envoi de l'email de livraison
           (<Link to="/cgv" className="underline">article 9.4 des CGV</Link>).
         </p>
       </Section>

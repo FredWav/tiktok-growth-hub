@@ -5,7 +5,6 @@ import { seoFor } from "@/config/seo";
 import { ACADEMY_LIVE_SLOT, ACADEMY_SUPPORT_DAYS, LAUNCH_END_LABEL } from "@/config/offers";
 import { Link } from "react-router-dom";
 import { VERSION, VERSION_LABEL } from "../../supabase/functions/_shared/consent-texts.ts";
-import { HOOKS_CONSENT_TEXT, HOOKS_CONSENT_VERSION } from "../../supabase/functions/_shared/hooks-delivery.ts";
 
 export default function CGV() {
   return (
@@ -162,7 +161,7 @@ export default function CGV() {
             <strong>Prestations à livraison numérique immédiate (Analyse vidéo, Analyse Express) :</strong> le rapport et les contenus délivrés sont définitivement dus dès leur mise à disposition lorsque le Client a expressément demandé l'exécution immédiate et préalablement reconnu la perte de son droit de rétractation dans les conditions de l'article 9.2.
           </p>
           <p className="text-muted-foreground mb-4">
-            <strong>Packs de hooks :</strong> la perte du droit de rétractation intervient au début du premier téléchargement, dans les conditions de l'article 9.4. Les garanties légales et les recours en cas de défaut de livraison restent applicables.
+            <strong>Packs de hooks :</strong> les fichiers sont définitivement dus dès l'envoi de l'email automatique de livraison, dans les conditions de l'article 9.4. Aucun remboursement, total ou partiel, n'est accordé après cet envoi, sauf manquement du Vendeur ou fichiers non conformes.
           </p>
           <p className="text-muted-foreground mb-4">
             La présente clause ne s'applique pas lorsque l'interruption résulte d'un manquement du Vendeur à ses obligations. Dans ce cas, les dispositions de l'Article 10 s'appliquent.
@@ -228,15 +227,15 @@ export default function CGV() {
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">9.4 Contenu numérique livré immédiatement (Packs de hooks)</h3>
           <p className="text-muted-foreground mb-2">
-            Les Packs de hooks sont des contenus numériques non fournis sur support matériel. Après paiement, le Client reçoit par email un lien personnel vers ses fichiers. Avant de payer, le Client coche une case non précochée par laquelle il :
+            Les Packs de hooks sont des contenus numériques non fournis sur support matériel, livrés automatiquement par email dès la confirmation du paiement. Avant le paiement, le Client coche une case distincte, non précochée, par laquelle il :
           </p>
           <ul className="text-muted-foreground mb-4 space-y-1">
             <li>accepte les présentes CGV ;</li>
-            <li>demande expressément à pouvoir télécharger le pack avant la fin du délai légal de 14 jours ;</li>
-            <li>reconnaît qu’il perdra son droit de rétractation dès qu’il lancera le premier téléchargement.</li>
+            <li>demande expressément l'envoi immédiat des fichiers avant la fin du délai de 14 jours ;</li>
+            <li>renonce expressément à son droit de rétractation dès cet envoi.</li>
           </ul>
           <p className="text-muted-foreground mb-4">
-            Conformément aux articles L221-28, 13°, et L221-13 du Code de la consommation, le droit de rétractation prend fin <strong>au début du premier téléchargement lancé par le Client</strong>, si le Client a donné son accord exprès et a reçu sa confirmation sur support durable. L’ouverture de l’email ou de la page d’accès laisse le droit de rétractation applicable pendant le délai légal. L’email de confirmation contient le récapitulatif de la commande et le texte versionné de l’accord (version {HOOKS_CONSENT_VERSION}). La date du premier téléchargement est enregistrée avec la référence de la commande.
+            Conformément à l'article L221-28, 13° du Code de la consommation, <strong>aucune rétractation n'est possible dès l'envoi de l'email automatique de livraison</strong> contenant les liens de téléchargement : la commande est alors définitivement due, qu'elle soit ou non téléchargée. Le texte exact accepté, sa version, l'horodatage et la référence de paiement sont récapitulés dans cet email, qui vaut support durable. Si, pour une raison technique, aucun email de livraison n'a été envoyé, le droit de rétractation reste entier et le Client est remboursé ou livré à son choix.
           </p>
 
           <h3 className="font-display text-lg font-medium mt-4 mb-2">9.5 Confirmation sur support durable</h3>
@@ -359,7 +358,7 @@ export default function CGV() {
             <p>☐ (One Shot, Wav Premium) Je demande expressément l'exécution de la prestation avant la fin du délai légal de rétractation de 14 jours. En cas de rétractation après le début de l'exécution, je resterai redevable du montant proportionné au service effectivement fourni ; si la prestation est pleinement exécutée, je reconnais perdre mon droit de rétractation.</p>
             <p>☐ (Analyse vidéo, Analyse Express) Je demande expressément l'exécution immédiate de l'analyse avant la fin du délai de 14 jours et je reconnais perdre mon droit de rétractation lorsque la prestation est pleinement exécutée et le rapport mis à disposition.</p>
             <p>☐ (Wav Academy) Je demande l’exécution du service et l’accès au contenu numérique à la date convenue avant l'expiration du délai de rétractation de 14 jours. Je reconnais que pour le contenu numérique, je perds mon droit de rétractation dès l'accès ; pour la partie service, en cas de rétractation, je reste redevable du prix au prorata du service déjà fourni.</p>
-            <p>☐ (Packs de hooks) {HOOKS_CONSENT_TEXT}</p>
+            <p>☐ (Packs de hooks) J'accepte les CGV. Je demande l'envoi immédiat des fichiers par email, avant la fin du délai de rétractation de 14 jours, et je renonce expressément à mon droit de rétractation dès cet envoi.</p>
           </div>
         </div>
       </Section>

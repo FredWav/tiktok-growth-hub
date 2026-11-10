@@ -857,6 +857,7 @@ const csrManifest: CsrRouteManifestEntry[] = ([
   { path: "/analyse-video/merci", title: "Commande confirmée | Fred Wav" },
   { path: "/analyse-video/rapport", title: "Ton analyse vidéo | Fred Wav", private: true },
   { path: "/claim/error", title: "Accès personnel | Fred Wav" },
+  { path: "/claim/hooks", title: "Téléchargement de ton pack de hooks | Fred Wav", private: true },
   { path: "/claim/:token", title: "Accès personnel | Fred Wav" },
   { path: "/go/:slug", title: "Redirection | Fred Wav" },
   { path: "/retractation", title: "Formulaire de rétractation | Fred Wav" },

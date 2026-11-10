@@ -74,6 +74,7 @@ const RessourceStatistiquesTikTok = lazy(() => import("./pages/RessourceStatisti
 const RessourceVuesTikTok = lazy(() => import("./pages/RessourceVuesTikTok"));
 const RessourceRetentionTikTok = lazy(() => import("./pages/RessourceRetentionTikTok"));
 const Retractation = lazy(() => import("./pages/Retractation"));
+const HooksDownload = lazy(() => import("./pages/HooksDownload"));
 
 const AdminSettings = lazy(() => import("./pages/admin/Settings"));
 const AdminOverview = lazy(() => import("./pages/admin/Overview"));
@@ -150,6 +151,7 @@ const CSR_ROUTE_ELEMENTS: Record<string, ReactNode> = {
   "/analyse-video/merci": <AnalyseVideoMerci />,
   "/analyse-video/rapport": <AnalyseVideoRapport />,
   "/claim/error": <Claim />,
+  "/claim/hooks": <HooksDownload />,
   "/claim/:token": <Claim />,
   "/go/:slug": <GoRedirect />,
   "/retractation": <Retractation />,

@@ -3,23 +3,31 @@
  *
  * Les liens portent metadata.produit (hooks_100, hooks_250, hooks_500, hooks_850),
  * recopiée par Stripe sur la Checkout Session. Les fichiers sont dans le bucket
- * privé HOOKS_BUCKET ; le webhook génère des liens signés et met l'email en file.
+ * privé HOOKS_BUCKET. L'email donne accès à une page de commande, qui remet les
+ * fichiers sur action du client et conserve la date du premier téléchargement.
  *
  * Module sans import Deno/npm : testable depuis Node (tests/hooks-delivery.test.mjs).
  */
 
 export const HOOKS_BUCKET = "hooks-packs";
-/** Durée des liens de téléchargement envoyés au client : 1 an. */
-export const HOOKS_LINK_TTL_SECONDS = 365 * 24 * 60 * 60;
-
-/**
- * Texte exact de la case à cocher des Payment Links (sans le lien markdown).
- * Doit rester identique au texte de livrables/stripe-liens-hooks.ps1 : changer l'un
- * impose de changer l'autre et d'incrémenter la version.
- */
-export const HOOKS_CONSENT_VERSION = "2026-09-23";
+export const HOOKS_CONSENT_VERSION = "2026-11-10";
 export const HOOKS_CONSENT_TEXT =
-  "J'accepte les CGV. Je demande l'envoi immédiat des fichiers par email, avant la fin du délai de rétractation de 14 jours, et je renonce expressément à mon droit de rétractation dès cet envoi.";
+  "J’accepte les CGV. Je demande expressément à pouvoir télécharger mon pack avant la fin du délai légal de 14 jours. Je reconnais que je perdrai mon droit de rétractation dès que je lancerai le premier téléchargement.";
+export const HOOKS_CHECKOUT_CONSENT = HOOKS_CONSENT_TEXT.replace(
+  "les CGV",
+  "les [CGV](https://fredwav.com/cgv)",
+);
+
+/** La session conserve le texte présenté à l'acheteur, même si le lien a changé depuis. */
+export function hasHooksConsent(session: {
+  consent?: { terms_of_service?: string | null } | null;
+  consent_collection?: { terms_of_service?: string | null } | null;
+  custom_text?: { terms_of_service_acceptance?: { message: string } | null } | null;
+}): boolean {
+  return session.consent?.terms_of_service === "accepted" &&
+    session.consent_collection?.terms_of_service === "required" &&
+    session.custom_text?.terms_of_service_acceptance?.message === HOOKS_CHECKOUT_CONSENT;
+}
 
 export type HooksFile = { label: string; path: string };
 export type HooksPack = { code: HooksPackCode; name: string; files: HooksFile[] };
@@ -44,7 +52,9 @@ export const HOOKS_PACKS: Record<HooksPackCode, HooksPack> = {
 
 export function hooksPackFor(metadata: Record<string, string> | null | undefined): HooksPack | null {
   const code = metadata?.produit;
-  return code && Object.hasOwn(HOOKS_PACKS, code) ? HOOKS_PACKS[code as HooksPackCode] : null;
+  return code && Object.prototype.hasOwnProperty.call(HOOKS_PACKS, code)
+    ? HOOKS_PACKS[code as HooksPackCode]
+    : null;
 }
 
 const esc = (value: string) =>
@@ -52,13 +62,12 @@ const esc = (value: string) =>
 
 export function buildHooksEmail(input: {
   pack: HooksPack;
-  links: { label: string; url: string }[];
+  accessUrl: string;
   customerName?: string | null;
   amountCents: number | null;
   currency: string | null;
   sessionId: string;
   paidAt: Date;
-  consentAccepted: boolean;
   siteUrl: string;
 }): { subject: string; html: string } {
   const firstName = input.customerName?.trim().split(/\s+/)[0];
@@ -69,17 +78,14 @@ export function buildHooksEmail(input: {
   const paidAt = new Intl.DateTimeFormat("fr-FR", { dateStyle: "long", timeStyle: "short", timeZone: "Europe/Paris" })
     .format(input.paidAt);
   const p = (html: string) => `<p style="margin:0 0 14px;line-height:1.6">${html}</p>`;
-  const button = (l: { label: string; url: string }) =>
-    `<tr><td style="padding:0 0 10px"><a href="${esc(l.url)}" style="display:block;background:#D9B53F;color:#0F0F0F;text-decoration:none;font-weight:bold;padding:14px 18px;border-radius:6px">Télécharger : ${esc(l.label)}</a></td></tr>`;
   const row = (k: string, v: string) =>
     `<tr><td style="padding:6px 12px 6px 0;color:#6B6B6B;vertical-align:top;white-space:nowrap">${k}</td><td style="padding:6px 0">${v}</td></tr>`;
 
   const html = `<div style="font-family:Arial,sans-serif;color:#0F0F0F;max-width:600px;margin:0 auto;padding:24px">
 ${p(firstName ? `Salut ${esc(firstName)},` : "Salut,")}
-${p(`Merci pour ton achat. Voici tes fichiers : <strong>${esc(input.pack.name)}</strong>.`)}
-<table role="presentation" style="width:100%;border-collapse:collapse;margin:8px 0 16px">${input.links.map(button).join("")}</table>
-${p("Les liens restent valables 1 an. Télécharge tes fichiers maintenant et garde-les.")}
-${p("Un conseil pour bien t'en servir : prends la structure, pas les mots. Remplace les [CASES] par ta niche.")}
+${p(`Merci pour ton achat. Tes fichiers sont prêts : <strong>${esc(input.pack.name)}</strong>.`)}
+${p(`<a href="${esc(input.accessUrl)}" style="display:inline-block;background:#D9B53F;color:#0F0F0F;font-weight:bold;padding:14px 18px;border-radius:6px">Accéder à mes fichiers</a>`)}
+${p("Garde ce lien personnel. Il te permet de récupérer tes fichiers pendant un an. Ouvrir la page d’accès te permet de consulter la liste des fichiers. Ton accord s’applique à partir du premier téléchargement.")}
 ${p("Fred")}
 <hr style="border:none;border-top:1px solid #E6E6E6;margin:24px 0">
 <p style="margin:0 0 10px;font-weight:bold">Récapitulatif de ta commande</p>
@@ -89,11 +95,14 @@ ${row("Montant payé", esc(amount))}
 ${row("Date", esc(paidAt))}
 ${row("Référence", esc(input.sessionId))}
 </table>
-${input.consentAccepted
-    ? `<p style="margin:16px 0 6px;font-size:14px">Ton accord, donné au moment du paiement (version ${HOOKS_CONSENT_VERSION}) :</p>
-<p style="margin:0 0 14px;font-size:14px;padding:10px 14px;background:#F9F8F5;border-left:3px solid #D9B53F">« ${esc(HOOKS_CONSENT_TEXT)} »</p>`
-    : ""}
-<p style="margin:0;font-size:13px;color:#6B6B6B">CGV : <a href="${esc(input.siteUrl)}/cgv" style="color:#92721C">${esc(input.siteUrl)}/cgv</a> · Rétractation : <a href="${esc(input.siteUrl)}/retractation" style="color:#92721C">${esc(input.siteUrl)}/retractation</a> · Une question : contact@fredwav.com</p>
+${p(`Ton accord au paiement (version ${HOOKS_CONSENT_VERSION}) : « ${esc(HOOKS_CONSENT_TEXT)} »`)}
+<h2 style="font-size:16px">Conditions de ton achat</h2>
+${p("Vendeur et assistance : Frédéric Olalde, entrepreneur individuel (Fred Wav), SIRET 921 749 727 00019, 2 route de Malagué, 86270 Coussay-les-Bois, France. Contact : contact@fredwav.com.")}
+${p("Paiement unique. Le prix total payé figure ci-dessus. Le pack contient des fichiers PDF et XLSX, accessibles par internet via le lien personnel. Un lecteur PDF et un tableur compatible XLSX permettent de les ouvrir. Tu peux conserver les fichiers téléchargés. Leur utilisation est personnelle. Le partage, la revente et la rediffusion sont interdits. Les structures sont à adapter à tes contenus. Aucun résultat d’audience ou de revenus n’est garanti.")}
+${p(`Tu disposes de 14 jours à compter de la commande pour te rétracter. Si tu lances le premier téléchargement pendant ce délai après ton accord confirmé dans cet email, tu perds ce droit. Tant qu’il s’applique, tu peux utiliser le <a href="${esc(input.siteUrl)}/retractation">formulaire de rétractation</a> ou écrire à contact@fredwav.com. En cas de rétractation valable, le remboursement intervient dans les 14 jours suivant la notification, par le moyen de paiement utilisé, sauf accord contraire.`)}
+${p("Modèle à compléter et à adresser au vendeur : « Je vous notifie ma rétractation du contrat portant sur le pack ___, commandé le ___, référence ___. Nom et adresse : ___. Date : ___. Signature si le formulaire est envoyé sur papier. »")}
+${p("La garantie légale de conformité des contenus numériques et, le cas échéant, celle des vices cachés restent applicables. Contacte le vendeur si un fichier est manquant ou non conforme. Si une réclamation écrite reste sans solution, tu peux saisir SAS Médiation Solution Conso, 222 chemin de la Bergerie, 01800 Saint Jean de Niost, contact@sasmediationsolution-conso.fr.")}
+${p(`<a href="${esc(input.siteUrl)}/cgv">Conditions générales de vente</a>`)}
 </div>`;
 
   return { subject: `Tes hooks sont prêts : ${input.pack.name}`, html };
